@@ -38,12 +38,14 @@ struct SurfaceView: View {
     var readingID: String?
     var onChange: ((Block) -> Void)?
     var onExplore: ((String) -> Void)?
+    /// A different answer to one of the questions asked before building.
+    var onAnswer: ((Answer, String) -> Void)?
 
     var body: some View {
         let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values), state: state, focusedID: focusedID, onChange: onChange, readingID: readingID)
         let blocks = surface.displayBlocks
         VStack(alignment: .leading, spacing: 26) {
-            SurfaceHeader(surface: surface, stage: stage)
+            SurfaceHeader(surface: surface, stage: stage, onAnswer: onAnswer)
                 .readingMark(readingID == Narration.headerID, palette: surface.palette)
             SurfaceImage(photo: photo, url: surface.hasInformation ? surface.reference?.imageURL.flatMap { URL(string: $0) } : nil, palette: surface.palette)
             ForEach(blocks) { block in
@@ -65,6 +67,7 @@ struct SurfaceView: View {
 private struct SurfaceHeader: View {
     let surface: Surface
     let stage: String?
+    var onAnswer: ((Answer, String) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -81,6 +84,9 @@ private struct SurfaceHeader: View {
                     .font(.title3)
                     .lineSpacing(3)
                     .foregroundStyle(.secondary)
+            }
+            if let answers = surface.answers {
+                AnswerTags(answers: answers, palette: surface.palette, onChange: onAnswer)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -113,16 +119,20 @@ struct StageMark: View {
     }
 }
 
-/// While nothing's arrived: the request itself, and shapes where the surface will land.
+/// While nothing's arrived: the request itself, and shapes where the surface will land. If the
+/// model has questions first, they take the shapes' place until they're answered.
 struct FormingView: View {
     let intent: String
     let stage: String?
     let palette: Palette
+    var asking: Asking?
 
     var body: some View {
+        let isAsking = asking?.isWaiting ?? false
         VStack(alignment: .leading, spacing: 22) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
-                if let stage {
+                // Waiting on the user isn't working.
+                if let stage, !isAsking {
                     StageMark(symbol: stage, palette: palette)
                 }
                 Text(intent)
@@ -131,18 +141,26 @@ struct FormingView: View {
                     .lineLimit(4)
             }
             .padding(.top, 12)
-            VStack(alignment: .leading, spacing: 12) {
-                Capsule().frame(height: 14).frame(maxWidth: .infinity)
-                Capsule().frame(width: 220, height: 14)
+            if let asking, asking.isWaiting || !asking.answers.isEmpty {
+                AskingView(asking: asking, palette: palette)
             }
-            .foregroundStyle(palette.wash)
-            .shimmering()
-            RoundedRectangle(cornerRadius: 28)
-                .fill(palette.wash)
-                .frame(height: 160)
+            if !isAsking {
+                VStack(alignment: .leading, spacing: 12) {
+                    Capsule().frame(height: 14).frame(maxWidth: .infinity)
+                    Capsule().frame(width: 220, height: 14)
+                }
+                .foregroundStyle(palette.wash)
                 .shimmering()
+                .transition(.opacity)
+                RoundedRectangle(cornerRadius: 28)
+                    .fill(palette.wash)
+                    .frame(height: 160)
+                    .shimmering()
+                    .transition(.opacity)
+            }
         }
-        .accessibilityElement(children: .combine)
+        .accessibilityElement(children: isAsking ? .contain : .combine)
+        .animation(.smooth(duration: 0.5), value: isAsking)
     }
 }
 

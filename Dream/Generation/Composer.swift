@@ -31,6 +31,8 @@ final class Composer {
     /// Working, but with nothing new on screen for a moment: reasoning, or looking something up.
     /// The screen shows it in the color field rather than in words.
     private(set) var isThinking = false
+    /// The model's questions before it builds, and the user's answers. The screen shows them while the model waits.
+    let asking = Asking()
 
     /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
     enum Provider: String, CaseIterable {
@@ -70,6 +72,7 @@ final class Composer {
         isThinking = true
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
+        asking.start()
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt {
@@ -95,6 +98,7 @@ final class Composer {
         isThinking = true
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
+        asking.start(keeping: current.answers)
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt(Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context))
@@ -137,7 +141,9 @@ final class Composer {
 
     /// The tools a surface is written with. Features that give the model a tool add it here.
     private func tools(found: ReferenceLog) -> [any Tool] {
-        [LookupTool(found: found, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } })]
+        [LookupTool(found: found, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
+         AskTool(asking: asking, onAsk: { [weak self] line in Task { @MainActor in self?.note(line) } }),
+         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
     }
 
     private func lookingUp(_ subject: String) {
@@ -166,13 +172,14 @@ final class Composer {
         }
         await surface.findRecordings()
         report(Checker.checkBlocks(&surface))
+        surface = surface.answered(asking.answers)
         self.surface = surface
         note(surface.outline)
     }
 
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
     private func generateSurface(in session: LanguageModelSession, prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
-        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.surface = Surface(partial: $0, reference: found.first ?? fallback) } : nil
+        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.surface = Surface(partial: $0, reference: found.first ?? fallback).answered(self.asking.answers) } : nil
         do {
             let wire = try await generate(WireSurface.self, in: session, step: "Surface", options: GenerationOptions(temperature: 0.4), prompt: prompt,
                                           onPartial: onPartial, isRunaway: { Surface(partial: $0, reference: nil).isRepeatingItself })
@@ -242,6 +249,8 @@ final class Composer {
         let watchdog = Task { @MainActor in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
+                // Waiting for the user to answer isn't a stall.
+                if self.asking.isWaiting { continue }
                 if !self.isThinking, Date.now.timeIntervalSince(watch.lastChange) > 1.5 { self.isThinking = true }
                 let latest = max(watch.lastChange, ModelActivity.lastSeen)
                 if Date.now.timeIntervalSince(latest) > patience {

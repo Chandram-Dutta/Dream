@@ -26,6 +26,8 @@ struct Surface: Codable, Hashable {
     var question: String?
     /// Tones and recordings that `sound` blocks play. Nil in surfaces saved before sounds existed.
     var sounds: [Sound]?
+    /// The questions asked before building it, with the user's answers. Nil when nothing was asked.
+    var answers: [Answer]?
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 

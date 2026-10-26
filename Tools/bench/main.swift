@@ -36,4 +36,12 @@ var remaining = Array(CommandLine.arguments.dropFirst())[...]
 while let argument = remaining.popFirst() {
     if argument.hasPrefix("-") { _ = remaining.popFirst() } else { arguments.append(argument) }
 }
+// The bench has no one to ask, so questions are printed and left to the model. "-memory
+// 'Home city=Pune; Diet=Vegetarian'" stands in for what the app remembers about the user.
+if let memory = UserDefaults.standard.string(forKey: "memory") {
+    Recall.source = .fixed(memory.split(separator: ";").compactMap { pair in
+        let parts = pair.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
+        return parts.count == 2 ? Remembered(topic: parts[0], detail: parts[1]) : nil
+    })
+}
 await run(arguments.isEmpty ? defaultRequests : arguments)
