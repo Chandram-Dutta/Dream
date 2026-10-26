@@ -43,7 +43,8 @@ export function capture(env: AnalyticsEnv, ctx: Pick<ExecutionContext, "waitUnti
     api_key: key,
     event,
     distinct_id: userID,
-    properties: { ...properties, source: "server" },
+    // Sent from Cloudflare, whose address says nothing about where the person is.
+    properties: { ...properties, source: "server", $geoip_disable: true },
     timestamp: new Date().toISOString(),
   });
   const sending = fetch(`${host}/i/v0/e/`, { method: "POST", headers: { "Content-Type": "application/json" }, body }).then(
