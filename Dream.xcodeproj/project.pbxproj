@@ -195,6 +195,7 @@
 				DEVELOPMENT_TEAM = DR99P625RR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = Dream;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dream listens when you tap the microphone, so you can ask out loud.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Dream turns what you say into text on your iPhone.";
@@ -225,6 +226,7 @@
 				DEVELOPMENT_TEAM = DR99P625RR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = Dream;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dream listens when you tap the microphone, so you can ask out loud.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Dream turns what you say into text on your iPhone.";
