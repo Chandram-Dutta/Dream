@@ -34,7 +34,8 @@ final class ConnectionStore {
     }()
 
     /// At launch: loads what's saved, connects it to building screens, and refreshes old tool lists.
-    func start(personalDetails: @escaping @Sendable () async -> [String]) {
+    /// `directory` is the server whose /api/mcp/ lists services to discover, if there is one.
+    func start(personalDetails: @escaping @Sendable () async -> [PersonalDetail], directory: URL?) {
         guard !started else { return }
         started = true
         load()
@@ -48,9 +49,55 @@ final class ConnectionStore {
                     throw ConnectionError.needsSignIn(connection.name)
                 }
             },
-            personalDetails: personalDetails)
+            personalDetails: personalDetails,
+            allowAlways: { id, tool in await ConnectionStore.shared.allowAlways(id, tool: tool) })
         Connections.registerLive()
+        directoryServer = directory
+        Connections.directory = Directory.saved
         Task { await refresh(olderThan: 24 * 60 * 60) }
+        Task { await refreshDirectory() }
+    }
+
+    // MARK: - Discovering
+
+    /// Where the directory comes from: Dream's sharing server.
+    private(set) var directoryServer: URL?
+    /// The featured services, as last fetched.
+    private(set) var featured: [DirectoryEntry] = Directory.saved
+
+    /// Fetches the featured services again, for discovery and for noticing them in requests.
+    func refreshDirectory() async {
+        guard let directoryServer, let fresh = try? await Directory.featured(from: directoryServer), !fresh.isEmpty else { return }
+        featured = fresh
+        Connections.directory = fresh
+        Directory.save(fresh)
+    }
+
+    /// The connection for a directory entry, if the user has it.
+    func connection(for entry: DirectoryEntry) -> Connection? {
+        connections.first { $0.url.host()?.lowercased() == entry.url.host()?.lowercased() && $0.url.path() == entry.url.path() }
+    }
+
+    /// Connects an entry in one go: adds it, and signs in if it asks. Returns the connection
+    /// once it's ready to use.
+    func connect(_ entry: DirectoryEntry, present: @escaping @Sendable (URL) async throws -> URL) async throws -> Connection {
+        let connection = try await add(entry.url.absoluteString)
+        if status(of: connection.id) == .needsSignIn {
+            try await signIn(connection.id, present: present)
+        }
+        if case .failed(let message) = status(of: connection.id) { throw ConnectionError.failed(message) }
+        return self.connection(connection.id) ?? connection
+    }
+
+    // MARK: - Allowing
+
+    /// An "Always" from the card: a service's look-ups (a nil tool), or one tool.
+    func allowAlways(_ id: UUID, tool: String?) {
+        if let tool {
+            updateTool(tool, of: id) { $0.alwaysAllowed = true }
+        } else {
+            update(id) { $0.alwaysLooksUp = true }
+        }
     }
 
     func connection(_ id: UUID) -> Connection? {
@@ -106,7 +153,9 @@ final class ConnectionStore {
                     var tool = tool
                     if let old = before[tool.name] {
                         tool.isOn = old.isOn
-                        tool.userSaysReadsOnly = old.userSaysReadsOnly
+                        // An "Always" holds for the tool as it was: one that now says it does
+                        // something else is asked about again.
+                        tool.alwaysAllowed = old.alwaysAllowed && old.readOnlyHint == tool.readOnlyHint && old.destructiveHint == tool.destructiveHint
                     }
                     return tool
                 }

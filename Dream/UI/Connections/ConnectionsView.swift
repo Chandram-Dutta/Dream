@@ -1,13 +1,30 @@
 import SwiftUI
 
-/// The services Dream can use while it builds a page: add one by its address, sign in, see its
-/// tools, and choose what each may be used for and what it may receive.
+/// The services Dream can use while it builds a page: discover one or add one by its address,
+/// sign in, see its tools, and see and take back every "Always" given when Dream asked.
 struct ConnectionsView: View {
     private let store = ConnectionStore.shared
     @State private var adding = false
 
     var body: some View {
         List {
+            Section {
+                NavigationLink {
+                    DiscoverView()
+                } label: {
+                    Label {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("Discover services")
+                            Text(store.featured.isEmpty ? "From the MCP Registry" : store.featured.prefix(3).map(\.name).joined(separator: ", ") + ", and more")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                    } icon: {
+                        Image(systemName: "sparkle.magnifyingglass")
+                            .foregroundStyle(Palette.now.gradient)
+                    }
+                }
+            }
             if !store.connections.isEmpty {
                 Section {
                     ForEach(store.connections) { connection in
@@ -18,22 +35,11 @@ struct ConnectionsView: View {
                         }
                     }
                 } footer: {
-                    Text("While it builds a page, Dream's model can use tools that only read, like looking up your issues or a project's docs. Tools that change things are never run by the model.")
+                    Text("While it builds a page, Dream can use these services. It asks you first, where the page is forming: once for a service that only looks things up, and every time something would change, showing exactly what's sent.")
                 }
             }
             Section {
-                Button("Add a service", systemImage: "plus") { adding = true }
-            }
-        }
-        .overlay {
-            if store.connections.isEmpty {
-                ContentUnavailableView {
-                    Label("No services yet", systemImage: "point.3.connected.trianglepath.dotted")
-                } description: {
-                    Text("Connect a service that works with MCP, like Linear or Notion, and Dream can use what's in it when it builds a page.")
-                } actions: {
-                    Button("Add a service") { adding = true }
-                }
+                Button("Add a service by its address", systemImage: "plus") { adding = true }
             }
         }
         .navigationTitle("Connections")
@@ -77,7 +83,7 @@ private struct ConnectionRow: View {
 
     var body: some View {
         HStack(spacing: 12) {
-            Monogram(name: connection.name, isOn: connection.isOn)
+            ServiceMonogram(name: connection.name, isOn: connection.isOn)
             VStack(alignment: .leading, spacing: 2) {
                 Text(connection.name)
                 Text(detail)
@@ -101,19 +107,25 @@ private struct ConnectionRow: View {
         case .needsSignIn: return "Needs you to sign in"
         case .failed: return "Couldn't reach it"
         case .ready:
-            let reading = connection.tools.filter { $0.isOn && $0.readsOnly }.count
-            return "\(connection.host) · \(reading) of \(connection.tools.count) tools usable"
+            let tools = connection.tools.filter(\.isOn).count
+            return "\(connection.host) · \(tools) tool\(tools == 1 ? "" : "s")"
         }
     }
 }
 
 /// A service's initial, in a color of its own that stays the same.
-private struct Monogram: View {
+struct ServiceMonogram: View {
     let name: String
     let isOn: Bool
 
+    /// A service's own colors, picked from its name, so it always looks the same.
+    static func palette(for name: String) -> Palette {
+        let sum = name.unicodeScalars.reduce(0) { $0 + Int($1.value) }
+        return Accent.allCases[sum % Accent.allCases.count].palette
+    }
+
     var body: some View {
-        let palette = accent.palette
+        let palette = Self.palette(for: name)
         Text(name.first.map { String($0).uppercased() } ?? "?")
             .font(.display(.headline))
             .foregroundStyle(isOn ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
@@ -121,11 +133,6 @@ private struct Monogram: View {
             .background(isOn ? palette.wash : Color(.tertiarySystemFill), in: .rect(cornerRadius: 10))
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isOn ? palette.edge : .clear, lineWidth: 0.5))
             .accessibilityHidden(true)
-    }
-
-    private var accent: Accent {
-        let sum = name.unicodeScalars.reduce(0) { $0 + Int($1.value) }
-        return Accent.allCases[sum % Accent.allCases.count]
     }
 }
 
@@ -166,12 +173,30 @@ private struct ConnectionDetailView: View {
                     .textSelection(.enabled)
             }
             Section {
-                Toggle("What Dream knows about you", isOn: setting(\.mayReceiveMemory))
-                Toggle("Entries in your lists", isOn: setting(\.mayReceiveLists))
+                if connection.alwaysLooksUp {
+                    HStack {
+                        Label("Looks things up without asking", systemImage: "checkmark.seal")
+                        Spacer()
+                        Button("Ask again") { store.update(id) { $0.alwaysLooksUp = false } }
+                            .font(.subheadline)
+                    }
+                }
+                ForEach(connection.tools.filter(\.alwaysAllowed)) { tool in
+                    HStack {
+                        Label("\(tool.label) runs without asking", systemImage: "checkmark.seal")
+                        Spacer()
+                        Button("Ask again") { store.updateTool(tool.name, of: id) { $0.alwaysAllowed = false } }
+                            .font(.subheadline)
+                    }
+                }
+                if !connection.alwaysLooksUp && !connection.tools.contains(where: \.alwaysAllowed) {
+                    Text("Dream asks before \(connection.name) is used.")
+                        .foregroundStyle(.secondary)
+                }
             } header: {
-                Text("It may receive")
+                Text("Without asking")
             } footer: {
-                Text("Off unless you turn them on. Then Dream won't send \(connection.name) the details it remembers about you, like your home city, or what's in your lists.")
+                Text("What you've said Always to, when Dream asked. A call that would send something Dream knows about you, or from your lists, is always shown first.")
             }
             Section {
                 ForEach(connection.tools) { tool in
@@ -188,7 +213,7 @@ private struct ConnectionDetailView: View {
             } header: {
                 Text("Tools")
             } footer: {
-                Text("The model can use a tool while it builds a page only if the tool just reads. Ones that change things wait for a button you tap.")
+                Text("Dream asks before a tool runs: once for a service's look-ups, and every time something would change, unless you've said Always.")
             }
             Section {
                 Button("Remove \(connection.name)", role: .destructive) { confirmingRemoval = true }
@@ -264,7 +289,7 @@ private struct ToolRow: View {
     }
 }
 
-/// What a tool does, by its service's hints, or by the user's word when the service gives none.
+/// What a tool does, by its service's hints.
 private struct EffectLabel: View {
     let tool: ConnectedTool
 
@@ -278,7 +303,6 @@ private struct EffectLabel: View {
     private var text: String {
         if !tool.isOn { return "Off" }
         if tool.readOnlyHint == true { return "Reads" }
-        if tool.readsOnly { return "Reads, you said" }
         if tool.readOnlyHint == nil { return "Might change things" }
         return tool.effect == .destroys ? "Can delete" : "Changes things"
     }
@@ -328,12 +352,14 @@ private struct ToolDetailView: View {
                         Text("Dream can't fill in this tool's inputs yet, so the model never sees it.")
                     }
                 }
-                if tool.readOnlyHint == nil {
-                    Section {
-                        Toggle("It only reads", isOn: setting(\.userSaysReadsOnly, of: tool))
-                    } footer: {
-                        Text("\(connection.name) doesn't say whether this tool changes anything, so Dream treats it as one that might, and the model never runs it. Turn this on only if you're sure it just reads.")
-                    }
+                Section {
+                    Toggle("Run without asking", isOn: setting(\.alwaysAllowed, of: tool))
+                } footer: {
+                    Text(tool.readsOnly
+                         ? "It only looks things up. Dream asks the first time \(connection.name) is used, until you say Always."
+                         : tool.readOnlyHint == nil
+                            ? "\(connection.name) doesn't say whether this changes anything, so Dream asks every time, showing what it sends."
+                            : "It changes things in \(connection.name), so Dream asks every time, showing what it sends.")
                 }
                 let inputs = Self.inputs(of: tool)
                 if !inputs.isEmpty {

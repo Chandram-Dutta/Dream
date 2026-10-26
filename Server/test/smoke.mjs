@@ -111,6 +111,30 @@ async function run(base) {
   response = await create(base, JSON.stringify({ ...JSON.parse(fixture), values: { "bad name": 1 } }));
   expect(response.status === 400, "values must be numbers by name");
 
+  console.log("Directory of MCP servers (reads the real registry)");
+  response = await fetch(`${base}/api/mcp/featured`);
+  const featured = (await response.json()).servers ?? [];
+  const named = Object.fromEntries(featured.map((server) => [server.name, server]));
+  expect(response.status === 200 && featured.length >= 6, `featured servers (${featured.length})`);
+  expect(named.DeepWiki?.signIn === false && named.Linear?.signIn === true, "each says whether it needs a sign-in");
+  expect(featured.every((server) => server.url.startsWith("https://") && server.featured), "every one is https, and marked featured");
+  expect(!named.Figma, "Figma, which wouldn't register Dream, isn't featured");
+  expect(named.Atlassian?.aliases?.includes("Jira"), "other names for a service, for noticing it in a request");
+  response = await fetch(`${base}/api/mcp/servers?search=linear`);
+  const found = (await response.json()).servers ?? [];
+  expect(response.status === 200 && found.some((server) => server.url === "https://mcp.linear.app/mcp" && server.name === "Linear"), `searching the registry finds Linear (${found.length} found)`);
+  expect(found.length > 0 && found.every((server) => server.url.startsWith("https://") && !server.url.includes("{")), "only servers the app can use");
+  expect(found.every((server) => !server.icon || /\.(png|jpe?g|webp)(\?|$)/i.test(server.icon)), "icons are bitmaps, never SVG");
+  expect(response.headers.get("cache-control")?.includes("max-age=3600"), "kept for an hour");
+  response = await fetch(`${base}/api/mcp/servers?search=Linear`);
+  expect((await response.json()).servers?.length === found.length, "the same search, in other letters, is the same answer");
+  response = await fetch(`${base}/api/mcp/servers?search=${"x".repeat(100)}`);
+  expect(response.status === 400, "a search that's too long is refused");
+  response = await fetch(`${base}/api/mcp/featured`, { method: "POST" });
+  expect(response.status === 405, "the directory is read-only");
+  response = await fetch(`${base}/api/mcp/elsewhere`);
+  expect(response.status === 404, "nothing else under /api/mcp/");
+
   console.log("Rate limiting");
   let limited = false;
   for (let i = 0; i < 15 && !limited; i++) limited = (await create(base, fixture)).status === 429;

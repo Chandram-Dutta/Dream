@@ -1,9 +1,9 @@
 import Foundation
 
-// Connected services as live data and actions (ROADMAP.md, workstream 8). A read tool the
-// model calls while writing is a source the screen reads again when it opens and on a pull,
-// without writing anything anew: the call itself declares it, as the live tool's do. A write
-// tool the model calls isn't run: the call becomes a button that runs it only when tapped.
+// Connected services as live data and actions (ROADMAP.md, workstream 8). A look-up the model
+// calls while writing, which the user lets run without asking, is a source the screen reads
+// again when it opens and on a pull, without writing anything anew: the call itself declares
+// it, as the live tool's do. Service buttons already on a page run their tool when tapped.
 
 extension Connections {
     /// Connects services to the live layer: their read tools as a provider, their write tools
@@ -40,11 +40,15 @@ struct ConnectionProvider: LiveProvider {
         guard let tool = connection.tools.first(where: { $0.name == source["tool"] }), tool.readsOnly else {
             throw LiveError(.unavailable, "\(service) no longer offers this to read.")
         }
+        // Only what the user lets run without asking is read again. A source is declared only
+        // then, but "Always" can be taken back in Connections, and a personal call is always asked.
+        guard connection.alwaysLooksUp || tool.alwaysAllowed, source["memory"] != "yes" else {
+            throw LiveError(.unavailable, "Dream asks before \(service) looks this up. Choose Always for it in Connections to keep this current.")
+        }
         let arguments = (try? JSONValue(json: source["arguments"])) ?? .object([:])
-        let carrying: Set<Connections.Personal> = source["memory"] == "yes" ? [.memory] : []
         let result: ToolResult
         do {
-            result = try await Connections.call(tool.name, on: connection.id, arguments: arguments, carrying: carrying)
+            result = try await Connections.call(tool.name, on: connection.id, arguments: arguments)
         } catch let error as ConnectionError {
             throw LiveError(.unavailable, error.problem(for: connection.name))
         }
@@ -203,13 +207,12 @@ struct ConnectionPerformer: ActionPerformer {
         guard let connection = Connections.connection(at: action["server"]), let tool = Self.tool(for: action) else {
             throw LiveError(.unavailable, "Connect \(service) in Connections to do this.")
         }
+        // The tap is the user's word; one that may destroy, or carries something personal, was
+        // confirmed first (`needsConfirmation`).
         let arguments = Self.inputs(action)
-        // Whether the values carry something Dream remembers was found when the button was
-        // made, against what the user asked; the service must still be allowed it now.
-        let carrying: Set<Connections.Personal> = action["memory"] == "yes" ? [.memory] : []
         let result: ToolResult
         do {
-            result = try await Connections.call(tool.name, on: connection.id, arguments: arguments, carrying: carrying)
+            result = try await Connections.call(tool.name, on: connection.id, arguments: arguments)
         } catch let error as ConnectionError {
             throw LiveError(.unavailable, error.problem(for: connection.name))
         } catch {
@@ -265,7 +268,6 @@ extension ConnectionError {
     /// What went wrong, for under a button or beside a value.
     func problem(for service: String) -> String {
         switch self {
-        case .notAllowed: "\(service) isn't allowed to receive what this sends. You can allow it in Connections."
         case .needsSignIn: "Sign in to \(service) in Connections first."
         case .off, .toolOff: "\(service) is switched off in Connections."
         default: errorDescription ?? "\(service) didn't answer."
@@ -275,24 +277,25 @@ extension ConnectionError {
 
 // MARK: - While writing
 
-/// What writing with connected services leaves the surface: buttons proposed for write tools,
-/// and which services' data went into it.
+/// What writing with connected services leaves the surface: which services' data went into it,
+/// the service buttons it already had, and which changing tools were offered and tried.
 final class ConnectionLog: @unchecked Sendable {
     private let lock = NSLock()
-    private var proposed: [Action] = []
     private var earlier: [Action] = []
     private var used: [String] = []
-    /// The write tools offered because the request asks to do something, by the names the
+    /// The changing tools offered because the request asks to do something, by the names the
     /// model calls them.
     private var offered: [String] = []
+    /// Changing tools the model called, whether or not the user allowed them.
+    private var attempted: Set<String> = []
 
     /// A new request starts with nothing; a change keeps what the screen already has.
     func start(keeping surface: Surface? = nil) {
         lock.withLock {
-            proposed = []
             earlier = (surface?.actions ?? []).filter(\.isConnection)
             used = surface?.services ?? []
             offered = []
+            attempted = []
         }
     }
 
@@ -300,59 +303,37 @@ final class ConnectionLog: @unchecked Sendable {
         lock.withLock { offered = tools }
     }
 
-    /// What goes back to the model with the checker's problems: the request asks to do
-    /// something a service's tool does, and no button does it, because its tool was never
-    /// called. Models often write a reminder in its place instead.
-    func problems(in surface: Surface) -> [Issue] {
-        let (offered, proposed) = lock.withLock { (offered, proposed) }
-        guard !offered.isEmpty, proposed.isEmpty, !(surface.actions ?? []).contains(where: \.isConnection) else { return [] }
-        return [Issue(kind: .needsModel, message: "The request asks to do something in a connected service, but no button does it, because you didn't call \(offered.joined(separator: " or ")). Call it now with the values to send: that makes the button. Show it with an action block whose ref is the name the call gives, and drop any other action standing in for it.")]
-    }
-
-    func propose(_ action: Action) {
-        lock.withLock {
-            proposed.removeAll { $0.name == action.name }
-            earlier.removeAll { $0.name == action.name }
-            proposed.append(action)
-        }
+    func tried(_ tool: String) {
+        lock.withLock { _ = attempted.insert(tool) }
     }
 
     func use(_ service: String) {
         lock.withLock { if !used.contains(service) { used.append(service) } }
     }
 
-    /// A name no other button has.
-    func name(for base: String) -> String {
-        lock.withLock {
-            let taken = Set((proposed + earlier).map(\.name))
-            var name = base
-            var number = 2
-            while taken.contains(name) {
-                name = "\(base)\(number)"
-                number += 1
-            }
-            return name
-        }
+    /// What goes back to the model with the checker's problems: the request asks to do
+    /// something a service's tool does, and it never called that tool. Models often write a
+    /// reminder in its place, or say it's done.
+    func problems(in surface: Surface) -> [Issue] {
+        let (offered, attempted) = lock.withLock { (offered, attempted) }
+        guard !offered.isEmpty, attempted.isEmpty else { return [] }
+        return [Issue(kind: .needsModel, message: "The request asks to do something in a connected service, but you didn't call \(offered.joined(separator: " or ")). Call it now with the values to send: Dream asks the user, and it runs if they allow it. Then say on the screen what happened, and drop any other action standing in for it.")]
     }
 
-    fileprivate var state: (proposed: [Action], earlier: [Action], used: [String]) {
-        lock.withLock { (proposed, earlier, used) }
+    fileprivate var state: (earlier: [Action], used: [String]) {
+        lock.withLock { (earlier, used) }
     }
 }
 
 extension Surface {
-    /// With the buttons proposed while it was written, those it had that it still shows, and
-    /// the services whose data it holds.
+    /// With the service buttons it had that it still shows, and the services whose data it holds.
     func connected(_ log: ConnectionLog) -> Surface {
         var surface = self
-        let (proposed, earlier, used) = log.state
+        let (earlier, used) = log.state
         let shown = Self.actionRefs(in: blocks)
-        let added = proposed + earlier.filter { shown.contains($0.name) }
-        // An action the model wrote under a proposed button's name is its attempt to define
-        // that button, which the call already did.
-        let names = Set(added.map(\.name))
-        let own = (actions ?? []).filter { !$0.isConnection && !names.contains($0.name) }
-        let all = own + added
+        let kept = earlier.filter { shown.contains($0.name) }
+        let names = Set(kept.map(\.name))
+        let all = (actions ?? []).filter { !$0.isConnection && !names.contains($0.name) } + kept
         surface.actions = all.isEmpty ? nil : all
         surface.services = used.isEmpty ? nil : used
         return surface

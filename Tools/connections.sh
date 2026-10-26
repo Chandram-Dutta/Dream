@@ -1,8 +1,9 @@
 #!/bin/zsh
 # Checks connected services on this Mac without a model: JSON Schemas made into generation
-# schemas, picking tools, keeping remembered details from services, readings and the lists they
-# fill, refreshing a source, buttons for write tools, and what sharing leaves out. It starts the
-# local test server (Tools/mcp-test-server.py) and talks to it through the MCP SDK.
+# schemas, picking tools, when Dream asks before a tool runs and what each answer does, readings
+# and the lists they fill, refreshing a source, service buttons, services a request names, and
+# what sharing leaves out. It starts the local test server (Tools/mcp-test-server.py) and talks
+# to it through the MCP SDK.
 # Usage: Tools/connections.sh
 set -e
 cd "$(dirname "$0")/.."

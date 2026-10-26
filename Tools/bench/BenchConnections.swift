@@ -2,10 +2,33 @@ import Foundation
 
 // Connected services on the bench: servers registered with -mcp, and sign-in up to the browser.
 
+/// The bench's connections, changed by an "Always" partway through a run.
+final class BenchFixture: @unchecked Sendable {
+    private let lock = NSLock()
+    private var value: [Connection] = []
+
+    var connections: [Connection] {
+        get { lock.withLock { value } }
+        set { lock.withLock { value = newValue } }
+    }
+
+    func allowAlways(_ id: UUID, tool: String?) {
+        lock.withLock {
+            guard let index = value.firstIndex(where: { $0.id == id }) else { return }
+            if let tool, let at = value[index].tools.firstIndex(where: { $0.name == tool }) {
+                value[index].tools[at].alwaysAllowed = true
+            } else if tool == nil {
+                value[index].alwaysLooksUp = true
+            }
+        }
+    }
+}
+
 @MainActor
 enum BenchConnections {
-    static func connect(_ addresses: [String], reads: String, remembered: [Remembered]) async {
-        let trusted = Set(reads.split(separator: ",").map { $0.trimmingCharacters(in: .whitespaces) })
+    static let fixture = BenchFixture()
+
+    static func connect(_ addresses: [String], remembered: [Remembered]) async {
         var connections: [Connection] = []
         for address in addresses {
             do {
@@ -13,32 +36,44 @@ enum BenchConnections {
                 var connection = Connection(url: url, name: url.host() ?? address)
                 let description = try await ConnectionSessions.shared.describe(url, id: connection.id)
                 connection.name = description.name
-                connection.tools = description.tools.map { tool in
-                    var tool = tool
-                    tool.userSaysReadsOnly = trusted.contains("all") || trusted.contains(tool.name)
-                    return tool
-                }
+                connection.tools = description.tools
                 connections.append(connection)
                 print("Connected \(connection.name) (\(url.absoluteString)):")
                 for tool in connection.tools {
                     let hint = tool.readOnlyHint.map { $0 ? "reads" : "writes" } ?? "no hint"
-                    print("  \(tool.name): \(hint)\(tool.userSaysReadsOnly ? ", treated as reading" : "")\(tool.isRepresentable ? "" : ", inputs can't be represented")")
+                    print("  \(tool.name): \(hint)\(tool.isRepresentable ? "" : ", inputs can't be represented")")
                 }
             } catch {
                 print("Couldn't connect \(address): \(error.localizedDescription)")
             }
         }
-        let fixed = connections
+        fixture.connections = connections
+        let fixture = fixture
         Connections.source = Connections.Source(
-            connections: { fixed },
+            connections: { fixture.connections },
             call: { connection, tool, arguments in try await ConnectionSessions.shared.call(connection, tool: tool, arguments: arguments) },
-            personalDetails: { remembered.map(\.detail) })
+            personalDetails: { remembered.map { PersonalDetail(text: $0.detail, from: "what Dream knows about you (\($0.topic.lowercased()))") } },
+            allowAlways: { id, tool in fixture.allowAlways(id, tool: tool) })
         Connections.registerLive()
+    }
+
+    /// The featured services from Dream's directory, for noticing one a request names.
+    static func loadDirectory(_ address: String) async {
+        guard let server = URL(string: address) else { return }
+        do {
+            Connections.directory = try await Directory.featured(from: server)
+            print("Directory: \(Connections.directory.map(\.name).joined(separator: ", "))")
+        } catch {
+            print("Couldn't read the directory at \(address): \(error.localizedDescription)")
+        }
     }
 
     /// What the screen would do with a surface's connected services: read each source again,
     /// as a pull does, and show the buttons for write tools as they'd read.
-    static func showLive(_ surface: Surface) async {
+    static func showLive(_ surface: Surface, suggesting suggestions: [DirectoryEntry] = []) async {
+        for entry in suggestions {
+            print("Card above the page: Connect \(entry.name)\(entry.signIn == true ? " (signs in)" : "")")
+        }
         for collection in surface.recordCollections where collection.source != nil {
             print("List \(collection.name) is filled from \(collection.source ?? "")")
         }
@@ -66,8 +101,10 @@ enum BenchConnections {
 
     static func showPicks(_ requests: [String]) {
         for request in requests {
-            let picked = ToolPicker.pick(for: request, from: Connections.readingTools)
-            print("\(request) → \(picked.isEmpty ? "nothing" : picked.map { "\($0.connection.name) \($0.tool.name)" }.joined(separator: ", "))")
+            let picked = ToolPicker.pick(for: request, from: Connections.lookingTools)
+                + (ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : [])
+            print("\(request) → \(picked.isEmpty ? "nothing" : picked.map { "\($0.connection.name) \($0.tool.name)" }.joined(separator: ", "))"
+                  + Connections.unconnected(in: request).map { "; card: Connect \($0.name)" }.joined())
         }
     }
 
