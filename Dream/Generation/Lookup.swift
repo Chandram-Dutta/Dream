@@ -4,6 +4,8 @@ import FoundationModels
 /// Lets a capable model look things up itself, when it decides the facts matter.
 struct LookupTool: Tool {
     let found: ReferenceLog
+    /// Told the subject as each lookup starts, so the screen can show it's reading.
+    var onLookup: @Sendable (String) -> Void = { _ in }
     let name = "lookup"
     let description = "Looks up a subject in Wikipedia and returns the article's introduction. Use it whenever facts, numbers, dates or names matter."
 
@@ -14,6 +16,7 @@ struct LookupTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
+        onLookup(arguments.subject)
         guard let reference = await Lookup.find(arguments.subject) else {
             return "Nothing found for \"\(arguments.subject)\"."
         }

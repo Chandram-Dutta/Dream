@@ -1,8 +1,8 @@
 import Foundation
 
-// Runs the composer on this Mac's on-device model and prints what came out, so prompt and
-// checker changes can be judged without the app. Build and run with Tools/bench.sh.
-// Settings go as "-name value": "-strategy onePass", "-provider xai" (with XAI_API_KEY set).
+// Runs the composer on this Mac and prints what came out, so prompt and checker changes can be
+// judged without the app. Build and run with Tools/bench.sh. It uses Grok, with XAI_API_KEY set
+// (bench.sh reads it from the login Keychain). Settings go as "-name value", like "-xaiModel grok-4.7".
 
 let defaultRequests = [
     "what is compound interest",

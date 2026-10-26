@@ -1,4 +1,3 @@
-import FoundationModels
 import PhotosUI
 import SwiftData
 import SwiftUI
@@ -13,6 +12,8 @@ struct HomeView: View {
     @State private var photo: UIImage?
     @State private var request: ComposeRequest?
     @State private var ideas = Ideas()
+    @State private var canCompose = Composer.canCompose
+    @State private var showingSettings = false
     @FocusState private var focused: Bool
     @Namespace private var zoom
     @MainActor private static var startedAutomatically = false
@@ -26,10 +27,14 @@ struct HomeView: View {
                     Text("Dream")
                         .font(.display(.largeTitle, weight: .bold))
                         .padding(.top, 24)
-                    if case .unavailable(let reason) = SystemLanguageModel.default.availability {
-                        Label("Apple Intelligence isn't available (\(String(describing: reason))). Turn it on in Settings to make anything.", systemImage: "exclamationmark.triangle.fill")
-                            .font(.subheadline)
-                            .panel(palette)
+                    if !canCompose {
+                        Button { showingSettings = true } label: {
+                            Label("Add an xAI API key to start making screens.", systemImage: "key.fill")
+                                .font(.subheadline)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                        .buttonStyle(.plain)
+                        .panel(palette)
                     }
                     if !surfaces.isEmpty {
                         shelf
@@ -56,8 +61,8 @@ struct HomeView: View {
                     .navigationTransition(.zoom(sourceID: saved.id, in: zoom))
             }
         }
-        .onChange(of: focused) { _, isFocused in
-            if isFocused { Composer.prewarm() }
+        .sheet(isPresented: $showingSettings, onDismiss: { canCompose = Composer.canCompose }) {
+            DebugView(surface: nil, values: [:], log: [], modelName: "")
         }
         .onChange(of: photoItem) { _, item in
             Task { await loadPhoto(item) }

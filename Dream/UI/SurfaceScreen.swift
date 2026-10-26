@@ -64,9 +64,7 @@ struct SurfaceScreen: View {
     /// What the model is doing, as a symbol. Nil when it's not working.
     private var stage: String? {
         switch composer.phase {
-        case .planning: "sparkles"
         case .researching: "book.pages"
-        case .calculating: "function"
         case .fixing: "wrench.adjustable"
         case .composing: "rectangle.3.group"
         case .idle, .done, .failed: nil

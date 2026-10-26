@@ -1,11 +1,12 @@
 import Foundation
 
-/// Everything the model is told. The step prompts are written for the on-device model: short,
-/// concrete, one job per request. The one-pass prompt gives a capable model the same rules at once.
+/// Everything the model is told. The core rules live here. Each feature's own rules live in its
+/// own file (`Prompts+Lists.swift` and so on) and are gathered in `featureRules`, so a feature can
+/// change what it teaches the model without touching this file or any other feature.
 enum Prompts {
-    // MARK: - Shared rules
+    // MARK: - Core rules
 
-    /// When numbers deserve controls. Shared by every path, so a fact never becomes a slider.
+    /// When numbers deserve controls, so a fact never becomes a slider.
     private static let whenToCalculate = """
         Calculate only when changing numbers helps the user: their own figures (a bill, a loan, a trip), a decision, or a what-if worth exploring, like how the angle changes a throw or how a graph moves when a term changes. A number that's simply true is a fact, not an input: a population, a death toll, a date, a distance, a record. Show facts in facts, stat or data blocks, never on a slider, and don't invent a formula to restate or project them.
         """
@@ -48,125 +49,14 @@ enum Prompts {
 
     private static let closingRules = "Lead with what answers the request. Keep text short. Then list related: 3 to 6 nearby topics to explore next."
 
-    // MARK: - Steps
-
-    static let plan = """
-        Decide what a screen needs to answer the user's request. A screen can explain something, let the user calculate something, or both.
-        lookup: a subject to look up so the facts are right, when the user wants to know, understand or identify something.
-        calculation: what to work out, when the user wants numbers: costs, amounts, time, comparisons, or trying different values.
-        Many requests need both, like "what is compound interest" or "is it worth buying solar panels". Leave a field empty when it isn't needed.
-        """
-
-    static let editPlan = """
-        Decide what a change to a screen needs.
-        lookup: a new subject to look up, only if the change needs facts the screen doesn't have.
-        calculation: if the change adds or alters what the screen calculates, the new calculation in a few words.
-        removeCalculation: true only if the user wants the calculation off the screen.
-        Leave fields empty, or false, when they aren't needed.
-        """
-
-    static var logic: String {
-        """
-        You write the calculation behind an interactive screen, so the user can change numbers and see the results update instantly.
-        \(whenToCalculate)
-
-        \(formulaRules)
-
-        Example, for "split a dinner bill":
-        inputs: bill (currency, starts at a typical dinner bill, step 10), tipPercent (percent, starts at 10, 0 to 30, step 1), people (integer, starts at 4, 1 to 20, step 1)
-        outputs: perPerson (currency) = bill * (1 + tipPercent / 100) / people; tipAmount (currency) = bill * tipPercent / 100
-        """
+    /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
+    private static var featureRules: [String] {
+        [memoryRules, listRules, figureRules, soundRules, languageRules].filter { !$0.isEmpty }
     }
 
-    /// The calculation rules only when there's a calculation: fewer options make a small model do better with each.
-    static func compose(withCalculation: Bool) -> String {
-        """
-        You compose one screen that answers the user's request\(withCalculation ? ": explain what helps, and let the user calculate" : "").
-        \(withCalculation ? "" : "Show numbers as facts, stat or data blocks; this screen has no controls.\n")
+    // MARK: - Writing a surface
 
-        \(informationRules)
-        \(withCalculation ? calculationRules + "\n" : "")\(closingRules)
-        When a reference is given, take facts, numbers, dates and names only from it.
-        """
-    }
-
-    static func planRequest(_ intent: String) -> String {
-        "Request: \(intent)"
-    }
-
-    static func logicRequest(_ intent: String, calculation: String, reference: Reference?, hasImage: Bool) -> String {
-        var text = "Request: \(intent)\nCalculate: \(calculation)"
-        if hasImage {
-            text += "\nThe user attached a photo. Use what's in it (amounts, items, quantities) for the starting values and labels."
-        }
-        if let reference {
-            text += "\n\nBackground, from Wikipedia's article \"\(reference.title)\":\n\(reference.extract.prefix(700))"
-        }
-        return text
-    }
-
-    static func repair(_ intent: String, surface: Surface, problems: [Issue]) -> String {
-        """
-        You wrote this calculation for "\(intent)":
-        \(surface.logicSummary)
-
-        It has problems:
-        \(problems.map { "- \($0.message)" }.joined(separator: "\n"))
-
-        Return the whole calculation with these problems fixed. Keep everything else the same.
-        """
-    }
-
-    static func composeRequest(_ intent: String, surface: Surface) -> String {
-        var parts = ["Request: \(intent)"]
-        if surface.hasLogic {
-            parts.append("Calculation, with the inputs and outputs you can show:\n\(surface.logicSummary)")
-        }
-        parts.append(referenceText(surface.reference, limit: surface.hasLogic ? 1200 : 1800, required: !surface.hasLogic))
-        return parts.filter { !$0.isEmpty }.joined(separator: "\n\n")
-    }
-
-    static func editPlanRequest(intent: String, surface: Surface, instruction: String, focus: Block?) -> String {
-        """
-        The user has this screen, made for "\(intent)":
-        \(screen(surface))
-
-        \(request(instruction, focus: focus, in: surface))
-        """
-    }
-
-    static func editLogic(intent: String, surface: Surface, instruction: String, calculation: String) -> String {
-        """
-        The user has a screen made for "\(intent)".
-        \(surface.hasLogic ? "Its calculation:\n\(surface.logicSummary)" : "It doesn't calculate anything yet.")
-
-        They say: "\(instruction)"
-        The calculation should now: \(calculation)
-
-        Return the whole updated calculation. Keep the names of inputs and outputs that don't change.
-        """
-    }
-
-    static func editCompose(intent: String, current: Surface, updated: Surface, instruction: String, focus: Block?) -> String {
-        var parts = [
-            """
-            The user has this screen, made for "\(intent)":
-            \(current.outline)
-
-            \(request(instruction, focus: focus, in: current))
-            """,
-        ]
-        if updated.hasLogic {
-            parts.append("Calculation now, with the inputs and outputs you can show:\n\(updated.logicSummary)")
-        }
-        parts.append(referenceText(updated.reference, limit: 900, required: false))
-        parts.append("Return the whole updated screen. Keep the blocks they didn't ask to change.")
-        return parts.filter { !$0.isEmpty }.joined(separator: "\n\n")
-    }
-
-    // MARK: - One pass
-
-    static var onePass: String {
+    static var surface: String {
         """
         You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Use the lookup tool whenever facts, numbers, dates or names matter, and take them only from what it returns.
 
@@ -177,19 +67,28 @@ enum Prompts {
         Then compose the screen from blocks.
         \(informationRules)
         \(calculationRules)
-        \(closingRules)
+        \(([closingRules] + featureRules).joined(separator: "\n\n"))
         """
     }
 
-    static func onePassRequest(_ intent: String, hasImage: Bool) -> String {
-        var text = "Request: \(intent)"
-        if hasImage {
-            text += "\nThe user attached a photo. If they're asking what something is, identify it; if it shows amounts or items, use them as starting values."
-        }
-        return text
+    /// What the model is told alongside each request about the user and their device. Each
+    /// feature adds its own lines from its own file.
+    static func context(for intent: String) async -> [String] {
+        await memoryContext(for: intent) + languageContext()
     }
 
-    static func onePassRepair(_ problems: [Issue]) -> String {
+    static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
+        var parts = ["Request: \(intent)"]
+        if hasImage {
+            parts.append("The user attached a photo. If they're asking what something is, identify it; if it shows amounts or items, use them as starting values.")
+        }
+        if !context.isEmpty {
+            parts.append(context.joined(separator: "\n"))
+        }
+        return parts.joined(separator: "\n\n")
+    }
+
+    static func repair(_ problems: [Issue]) -> String {
         """
         The calculation in that screen has problems:
         \(problems.map { "- \($0.message)" }.joined(separator: "\n"))
@@ -198,15 +97,21 @@ enum Prompts {
         """
     }
 
-    static func onePassEdit(intent: String, surface: Surface, instruction: String, focus: Block?) -> String {
-        """
-        The user has this screen, made for "\(intent)":
-        \(screen(surface))
+    static func edit(intent: String, surface: Surface, instruction: String, focus: Block?, context: [String]) -> String {
+        var parts = [
+            """
+            The user has this screen, made for "\(intent)":
+            \(screen(surface))
 
-        \(request(instruction, focus: focus, in: surface))
+            \(request(instruction, focus: focus, in: surface))
 
-        Return the whole updated screen. Keep what they didn't ask to change.
-        """
+            Return the whole updated screen. Keep what they didn't ask to change.
+            """,
+        ]
+        if !context.isEmpty {
+            parts.append(context.joined(separator: "\n"))
+        }
+        return parts.joined(separator: "\n\n")
     }
 
     // MARK: - Pieces
@@ -236,13 +141,6 @@ enum Prompts {
         case .paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data:
             return "the \(block.kind.rawValue) block\(block.title.isEmpty ? "" : " \"\(block.title)\"") (#\(block.id))"
         }
-    }
-
-    private static func referenceText(_ reference: Reference?, limit: Int, required: Bool) -> String {
-        guard let reference else {
-            return required ? "No reference was found. Don't state precise numbers or dates you're unsure of." : ""
-        }
-        return "Reference, from Wikipedia's article \"\(reference.title)\":\n\(reference.extract.prefix(limit))"
     }
 }
 

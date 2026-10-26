@@ -101,9 +101,7 @@ struct StageMark: View {
 
     static func description(of symbol: String) -> String {
         switch symbol {
-        case "sparkles": "Working out what's needed"
         case "book.pages": "Looking it up"
-        case "function": "Writing the calculation"
         case "wrench.adjustable": "Fixing the calculation"
         default: "Putting it together"
         }

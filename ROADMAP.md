@@ -6,29 +6,30 @@ Each workstream below says what it owns, what it depends on, and how to check it
 ## Principles every workstream follows
 
 - **The model writes structure; the engine draws it.** The engine also checks the structure and ties it to live values. New capabilities are new parts of the surface format (`Dream/Engine/Surface.swift`, `Dream/Generation/Wire.swift`). Each one also needs checker rules (`Checker.swift`), a renderer (`Dream/UI/`) and prompt rules (`Prompts.swift`). They are never one-off prompt patches.
-- **Independent of the model.** A weak model writes a simple version, a strong one a rich version, and the same renderer handles both. The on-device steps path must keep working: run `Tools/bench.sh` without `-provider xai` to check.
+- **Independent of the model.** A cloud model (Grok, or Apple's Private Cloud Compute once granted) builds every screen in one pass, through Foundation Models. Nothing may depend on Grok specifically. Apple's on-device model never builds screens. It's a helper for small private jobs, like the home ideas, picking memory facts, and turning "add milk" into list entries.
 - **Facts are never controls.** Inputs have roles: adjustable, given, variable, and soon live. Real figures go in facts, stat or data blocks.
 - **The template stays separate from your data.** A surface is a shareable template. Your values, records and memory stay private, on the phone.
 - **Show, don't tell.** Distinctive but restrained visuals, using the surface's palette, and motion only to show a change.
 - **Model output is untrusted.** Tool output, MCP results and shared screens are treated as data, never instructions. Writes happen only when the user taps.
 
-## Before splitting up (do these in order, one agent)
+## Done before splitting up (2026-10-27)
 
-1. **`git init` and a first commit.** The project isn't a repository yet. Each agent then works in its own worktree.
-2. **Learn the checking tools (already in `Tools/`):**
-   - `Tools/bench.sh "request"`: the composer on this Mac, using the on-device model.
-   - `Tools/bench-many.sh outdir "request" …`: requests on Grok in parallel, one file each.
-   - Build and install on the iPhone:
-     - `xcodebuild -project Dream.xcodeproj -scheme Dream -destination 'id=00008150-000E4D423A82401C' -allowProvisioningUpdates build`
-     - then `xcrun devicectl device install app --device 00008150-000E4D423A82401C <Dream.app>`
-   - `Tools/device-tour.sh outdir "request"`: runs one request on the iPhone and screenshots the whole page as it scrolls.
-   - Always use the iPhone, never the Simulator. Use `-provider xai` only as a launch argument, so the stored model setting stays untouched. Never print the xAI key.
-3. **A foundation pass on the shared files**, so the parallel agents rarely touch the same code:
-   - Add every new `BlockKind` / `WireBlockKind` case at once (`list`, `add`, `figure`, `diagram`, `sound`, `scene`, `action`, `map`). Each gets a placeholder renderer in its own file under `Dream/UI/Blocks/`, a placeholder checker case and a placeholder `describe` case.
-   - Add the `live` input role, and the `unit` field on inputs and outputs (see workstream 4).
-   - Split prompt rules into one file per feature (`Prompts+Lists.swift`, `Prompts+Figures.swift`, …). `Prompts.swift` assembles them.
-   - Add one storage layer for personal data (memory facts, records): a generic SwiftData model. Workstreams 1 and 2 build on it.
-   - Optional fields with backward-compatible decoding, as `Input`/`Output` already do.
+1. **Git.** The project is a repository on `main`. Each agent works in its own worktree and branch.
+2. **Checking tools** (in `Tools/`):
+   - `Tools/bench.sh "request"`: the composer on this Mac, on Grok.
+   - `Tools/bench-many.sh outdir "request" …`: several requests in parallel, one file each.
+   - Build the app for the iPhone (compile check):
+     - `xcodebuild -project Dream.xcodeproj -scheme Dream -destination 'id=00008150-000E4D423A82401C' -derivedDataPath <your own folder> -allowProvisioningUpdates build`
+     - Install with `xcrun devicectl device install app --device 00008150-000E4D423A82401C <Dream.app>`
+   - `Tools/device-tour.sh outdir "request"`: runs one request on the iPhone and screenshots the whole page.
+   - There's one iPhone, and only the integrator uses it. Never use the Simulator. Never print the xAI key.
+3. **Foundation pass:**
+   - The on-device step-by-step builder is gone. There's now one path: `Composer.write` in a single session, with the checker sending problems back.
+   - Hooks so features don't edit the same lines:
+     - **Rules:** each feature's rules go in its own `Generation/Prompts+<Feature>.swift` (`memoryRules`, `listRules`, `languageRules`, `figureRules`, `soundRules`). `Prompts.surface` gathers them.
+     - **Context:** text the model gets alongside each request comes from `Prompts.memoryContext(for:)` and `Prompts.languageContext()`, gathered by `Prompts.context(for:)`.
+     - **Tools:** model tools go in `Composer.tools(found:)`. The ask tool goes there.
+   - **Where new content lives:** content a new block needs (a collection, a figure's shapes, a sound) is a named definition at the top level of the surface. Blocks point to it with `ref`, the way controls point to inputs. Each feature adds one optional array to `Surface`, decoded with a default so older surfaces still load, and one array to `WireSurface`. It does not add fields to `WireBlock`.
 
 ## Workstreams
 
@@ -41,10 +42,9 @@ Sizes: S is up to half a day, M about a day, L more than a day.
 - A "What Dream knows" screen to see, edit and delete facts. Inferred facts are confirmed before use.
 - Relevant facts are picked per request with on-device NaturalLanguage embeddings, and only those go into the prompt.
 - Screen memory: a request that matches a saved surface (by intent or question) opens it instead of rebuilding.
-- An `ask` tool for capable models: up to 3 questions, one round, tappable options plus "You choose". It is never used for what a control or a lookup can handle.
+- An `ask` tool: up to 3 questions, one round, tappable options plus "You choose". It is never used for what a control or a lookup can handle.
   - The cards show while the page forms, with a calm Aura "waiting for you" state.
   - Answers fold into the header as tags. Tapping a tag rebuilds the page.
-  - The steps path gets an optional "which did you mean?" field on the plan.
 - Files: new `Dream/Memory/*`, `Dream/Generation/Ask.swift`, `Composer.swift` (tool wiring), the forming view and header in `SurfaceView.swift`.
 - Check: "Mercury" asks which one; "plan my trip" asks where and when; "split a bill" asks nothing.
 
@@ -56,7 +56,7 @@ Sizes: S is up to half a day, M about a day, L more than a day.
   - Summaries via formula aggregates: `sum(expenses.amount)`, `count(tasks where done)`, `last(weights.value)`.
 - `data` charts can be bound to a collection.
 - Records are stored generically: SwiftData can't create tables at runtime.
-- Talking to a list: "add milk and eggs" or a receipt photo makes the model return insert, update and delete operations, checked against the fields. The on-device model must handle this.
+- Talking to a list: "add milk and eggs" or a receipt photo makes the model return insert, update and delete operations, checked against the fields. Try the on-device model for this, since it's private and free. Use the cloud model when it isn't good enough.
 - Changing fields later ("add a price column") needs versioned fields, a mapping the model proposes, and checker validation.
 - Depends on: the foundation storage layer. Coordinate the formula-language changes (`Formula.swift`, `Evaluation.swift`) with nobody else.
 - Check: a grocery list, an expense tracker with a monthly total and chart, and a habit tracker, all on the iPhone.
@@ -111,21 +111,21 @@ Sizes: S is up to half a day, M about a day, L more than a day.
 **8. MCP client (M)** (depends on 7)
 - Uses the official MCP Swift SDK, with remote HTTP servers only.
 - Each MCP tool becomes a Foundation Models `Tool` whose schema is built at runtime from its JSON Schema. Arguments arrive as `GeneratedContent`.
-- Only capable models get MCP tools, and only the few relevant to each request.
+- Only the few tools relevant to each request are offered.
 - Read tools become live sources. Write tools become `action` buttons, with MCP's read-only and destructive hints deciding which need a confirmation.
 - A collection can be backed by an MCP server.
 - Sign-in uses OAuth with ASWebAuthenticationSession, and tokens go in the Keychain. A "Connections" screen adds servers.
 - Which memory facts may go to which server is explicit.
 
-**9. Sharing (M–L)** (needs the backend decision below)
+**9. Sharing (M–L)** (on Cloudflare)
 - What gets shared is a surface, not a chat. Blank by default; your numbers only when you choose.
 - Three levels:
   1. An image, via `ImageRenderer`.
-  2. A link that opens in Dream, using CloudKit's public database or our own server.
-  3. A web viewer for people without Dream.
-- Shared lists need CloudKit sharing (`CKShare`), which SwiftData doesn't do by itself.
+  2. A link that opens in Dream: surfaces stored on Cloudflare (a Worker, with R2, D1 or KV).
+  3. A web viewer for people without Dream, served by the same Worker.
+- Shared lists (a family grocery list) sync through the same backend. Durable Objects could handle live editing.
 - Shared surfaces form the start of the cross-user template library from the memory layer.
-- Later: Dream as an MCP server, so other assistants can read your lists.
+- Later: Dream as a remote MCP server on Cloudflare Workers, so other assistants can read your lists.
 
 **10. 3D (L)**
 - RealityKit `RealityView`. Limited to subjects where 3D is accurate.
@@ -147,22 +147,22 @@ Every workstream touches these files, so the foundation pass should do the share
 
 | File | Why everyone touches it | Plan |
 |---|---|---|
-| `Engine/Surface.swift`, `Generation/Wire.swift` | new kinds, roles, fields | added in the foundation pass |
-| `Generation/Prompts.swift` | rule text | split into one file per feature |
-| `Engine/Checker.swift` | one `switch` over block kinds | foundation adds the cases; each agent fills in only its own |
+| `Engine/Surface.swift`, `Generation/Wire.swift` | new block kinds and top-level arrays | each workstream adds its own lines; the integrator merges the small conflicts |
+| `Generation/Prompts.swift` | rule text, request context | done: one `Prompts+<Feature>.swift` per feature |
+| `Engine/Checker.swift` | one `switch` over block kinds | each kind's case calls a function in that feature's own file |
 | `UI/BlockView.swift` | one `switch` over block kinds | each kind renders from its own file in `UI/Blocks/` |
-| `Generation/Composer.swift` | tools (ask, sources, MCP) | add one tool list that workstreams append to |
+| `Generation/Composer.swift` | tools (ask, sources, MCP) | done: `tools(found:)` |
 | `Dream.xcodeproj/project.pbxproj` | packages, capabilities | one agent at a time; folder sync means new files need no project edits |
 
-## Decisions needed from the user
+## Decisions (2026-10-27)
 
-- Is the developer membership paid, so WeatherKit works?
-- Should sharing use CloudKit (free, Apple-only) or our own server (needed for a web viewer and for Dream as an MCP server)?
-- How many agents should run at once, and how much Grok use per day is acceptable for bench runs?
+- **On-device model:** removed as a page builder, kept as a helper for small private jobs.
+- **Developer membership:** paid, so WeatherKit is available. Enable it for `com.chandramdutta.dream` when workstream 7 starts.
+- **Sharing backend:** Cloudflare (Workers with R2, D1 or KV). The same backend later serves the web viewer and Dream's MCP server. It needs the user's Cloudflare account and `wrangler login`.
+- **Agents:** all six first-wave workstreams in parallel, each in its own worktree. Keep Grok use modest: about 15 bench requests per agent per round, unless the user says otherwise.
 
 ## Loose ends from 2026-10-26
 
 - Not yet tried by hand: the chart's fading trace of the old curve and the drag readouts.
 - Inline maths makes some lines taller than others in paragraphs.
 - Confirm the finished page now stays at the top (`SurfaceScreen` scrolls to the top when done).
-- The on-device model still makes domain mistakes in formulas, such as adding the number of people to a bill total.

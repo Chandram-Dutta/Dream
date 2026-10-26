@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Builds the engine and composer for macOS and runs them on this Mac.
-# Usage: Tools/bench.sh [-provider xai] [-strategy onePass] ["a request" ...]
+# Usage: Tools/bench.sh [-xaiModel grok-4.7] ["a request" ...]
 # For Grok, keep the key in the login Keychain: security add-generic-password -a xai -s dream -w
 set -e
 cd "$(dirname "$0")/.."
