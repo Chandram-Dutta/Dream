@@ -7,7 +7,7 @@ DEVICE=${DREAM_DEVICE:-00008150-000E4D423A82401C}
 out=$1; request=$2
 mkdir -p "$out"
 log="$out/console.log"
-xcrun devicectl device process launch --device $DEVICE --terminate-existing --console com.chandramdutta.dream -- -provider xai -DreamAutoIntent "$request" -DreamTour 1 > "$log" 2>&1 &
+xcrun devicectl device process launch --device $DEVICE --terminate-existing --console xyz.onlychan.Dream -- -provider xai -DreamAutoIntent "$request" -DreamTour 1 > "$log" 2>&1 &
 launcher=$!
 for i in {1..240}; do
   sleep 1

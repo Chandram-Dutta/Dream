@@ -190,12 +190,13 @@
 		DA000000000000000000000E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = Dream;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dream listens when you tap the microphone, so you can ask out loud.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Dream turns what you say into text on your iPhone.";
@@ -208,8 +209,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chandramdutta.dream;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.Dream;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -221,12 +223,13 @@
 		DA000000000000000000000F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				INFOPLIST_KEY_CFBundleDisplayName = Dream;
 				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Dream listens when you tap the microphone, so you can ask out loud.";
 				INFOPLIST_KEY_NSSpeechRecognitionUsageDescription = "Dream turns what you say into text on your iPhone.";
@@ -239,8 +242,9 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 0.1;
-				PRODUCT_BUNDLE_IDENTIFIER = com.chandramdutta.dream;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.Dream;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -271,6 +275,7 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		DA0000000000000000000022 /* XCRemoteSwiftPackageReference "SwiftMath" */ = {
 			isa = XCRemoteSwiftPackageReference;

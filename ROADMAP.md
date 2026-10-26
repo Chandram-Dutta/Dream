@@ -106,7 +106,7 @@ Sizes: S is up to half a day, M about a day, L more than a day.
   - MapKit for places, distance and travel time.
 - `live` inputs name a source. The engine fetches and refreshes them when the screen opens; the model never types live numbers.
 - `action` blocks are buttons that perform a write only when tapped, showing what they'll send.
-- Needs: WeatherKit enabled for `com.chandramdutta.dream`, which requires a paid membership, plus the Apple Weather attribution on screen.
+- Needs: WeatherKit enabled for `xyz.onlychan.Dream`, which requires a paid membership, plus the Apple Weather attribution on screen.
 
 **8. MCP client (M)** (depends on 7)
 - Uses the official MCP Swift SDK, with remote HTTP servers only.
@@ -158,7 +158,7 @@ Every workstream touches these files, so the foundation pass should do the share
 ## Decisions (2026-10-27)
 
 - **On-device model:** removed as a page builder, kept as a helper for small private jobs.
-- **Developer membership:** paid, so WeatherKit is available. Enable it for `com.chandramdutta.dream` when workstream 7 starts.
+- **Developer membership:** paid, so WeatherKit is available. Enable it for `xyz.onlychan.Dream` when workstream 7 starts.
 - **Sharing backend:** Cloudflare (Workers with R2, D1 or KV). The same backend later serves the web viewer and Dream's MCP server. It needs the user's Cloudflare account and `wrangler login`.
 - **Agents:** all six first-wave workstreams in parallel, each in its own worktree. Keep Grok use modest: about 15 bench requests per agent per round, unless the user says otherwise.
 
