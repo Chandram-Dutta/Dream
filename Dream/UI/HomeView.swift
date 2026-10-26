@@ -220,11 +220,15 @@ struct HomeView: View {
     }
 
     /// For testing on a device: launch with `-DreamAutoIntent "split a bill"`. `-DreamXAIKey`
-    /// moves an xAI key into this device's Keychain and switches to Grok.
+    /// moves an xAI key into this device's Keychain and switches to Grok; `-DreamWebKey` does
+    /// the same for the key the web search server expects.
     private func startFromLaunchArgument() {
         if let key = UserDefaults.standard.string(forKey: "DreamXAIKey"), !key.isEmpty {
             Keychain.save(key, for: "xai")
             UserDefaults.standard.set(Composer.Provider.xai.rawValue, forKey: "provider")
+        }
+        if let key = UserDefaults.standard.string(forKey: "DreamWebKey"), !key.isEmpty {
+            Keychain.save(key, for: "web")
         }
         guard !Self.startedAutomatically, let auto = UserDefaults.standard.string(forKey: "DreamAutoIntent"), !auto.isEmpty else { return }
         Self.startedAutomatically = true
