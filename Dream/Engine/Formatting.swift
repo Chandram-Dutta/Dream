@@ -47,6 +47,15 @@ extension Format {
         return value.formatted(.currency(code: code).precision(.fractionLength(whole ? 0 : 2)))
     }
 
+    /// A measured value, like a temperature, a distance or a throw: about three significant
+    /// figures, since none is known to the hundredth. Whole digits are never rounded away.
+    static func measured(_ value: Double) -> String {
+        let magnitude = Swift.abs(value)
+        guard magnitude >= 1, magnitude < 1e12 else { return number(value) }
+        let decimals = magnitude >= 100 ? 0 : magnitude >= 10 ? 1 : 2
+        return value.formatted(.number.precision(.fractionLength(0...decimals)))
+    }
+
     /// Two decimals for everyday sizes; significant digits for small ones, so 1/440 isn't 0;
     /// powers of ten for the very large and very small.
     private static func number(_ value: Double) -> String {

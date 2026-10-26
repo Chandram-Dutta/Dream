@@ -95,7 +95,7 @@ extension Surface {
         if format == .toggle, output(name) != nil { return Reading(number: value != 0 ? "Yes" : "No") }
         guard let unit = shownUnit(name) else { return Reading(number: format.display(value)) }
         let shown = unit.shown(value)
-        let number = format.display(shown)
+        let number = format == .number ? Format.measured(shown) : format.display(shown)
         return Units.span(shown, unit: unit.symbol, number: number) ?? Units.clock(shown, unit: unit.symbol)
             ?? Reading(number: number, unit: unit.symbol, attaches: unit.attaches)
     }

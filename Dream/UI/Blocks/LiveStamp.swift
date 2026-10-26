@@ -29,7 +29,9 @@ extension RenderContext {
         let shown = surface.sources(shownBy: block)
         guard !shown.isEmpty else { return [] }
         let blocks = surface.displayBlocks
-        guard let index = blocks.firstIndex(where: { $0.id == block.id }), index + 1 < blocks.count else { return shown }
+        // A row draws its blocks as if they were on the page; the row's own stamp covers them.
+        guard let index = blocks.firstIndex(where: { $0.id == block.id }) else { return [] }
+        guard index + 1 < blocks.count else { return shown }
         let next = Set(surface.sources(shownBy: blocks[index + 1]))
         return shown.filter { !next.contains($0) }
     }
