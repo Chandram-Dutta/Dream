@@ -254,6 +254,7 @@ final class Composer {
             surface = Surface(wire, reference: found.first ?? fallback).fetched(live)
         }
         await surface.findRecordings()
+        await surface.findMolecules()
         report(Checker.checkBlocks(&surface))
         surface = surface.answered(asking.answers)
         self.surface = surface

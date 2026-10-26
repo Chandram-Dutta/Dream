@@ -77,6 +77,8 @@ struct BlockView: View {
             DiagramBlockView(block: block, context: context)
         case .action:
             ActionBlockView(block: block, context: context)
+        case .scene:
+            SceneBlockView(block: block, context: context).panel(palette, enabled: depth == 0)
         case .slider, .stepper, .field, .toggle, .picker:
             if let input = context.surface.input(block.ref) {
                 ControlView(kind: block.kind, input: input, context: context).panel(palette, enabled: depth == 0)

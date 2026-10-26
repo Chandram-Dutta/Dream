@@ -66,6 +66,7 @@ enum WireBlockKind {
     case list, add
     case figure, diagram
     case action
+    case scene
 }
 
 @Generable
@@ -122,6 +123,8 @@ struct WireSurface {
     var diagrams: [WireDiagram]
     @Guide(description: "Things the user can do with one tap, each shown by an action block. Usually empty.", .count(0...3))
     var actions: [WireAction]
+    @Guide(description: "3D scenes, only where depth teaches, each shown by a scene block", .count(0...2))
+    var scenes: [WireScene]
     @Guide(.count(1...12))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
@@ -148,6 +151,7 @@ extension Surface {
         sounds = Sound.list(wire.sounds)
         takeVisuals(figures: wire.figures.map(Figure.init), diagrams: wire.diagrams.map(Diagram.init))
         actions = Action.list(wire.actions)
+        takeScenes(wire.scenes.map(Scene3D.init))
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -167,6 +171,7 @@ extension Surface {
         sounds = Sound.list(partial: wire.sounds)
         takeVisuals(figures: (wire.figures ?? []).compactMap(Figure.init(partial:)), diagrams: (wire.diagrams ?? []).compactMap(Diagram.init(partial:)))
         actions = Action.list(partial: wire.actions)
+        takeScenes((wire.scenes ?? []).compactMap(Scene3D.init(partial:)))
     }
 }
 

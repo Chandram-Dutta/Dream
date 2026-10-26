@@ -36,6 +36,8 @@ struct Surface: Codable, Hashable {
     var figures: [Figure]? = nil
     /// Flows, cycles and hierarchies, shown by `diagram` blocks.
     var diagrams: [Diagram]? = nil
+    /// Scenes in three dimensions, shown by `scene` blocks. Nil in surfaces made before scenes existed.
+    var scenes: [Scene3D]? = nil
     /// The language and measurement system it was written for, so a reader elsewhere sees it in
     /// theirs. Nil while it's being written, and for surfaces saved before this was recorded.
     var locale: SurfaceLocale?
@@ -155,6 +157,8 @@ enum BlockKind: String, Codable {
     case figure, diagram
     // A button that does something for the user, from `Surface.actions`.
     case action
+    // In three dimensions, from `Surface.scenes`.
+    case scene
 
     var isContainer: Bool { self == .section || self == .row }
     var isControl: Bool { [.slider, .stepper, .field, .toggle, .picker].contains(self) }
