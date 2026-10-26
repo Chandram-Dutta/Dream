@@ -108,8 +108,10 @@ anyway), and no other companies' or models' names. Use "maths" in the U.K. and I
 - **Marketing URL** (optional): none for now. **[A landing page at https://dream.onlychan.xyz/
   later.]**
 
-All three pages are drafts served by the Worker (Server/src/legal.ts) and need a lawyer's review
-before submission.
+All three pages are served by the Worker (Server/src/legal.ts), in Chandram Dutta's name as an
+individual developer, with support@ and privacy@onlychan.xyz as contacts (Cloudflare Email
+Routing). They were written without a lawyer; a one-time review is worth it once there's revenue
+or an EU push.
 
 ## Screenshots
 
@@ -269,7 +271,10 @@ submitted together with a new app version.
 - [ ] Release build archived: Under the hood hidden, testing launch arguments ignored, no model
       traffic in the console (Dream/Engine/Build.swift).
 - [ ] Privacy manifest included, and the App Privacy answers entered from AppPrivacy.md.
-- [ ] Privacy policy, terms and support pages live and reviewed by a lawyer.
+- [x] Privacy policy, terms and support pages written, with support@ and privacy@onlychan.xyz
+  routed (no lawyer review yet; see above).
+- [ ] Parallel's Data Processing Addendum signed, and whether shared pages may carry text made
+  from its results (its terms keep each result for the one person who asked).
 - [ ] Permission before a request first goes to the AI provider (5.1.2(i)): agreed at sign-in, with
   the providers named in the privacy policy (`SignInButton.agreement`). Decide whether review needs
   more than that.
