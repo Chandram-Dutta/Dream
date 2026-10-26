@@ -30,7 +30,7 @@ final class Listener {
     private(set) var level: Double = 0
     /// How long a pause ends listening. Nil keeps listening until told to stop, for commands.
     var pauseToStop: Duration? = .seconds(1.5)
-    var use: VoiceSession.Use = .listening
+    var use: AudioSession.Use = .listening
     /// Called whenever the transcript changes.
     var onTranscript: ((String) -> Void)?
     /// While Dream itself is speaking, so it doesn't hear itself.
@@ -132,9 +132,9 @@ final class Listener {
         guard attempt == current else { return }
 
         // The session comes first: the microphone's format depends on it.
-        try VoiceSession.acquire(use)
+        try AudioSession.acquire(use)
         var started = false
-        defer { if !started { VoiceSession.release() } }
+        defer { if !started { AudioSession.release(use) } }
         let engine = AVAudioEngine()
         let format = engine.inputNode.outputFormat(forBus: 0)
         guard format.sampleRate > 0, format.channelCount > 0 else { throw Problem.failed }
@@ -324,7 +324,7 @@ final class Listener {
         results?.cancel()
         results = nil
         if holdsSession {
-            VoiceSession.release()
+            AudioSession.release(use)
             holdsSession = false
         }
     }

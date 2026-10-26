@@ -15,7 +15,7 @@ final class Reader: NSObject {
     /// How far through: the passage being read, out of how many.
     private(set) var position = 0
     private(set) var count = 0
-    var use: VoiceSession.Use = .reading
+    var use: AudioSession.Use = .reading
 
     @ObservationIgnored private let synthesizer = AVSpeechSynthesizer()
     @ObservationIgnored private var script: (() -> [Narration.Passage])?
@@ -37,7 +37,7 @@ final class Reader: NSObject {
         stop()
         guard !script().isEmpty else { return }
         do {
-            try VoiceSession.acquire(use)
+            try AudioSession.acquire(use)
             holdsSession = true
         } catch {
             return
@@ -108,7 +108,7 @@ final class Reader: NSObject {
         position = 0
         count = 0
         if holdsSession {
-            VoiceSession.release()
+            AudioSession.release(use)
             holdsSession = false
         }
     }

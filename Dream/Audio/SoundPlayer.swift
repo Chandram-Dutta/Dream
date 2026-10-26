@@ -157,22 +157,23 @@ final class SoundPlayer {
 
     // MARK: - Audio session
 
+    @ObservationIgnored private var holdsSession = false
+
     private func activate() -> Bool {
-        let session = AVAudioSession.sharedInstance()
+        guard !holdsSession else { return true }
         do {
-            try session.setCategory(.playback, mode: .default)
-            try session.setActive(true)
+            try AudioSession.acquire(.sound)
+            holdsSession = true
             return true
         } catch {
             return false
         }
     }
 
-    /// Back to the system's default once nothing's playing, so other audio can carry on.
+    /// Handed back once nothing's playing, so other audio can carry on.
     private func deactivate() {
-        guard playing == nil else { return }
-        let session = AVAudioSession.sharedInstance()
-        try? session.setActive(false, options: .notifyOthersOnDeactivation)
-        try? session.setCategory(.soloAmbient)
+        guard playing == nil, holdsSession else { return }
+        AudioSession.release(.sound)
+        holdsSession = false
     }
 }
