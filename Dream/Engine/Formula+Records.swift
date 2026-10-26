@@ -104,7 +104,7 @@ extension Surface {
     /// when the name isn't a list.
     func column(_ name: String, in records: [String: [Record]]) -> [Double]? {
         let parts = name.split(separator: ".", maxSplits: 1).map(String.init)
-        guard let collection = collection(parts[0]) else { return nil }
+        guard let first = parts.first, let collection = collection(first) else { return nil }
         let entries = collection.chronological(records[collection.name] ?? [])
         guard parts.count == 2 else { return entries.map { _ in 1 } }
         guard let field = collection.field(parts[1]) else { return nil }

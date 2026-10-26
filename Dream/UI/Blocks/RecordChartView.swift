@@ -12,7 +12,7 @@ struct RecordChartView: View {
     var body: some View {
         let parts = block.ref.split(separator: ".", maxSplits: 1).map(String.init)
         let along = block.over.split(separator: ".", maxSplits: 1).last.map(String.init) ?? ""
-        if let collection = context.surface.collection(parts[0]), let axis = collection.field(along) {
+        if let first = parts.first, let collection = context.surface.collection(first), let axis = collection.field(along) {
             let measure = parts.count == 2 ? collection.field(parts[1]) : nil
             let points = collection.series(of: measure?.name, along: axis.name, in: context.state.records[collection.name] ?? [])
             VStack(alignment: .leading, spacing: 14) {

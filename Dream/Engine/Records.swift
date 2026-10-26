@@ -367,7 +367,8 @@ extension Surface {
     /// A collection's label, or a field's ("expenses.amount" → "Amount"), for whatever names them.
     func collectionLabel(_ name: String) -> String? {
         let parts = name.split(separator: ".", maxSplits: 1).map(String.init)
-        guard let collection = collection(parts[0]) else { return nil }
+        // Empty while a block is still streaming in.
+        guard let first = parts.first, let collection = collection(first) else { return nil }
         guard parts.count == 2 else { return collection.label }
         return collection.field(parts[1])?.label
     }

@@ -109,7 +109,7 @@ extension Checker {
         guard !surface.recordCollections.isEmpty, !block.ref.isEmpty else { return false }
         let parts = block.ref.split(separator: ".", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
         let names = Set(surface.recordCollections.map(\.name))
-        guard let name = surface.collection(parts[0])?.name ?? closestName(to: parts[0], in: names),
+        guard let first = parts.first, let name = surface.collection(first)?.name ?? closestName(to: first, in: names),
               let collection = surface.collection(name) else { return false }
         var measured = collection.name
         if parts.count == 2 {
