@@ -49,6 +49,7 @@ final class ConnectionStore {
                 }
             },
             personalDetails: personalDetails)
+        Connections.registerLive()
         Task { await refresh(olderThan: 24 * 60 * 60) }
     }
 

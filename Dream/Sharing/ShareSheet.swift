@@ -33,6 +33,12 @@ struct ShareSheet: View {
     @State private var links: [Bool: URL] = [:]
     @State private var isUploading = false
     @State private var failure: String?
+    /// Whether the user chose to share what connected services gave the page. Until then a page
+    /// that holds some can't go anywhere.
+    @State private var sharesServices = false
+
+    private var services: [String] { surface.services ?? [] }
+    private var waitsForChoice: Bool { !services.isEmpty && !sharesServices }
 
     private var palette: Palette { surface.palette }
     private var shared: SharedSurface { SharedSurface(sharing: surface, values: includesNumbers ? values : nil) }
@@ -54,6 +60,9 @@ struct ShareSheet: View {
                             .panel(palette)
                     }
                     privacy
+                    if !services.isEmpty {
+                        ServiceShareChoice(services: services, palette: palette, isOn: $sharesServices)
+                    }
                     actions
                 }
                 .padding(.horizontal, 20)
@@ -138,9 +147,9 @@ struct ShareSheet: View {
                 } label: {
                     action(isUploading ? "Making a link…" : "Make a link", symbol: "link", busy: isUploading)
                 }
-                .disabled(isUploading || server == nil)
+                .disabled(isUploading || server == nil || waitsForChoice)
             }
-            if let picture {
+            if let picture, !waitsForChoice {
                 ShareLink(item: Image(uiImage: picture), preview: SharePreview(title, image: Image(uiImage: picture))) {
                     action("Share picture", symbol: "photo", prominent: false)
                 }

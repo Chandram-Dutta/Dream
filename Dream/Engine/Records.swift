@@ -18,6 +18,10 @@ struct RecordCollection: Codable, Hashable {
     /// Entries anyone would start with, like what to pack for a beach. Shareable defaults, copied
     /// into the user's records the first time the surface opens. Keyed by field name.
     var starters: [[String: RecordValue]] = []
+    /// A list a connected service returned, like searchNotes.notes, that fills this one and keeps
+    /// it current. Its entries are the service's, so nobody edits them here. Nil for a list the
+    /// user keeps.
+    var source: String? = nil
 
     func field(_ name: String) -> RecordField? { fields.first { $0.name == name } }
 
@@ -391,7 +395,8 @@ extension Surface {
             let fields = collection.fields.map { field in
                 field.type == .choice ? "\(field.name) (choice of \(field.options.joined(separator: " / ")))" : "\(field.name) (\(field.type.rawValue))"
             }
-            lines.append("- \(collection.name): \"\(collection.label)\", each \(collection.anEntry): \(fields.joined(separator: ", "))")
+            lines.append("- \(collection.name): \"\(collection.label)\", each \(collection.anEntry): \(fields.joined(separator: ", "))"
+                + (collection.source.map { "; filled from \($0)" } ?? ""))
             if let title = collection.titleField, !collection.starters.isEmpty {
                 let titles = collection.starters.prefix(30).compactMap { $0[title.name].map(title.written) }
                 lines.append("  starters: \(titles.joined(separator: ", "))")
@@ -409,6 +414,7 @@ extension RecordCollection {
         entry = try container.decodeIfPresent(String.self, forKey: .entry) ?? ""
         fields = try container.decodeIfPresent([RecordField].self, forKey: .fields) ?? []
         starters = try container.decodeIfPresent([[String: RecordValue]].self, forKey: .starters) ?? []
+        source = try container.decodeIfPresent(String.self, forKey: .source)
     }
 }
 

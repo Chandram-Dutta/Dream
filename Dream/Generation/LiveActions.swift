@@ -21,10 +21,14 @@ protocol ActionPerformer: Sendable {
     func details(_ action: ResolvedAction) -> [String]
     /// Does it. Throws `LiveError` with words the user can act on.
     func perform(_ action: ResolvedAction) async throws -> ActionDone
+    /// Whether this one asks once more, for performers whose actions differ, like a connected
+    /// service's tools, some of which can delete. Usually just `confirms`.
+    func needsConfirmation(_ action: ResolvedAction) -> Bool
 }
 
 extension ActionPerformer {
     var confirms: Bool { false }
+    func needsConfirmation(_ action: ResolvedAction) -> Bool { confirms }
 }
 
 /// What an action did, in words, and where to see it.

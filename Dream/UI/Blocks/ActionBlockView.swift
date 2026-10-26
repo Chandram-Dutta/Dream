@@ -32,7 +32,7 @@ struct ActionBlockView: View {
         let done: ActionDone? = if case .done(let done) = phase { done } else { nil }
         VStack(alignment: .leading, spacing: 10) {
             Button {
-                if performer?.confirms == true { confirming = true } else { perform(action, with: performer) }
+                if performer?.needsConfirmation(action) == true { confirming = true } else { perform(action, with: performer) }
             } label: {
                 HStack(alignment: .center, spacing: 14) {
                     Image(systemName: done == nil ? performer?.symbol ?? "exclamationmark.circle" : "checkmark.circle.fill")
@@ -91,6 +91,8 @@ struct ActionBlockView: View {
         .sensoryFeedback(.success, trigger: done)
         .confirmationDialog(sentence, isPresented: $confirming, titleVisibility: .visible) {
             Button("Do it") { perform(action, with: performer) }
+        } message: {
+            Text((performer?.details(action) ?? []).joined(separator: "\n"))
         }
     }
 

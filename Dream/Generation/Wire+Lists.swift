@@ -37,20 +37,29 @@ struct WireCollection {
     var fields: [WireField]
     @Guide(description: "Only entries the request itself implies, like what to pack for a beach. Never the user's own figures, like expenses or weights. Usually empty.", .maximumCount(30))
     var starters: [WireStarter]
+    @Guide(description: "Empty for a list the user keeps. For a list a connected service's tool returned, its name as the tool said, like searchNotes.notes")
+    var source: String
 }
 
 extension RecordCollection {
     init(_ wire: WireCollection) {
         let fields = wire.fields.map { RecordField($0) }
         self.init(name: wire.name, label: wire.label, entry: wire.entry, fields: fields,
-                  starters: wire.starters.map { Self.starter($0.values, fields: fields) })
+                  starters: wire.starters.map { Self.starter($0.values, fields: fields) },
+                  source: Self.source(wire.source))
     }
 
     init?(partial wire: WireCollection.PartiallyGenerated) {
         guard let name = wire.name, !name.isEmpty else { return nil }
         let fields = (wire.fields ?? []).compactMap { RecordField(partial: $0) }
         self.init(name: name, label: wire.label ?? "", entry: wire.entry ?? "", fields: fields,
-                  starters: (wire.starters ?? []).map { Self.starter($0.values ?? [], fields: fields) })
+                  starters: (wire.starters ?? []).map { Self.starter($0.values ?? [], fields: fields) },
+                  source: Self.source(wire.source ?? ""))
+    }
+
+    private static func source(_ written: String) -> String? {
+        let source = written.trimmingCharacters(in: .whitespacesAndNewlines)
+        return source.isEmpty ? nil : source
     }
 
     /// A starter's values, written in field order, by field name.

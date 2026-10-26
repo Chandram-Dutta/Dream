@@ -42,7 +42,11 @@ struct ListBlockView: View {
             ForEach(Array(lines.enumerated()), id: \.element.id) { index, line in
                 switch line {
                 case .entry(let record):
-                    row(record, in: collection)
+                    if collection.source != nil {
+                        ServiceEntryRow(record: record, collection: collection, palette: palette)
+                    } else {
+                        row(record, in: collection)
+                    }
                     if index + 1 < lines.count, case .entry = lines[index + 1] {
                         Rectangle()
                             .fill(palette.edge)
@@ -55,9 +59,11 @@ struct ListBlockView: View {
                             .font(.subheadline.weight(.semibold))
                             .foregroundStyle(.secondary)
                         Spacer()
-                        Button("Clear") { state.delete(done.map(\.id), from: collection, in: context.surface) }
-                            .font(.subheadline)
-                            .foregroundStyle(palette.accent)
+                        if collection.source == nil {
+                            Button("Clear") { state.delete(done.map(\.id), from: collection, in: context.surface) }
+                                .font(.subheadline)
+                                .foregroundStyle(palette.accent)
+                        }
                     }
                     .padding(.top, open.isEmpty ? 4 : 18)
                     .padding(.bottom, 2)
@@ -70,7 +76,7 @@ struct ListBlockView: View {
                     .padding(.vertical, 12)
             }
             if all.isEmpty && !working {
-                Text("No \(collection.entries) yet")
+                Text(collection.source == nil ? "No \(collection.entries) yet" : "No \(collection.entries) right now")
                     .font(.subheadline)
                     .foregroundStyle(.tertiary)
                     .padding(.vertical, 12)

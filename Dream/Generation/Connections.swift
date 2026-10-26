@@ -192,6 +192,14 @@ enum Connections {
             connection.tools.filter { $0.isOn && $0.readsOnly && $0.isRepresentable }.map { (connection, $0) }
         }
     }
+
+    /// Every tool that changes things the model may turn into a button while building. Calling
+    /// one never runs it.
+    static var writingTools: [(connection: Connection, tool: ConnectedTool)] {
+        source.connections().filter(\.isOn).flatMap { connection in
+            connection.tools.filter { $0.isOn && !$0.readsOnly && $0.isRepresentable }.map { (connection, $0) }
+        }
+    }
 }
 
 // MARK: - Picking
@@ -255,6 +263,29 @@ enum ToolPicker {
         kept += request.split(whereSeparator: \.isWhitespace).map(String.init).filter { $0.contains("-") || $0.contains("/") }
         return kept.joined(separator: " ")
     }
+
+    /// Whether the request asks to do something, not only to know something: only then are
+    /// tools that change things worth turning into buttons.
+    static func asksToAct(_ request: String) -> Bool {
+        // Only as verbs: "my open issues" and "my notes" ask nothing to be done.
+        let tagger = NLTagger(tagSchemes: [.lexicalClass])
+        let text = request.lowercased()
+        tagger.string = text
+        var acts = false
+        tagger.enumerateTags(in: text.startIndex..<text.endIndex, unit: .word, scheme: .lexicalClass, options: [.omitWhitespace, .omitPunctuation]) { tag, range in
+            let word = String(text[range])
+            if tag == .verb, actWords.contains(where: { word == $0 || (word.hasPrefix($0) && word.count <= $0.count + 3) }) { acts = true }
+            return !acts
+        }
+        return acts
+    }
+
+    private static let actWords: [String] = [
+        "add", "append", "create", "save", "store", "post", "send", "log", "record", "file", "put", "write", "note",
+        "remind", "schedule", "book", "update", "change", "edit", "rename", "move", "assign", "close", "complete",
+        "finish", "mark", "delete", "remove", "archive", "cancel", "comment", "reply", "invite", "upload", "publish",
+        "open", "start", "track", "set", "make", "turn",
+    ]
 
     private static func matches(_ word: String, _ words: Set<String>) -> Bool {
         if words.contains(word) { return true }

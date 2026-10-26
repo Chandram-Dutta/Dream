@@ -35,6 +35,8 @@ final class Composer {
     let asking = Asking()
     /// The live data fetched while writing, which the surface's live inputs bind to.
     private let live = LiveLog()
+    /// Buttons proposed for connected services' write tools, and which services were read.
+    private let connected = ConnectionLog()
 
     /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
     enum Provider: String, CaseIterable {
@@ -85,6 +87,7 @@ final class Composer {
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         asking.start()
         live.start()
+        connected.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
         do {
@@ -111,6 +114,7 @@ final class Composer {
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
+        connected.start(keeping: current)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
         do {
@@ -159,7 +163,7 @@ final class Composer {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
-            + ConnectionTool.offered(for: request, asking: asking, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
+            + ConnectionTool.offered(for: request, asking: asking, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
     }
 
     private func lookingUp(_ subject: String) {
@@ -243,15 +247,15 @@ final class Composer {
         phase = .composing
         let found = ReferenceLog()
         let session = session(Prompts.surface, tools: tools(found: found))
-        var surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming).fetched(live)
+        var surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming).fetched(live).connected(connected)
         for round in 0...2 {
-            let issues = Checker.checkLogic(&surface)
+            let issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
             if problems.isEmpty || round == 2 { break }
             phase = .fixing(problems.count)
             let wire = try await generate(WireSurface.self, in: session, step: "Repair \(round + 1)", prompt: Prompt(Prompts.repair(problems)))
-            surface = Surface(wire, reference: found.first ?? fallback).fetched(live)
+            surface = Surface(wire, reference: found.first ?? fallback).fetched(live).connected(connected)
         }
         await surface.findRecordings()
         await surface.findMolecules()

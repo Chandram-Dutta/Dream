@@ -49,7 +49,7 @@ extension Surface {
         if let actions, !actions.isEmpty {
             lines.append("actions:")
             for action in actions {
-                let fields = action.fields.sorted { $0.key < $1.key }.map { "\($0.key) \"\($0.value)\"" }.joined(separator: ", ")
+                let fields = action.isConnection ? action.connectionOutline : action.fields.sorted { $0.key < $1.key }.map { "\($0.key) \"\($0.value)\"" }.joined(separator: ", ")
                 lines.append("- \(action.name): \(action.kind), \(fields)")
             }
         }

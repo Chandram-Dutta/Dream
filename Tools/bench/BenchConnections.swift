@@ -33,6 +33,35 @@ enum BenchConnections {
             connections: { fixed },
             call: { connection, tool, arguments in try await ConnectionSessions.shared.call(connection, tool: tool, arguments: arguments) },
             personalDetails: { remembered.map(\.detail) })
+        Connections.registerLive()
+    }
+
+    /// What the screen would do with a surface's connected services: read each source again,
+    /// as a pull does, and show the buttons for write tools as they'd read.
+    static func showLive(_ surface: Surface) async {
+        for collection in surface.recordCollections where collection.source != nil {
+            print("List \(collection.name) is filled from \(collection.source ?? "")")
+        }
+        for source in surface.liveSources where source.isConnection {
+            do {
+                let reading = try await LiveSources.read(source, again: true)
+                print("Read \(source.name) again, as a pull would:")
+                for (input, value) in surface.liveValues(reading, from: source.name).sorted(by: { $0.key < $1.key }) {
+                    print("  \(input) = \(value.plain)")
+                }
+                for (collection, entries) in surface.serviceRecords(reading, from: source.name) {
+                    let title = surface.collection(collection)?.titleField?.name ?? ""
+                    print("  \(collection): \(entries.count) entries (\(entries.compactMap { $0[title]?.textValue }.joined(separator: ", ")))")
+                }
+            } catch {
+                print("Couldn't read \(source.name) again: \(error.localizedDescription)")
+            }
+        }
+        let performer = ConnectionPerformer()
+        for action in surface.actions ?? [] where action.isConnection {
+            let resolved = ResolvedAction(name: action.name, kind: action.kind, text: action.fields, start: nil, hasTime: false, minutes: nil)
+            print("Button \(action.name): “\(performer.sentence(resolved))”\(performer.needsConfirmation(resolved) ? ", asks first" : "") — \(performer.details(resolved).joined(separator: "; "))")
+        }
     }
 
     static func showPicks(_ requests: [String]) {

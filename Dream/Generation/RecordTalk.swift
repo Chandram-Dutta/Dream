@@ -29,6 +29,8 @@ enum RecordTalk {
     /// `adding` is a list's add bar: only new entries for that list. Nil when nothing could make
     /// sense of it.
     static func interpret(_ text: String, image: CGImage? = nil, surface: Surface, records: [String: [Record]], adding: String? = nil, now: Date = .now) async -> Outcome? {
+        // A list a connected service fills is the service's, not the user's to change here.
+        let surface = surface.keepingOwnLists
         let collections = surface.recordCollections.filter { adding == nil || $0.name == adding }
         guard !collections.isEmpty, let schema = try? RecordSchema.schema(for: collections, adding: adding != nil) else { return nil }
         let request = Prompts.recordRequest(text, surface: surface, records: records, hasImage: image != nil, adding: adding, now: now)
