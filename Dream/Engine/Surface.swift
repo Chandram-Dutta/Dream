@@ -24,6 +24,8 @@ struct Surface: Codable, Hashable {
     /// angle change the throw?". Nil when nothing's calculated. Remembered with the surface, so
     /// it can be found again for the same question.
     var question: String?
+    /// Tones and recordings that `sound` blocks play. Nil in surfaces saved before sounds existed.
+    var sounds: [Sound]?
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -35,7 +37,7 @@ struct Surface: Codable, Hashable {
 
     func input(_ name: String) -> Input? { inputs.first { $0.name == name } }
     func output(_ name: String) -> Output? { outputs.first { $0.name == name } }
-    func label(of name: String) -> String { input(name)?.label ?? output(name)?.label ?? name }
+    func label(of name: String) -> String { input(name)?.label ?? output(name)?.label ?? sound(name)?.label ?? name }
 
     var initialValues: [String: Double] {
         Dictionary(inputs.map { ($0.name, $0.initial) }, uniquingKeysWith: { first, _ in first })
@@ -127,6 +129,8 @@ enum BlockKind: String, Codable {
     case paragraph, facts, bullets, steps, timeline, stat, equation, data
     // Grouping.
     case section, row
+    // Something to hear, from `Surface.sounds`.
+    case sound
 
     var isContainer: Bool { self == .section || self == .row }
     var isControl: Bool { [.slider, .stepper, .field, .toggle, .picker].contains(self) }

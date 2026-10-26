@@ -169,6 +169,7 @@ enum Checker {
             surface.inputs[index].role = .adjustable
             fixed("Gave '\(surface.inputs[index].name)' a control, since no chart runs along it.")
         }
+        issues += checkSounds(&surface)
         let reference = surface
 
         /// `{name}` placeholders the calculation can fill; others are dropped.
@@ -331,6 +332,10 @@ enum Checker {
                 block.text = cleaned(prose(block.text))
                 guard !block.text.isEmpty else { return nil }
 
+            case .sound:
+                guard let checked = soundBlock(block, in: reference, fixed: fixed) else { return nil }
+                block = checked
+
             case .facts, .bullets, .steps, .timeline, .stat:
                 (block.ref, block.over, block.children) = ("", "", [])
                 if block.items.isEmpty {
@@ -357,7 +362,7 @@ enum Checker {
             .prefix(6))
 
         // A calculation the blocks don't show is still placed, so it's never lost.
-        guard surface.hasLogic else { return issues }
+        guard surface.hasLogic else { return issues + placeSounds(&surface) }
         if heroes == 0, let main = surface.outputs.first?.name,
            let index = surface.blocks.firstIndex(where: { $0.kind == .metric && $0.ref == main }) {
             surface.blocks[index].kind = .hero
@@ -398,6 +403,7 @@ enum Checker {
             }
         }
         issues += placeCharts(&surface)
+        issues += placeSounds(&surface)
         return issues
     }
 

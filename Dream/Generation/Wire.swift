@@ -56,6 +56,7 @@ enum WireBlockKind {
     case hero, metric, slider, stepper, field, toggle, picker, chart
     case paragraph, facts, bullets, steps, timeline, stat, equation, data
     case section, row
+    case sound
 }
 
 @Generable
@@ -101,6 +102,8 @@ struct WireSurface {
     var inputs: [WireInput]
     @Guide(description: "Results calculated from the inputs, main result first", .count(0...6))
     var outputs: [WireOutput]
+    @Guide(description: "Sounds the user can play, only when hearing something teaches", .count(0...3))
+    var sounds: [WireSound]
     @Guide(.count(1...12))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
@@ -123,6 +126,7 @@ extension Surface {
             related: wire.related,
             reference: reference,
             question: wire.question.isEmpty ? nil : wire.question)
+        sounds = Sound.list(wire.sounds)
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -138,6 +142,7 @@ extension Surface {
             related: wire.related ?? [],
             reference: reference,
             question: wire.question.flatMap { $0.isEmpty ? nil : $0 })
+        sounds = Sound.list(partial: wire.sounds)
     }
 }
 

@@ -140,6 +140,8 @@ enum Prompts {
             return "the equation for \"\(surface.label(of: block.ref))\" (\(block.ref), #\(block.id))"
         case .paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data:
             return "the \(block.kind.rawValue) block\(block.title.isEmpty ? "" : " \"\(block.title)\"") (#\(block.id))"
+        case .sound:
+            return "the sound \"\(surface.sound(block.ref)?.label ?? block.ref)\" (\(block.ref), #\(block.id))"
         }
     }
 }
@@ -189,6 +191,7 @@ extension Surface {
             }
         }
         var all = ["\(title): \(summary)"] + lines(visibleBlocks, depth: 0)
+        all += soundOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
         return all.joined(separator: "\n")
     }

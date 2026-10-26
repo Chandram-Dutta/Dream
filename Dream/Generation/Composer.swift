@@ -164,6 +164,7 @@ final class Composer {
             let wire = try await generate(WireSurface.self, in: session, step: "Repair \(round + 1)", prompt: Prompt(Prompts.repair(problems)))
             surface = Surface(wire, reference: found.first ?? fallback)
         }
+        await surface.findRecordings()
         report(Checker.checkBlocks(&surface))
         self.surface = surface
         note(surface.outline)
