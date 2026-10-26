@@ -21,6 +21,7 @@
 import type { Env } from "./index";
 import { sharingErasure } from "./sharing";
 import { exportUserData, syncErasure } from "./syncdata";
+import { planErasure } from "./usage";
 
 export interface Holding {
   name: string;
@@ -30,6 +31,28 @@ export interface Holding {
 
 /** Every workstream's tables. The account's own come after these, in `ACCOUNT`. */
 const HOLDINGS: Holding[] = [
+  {
+    name: "plan",
+    // What was used each month and the subscription's state; not what the pages said.
+    export: async (env, user) => ({
+      usage: (await rows(env, "SELECT period, pages, tokens_in, tokens_out, searches, reads FROM usage WHERE user_id = ? ORDER BY period", user)).map((row) => ({
+        period: row.period,
+        pages: row.pages,
+        tokensIn: row.tokens_in,
+        tokensOut: row.tokens_out,
+        searches: row.searches,
+        reads: row.reads,
+      })),
+      subscriptions: (await rows(env, "SELECT product_id, environment, expires_at, revoked_at, auto_renew FROM subscriptions WHERE user_id = ?", user)).map((row) => ({
+        product: row.product_id,
+        environment: row.environment,
+        expiresAt: typeof row.expires_at === "number" ? new Date(row.expires_at).toISOString() : null,
+        revokedAt: typeof row.revoked_at === "number" ? new Date(row.revoked_at).toISOString() : null,
+        renews: row.auto_renew === null ? null : row.auto_renew === 1,
+      })),
+    }),
+    erase: async (env, user) => planErasure(env, user),
+  },
   {
     name: "synced",
     // Pages with their numbers and conversations, list entries, memory, connections (never their

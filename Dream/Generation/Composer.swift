@@ -44,15 +44,18 @@ final class Composer {
     /// The web pages read while writing, which the surface may cite (WebSearch.swift).
     private let web = WebLog()
 
-    /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
+    /// Which model writes surfaces. If the chosen one can't be used or fails, the next is tried.
     enum Provider: String, CaseIterable {
-        /// Grok, with an xAI API key from the Keychain.
+        /// Grok through Dream's server, with the signed-in user's session and allowance (DreamModel.swift).
+        case dream
+        /// Grok, with the developer's own xAI API key from the Keychain.
         case xai
         /// Needs an entitlement Apple grants on request (com.apple.developer.private-cloud-compute).
         case privateCloud
 
         var name: String {
             switch self {
+            case .dream: "Dream (\(Composer.xaiModelID))"
             case .xai: "Grok (\(Composer.xaiModelID))"
             case .privateCloud: "Private Cloud Compute"
             }
@@ -60,20 +63,24 @@ final class Composer {
 
         var isUsable: Bool {
             switch self {
+            case .dream: DreamLanguageModel.isUsable
             case .xai: XAILanguageModel.savedKey != nil
             case .privateCloud: PrivateCloudComputeLanguageModel().isAvailable
             }
         }
     }
 
-    nonisolated static var provider: Provider { Provider(rawValue: UserDefaults.standard.string(forKey: "provider") ?? "") ?? .xai }
+    nonisolated static var provider: Provider { Provider(rawValue: UserDefaults.standard.string(forKey: "provider") ?? "") ?? .dream }
     nonisolated static var xaiModelID: String { UserDefaults.standard.string(forKey: "xaiModel").flatMap { $0.isEmpty ? nil : $0 } ?? "grok-4.7" }
 
     /// Whether any model can make screens right now.
     static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
 
     /// The model this request runs on.
-    private var active: Provider = .xai
+    private var active: Provider = .dream
+    /// This build or change, as Dream's server counts pages: every request for it, the gap check
+    /// included, carries it.
+    private var page = UUID().uuidString
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
@@ -91,6 +98,7 @@ final class Composer {
         isThinking = true
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
+        page = UUID().uuidString
         asking.start()
         live.start()
         connected.start()
@@ -120,6 +128,7 @@ final class Composer {
         isThinking = true
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
+        page = UUID().uuidString
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
         connected.start(keeping: current)
@@ -147,7 +156,7 @@ final class Composer {
     private func withModel(_ run: () async throws -> Void) async throws {
         let usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
         guard let first = usable.first else {
-            throw ComposeError("Dream needs a model to make screens. Add an xAI API key in Under the hood.")
+            throw ComposeError("Sign in to make pages.")
         }
         active = first
         note("Model: \(active.name)")
@@ -162,6 +171,7 @@ final class Composer {
 
     private func session(_ instructions: String, tools: [any Tool]) -> LanguageModelSession {
         switch active {
+        case .dream: LanguageModelSession(model: DreamLanguageModel(modelID: Self.xaiModelID, page: page), tools: tools, instructions: instructions)
         case .xai: LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Self.xaiModelID), tools: tools, instructions: instructions)
         case .privateCloud: LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: tools, instructions: instructions)
         }

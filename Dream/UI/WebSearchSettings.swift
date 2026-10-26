@@ -29,7 +29,7 @@ struct WebSearchSettings: View {
         } header: {
             Text("Web search")
         } footer: {
-            Text("Dream searches the web and reads pages through its own server, which asks for this key. The key stays in the Keychain. Searches are written to carry only what a question is about, leaving out what Dream knows about you. An empty server uses the sharing server.")
+            Text("Dream searches the web and reads pages through its own server, for whoever's signed in. The iPhone shows the server it's Dream with App Attest; this key does the same where that isn't set up, and also reaches the model through the server. The key stays in the Keychain. Searches are written to carry only what a question is about, leaving out what Dream knows about you. An empty server uses the sharing server.")
         }
     }
 }

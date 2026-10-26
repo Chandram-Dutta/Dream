@@ -11,12 +11,14 @@ struct DreamApp: App {
         ConnectionStore.shared.start(container)
         Account.shared.start(container)
         Sync.start(container)
+        Plan.shared.start()
     }
 
     var body: some Scene {
         WindowGroup {
             HomeView()
                 .accountFlow()
+                .offeringPlans()
         }
         .modelContainer(container)
     }

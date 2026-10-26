@@ -17,11 +17,19 @@ fi
 if [[ -z "$DREAM_WEB_KEY" ]]; then
   export DREAM_WEB_KEY="$(security find-generic-password -a web -s dream -w 2>/dev/null || true)"
 fi
+# Through Dream's server with DREAM_SERVER, as in bench.sh; otherwise straight to Grok.
+provider=(-provider xai)
+if [[ -n "$DREAM_SERVER" ]]; then
+  if [[ -z "$DREAM_SESSION" ]]; then
+    export DREAM_SESSION="$(curl -sf -X POST "$DREAM_SERVER/api/dev/session?user=bench" | /usr/bin/python3 -c 'import json,sys; print(json.load(sys.stdin)["token"])')"
+  fi
+  provider=(-provider dream -shareServer "$DREAM_SERVER")
+fi
 settings=()
 while [[ "$1" == -* ]]; do
   settings+=("$1" "$2"); shift 2
 done
 for request in "$@"; do
-  "$bin" -provider xai "${settings[@]}" "$request" > "$out/$(echo $request | tr ' /' '--').txt" 2>&1 &
+  "$bin" "${provider[@]}" "${settings[@]}" "$request" > "$out/$(echo $request | tr ' /' '--').txt" 2>&1 &
 done
 wait

@@ -24,6 +24,11 @@ their own account instead, for their devices only: see [Sync](#sync).
 | `GET /reader` | What DreamReader is, for site owners who see it in their logs. |
 | `GET /api/sync`, `POST /api/sync` | A signed-in person's changes, read and sent. See [Sync](#sync). |
 | `PUT`, `GET`, `DELETE /api/photos/:id` | Photos from a signed-in person's pages. |
+| `POST /api/model` | The model, for signed-in users of the app. See [The model](#the-model). |
+| `GET /api/usage` | The account's plan, and pages used and left. See [Plans and limits](#plans-and-limits). |
+| `POST /api/appstore/transactions` | Dream Plus purchases the app made or restored. See [Dream Plus](#dream-plus). |
+| `POST /api/appstore/notifications` | App Store Server Notifications v2. |
+| `POST /api/attest/challenge`, `POST /api/attest/key` | App Attest. See [App Attest](#app-attest). |
 
 ## What's uploaded
 
@@ -275,8 +280,11 @@ POST /api/read    { "url": "https://…", "focus": "new features", "maxChars": 4
 → { "url", "canonical", "title", "site", "date", "language", "text", "excerpted", "truncated", "via", "cached" }
 ```
 
-Both need `Authorization: Bearer <app key>`. `count` is 1 to 8 (default 5); `freshness` is day,
-week, month or year; `region` is a two-letter country; `maxChars` is 500 to 12,000 (default 6,000).
+Both need the user's session (`Authorization: Bearer <session>`) and proof that it's the app
+asking: an App Attest assertion, or the shared app key in `X-Dream-Key` (see
+[App Attest](#app-attest)). Each counts against the account's daily allowance. `count` is 1 to 8
+(default 5); `freshness` is day, week, month or year; `region` is a two-letter country;
+`maxChars` is 500 to 12,000 (default 6,000).
 
 ### Providers
 
@@ -311,11 +319,11 @@ isn't used: Parallel already reads pages that need JavaScript, without a browser
 
 These cost money, so they mustn't become an open proxy:
 
-- **Only the app:** a shared app key in `Authorization`, checked in constant time against the
-  `DREAM_APP_KEYS` secret (several, comma-separated, so one can be rotated out). Without the
-  secret, both routes refuse everything. The app keeps the key in its Keychain (Under the hood ›
-  Web search). A key in an app can be extracted, so it's a speed bump: App Attest, below, is the
-  real answer.
+- **Only signed-in people, using the app:** a session, then an App Attest assertion or a shared
+  app key in `X-Dream-Key`, checked in constant time against the `DREAM_APP_KEYS` secret
+  (several, comma-separated, so one can be rotated out). Without the secret, a request without
+  an assertion is refused. The app keeps the key in its Keychain (Under the hood › Web search).
+- **An allowance per account:** searches and reads a day, by plan (`src/usage.ts`).
 - **Rate limits:** per address, 30 searches and 30 page reads a minute (`SEARCH_LIMIT`,
   `PAGE_LIMIT`), checked before anything else.
 - **A daily budget:** at most `WEB_DAILY_LIMIT` (2,000) paid calls of each kind a day, for
@@ -340,32 +348,15 @@ These cost money, so they mustn't become an open proxy:
 What the routes return is untrusted text from the web. The app fences it between random markers
 and labels it as data for the model, and the checker keeps only citations of pages that were read.
 
-### App Attest (designed, not built)
+### App Attest
 
-[App Attest](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
-proves a request comes from a real copy of Dream on a real iPhone, so an extracted key is no use:
-
-1. `GET /api/attest/challenge` returns a random challenge, kept in D1 for five minutes.
-2. The app makes a key with `DCAppAttestService.generateKey()`, then
-   `attestKey(keyId, clientDataHash: SHA256(challenge))`, and sends the key id and attestation.
-3. The Worker checks the attestation (CBOR): the certificate chain up to Apple's App Attest root
-   CA, the nonce (`SHA256(authData ‖ clientDataHash)`, in the certificate's
-   `1.2.840.113635.100.8.2` extension), `rpIdHash == SHA256("DR99P625RR.xyz.onlychan.Dream")`,
-   counter 0, the `appattest` or `appattestdevelop` AAGUID, and that the credential id is the
-   key id. It stores the public key and counter under the key id.
-4. Each search or read carries `X-Dream-Key-Id` and an assertion from
-   `generateAssertion(keyId, clientDataHash: SHA256(method ‖ path ‖ body ‖ timestamp))`. The
-   Worker checks the signature with the stored key, that the counter went up, and that the
-   timestamp is within a minute.
-5. Rate limits and budgets then count per attested key, not per address, and a key can be revoked.
-
-The shared key stays for the bench and `wrangler dev`, where App Attest can't run.
+See [App Attest](#app-attest) below: it covers the model too.
 
 ### Setting it up
 
 ```sh
 cd Server
-npx wrangler d1 migrations apply dream-share --remote     # adds web_cache and web_usage
+npx wrangler d1 migrations apply dream-share --remote     # adds web_cache and web_usage (and later tables)
 security find-generic-password -a parallel -s dream -w | tr -d '\n' | npx wrangler secret put PARALLEL_API_KEY
 security add-generic-password -U -a web -s dream -w "$(openssl rand -hex 32)"         # once: makes the app key
 security find-generic-password -a web -s dream -w | tr -d '\n' | npx wrangler secret put DREAM_APP_KEYS
@@ -528,6 +519,168 @@ npx wrangler r2 bucket create dream-photos
 npx wrangler d1 migrations apply dream-share --remote     # adds sync_items, sync_state and sync_photos
 npx wrangler deploy
 ```
+## The model
+
+The app never holds a provider key. Its default model, "Dream"
+(`Dream/Generation/Providers/DreamModel.swift`), sends the chat completion it would send xAI to
+`POST /api/model` (`src/model.ts`), which passes it to xAI with the server's `XAI_API_KEY` and
+streams the answer back byte for byte, reasoning included, so the app's stall watchdog sees the
+model thinking. The app's xAI adapter and the Dream adapter share one translation
+(`ChatCompletions.swift`); Grok with your own key and Private Cloud Compute stay in Under the
+hood as developer options.
+
+A request needs a session, proof that it's the app (as for web search), and room in the
+account's allowance. It's checked and rebuilt from the fields Dream uses: the model must be on
+the list (`MODELS`, default `grok-4.7`), tools must be the app's own functions (never a
+provider's paid server-side tools), pictures go only as `data:` URLs, `reasoning_effort` is low,
+medium or high, `max_tokens` is capped (`MAX_OUTPUT_TOKENS`, default 32,000), the body is at
+most 2 MB, and anything else (`n`, `search_parameters`, `user`, …) is dropped. Streams ask xAI
+for usage (`stream_options.include_usage`); the Worker reads only that last chunk, and counts
+its tokens and cost (`cost_in_usd_ticks`, in 10⁻¹⁰ dollars) against the account. A stream cut
+short is estimated from its size. Requests carry `x-grok-conv-id`, a hash of the account, so
+xAI serves its long instructions from its prompt cache at a quarter of the price.
+
+`X-Dream-Page` names the page a request belongs to: the app makes one id per build or change,
+so the gap check, the writing, its tool calls and repairs count as one page. Small jobs that
+aren't a page (turning "add milk" into a list entry) send none and count only their cost.
+
+Nothing asked or answered is logged or kept; only counts and costs (`migrations/0007_usage.sql`).
+xAI's errors become plain answers: its rate limit is a 503 to retry, a malformed request a 400
+with xAI's reason, anything else a 502.
+
+## Plans and limits
+
+`GET /api/usage` tells the app the plan, pages used today and this month, the limits of both
+plans, when more come, and the account's purchase token. When a page doesn't fit, the model
+route answers:
+
+```
+402  { "error": "You've made today's 5 free pages. You can make more tomorrow, or now with Dream Plus.",
+       "reason": "allowance", "upgrade": true, "resetsAt": 1761523200 }      (and Retry-After)
+429  … "upgrade": false …   for a subscriber who's used a day's or a month's pages
+```
+
+The app shows `error` as it is and, when `upgrade` is true, offers Dream Plus right then.
+
+| | Free | Dream Plus |
+|---|---|---|
+| Pages a day (a change counts as a page) | 5 | 25 |
+| Pages a month | 30 | 150 |
+| Web searches / reads a day | 15 / 20 | 75 / 100 |
+| Most one page may cost | $0.30 | $0.40 |
+| Most a day may cost, all requests (backstop) | $0.60 | $3.00 |
+
+Everyone together may spend `MODEL_DAILY_BUDGET` ($100) a day on the model; past it, pages wait
+until tomorrow (503). `ALLOWANCES` (JSON, like `{"free":{"pagesPerDay":3}}`) changes any of the
+per-plan numbers without a code change.
+
+**The maths.** grok-4.7 costs $2 per million input tokens, $0.50 cached, and $6 per million
+output tokens, reasoning included (docs.x.ai, October 2026). Parallel costs $1 per 1,000
+searches and $1 per 1,000 page reads. Five pages built through the proxy on 2026-10-26 cost
+$0.035, $0.036, $0.053, $0.082 and $0.191: about 34,000 tokens in and 3,000 out each, and the
+dearest searched three times and read four pages. Input is four fifths of the cost, so cache
+hits matter more than anything else. A page's web use is at most 3 searches and 4 reads, $0.007.
+
+- Planning cost: **$0.08 a page**, $0.20 for one that researches the web.
+- Free: at most 30 pages a month, about **$2.40** an account at the average, and never more than
+  $9 (30 × the $0.30 page cap). Most free accounts will make far fewer.
+- Dream Plus at **$9.99 a month or $79.99 a year**. After Apple's 15% (the Small Business
+  Program, or any subscription after its first year) that's $8.49 a month, or $5.67 a month on
+  the yearly plan; at 30%, $6.99 and $4.67. At $0.08 a page the monthly plan pays for about 106
+  pages a month and the yearly about 71. A subscriber who makes two pages a day costs about
+  $4.80; one who uses all 150 costs about $12, which the many who don't pay for.
+
+## Dream Plus
+
+One subscription group, "Dream Plus", with `xyz.onlychan.dream.plus.monthly` and
+`xyz.onlychan.dream.plus.yearly` at the same level (`Dream/Subscription/Products.swift`; for
+Xcode, `Config/Dream.storekit`). The app buys with StoreKit 2, passing the account's id as the
+`appAccountToken`, then sends the signed transaction to `POST /api/appstore/transactions`; on
+every launch and sign-in it sends the subscriptions the Apple Account has
+(`Transaction.currentEntitlements`). The App Store also tells the server itself, at
+`POST /api/appstore/notifications` (Server Notifications v2), which covers renewals, refunds and
+expiry while the app is closed.
+
+Both are JWS, checked as Apple's App Store Server Library checks them (`src/appstore.ts`,
+`src/x509.ts`): `alg` ES256; three certificates in `x5c`; the intermediate signed by Apple Root
+CA - G3, which is pinned in the code (the root a sender includes is never trusted); the leaf
+signed by the intermediate, which must be a CA; Apple's marker extensions
+(`1.2.840.113635.100.6.11.1` on the leaf, `1.2.840.113635.100.6.2.1` on the intermediate); every
+certificate valid when the data was signed; then the signature. Online revocation checks
+(OCSP) aren't made. The transaction must be for this bundle ID, an auto-renewable subscription
+to one of the two products, in an environment that counts (`APPSTORE_ENVIRONMENTS`, default
+`Production,Sandbox`: TestFlight and App Review buy in the sandbox), and name this account or
+none. Production notifications are also checked against `APPSTORE_APP_APPLE_ID` once it's set.
+
+A subscription is one row per original transaction id: who it belongs to, its product, when it
+ends (counting a billing grace period from the renewal info), and whether it was refunded or
+revoked. The newest signed state wins, so notifications arriving out of order can't undo a
+refund. A subscription tied to one account can't be claimed by another (409). Notifications
+already handled are remembered by `notificationUUID` for a month. Account deletion removes it
+all (`deleteUserData` in `src/usage.ts`); the App Store subscription itself carries on until the
+person cancels it in Settings.
+
+## App Attest
+
+[App Attest](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
+proves a request comes from a genuine copy of Dream on a real device, so an extracted key is no
+use (`src/attest.ts`, `Dream/Generation/Providers/AppProof.swift`):
+
+1. The app asks `POST /api/attest/challenge` (signed in) for a one-time challenge, kept five minutes.
+2. It makes a key with `DCAppAttestService.generateKey()`, has it attested with
+   `attestKey(keyId, clientDataHash: SHA256(challenge))`, and sends `POST /api/attest/key
+   { keyId, attestation, challenge }`.
+3. The Worker checks the attestation as Apple's "Validating apps that connect to your server"
+   lays out: the chain up to the pinned Apple App Attestation Root CA; the nonce
+   `SHA256(authData ‖ SHA256(challenge))` in the credential certificate's
+   `1.2.840.113635.100.8.2` extension; the key id is `SHA256` of the public key; the RP ID is
+   `SHA256("DR99P625RR.xyz.onlychan.Dream")`; the counter is 0; the AAGUID is `appattest`
+   (production) or `appattestdevelop` (development); the credential id is the key id; and, where
+   newer systems report one, the launch validation category is TestFlight, development or the
+   App Store. It keeps the public key and the receipt.
+4. Each model and web request then carries `X-Dream-Attest-Key`, `X-Dream-Attest-Time` and
+   `X-Dream-Assertion`, an assertion over `METHOD\npath\ntime\nhex(SHA256(body))`. The Worker
+   checks the signature with the kept key, the RP ID, that the time is within two minutes, and
+   that the counter hasn't been used: it may arrive up to 20 below the highest seen, once, since
+   the app sends requests in parallel.
+
+Apple suggests a fresh challenge for every assertion. Instead, the time bounds when an assertion
+can be used, the body hash ties it to one request, and the counter stops replays, which saves a
+round trip on every model request.
+
+A key the server doesn't know answers `401` with `X-Dream-Attest: again`, and the app makes a new
+one. If attesting fails, the app sends requests without an assertion and tries again ten minutes
+later; the shared key still counts where it's set. **`APP_PROOF=off`** lets signed-in requests
+through without either: an emergency switch if App Attest misbehaves in production, since
+release builds carry no shared key.
+
+## Setting up the model and Dream Plus
+
+Secrets (`wrangler secret put`): **`XAI_API_KEY`**, Dream's production xAI key. Nothing else new:
+App Store data is verified with Apple's public certificates, so no App Store key is needed yet.
+
+```sh
+cd Server
+npx wrangler d1 migrations apply dream-share --remote     # 0007_usage.sql, after 0004–0006
+npx wrangler secret put XAI_API_KEY
+npx wrangler deploy
+```
+
+Optional settings (`vars`): `APPSTORE_APP_APPLE_ID` (the app's Apple ID, from App Store Connect),
+`APPSTORE_ENVIRONMENTS`, `MODEL_DAILY_BUDGET`, `MODELS`, `MAX_OUTPUT_TOKENS`, `ALLOWANCES`,
+`APP_PROOF`.
+
+In App Store Connect: sign the Paid Apps agreement; create the subscription group "Dream Plus"
+with the two products above, both at level 1, priced $9.99 a month and $79.99 a year; and set
+the App Store Server Notifications URL (Version 2) for production and sandbox to
+`https://dream.onlychan.xyz/api/appstore/notifications`.
+
+Locally, `.dev.vars` takes `XAI_API_KEY` and `DEV_LOGIN=1`. Then `POST /api/dev/session?user=bench`
+gives a session, and `DREAM_SERVER=http://127.0.0.1:8787 ../Tools/bench.sh "a request"` builds
+pages through the proxy, as the app does. `npm test` uses a stand-in for xAI
+(`test/stub-xai.mjs`) and test roots for the App Store and App Attest (`test/vectors.mjs`, trusted
+only with `DEV_LOGIN=1`), so nothing is paid for. `node test/billing.mjs` checks JWS and App
+Attest verification, the counter window and what the proxy forwards, on their own.
 
 ## Later: shared lists
 

@@ -32,7 +32,10 @@
     // Reports of shared pages (src/safety.ts), per address.
     { "name": "REPORT_LIMIT", "namespace_id": "4861", "simple": { "limit": 5, "period": 60 } },
     // Sync and photos (src/sync.ts), counted per signed-in person rather than per address.
-    { "name": "SYNC_LIMIT", "namespace_id": "4851", "simple": { "limit": 300, "period": 60 } }
+    { "name": "SYNC_LIMIT", "namespace_id": "4851", "simple": { "limit": 300, "period": 60 } },
+    // Per account (src/model.ts, src/attest.ts): a page takes a handful of model requests.
+    { "name": "MODEL_LIMIT", "namespace_id": "4805", "simple": { "limit": 60, "period": 60 } },
+    { "name": "ATTEST_LIMIT", "namespace_id": "4806", "simple": { "limit": 10, "period": 60 } }
   ],
 
   // Photos from synced pages (src/sync.ts), kept under <user id>/<photo id>. Create the bucket
@@ -49,9 +52,11 @@
     // Sign in with Apple (src/apple.ts): the audience of the app's identity tokens (its bundle ID),
     // and the team whose Sign in with Apple key revokes Apple's tokens when an account is deleted.
     "APPLE_CLIENT_ID": "xyz.onlychan.Dream",
-    "APPLE_TEAM_ID": "DR99P625RR"
+    "APPLE_TEAM_ID": "DR99P625RR",
+    // Dollars a day the model may cost for everyone together (src/usage.ts); past it, pages wait.
+    "MODEL_DAILY_BUDGET": "100"
     // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS,
-    // APPLE_KEY_ID and APPLE_PRIVATE_KEY, and ADMIN_KEY (reviewing reported pages, src/safety.ts).
+    // XAI_API_KEY, APPLE_KEY_ID and APPLE_PRIVATE_KEY, and ADMIN_KEY (reviewing reported pages, src/safety.ts).
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.
