@@ -68,7 +68,8 @@ const PRIVACY = [
   section(
     "The short version",
     list([
-      "Your account, saved pages, lists and memory are kept on Dream's server, so they're there on every iPhone you sign in on. Dream's server can read them: they aren't end-to-end encrypted.",
+      "Your pages, lists and memory are kept in your account, encrypted on the way and on disk, so they're there on every iPhone you sign in on. They're used only to do what you ask: keep them in step, make and change your pages, and export or delete them.",
+      "Nobody at Dream looks at your pages, lists or memory, unless you ask for help with something specific or the law requires it.",
       "To make a page, what you ask goes through Dream's server to an AI provider's model (today, xAI), with what's needed to answer it. You agree to this when you sign in.",
       "Once you sign in, Dream sends crash reports and usage counts, which you can turn off in Account under “Help improve Dream”. They never include what you ask, what pages say, or your lists and memory.",
       "Dream doesn't sell your data, show ads, or track you across other companies' apps and websites.",
@@ -244,7 +245,7 @@ const PRIVACY = [
   section(
     "Security",
     p(
-      `Everything travels over HTTPS. Sessions are stored only as hashes, and sign-ins to connected services stay in your iPhone's Keychain. Only ${OWNER}, who runs Dream, can reach its production data.`,
+      `Everything travels over HTTPS and is encrypted on disk by Cloudflare. Sessions are stored only as hashes, and sign-ins to connected services stay in your iPhone's Keychain. Only ${OWNER}, who runs Dream, has access to its systems, and doesn't look at your pages, lists or memory unless you ask for help with something specific or the law requires it.`,
     ),
   ),
   section("Changes", p("If this policy changes in a way that matters, Dream will say so in the app before the change takes effect.")),
