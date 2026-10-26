@@ -14,7 +14,7 @@
     {
       "binding": "DB",
       "database_name": "dream-share",
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "0b42264b-ad3c-4da6-a5a3-188fb2ef5f1a",
       "migrations_dir": "migrations"
     }
   ],
