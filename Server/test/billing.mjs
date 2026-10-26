@@ -125,7 +125,7 @@ const env = { APP_IDS: app, MAX_OUTPUT_TOKENS: "4000" };
 const forwarded = model.upstreamBody({ model: "grok-4.7", messages: [{ role: "user", content: "hi" }], stream: true, max_tokens: 90_000, n: 3, search_parameters: { mode: "on" }, reasoning_effort: "low", user: "someone" }, env);
 expect(forwarded.max_tokens === 4000 && forwarded.stream_options?.include_usage === true, "max_tokens is capped, and the stream reports usage");
 expect(!("n" in forwarded) && !("search_parameters" in forwarded) && !("user" in forwarded), "fields Dream doesn't use never reach xAI");
-expect(model.upstreamBody({ messages: [{ role: "user", content: "hi" }] }, env).model === "grok-4.7" && model.upstreamBody({ messages: [{ role: "user", content: "hi" }] }, env).max_tokens === 4000, "no model means the first allowed one, and no max_tokens means the cap");
+expect(model.upstreamBody({ messages: [{ role: "user", content: "hi" }] }, env).model === null && model.upstreamBody({ messages: [{ role: "user", content: "hi" }] }, env).max_tokens === 4000, "no model is left for the account's plan to decide (models.ts), and no max_tokens means the cap");
 const refused = (body) => {
   try {
     model.upstreamBody(body, env);

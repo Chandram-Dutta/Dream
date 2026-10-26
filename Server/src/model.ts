@@ -2,10 +2,12 @@
 //
 //   POST /api/model   an OpenAI-style chat completion  → xAI's answer, streamed as it comes
 //
-// The request goes to xAI's Responses API through Dream's Cloudflare AI Gateway (`AI_GATEWAY`),
-// translated both ways by responses.ts, so the app keeps speaking chat completions. The gateway
-// keeps no logs of it. The account's cache key travels in the body, where the gateway leaves it
-// alone, so xAI reads repeated prompts from its cache.
+// Which model answers is the server's choice (models.ts): the default for everyone, or for Dream
+// Plus the one picked in Account. Requests go through Dream's Cloudflare AI Gateway
+// (`AI_GATEWAY`), which keeps no logs of them: Grok to xAI's Responses API, translated both ways
+// by responses.ts, and Workers AI's models through the AI binding, smoothed by workersai.ts. Either
+// way the app keeps speaking chat completions. Each account's cache key goes along (in the body
+// for xAI, `x-session-affinity` for Workers AI), so repeated prompts are read from a cache.
 //
 // The app's Dream provider (Dream/Generation/Providers/DreamModel.swift) sends what it would send
 // xAI, with the user's session, proof that it's the app (attest.ts), and `X-Dream-Page` naming
@@ -21,7 +23,9 @@ import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
 import { proveApp, type ProofEnv } from "./attest";
 import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
+import { choose, CATALOG, offered, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
+import { workersCompletion, workersStream } from "./workersai";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
 
 export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
@@ -33,8 +37,10 @@ export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
   AI?: Ai;
   /** The AI Gateway that model requests go through ("dream"). Without it, they go to xAI directly. */
   AI_GATEWAY?: string;
-  /** The models the app may ask for, separated by commas. The first is used when none is named. */
+  /** The models offered, ids from models.ts separated by commas; the first free one is the default. */
   MODELS?: string;
+  /** With DEV_LOGIN, test accounts may use any model, for the bench. */
+  DEV_LOGIN?: string;
   /** The most a single answer may be, in tokens. */
   MAX_OUTPUT_TOKENS?: string;
   MODEL_LIMIT?: RateLimit;
@@ -42,16 +48,11 @@ export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
 
 /** A page's prompt is 60–120 KB, with a photo up to about 400 KB more. */
 const MAX_BODY = 2_000_000;
-const DEFAULT_MODELS = "grok-4.7";
 const DEFAULT_MAX_OUTPUT = 32_000;
 const EFFORTS = new Set(["low", "medium", "high"]);
 const ROLES = new Set(["system", "developer", "user", "assistant", "tool"]);
 
-/** Dollars per million tokens, from https://docs.x.ai/docs/models, for when xAI doesn't say what
- * a request cost (it usually does, as `cost_in_usd_ticks`). */
-const PRICES: Record<string, { input: number; cached: number; output: number }> = {
-  "grok-4.7": { input: 2, cached: 0.5, output: 6 },
-};
+/** For a model nobody priced: on the high side, so limits err toward caution. */
 const FALLBACK_PRICE = { input: 4, cached: 1, output: 12 };
 
 class Invalid extends Error {}
@@ -78,9 +79,10 @@ function checkContent(content: unknown): number {
 
 /** What goes to xAI: the fields Dream uses, checked, and nothing else. */
 export function upstreamBody(body: Record<string, unknown>, env: ModelEnv): Record<string, unknown> {
-  const models = (env.MODELS ?? DEFAULT_MODELS).split(",").map((model) => model.trim()).filter(Boolean);
-  const model = body.model ?? models[0];
-  if (typeof model !== "string" || !models.includes(model)) throw new Invalid(`Dream doesn't offer that model. It offers ${models.join(", ")}.`);
+  // Which model is decided once the account is known (models.ts); here only that it's one Dream offers.
+  const models = offered(env.MODELS);
+  const model = body.model ?? null;
+  if (model !== null && model !== "default" && (typeof model !== "string" || !models.some((each) => each.id === model))) throw new Invalid(`Dream doesn't offer that model. It offers ${models.map((each) => each.id).join(", ")}.`);
 
   const messages = body.messages;
   if (!Array.isArray(messages) || messages.length < 1 || messages.length > 400) throw new Invalid("Send from 1 to 400 messages.");
@@ -156,7 +158,7 @@ export function useFrom(usage: unknown, model: string): ModelUse | null {
 }
 
 function priced(model: string, tokensIn: number, tokensCached: number, tokensOut: number): number {
-  const price = PRICES[model] ?? FALLBACK_PRICE;
+  const price = CATALOG.find((each) => each.id === model)?.price ?? FALLBACK_PRICE;
   return (tokensIn - tokensCached) * price.input + tokensCached * price.cached + tokensOut * price.output;
 }
 
@@ -264,6 +266,24 @@ function askXAI(env: ModelEnv, key: string, request: Record<string, unknown>, co
   return fetch(`${(base || "https://api.x.ai").replace(/\/$/, "")}/v1/responses`, { method: "POST", headers, body: JSON.stringify(request) });
 }
 
+/** Asks one of Workers AI's models, through the gateway by the AI binding. The answer comes back
+ * as chat completions the app reads (workersai.ts): streamed, or whole. */
+async function askWorkersAI(env: ModelEnv, model: Model, chat: Record<string, unknown>, conversation: string): Promise<Response> {
+  // Workers AI takes the chat completion as it is, less what's xAI's or the stream's business.
+  const { model: _model, stream_options: _options, ...input } = chat;
+  const gateway = env.AI_GATEWAY?.trim();
+  const run = env.AI!.run.bind(env.AI) as unknown as (model: string, input: unknown, options: unknown) => Promise<unknown>;
+  const answer = await run(model.upstream, input, {
+    ...(gateway ? { gateway: { id: gateway, collectLog: false, skipCache: true } } : {}),
+    // Sends an account's requests to the same model instance, which keeps its prompts cached.
+    extraHeaders: { "x-session-affinity": conversation },
+  });
+  if (chat.stream === true && answer instanceof ReadableStream) {
+    return new Response(workersStream(answer as ReadableStream<Uint8Array>, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
+  }
+  return Response.json(workersCompletion(answer, model.id));
+}
+
 async function conversationID(userID: string): Promise<string> {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`dream-conversation:${userID}`)));
   return [...digest.subarray(0, 16)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -278,8 +298,6 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   if (!raw) return problem(413, "That's too much to send the model at once.");
   const refused = await proveApp(request, env, raw, "Dream's model");
   if (refused) return refused;
-  const key = env.XAI_API_KEY?.trim();
-  if (!key) return problem(503, "Dream's model isn't set up on this server yet.");
 
   let body: Record<string, unknown>;
   try {
@@ -295,10 +313,16 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const page = request.headers.get("X-Dream-Page");
   const pageID = page && /^[A-Za-z0-9-]{8,64}$/.test(page) ? page : null;
   const account = await accountOf(env, user.id);
+  const chosen = choose(body.model, account.plan, offered(env.MODELS), env.DEV_LOGIN === "1");
+  if (!chosen) return problem(400, "Dream doesn't offer that model.");
+  const key = env.XAI_API_KEY?.trim();
+  if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
+  if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
+  body.model = chosen.upstream;
   const refusal = await admitModel(env, user.id, pageID, account);
   if (refusal) return refusalResponse(refusal);
 
-  const modelID = body.model as string;
+  const modelID = chosen.id;
   // For PostHog's LLM analytics, only when the person lets Dream count what's used (analytics.ts).
   const counted = countsAllowed(request);
   const started = Date.now();
@@ -306,6 +330,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     if (!counted) return;
     aiGeneration(env, ctx, user.id, {
       model: modelID,
+      provider: chosen.provider === "xai" ? "xai" : "cloudflare-workers-ai",
       page: pageID,
       plan: account.plan,
       tokensIn: use?.tokensIn ?? 0,
@@ -325,7 +350,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const conversation = await conversationID(user.id);
   let upstream: Response;
   try {
-    upstream = await askXAI(env, key, toResponses(body, conversation), conversation);
+    upstream = chosen.provider === "xai" ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation) : await askWorkersAI(env, chosen, body, conversation);
   } catch {
     console.error("Model provider unreachable");
     return problem(502, "The model didn't answer. Try again in a moment.");
@@ -340,7 +365,8 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   };
 
   if (body.stream && upstream.body) {
-    return new Response(metered(chatStream(upstream.body, modelID), modelID, raw.length, record), {
+    const chat = chosen.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;
+    return new Response(metered(chat, modelID, raw.length, record), {
       status: 200,
       headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
     });
@@ -348,7 +374,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   let text = "";
   let use: ModelUse | null = null;
   try {
-    const answer = chatCompletion(await upstream.json(), modelID);
+    const answer = chosen.provider === "xai" ? chatCompletion(await upstream.json(), modelID) : ((await upstream.json()) as Record<string, unknown>);
     text = JSON.stringify(answer);
     use = useFrom(answer.usage, modelID);
   } catch {

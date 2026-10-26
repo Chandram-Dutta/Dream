@@ -83,6 +83,8 @@ async function startLocal(stub, xai) {
     `ATTEST_TEST_ROOT:${attestCA.rootBase64}`,
     // Nothing from the tests reaches PostHog.
     "POSTHOG_KEY:",
+    // Only Grok, which goes to the stand-in: Workers AI's models would be real requests.
+    "MODELS:grok-4.7",
   ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
@@ -482,6 +484,7 @@ async function runPlan(base, xai) {
   let status = await usage();
   expect(status.plan === "free" && status.pages.today === 1 && status.pages.perDay === LOCAL_ALLOWANCES.free.pagesPerDay, `two requests for the same page count as one page (${status.pages?.today})`);
   expect(status.accountToken === me.user && status.subscription === null && status.plans?.plus?.pagesPerDay > status.plans?.free?.pagesPerDay, "with the account's purchase token, and what Dream Plus adds");
+  expect(status.models?.[0]?.id === "grok-4.7" && typeof status.models[0].name === "string" && "plus" in status.models[0], "and the models Account can offer");
   const [row] = query(`SELECT tokens_in, tokens_cached, tokens_out, cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
   // Four requests reached xAI and were answered: three streamed for page a (one a tool call), and one plain. Errors cost nothing.
   expect(row?.tokens_in === 4 * 1261 && row?.tokens_cached === 4 * 1152 && row?.tokens_out === 4 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);

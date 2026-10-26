@@ -73,6 +73,8 @@ export function subscriptionEnded(env: AnalyticsEnv, ctx: Pick<ExecutionContext,
  * it took. Never the messages or the answer: no `$ai_input` or `$ai_output_choices`. */
 export interface Generation {
   model: string;
+  /** "xai", or "cloudflare-workers-ai" for Workers AI's models. */
+  provider?: string;
   /** The page it's part of. A page's requests (tool rounds, repairs) make one trace. */
   page: string | null;
   plan: string;
@@ -98,9 +100,8 @@ export function aiGeneration(env: AnalyticsEnv, ctx: Pick<ExecutionContext, "wai
     $ai_session_id: null,
     // Besides pages, only talking to lists asks the model through the server (RecordTalk.swift).
     $ai_span_name: generation.page ? "page" : "lists",
-    $ai_provider: "xai",
+    $ai_provider: generation.provider ?? "xai",
     $ai_model: generation.model,
-    $ai_base_url: "https://api.x.ai/v1",
     $ai_input_tokens: generation.tokensIn,
     $ai_cache_read_input_tokens: generation.tokensCached,
     $ai_output_tokens: generation.tokensOut,

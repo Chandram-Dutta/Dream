@@ -64,6 +64,9 @@
     // The AI Gateway model requests go through: logs off, no cache, provider keys required. Made
     // with `cf ai-gateway gateways create`; empty sends them straight to xAI.
     "AI_GATEWAY": "dream",
+    // The models offered (src/models.ts), in Account's order; the first that isn't Dream Plus
+    // only is everyone's default.
+    "MODELS": "glm-5.3-flash,grok-4.7,deepseek-v4.1-flash,kimi-k2.6",
     // PostHog, for the server's own analytics events (src/analytics.ts), sent only for people who
     // turned on "Help improve Dream". The project key is public, like the app's; empty turns
     // server events off. The host is the US or EU cloud.
