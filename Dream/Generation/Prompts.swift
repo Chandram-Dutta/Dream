@@ -74,7 +74,7 @@ enum Prompts {
     /// What the model is told alongside each request about the user and their device. Each
     /// feature adds its own lines from its own file.
     static func context(for intent: String) async -> [String] {
-        await memoryContext(for: intent) + languageContext()
+        await memoryContext(for: intent) + languageContext(for: intent)
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
@@ -155,7 +155,7 @@ extension Surface {
             case .choice:
                 lines.append("- \(input.name): \"\(input.label)\", choice of \(input.options.joined(separator: " / ")), starts at option \(input.initial.plain)")
             default:
-                let symbol = input.symbol.isEmpty ? "" : ", written \(input.symbol)"
+                let symbol = (input.symbol.isEmpty ? "" : ", written \(input.symbol)") + (input.unit.isEmpty ? "" : ", in \(input.unit)")
                 switch input.role {
                 case .given:
                     lines.append("- \(input.name): \"\(input.label)\", given \(input.format.rawValue), \(input.initial.plain)\(symbol)")
@@ -168,7 +168,7 @@ extension Surface {
         }
         lines.append("Outputs:")
         for output in outputs {
-            lines.append("- \(output.name): \"\(output.label)\", \(output.format.rawValue)\(output.symbol.isEmpty ? "" : ", written \(output.symbol)") = \(output.formula)")
+            lines.append("- \(output.name): \"\(output.label)\", \(output.format.rawValue)\(output.symbol.isEmpty ? "" : ", written \(output.symbol)")\(output.unit.isEmpty ? "" : ", in \(output.unit)") = \(output.formula)")
         }
         return lines.joined(separator: "\n")
     }

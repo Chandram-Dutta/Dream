@@ -23,7 +23,7 @@ private struct ValueLabel: View {
 
     var body: some View {
         let value = context.state.value(input)
-        Text(context.surface.display(input.name, value))
+        Text(reading: context.surface.reading(input.name, value), unitFont: .display(.subheadline))
             .font(.display(.title3))
             .monospacedDigit()
             .foregroundStyle(context.palette.numberGradient)
@@ -44,7 +44,9 @@ struct SliderControl: View {
                 Spacer(minLength: 12)
                 ValueLabel(input: input, context: context)
             }
-            DreamSlider(value: context.state.binding(input), range: input.safeRange, step: input.safeStep, palette: context.palette)
+            // In the reader's units (Units+UI.swift).
+            let shown = context.surface.shown(input)
+            DreamSlider(value: context.binding(input), range: shown.safeRange, step: shown.safeStep, palette: context.palette)
         }
         .sensoryFeedback(.selection, trigger: input.hasFewSteps ? value : 0)
     }
@@ -112,9 +114,12 @@ struct StepperControl: View {
     let context: RenderContext
 
     var body: some View {
-        let value = context.state.value(input)
-        let step = input.safeStep ?? 1
-        let range = input.safeRange
+        // In the reader's units (Units+UI.swift).
+        let shown = context.surface.shown(input)
+        let binding = context.binding(input)
+        let value = binding.wrappedValue
+        let step = shown.safeStep ?? 1
+        let range = shown.safeRange
         HStack(alignment: .center) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(input.label).foregroundStyle(.secondary)
@@ -123,18 +128,18 @@ struct StepperControl: View {
             Spacer(minLength: 12)
             HStack(spacing: 10) {
                 RoundButton(symbol: "minus", palette: context.palette) {
-                    context.state.values[input.name] = max(value - step, range.lowerBound)
+                    binding.wrappedValue = max(value - step, range.lowerBound)
                 }
                 .disabled(value <= range.lowerBound)
                 RoundButton(symbol: "plus", palette: context.palette) {
-                    context.state.values[input.name] = min(value + step, range.upperBound)
+                    binding.wrappedValue = min(value + step, range.upperBound)
                 }
                 .disabled(value >= range.upperBound)
             }
         }
         .sensoryFeedback(.selection, trigger: value)
         .accessibilityRepresentation {
-            Stepper(input.label, value: context.state.binding(input), in: range, step: step)
+            Stepper(input.label, value: binding, in: range, step: step)
         }
     }
 }
@@ -257,7 +262,9 @@ struct FieldControl: View {
     @FocusState private var focused: Bool
 
     var body: some View {
-        let value = context.state.value(input)
+        // In the reader's units (Units+UI.swift).
+        let binding = context.binding(input)
+        let value = binding.wrappedValue
         VStack(alignment: .leading, spacing: 8) {
             Text(input.label).foregroundStyle(.secondary)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
@@ -275,6 +282,9 @@ struct FieldControl: View {
                 if input.format == .percent {
                     Text("%").font(.display(.title2)).foregroundStyle(.secondary)
                 }
+                if let unit = context.surface.shownUnit(input.name)?.symbol {
+                    Text(unit).font(.display(.title3)).foregroundStyle(.secondary)
+                }
             }
             Capsule()
                 .fill(focused ? AnyShapeStyle(context.palette.gradient) : AnyShapeStyle(context.palette.edge))
@@ -286,7 +296,7 @@ struct FieldControl: View {
         .onAppear { text = Self.text(for: value) }
         .onChange(of: text) { _, new in
             if let parsed = Double(new.replacingOccurrences(of: ",", with: ".")), parsed != value {
-                context.state.values[input.name] = parsed
+                binding.wrappedValue = parsed
             }
         }
         .onChange(of: value) { _, new in

@@ -53,7 +53,8 @@ extension Surface {
             let index = Int(exactly: value.rounded()) ?? -1
             return input.options.indices.contains(index) ? input.options[index] : "—"
         }
-        return (input(name)?.format ?? output(name)?.format ?? .number).display(value)
+        // With its unit, in the reader's units (Units.swift).
+        return reading(name, value).text
     }
 }
 
