@@ -11,7 +11,6 @@ All ten workstreams are merged into `main` and run on the iPhone:
 - **Also merged:** the asking gap check.
 
 Open items:
-- **WeatherKit** still fails on the device with an authentication error (WDSJWTAuthenticatorServiceListener code 2), although the provisioning profile includes it. Check that the App Services tab has WeatherKit on for xyz.onlychan.Dream, and allow time.
 - **Not yet tried by hand:** a full MCP sign-in (Linear or Notion), and universal links. Universal links need Settings › Developer › Associated Domains Development.
 - **Web viewer:** figures and tones are placeholders, and there's no live calculation.
 - **Picture share:** always uses the page's original language.
