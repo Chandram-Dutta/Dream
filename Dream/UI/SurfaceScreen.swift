@@ -74,6 +74,8 @@ struct SurfaceScreen: View {
     /// How lively the color field is: thinking spreads and swirls it, writing calms it, done settles it.
     private var energy: Double {
         guard composer.phase.isBusy else { return 0 }
+        // Waiting for answers: calmer than writing, still awake.
+        if composer.asking.isWaiting { return 0.25 }
         return composer.isThinking ? 1 : 0.45
     }
 
@@ -86,7 +88,8 @@ struct SurfaceScreen: View {
     var body: some View {
         let busy = composer.phase.isBusy
         ScrollView {
-            if let surface, !surface.isEmpty {
+            // Questions waiting on the user always show, even over a page that's begun.
+            if let surface, !surface.isEmpty, !composer.asking.isWaiting {
                 SurfaceView(
                     surface: surface,
                     state: state,
@@ -94,11 +97,12 @@ struct SurfaceScreen: View {
                     stage: stage,
                     focusedID: changing?.block?.id ?? changingID,
                     onChange: busy ? nil : { beginChange(ChangeTarget(block: $0)) },
-                    onExplore: busy ? nil : { exploring = ComposeRequest(intent: $0, image: nil) })
+                    onExplore: busy ? nil : { exploring = ComposeRequest(intent: $0, image: nil) },
+                    onAnswer: busy ? nil : { changeAnswer($0, to: $1) })
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
             } else {
-                FormingView(intent: intent, stage: stage, palette: palette)
+                FormingView(intent: intent, stage: stage, palette: palette, asking: composer.asking)
                     .padding(.horizontal, 20)
             }
         }
@@ -126,6 +130,7 @@ struct SurfaceScreen: View {
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .top) { failure }
         .safeAreaInset(edge: .bottom) { changeBar }
+        .safeAreaInset(edge: .bottom) { if changing == nil, !busy { NoticedFacts(request: intent, palette: palette) } }
         .animation(.smooth, value: composer.phase)
         .animation(.smooth, value: changing)
         .sensoryFeedback(trigger: composer.phase) { _, new in new == .done ? .success : nil }
@@ -147,6 +152,8 @@ struct SurfaceScreen: View {
                 modelName: composer.modelName.isEmpty ? (saved?.modelName ?? "") : composer.modelName)
         }
         .task { await start() }
+        // Never leave the model waiting on questions nobody can see.
+        .onDisappear { composer.asking.cancel() }
         .onChange(of: state.values) { _, values in saved?.values = values }
     }
 
@@ -235,6 +242,7 @@ struct SurfaceScreen: View {
         context.insert(saved)
         try? context.save()
         self.saved = saved
+        Memory.learn(from: request.intent, answers: surface.answers ?? [], in: context)
     }
 
     private func beginChange(_ target: ChangeTarget) {
@@ -261,6 +269,27 @@ struct SurfaceScreen: View {
             if let saved {
                 saved.surface = updated
                 saved.editRequests.append(text)
+                saved.generationLog.append(contentsOf: composer.log)
+                saved.modelName = composer.modelName
+                try? context.save()
+            }
+        }
+    }
+
+    /// A different answer to one of the questions asked before building, from its tag in the header.
+    private func changeAnswer(_ answer: Answer, to choice: String) {
+        guard let current = surface else { return }
+        Task {
+            await composer.rebuild(current, intent: intent, changing: answer, to: choice)
+            guard composer.phase == .done, let updated = composer.surface else { return }
+            state.values = state.values.filter { name, _ in
+                guard let before = current.input(name), let after = updated.input(name) else { return false }
+                return before.initial == after.initial
+            }
+            Memory.remember((updated.answers ?? []).filter { $0.question == answer.question }, from: intent, in: context)
+            if let saved {
+                saved.surface = updated
+                saved.editRequests.append(Prompts.changedAnswer(answer, to: choice))
                 saved.generationLog.append(contentsOf: composer.log)
                 saved.modelName = composer.modelName
                 try? context.save()

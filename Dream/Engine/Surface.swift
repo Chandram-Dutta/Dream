@@ -24,6 +24,8 @@ struct Surface: Codable, Hashable {
     /// angle change the throw?". Nil when nothing's calculated. Remembered with the surface, so
     /// it can be found again for the same question.
     var question: String?
+    /// The questions asked before building it, with the user's answers. Nil when nothing was asked.
+    var answers: [Answer]?
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 

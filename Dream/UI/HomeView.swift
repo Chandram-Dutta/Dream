@@ -27,6 +27,8 @@ struct HomeView: View {
                     Text("Dream")
                         .font(.display(.largeTitle, weight: .bold))
                         .padding(.top, 24)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .overlay(alignment: .bottomTrailing) { MemoryButton(palette: palette) }
                     if !canCompose {
                         Button { showingSettings = true } label: {
                             Label("Add an xAI API key to start making screens.", systemImage: "key.fill")
@@ -131,6 +133,7 @@ struct HomeView: View {
 
     private var composer: some View {
         VStack(spacing: 10) {
+            SavedSuggestion(text: intent, surfaces: surfaces)
             VStack(alignment: .leading, spacing: 10) {
                 if let photo {
                     Image(uiImage: photo)
