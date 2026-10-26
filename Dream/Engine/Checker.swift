@@ -31,7 +31,7 @@ enum Checker {
             if input.label.trimmingCharacters(in: .whitespaces).isEmpty { input.label = words(input.name) }
             input.symbol = symbol(input.symbol)
             // Only numbers can be fixed facts or run along a chart.
-            if input.role != .adjustable, !input.format.isNumeric {
+            if input.role != .adjustable, input.role != .live, !input.format.isNumeric {
                 fixed("Made '\(input.name)' adjustable, since a \(input.format.rawValue) can't be \(input.role == .given ? "a given" : "a chart's axis").")
                 input.role = .adjustable
             }
@@ -48,7 +48,8 @@ enum Checker {
             }
             if output.label.trimmingCharacters(in: .whitespaces).isEmpty { output.label = words(output.name) }
             output.symbol = symbol(output.symbol)
-            if !output.format.isNumeric { output.format = .number }
+            // A result can be a yes or no, like whether to take an umbrella; never a choice.
+            if output.format == .choice { output.format = .number }
             return output
         }
 
@@ -64,9 +65,10 @@ enum Checker {
         }
         if !madeCurrency.isEmpty { fixed("Showed \(madeCurrency.map { "'\($0)'" }.joined(separator: ", ")) as money.") }
         issues += checkUnits(&surface)
+        issues += checkLive(&surface)
 
         if surface.inputs.isEmpty && !totalsRecords(surface) { problem("The calculation has results but no inputs, so nothing can change.") }
-        if surface.outputs.isEmpty { problem("The calculation has inputs but no results calculated from them.") }
+        if surface.outputs.isEmpty && !surface.showsLiveValues { problem("The calculation has inputs but no results calculated from them.") }
 
         for index in surface.inputs.indices {
             surface.inputs[index] = checkedRange(surface.inputs[index], fixed: fixed, problem: problem)
@@ -113,7 +115,7 @@ enum Checker {
 
         // Starting values that break results, usually a count of 0 that something divides by.
         if broken(surface, surface.initialValues) > 0 {
-            for index in surface.inputs.indices where surface.inputs[index].format.isNumeric && surface.inputs[index].initial == 0 && surface.inputs[index].role != .given {
+            for index in surface.inputs.indices where surface.inputs[index].format.isNumeric && surface.inputs[index].initial == 0 && !surface.inputs[index].isFixed {
                 var trial = surface
                 let nudge = trial.inputs[index].format == .integer ? 1 : Swift.max(trial.inputs[index].step, 1)
                 trial.inputs[index].initial = nudge
@@ -154,7 +156,7 @@ enum Checker {
         }
 
         let used = surface.outputs.reduce(into: Set<String>()) { $0.formUnion(surface.inputs(feeding: $1.name)) }
-        for input in surface.inputs where !used.contains(input.name) {
+        for input in surface.inputs where !used.contains(input.name) && input.role != .live {
             warning("'\(input.name)' doesn't affect any result.")
         }
         return issues
@@ -174,6 +176,7 @@ enum Checker {
             fixed("Gave '\(surface.inputs[index].name)' a control, since no chart runs along it.")
         }
         issues += checkSounds(&surface)
+        issues += checkActions(&surface)
         let reference = surface
 
         /// `{name}` placeholders the calculation can fill; others are dropped.
@@ -233,7 +236,7 @@ enum Checker {
             case .hero, .metric:
                 (block.over, block.text, block.items, block.children) = ("", "", [], [])
                 let isGiven = reference.input(block.ref)?.role == .given
-                guard reference.output(block.ref) != nil || isGiven else {
+                guard reference.output(block.ref) != nil || isGiven || reference.input(block.ref)?.role == .live else {
                     // An adjustable input already shows its value in its control, and a chart shows its variable.
                     fixed("Removed a \(block.kind.rawValue) for '\(block.ref)', which isn't a result.")
                     return nil
@@ -248,10 +251,10 @@ enum Checker {
             case .slider, .stepper, .field, .toggle, .picker:
                 (block.over, block.text, block.items, block.children) = ("", "", [], [])
                 guard let input = reference.input(block.ref), input.role == .adjustable else {
-                    if reference.output(block.ref) != nil || reference.input(block.ref)?.role == .given {
+                    if reference.output(block.ref) != nil || reference.input(block.ref)?.isFixed == true {
                         shown.insert(block.ref)
                         block.kind = .metric
-                        fixed("'\(block.ref)' is \(reference.output(block.ref) != nil ? "a result" : "a given"), so it's shown instead of edited.")
+                        fixed("'\(block.ref)' is \(reference.output(block.ref) != nil ? "a result" : reference.input(block.ref)?.role == .live ? "live" : "a given"), so it's shown instead of edited.")
                         return block
                     }
                     fixed("Removed a control for '\(block.ref)', which isn't an adjustable input.")
@@ -275,7 +278,7 @@ enum Checker {
                 }
                 block.ref = series.prefix(4).joined(separator: ", ")
                 let feeding = series.reduce(into: Set<String>()) { $0.formUnion(reference.inputs(feeding: $1)) }
-                func runsAlong(_ input: Input) -> Bool { input.format.isNumeric && input.role != .given && feeding.contains(input.name) }
+                func runsAlong(_ input: Input) -> Bool { input.format.isNumeric && !input.isFixed && feeding.contains(input.name) }
                 if let over = reference.input(block.over), runsAlong(over) {
                     // Fine as it is.
                 } else if let replacement = reference.inputs.first(where: { $0.role == .variable && runsAlong($0) }) ?? reference.inputs.first(where: runsAlong) {
@@ -351,6 +354,10 @@ enum Checker {
                 guard let checked = visual(block, in: reference, fixed: fixed) else { return nil }
                 block = checked
 
+            case .action:
+                guard let checked = actionBlock(block, in: reference, fixed: fixed) else { return nil }
+                block = checked
+
             case .facts, .bullets, .steps, .timeline, .stat:
                 (block.ref, block.over, block.children) = ("", "", [])
                 if block.items.isEmpty {
@@ -379,6 +386,7 @@ enum Checker {
             .prefix(6))
 
         issues += placeLists(&surface)
+        issues += placeActions(&surface)
 
         // A calculation the blocks don't show is still placed, so it's never lost.
         guard surface.hasLogic else { return issues + placeSounds(&surface) }
@@ -394,7 +402,7 @@ enum Checker {
             surface.blocks.append(Block(id: uniqueID("more-inputs"), kind: .section, children: controls))
             fixed("Added controls for \(missingControls.map { "'\($0.name)'" }.joined(separator: ", ")).")
         }
-        let missingGivens = surface.inputs.filter { $0.role == .given && !shown.contains($0.name) }
+        let missingGivens = surface.inputs.filter { $0.isFixed && !shown.contains($0.name) }
         if !missingGivens.isEmpty {
             // Beside the controls, so the reader sees what the calculation takes as fixed.
             let metrics = missingGivens.map { Block(id: uniqueID("\($0.name)-given"), kind: .metric, ref: $0.name) }
@@ -491,8 +499,8 @@ enum Checker {
     private static func checkedRange(_ original: Input, fixed: (String) -> Void, problem: (String) -> Void) -> Input {
         var input = original
         let name = input.name
-        // A given is one known value; it has no range to check.
-        if input.role == .given {
+        // A given is one known value; it has no range to check. Nor has a live one.
+        if input.isFixed {
             if !input.initial.isFinite { problem("'\(name)' is a given without a value.") }
             (input.min, input.max) = (input.initial, input.initial)
             return input

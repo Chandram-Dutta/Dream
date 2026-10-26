@@ -114,6 +114,7 @@ struct SurfaceScreen: View {
                 .animation(.easeInOut(duration: 1.4), value: energy)
         }
         .background(Color(.systemBackground))
+        .refreshingLive(surface, state: state)
         .scrollPosition($scroll)
         // Blocks stream in above ones already shown, and the scroll view follows those down.
         // Hold the top while the surface forms, until the user scrolls themselves.
@@ -246,7 +247,8 @@ struct SurfaceScreen: View {
 
     private func start() async {
         if let saved {
-            if state.values.isEmpty { state.values = saved.values }
+            // Live values may have arrived first, and are newer than the saved ones.
+            state.values = saved.values.merging(state.values) { _, current in current }
             saved.openCount += 1
             saved.lastOpenedAt = .now
             return

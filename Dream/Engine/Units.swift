@@ -53,6 +53,12 @@ extension Surface {
         input(name)?.unit ?? output(name)?.unit ?? ""
     }
 
+    /// The currency an amount is in when it isn't the user's own, like USD in a converter.
+    func currency(of name: String) -> String? {
+        let unit = unit(of: name)
+        return Currency.isCode(unit) && unit != Currency.code ? unit : nil
+    }
+
     /// How a quantity's unit reaches this reader. Nil when it has none.
     func shownUnit(_ name: String) -> ShownUnit? {
         let format = input(name)?.format ?? output(name)?.format ?? .number
@@ -85,10 +91,12 @@ extension Surface {
     /// A value, in the surface's own units, as the reader sees it.
     func reading(_ name: String, _ value: Double) -> Reading {
         let format = input(name)?.format ?? output(name)?.format ?? .number
+        if format == .currency, let code = currency(of: name) { return Reading(number: Format.money(value, code: code)) }
+        if format == .toggle, output(name) != nil { return Reading(number: value != 0 ? "Yes" : "No") }
         guard let unit = shownUnit(name) else { return Reading(number: format.display(value)) }
         let shown = unit.shown(value)
         let number = format.display(shown)
-        return Units.span(shown, unit: unit.symbol, number: number)
+        return Units.span(shown, unit: unit.symbol, number: number) ?? Units.clock(shown, unit: unit.symbol)
             ?? Reading(number: number, unit: unit.symbol, attaches: unit.attaches)
     }
 

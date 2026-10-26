@@ -9,6 +9,7 @@ struct BlockView: View {
 
     var body: some View {
         content
+            .liveStamp(block, context: context, depth: depth)
             .readingMark(context.readingID == block.id, palette: context.palette)
             .overlay {
                 if context.focusedID == block.id {
@@ -74,6 +75,8 @@ struct BlockView: View {
             FigureBlockView(block: block, context: context).panel(palette, enabled: depth == 0)
         case .diagram:
             DiagramBlockView(block: block, context: context)
+        case .action:
+            ActionBlockView(block: block, context: context)
         case .slider, .stepper, .field, .toggle, .picker:
             if let input = context.surface.input(block.ref) {
                 ControlView(kind: block.kind, input: input, context: context).panel(palette, enabled: depth == 0)
