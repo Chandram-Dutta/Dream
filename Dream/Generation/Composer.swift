@@ -159,7 +159,12 @@ final class Composer {
 
     /// Runs on the chosen model, or on the other one if the chosen can't be used or fails.
     private func withModel(_ run: () async throws -> Void) async throws {
-        let usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
+        var usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
+        // Grok is xAI's: the first time, the user says whether it may have what they ask (AIConsent.swift).
+        if usable.first?.sendsToXAI == true, await !AIConsent.shared.ask() {
+            usable.removeAll(where: \.sendsToXAI)
+            if usable.isEmpty { throw ComposeError(AIConsent.declined) }
+        }
         guard let first = usable.first else {
             throw ComposeError("Sign in to make pages.")
         }

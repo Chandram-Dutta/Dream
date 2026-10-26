@@ -159,7 +159,7 @@ const PRIVACY = [
         what: "Usage counts, only if you turn on “Help improve Dream”",
         detail:
           "Events like “page built”, with how long it took, how many parts it had and of which kinds, and whether it used the web. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
-        where: `PostHog, ${todo("in the US or the EU")}`,
+        where: "PostHog, in the United States",
         how: todo("retention set in PostHog, for example 12 months"),
       },
     ]),
@@ -186,7 +186,7 @@ const PRIVACY = [
       "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account.",
       "<strong>Apple</strong> handles Sign in with Apple, App Store purchases, Weather and Maps.",
       "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds. It receives what's looked up.",
-      `<strong>PostHog</strong> keeps usage counts, only if you turn on “Help improve Dream”. ${todo("US or EU cloud")}`,
+      `<strong>PostHog</strong> keeps usage counts, only if you turn on “Help improve Dream”, in the United States.`,
     ]),
     p(
       "Services you connect yourself, like Linear or Notion, talk to your iPhone directly, under their own terms. Dream shows you what it will send before one of their tools runs.",
@@ -237,7 +237,7 @@ const PRIVACY = [
   section(
     "Moving data between countries",
     p(
-      `Cloudflare runs Dream's server around the world; xAI and Parallel are in the United States; PostHog is in ${todo("the US or the EU")}. When data leaves your country, ${todo("the safeguards used, such as the EU's standard contractual clauses")}.`,
+      `Cloudflare runs Dream's server around the world; xAI and Parallel are in the United States; and so is PostHog. When data leaves your country, ${todo("the safeguards used, such as the EU's standard contractual clauses")}.`,
     ),
   ),
   section(

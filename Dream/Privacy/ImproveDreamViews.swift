@@ -124,7 +124,7 @@ struct LegalLinks: View {
 }
 
 /// Saying yes stands out; "Not now" stays quiet but just as easy to tap.
-private struct AnswerStyle: ButtonStyle {
+struct AnswerStyle: ButtonStyle {
     let palette: Palette
     let isMain: Bool
 
