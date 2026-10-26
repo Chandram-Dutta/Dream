@@ -10,6 +10,7 @@ import { mkdtempSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import { chatUsage } from "../src/responses.ts";
 import { USAGE } from "./stub-xai.mjs";
 import { appStoreChain, assertion, attest, attestRoot, jws, requestData, transaction } from "./vectors.mjs";
 
@@ -142,10 +143,11 @@ expect(refused({ model: "grok-4.7", messages: [{ role: "user", content: "hi" }],
 expect(refused({ model: "grok-4.7", messages: [{ role: "user", content: "hi" }], temperature: 7 }), "temperature is checked");
 
 console.log("What a request costs");
-const use = model.useFrom(USAGE, "grok-4.7");
+// As model.ts counts it: xAI's Responses usage, translated to chat completions' terms first.
+const use = model.useFrom(chatUsage(USAGE), "grok-4.7");
 expect(use.tokensIn === 1261 && use.tokensCached === 1152 && use.tokensOut === 65, "reasoning tokens count as output, beside completion tokens");
 expect(Math.abs(use.cost - 1184) < 0.001, `xAI's own cost, in millionths of a dollar (${use.cost})`);
-const computed = model.useFrom({ ...USAGE, cost_in_usd_ticks: undefined }, "grok-4.7");
+const computed = model.useFrom(chatUsage({ ...USAGE, cost_in_usd_ticks: undefined }), "grok-4.7");
 expect(Math.abs(computed.cost - 1184) < 0.001, `without it, the price list gives the same (${computed.cost})`);
 
 console.log("Allowances");
