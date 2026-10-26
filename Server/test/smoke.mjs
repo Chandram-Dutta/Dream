@@ -585,7 +585,7 @@ async function runRelease(base, local) {
     const response = await fetch(`${base}${path}`);
     const page = await response.text();
     expect(response.status === 200 && response.headers.get("content-type")?.startsWith("text/html"), `${path} is a page`);
-    expect(page.includes(`<h1>${title}</h1>`) && page.includes("Draft, needs legal review"), `${path} says it's a draft`);
+    expect(page.includes(`<h1>${title}</h1>`) && !page.includes("<mark>"), `${path} has its title and nothing left to fill in`);
     expect(response.headers.get("content-security-policy")?.includes("default-src 'none'") && !page.includes("<script"), `${path} has no scripts`);
   }
   let response = await fetch(`${base}/privacy/`);

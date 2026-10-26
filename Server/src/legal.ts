@@ -1,7 +1,6 @@
 // The privacy policy, terms of use and support page, linked from the app's first run and
-// Account, and from App Store Connect. They read like the web viewer (page.ts). All three are
-// drafts that need a lawyer's review before launch, and say so at the top; anything in
-// [brackets] is still to be decided.
+// Account, and from App Store Connect. They read like the web viewer (page.ts). Written by
+// Chandram Dutta without a lawyer; when one reviews them, change UPDATED.
 //
 //   GET /privacy   GET /terms   GET /support
 
@@ -9,10 +8,8 @@ import { document } from "./page";
 
 export type LegalPath = "/privacy" | "/terms" | "/support";
 
-/** When the drafts last changed. */
+/** When the pages last changed in a way that matters. */
 const UPDATED = "26 October 2026";
-
-/** Something still to be filled in or decided, marked so it can't be missed. */
 
 const mail = (address: string) => `<a href="mailto:${address}">${address}</a>`;
 const PRIVACY_CONTACT = mail("privacy@onlychan.xyz");
@@ -21,10 +18,6 @@ const SUPPORT_CONTACT = mail("support@onlychan.xyz");
 const OWNER = "Chandram Dutta";
 
 const STYLE = `<style>
-.draft{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;
-background:color-mix(in srgb,#FF8D28 16%,transparent);color:#B85400;border:.5px solid color-mix(in srgb,#FF8D28 45%,transparent)}
-.draft::before{content:"";width:8px;height:8px;border-radius:50%;background:#FF8D28}
-@media (prefers-color-scheme:dark){.draft{color:#FFB46B}}
 .updated{margin:12px 0 0;font-size:13px;color:var(--secondary)}
 .legal{display:flex;flex-direction:column;gap:12px}
 .legal h2{font-family:var(--display);font-stretch:125%;font-size:22px;line-height:1.25;font-weight:600;margin:8px 0 0}
@@ -385,7 +378,6 @@ export function legalPage(path: LegalPath): string {
     accent: "indigo",
     head: `<meta name="description" content="${page.summary}">\n${STYLE}`,
     body: `<header>
-<p class="draft">Draft, needs legal review</p>
 <h1>${page.title}</h1>
 <p class="summary">${page.summary}</p>
 <p class="updated">Last updated ${UPDATED}</p>
