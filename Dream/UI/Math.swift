@@ -147,11 +147,11 @@ struct EquationBlockView: View {
             if !block.ref.isEmpty, let equation = surface.equation(for: block.ref) {
                 VStack(alignment: .leading, spacing: 6) {
                     MathView(latex: equation, size: size)
-                    if let worked = surface.workedEquation(for: block.ref, values: context.evaluation.values) {
-                        MathView(latex: worked, size: size)
+                    if let parts = surface.workedParts(for: block.ref, values: context.evaluation.values) {
+                        WorkedLine(working: parts.working, result: parts.result, size: size)
                             .foregroundStyle(context.palette.numberGradient)
                             .padding(.leading, indent(before: surface.texSymbol(block.ref)))
-                            .animation(.snappy, value: worked)
+                            .animation(.snappy, value: parts.result)
                     }
                 }
                 .accessibilityElement(children: .ignore)
@@ -204,6 +204,31 @@ struct EquationBlockView: View {
                 }
             }
             .padding(.top, 2)
+        }
+    }
+}
+
+/// The formula worked through, on one line when it fits. When it doesn't, the result moves to a
+/// line of its own, so the answer is never scrolled out of sight.
+private struct WorkedLine: View {
+    let working: String?
+    let result: String
+    let size: CGFloat
+
+    var body: some View {
+        let whole = working.map { "= \($0) = \(result)" } ?? "= \(result)"
+        ViewThatFits(in: .horizontal) {
+            if let rendered = MathRenderer.render(whole, size: size, display: true) {
+                Image(uiImage: rendered.image)
+                    .renderingMode(.template)
+                    .accessibilityLabel(TeX.spoken(whole))
+            }
+            VStack(alignment: .leading, spacing: 6) {
+                if let working {
+                    MathView(latex: "= \(working)", size: size)
+                }
+                MathView(latex: "= \(result)", size: size)
+            }
         }
     }
 }

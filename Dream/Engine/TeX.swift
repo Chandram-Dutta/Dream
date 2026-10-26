@@ -167,10 +167,19 @@ extension Surface {
 
     /// The same formula worked through with the reader's numbers: `= \sqrt{3^2 + 4^2} = 5`.
     func workedEquation(for name: String, values: [String: Double]) -> String? {
+        workedParts(for: name, values: values).map { parts in
+            parts.working.map { "= \($0) = \(parts.result)" } ?? "= \(parts.result)"
+        }
+    }
+
+    /// The worked line in its two parts, so a narrow screen can put the result on a line of its
+    /// own: the formula with the reader's numbers (nil when that's just the result), and what it
+    /// comes to.
+    func workedParts(for name: String, values: [String: Double]) -> (working: String?, result: String)? {
         guard let output = output(name), let expr = try? FormulaCache.parse(output.formula) else { return nil }
         let result = texValue(name, values[name] ?? .nan)
         let worked = TeXWriter(surface: self, values: values).write(expr).tex
-        return worked == result ? "= \(result)" : "= \(worked) = \(result)"
+        return (worked == result ? nil : worked, result)
     }
 
     /// Written LaTeX with each `\val{name}` replaced by its live value.

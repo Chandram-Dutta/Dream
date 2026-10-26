@@ -9,7 +9,7 @@ mkdir -p "$out"
 log="$out/console.log"
 xcrun devicectl device process launch --device $DEVICE --terminate-existing --console com.chandramdutta.dream -- -provider xai -DreamAutoIntent "$request" -DreamTour 1 > "$log" 2>&1 &
 launcher=$!
-for i in {1..120}; do
+for i in {1..240}; do
   sleep 1
   grep -q "\[Dream\] Done in\|\[Dream\] Failed" "$log" && break
 done
