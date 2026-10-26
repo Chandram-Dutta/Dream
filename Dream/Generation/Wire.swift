@@ -26,6 +26,8 @@ struct WireInput {
     var role: WireRole
     @Guide(description: "How it's written in an equation, in LaTeX, like x, \\theta or v_0. Empty for everyday quantities.")
     var symbol: String
+    @Guide(description: "What it's measured in, as its symbol, like m, m/s, s, kg, °C, km/h or years. Empty for money, percentages, counts and pure numbers.")
+    var unit: String
     var format: WireFormat
     @Guide(description: "Realistic starting value")
     var initial: Double
@@ -44,6 +46,8 @@ struct WireOutput {
     var label: String
     @Guide(description: "How it's written in an equation, in LaTeX. Empty for everyday quantities.")
     var symbol: String
+    @Guide(description: "What it's measured in, as its symbol, like m, m/s, s or °C. Empty for money, percentages, counts and pure numbers.")
+    var unit: String
     @Guide(description: "Formula using input names and earlier output names")
     var formula: String
     var format: WireFormat
@@ -217,7 +221,7 @@ extension Input {
     init(_ wire: WireInput) {
         self.init(name: wire.name, label: wire.label, format: Format(wire.format), initial: wire.initial,
                   min: wire.min, max: wire.max, step: wire.step, options: wire.options,
-                  role: InputRole(wire.role), symbol: wire.symbol)
+                  role: InputRole(wire.role), symbol: wire.symbol, unit: wire.unit)
     }
 
     init?(partial wire: WireInput.PartiallyGenerated) {
@@ -234,17 +238,18 @@ extension Input {
             step: wire.step ?? 0,
             options: wire.options ?? [],
             role: wire.role.map { InputRole($0) } ?? .adjustable,
-            symbol: wire.symbol ?? "")
+            symbol: wire.symbol ?? "",
+            unit: wire.unit ?? "")
     }
 }
 
 extension Output {
     init(_ wire: WireOutput) {
-        self.init(name: wire.name, label: wire.label, formula: wire.formula, format: Format(wire.format), symbol: wire.symbol)
+        self.init(name: wire.name, label: wire.label, formula: wire.formula, format: Format(wire.format), symbol: wire.symbol, unit: wire.unit)
     }
 
     init?(partial wire: WireOutput.PartiallyGenerated) {
         guard let name = wire.name, !name.isEmpty else { return nil }
-        self.init(name: name, label: wire.label ?? "", formula: wire.formula ?? "", format: wire.format.map { Format($0) } ?? .number, symbol: wire.symbol ?? "")
+        self.init(name: name, label: wire.label ?? "", formula: wire.formula ?? "", format: wire.format.map { Format($0) } ?? .number, symbol: wire.symbol ?? "", unit: wire.unit ?? "")
     }
 }

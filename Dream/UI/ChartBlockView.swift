@@ -22,9 +22,11 @@ struct ChartBlockView: View {
 
     var body: some View {
         let surface = context.surface
-        let curves = block.refs.map { Curve(name: $0, points: surface.series(of: $0, over: block.over, given: context.state.values, records: context.state.records)) }
+        // Plotted in the reader's units (Units.swift); `x` stays in the surface's.
+        let curves = block.refs.map { Curve(name: $0, points: surface.shownSeries(of: $0, over: block.over, given: context.state.values, records: context.state.records)) }
         let axis = surface.input(block.over)
         let x = axis.map { context.state.value($0) }
+        let shownX = x.map { surface.shownValue(block.over, $0) }
         let domain = Self.domain(of: curves + ghost)
         VStack(alignment: .leading, spacing: 10) {
             header(curves: curves, x: x)
@@ -50,12 +52,12 @@ struct ChartBlockView: View {
                             .lineStyle(StrokeStyle(lineWidth: index == 0 ? 2.5 : 2, lineCap: .round, dash: index >= 2 ? [6, 4] : []))
                     }
                 }
-                if let x {
+                if let x = shownX {
                     RuleMark(x: .value("x", x))
                         .foregroundStyle(context.accent.opacity(dragging ? 0.6 : 0.3))
                         .lineStyle(StrokeStyle(lineWidth: 1, dash: [3, 4]))
                     ForEach(Array(curves.enumerated()), id: \.element.id) { index, curve in
-                        if let y = context.value(curve.name), y.isFinite, domain.contains(y) {
+                        if let y = context.value(curve.name).map({ surface.shownValue(curve.name, $0) }), y.isFinite, domain.contains(y) {
                             PointMark(x: .value("x", x), y: .value("y", y))
                                 .foregroundStyle(.white)
                                 .symbolSize(index == 0 ? 140 : 90)
@@ -67,12 +69,12 @@ struct ChartBlockView: View {
                 }
             }
             .chartYScale(domain: domain)
-            .chartXScale(domain: axis.map { $0.safeRange } ?? 0...1)
+            .chartXScale(domain: axis.map { surface.shownRange($0) } ?? 0...1)
             .chartXAxis {
                 AxisMarks(values: .automatic(desiredCount: 4)) { value in
                     AxisGridLine()
                     AxisValueLabel {
-                        if let number = value.as(Double.self) { Text(surface.display(block.over, number)) }
+                        if let number = value.as(Double.self) { Text(surface.tick(block.over, shown: number)) }
                     }
                 }
             }
@@ -80,12 +82,15 @@ struct ChartBlockView: View {
                 AxisMarks(values: .automatic(desiredCount: 4)) { value in
                     AxisGridLine()
                     AxisValueLabel {
-                        if let number = value.as(Double.self) { Text(surface.display(block.refs.first ?? "", number)) }
+                        if let number = value.as(Double.self) { Text(surface.tick(block.refs.first ?? "", shown: number)) }
                     }
                 }
             }
             .chartXAxisLabel(position: .bottom, alignment: .trailing) {
-                Text(surface.label(of: block.over))
+                Text(surface.axisTitle(block.over))
+            }
+            .chartYAxisLabel(position: .top, alignment: .leading) {
+                if let unit = surface.shownUnit(block.refs.first ?? "")?.symbol { Text(unit) }
             }
             .chartOverlay { proxy in
                 GeometryReader { geometry in
@@ -99,7 +104,7 @@ struct ChartBlockView: View {
                                     let origin = geometry[plot].origin
                                     guard let raw: Double = proxy.value(atX: drag.location.x - origin.x) else { return }
                                     dragging = true
-                                    context.state.values[axis.name] = axis.snapped(raw)
+                                    context.state.values[axis.name] = surface.storedValue(axis.name, surface.shown(axis).snapped(raw))
                                 }
                                 .onEnded { _ in
                                     withAnimation(.easeOut(duration: 0.3)) { dragging = false }
@@ -160,7 +165,7 @@ struct ChartBlockView: View {
         if ghost.isEmpty {
             var values = before
             if let axis = context.surface.input(block.over) { values[axis.name] = context.state.value(axis) }
-            ghost = block.refs.map { Curve(name: $0, points: context.surface.series(of: $0, over: block.over, given: values, records: context.state.records)) }
+            ghost = block.refs.map { Curve(name: $0, points: context.surface.shownSeries(of: $0, over: block.over, given: values, records: context.state.records)) }
         }
         fade?.cancel()
         fade = Task { @MainActor in

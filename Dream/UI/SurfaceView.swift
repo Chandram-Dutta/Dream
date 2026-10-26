@@ -44,13 +44,20 @@ struct SurfaceView: View {
     var onExplore: ((String) -> Void)?
     /// A different answer to one of the questions asked before building.
     var onAnswer: ((Answer, String) -> Void)?
+    /// Shows a surface written in a language the reader doesn't read in theirs (TranslationNote.swift).
+    @State private var translation = SurfaceTranslation()
 
     var body: some View {
+        let surface = translation.shown(self.surface)
         let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values, records: state.records), state: state, focusedID: focusedID, onChange: onChange, readingID: readingID)
         let blocks = surface.displayBlocks
         VStack(alignment: .leading, spacing: 26) {
             SurfaceHeader(surface: surface, stage: stage, onAnswer: onAnswer)
                 .readingMark(readingID == Narration.headerID, palette: surface.palette)
+            if translation.status != .none {
+                TranslationNote(translation: translation, palette: surface.palette)
+                    .padding(.top, -14)
+            }
             SurfaceImage(photo: photo, url: surface.hasInformation ? surface.reference?.imageURL.flatMap { URL(string: $0) } : nil, palette: surface.palette)
             ForEach(blocks) { block in
                 BlockView(block: block, context: context, depth: 0)
@@ -65,6 +72,7 @@ struct SurfaceView: View {
         }
         .animation(.smooth(duration: 0.5), value: blocks)
         .animation(.smooth(duration: 0.5), value: surface.related)
+        .translating(self.surface, with: translation)
     }
 }
 

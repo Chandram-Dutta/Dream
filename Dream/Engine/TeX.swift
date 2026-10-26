@@ -195,9 +195,9 @@ extension Surface {
         case .currency:
             let shown = Swift.abs(value) >= 1000 ? value.rounded() : (value * 100).rounded() / 100
             return (Currency.symbol == "$" ? "\\$" : "") + TeX.number(shown)
-        case .integer: return TeX.number(value.rounded())
+        case .integer: return TeX.number(value.rounded()) + texUnit(name)
         case .choice, .toggle: return "\\text{\(TeX.escaped(display(name, value)))}"
-        case .number: return TeX.number(value)
+        case .number: return TeX.number(value) + texUnit(name)
         }
     }
 

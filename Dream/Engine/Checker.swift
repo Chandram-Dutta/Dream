@@ -63,6 +63,7 @@ enum Checker {
             madeCurrency.append(surface.outputs[index].name)
         }
         if !madeCurrency.isEmpty { fixed("Showed \(madeCurrency.map { "'\($0)'" }.joined(separator: ", ")) as money.") }
+        issues += checkUnits(&surface)
 
         if surface.inputs.isEmpty && !totalsRecords(surface) { problem("The calculation has results but no inputs, so nothing can change.") }
         if surface.outputs.isEmpty { problem("The calculation has inputs but no results calculated from them.") }
@@ -368,6 +369,7 @@ enum Checker {
 
         surface.blocks = surface.blocks.compactMap { clean($0, depth: 0) }
         issues += placeVisuals(&surface)
+        issues += removeRepeatedUnits(&surface)
 
         let title = surface.title.lowercased()
         var seenTopics: Set<String> = []

@@ -36,6 +36,9 @@ struct Surface: Codable, Hashable {
     var figures: [Figure]? = nil
     /// Flows, cycles and hierarchies, shown by `diagram` blocks.
     var diagrams: [Diagram]? = nil
+    /// The language and measurement system it was written for, so a reader elsewhere sees it in
+    /// theirs. Nil while it's being written, and for surfaces saved before this was recorded.
+    var locale: SurfaceLocale?
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -217,6 +220,9 @@ struct Input: Codable, Hashable {
     var role: InputRole = .adjustable
     /// How it's written in an equation, in LaTeX, like `\theta`. Empty for everyday quantities.
     var symbol = ""
+    /// What it's measured in, as its symbol, like m/s or °C. Formulas calculate in it. Empty for
+    /// money, percentages, counts and pure numbers.
+    var unit = ""
 
     /// The control to use when the model hasn't picked one, or picked one that doesn't fit.
     var defaultControl: BlockKind {
@@ -260,9 +266,10 @@ struct Output: Codable, Hashable {
     var formula: String
     var format: Format
     var symbol = ""
+    var unit = ""
 }
 
-// Surfaces saved before roles and symbols existed decode with the defaults.
+// Surfaces saved before roles, symbols and units existed decode with the defaults.
 extension Input {
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
@@ -276,6 +283,7 @@ extension Input {
         options = try container.decode([String].self, forKey: .options)
         role = try container.decodeIfPresent(InputRole.self, forKey: .role) ?? .adjustable
         symbol = try container.decodeIfPresent(String.self, forKey: .symbol) ?? ""
+        unit = try container.decodeIfPresent(String.self, forKey: .unit) ?? ""
     }
 }
 
@@ -287,5 +295,6 @@ extension Output {
         formula = try container.decode(String.self, forKey: .formula)
         format = try container.decode(Format.self, forKey: .format)
         symbol = try container.decodeIfPresent(String.self, forKey: .symbol) ?? ""
+        unit = try container.decodeIfPresent(String.self, forKey: .unit) ?? ""
     }
 }

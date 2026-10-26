@@ -64,6 +64,8 @@ final class Composer {
 
     /// The model this request runs on.
     private var active: Provider = .xai
+    /// The request's language, whose Wikipedia lookups read first.
+    private var language = "en"
 
     func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
@@ -73,6 +75,7 @@ final class Composer {
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         asking.start()
+        language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt {
@@ -83,6 +86,7 @@ final class Composer {
                 try await self.write(prompt: prompt, fallback: nil, streaming: true)
             }
             guard let surface, !surface.isEmpty else { throw ComposeError("Nothing came out of this. Try asking another way.") }
+            recordLocale(likely: Languages.guess(intent)?.rawValue)
             phase = .done
             note("Done in \(elapsed(since: started))")
         } catch {
@@ -99,12 +103,14 @@ final class Composer {
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
         asking.start(keeping: current.answers)
+        language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt(Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context))
             try await withModel {
                 try await self.write(prompt: prompt, fallback: current.reference, streaming: false)
             }
+            recordLocale(likely: current.locale?.language, editing: current.locale)
             phase = .done
             note("Done in \(elapsed(since: started))")
         } catch {
@@ -141,7 +147,7 @@ final class Composer {
 
     /// The tools a surface is written with. Features that give the model a tool add it here.
     private func tools(found: ReferenceLog) -> [any Tool] {
-        [LookupTool(found: found, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
+        [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          AskTool(asking: asking, onAsk: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
     }
@@ -206,7 +212,7 @@ final class Composer {
             surface.related.removeLast()
         }
         if surface.related.count < 3, let reference = surface.reference {
-            surface.related += await Lookup.related(to: reference.title)
+            surface.related += await Lookup.related(to: reference.title, language: reference.language)
         }
         return surface
     }
@@ -307,6 +313,16 @@ final class Composer {
     }
 
     // MARK: - Reporting
+
+    /// Notes the language and units a finished surface is written in (Language.swift), and
+    /// remembers its language as one the reader reads.
+    private func recordLocale(likely: String?, editing earlier: SurfaceLocale? = nil) {
+        guard let surface else { return }
+        let locale = SurfaceLocale(written: surface, likely: likely, fallback: language, editing: earlier)
+        self.surface?.locale = locale
+        Languages.remember(locale.language)
+        note("Written in \(Languages.name(locale.language)), for \(locale.measurementSystem) units")
+    }
 
     private func fail(_ error: Error) {
         let message = describe(error)
