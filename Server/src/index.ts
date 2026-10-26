@@ -9,6 +9,7 @@
 //   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
 //   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
 //   POST /api/dev/session     a test user's session, in local development only (auth.ts)
+//   GET, POST /api/sync; GET, PUT, DELETE /api/photos/:id   a signed-in person's own data (sync.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
@@ -18,9 +19,10 @@ import { directory } from "./directory";
 import { CSP, messagePage, surfacePage } from "./page";
 import { parseShared, readBody, Rejection } from "./payload";
 import { ID_PATTERN, load, save } from "./store";
+import { routeSync, type SyncEnv } from "./sync";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv {
+export interface Env extends WebEnv, AuthEnv, SyncEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -97,6 +99,8 @@ export default {
         const session = await devSession(request, env);
         if (session) return session;
       }
+      const synced = await routeSync(request, env, url);
+      if (synced) return synced;
       if (path === "/.well-known/apple-app-site-association" || path === "/apple-app-site-association") {
         return reading ? associatedDomains(env) : problem(405, "Only GET.", { Allow: "GET, HEAD" });
       }

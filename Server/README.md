@@ -6,7 +6,8 @@ without Dream, and tells iOS that `/s/` links open in the app.
 
 What's shared is a surface, never a chat: the template, its reference and credits, and its
 locale. The sharer's numbers go only when they switch on "Include my numbers". Their answers,
-list entries, photo and memory never leave the phone.
+list entries, photo and memory are never part of a share. When someone signs in, they're kept in
+their own account instead, for their devices only: see [Sync](#sync).
 
 | Request | What it does |
 |---|---|
@@ -17,6 +18,8 @@ list entries, photo and memory never leave the phone.
 | `POST /api/search` | Web search, for the app only. See [Web search and reading](#web-search-and-reading). |
 | `POST /api/read` | A web page's text, for the app only. |
 | `GET /reader` | What DreamReader is, for site owners who see it in their logs. |
+| `GET /api/sync`, `POST /api/sync` | A signed-in person's changes, read and sent. See [Sync](#sync). |
+| `PUT`, `GET`, `DELETE /api/photos/:id` | Photos from a signed-in person's pages. |
 
 ## What's uploaded
 
@@ -287,6 +290,66 @@ DREAM_APP_KEYS="a-long-random-local-key"
 budget and the rate limits. `node test/unit.mjs` checks the address rules, robots.txt and text
 tidying on their own. `../Tools/web.sh` checks the app's side.
 
+## Sync
+
+A signed-in person's pages, list entries, memory, connections and settings are kept in their
+account, so they're the same on each device they use (PRODUCTION.md, workstream B; `src/sync.ts`,
+`migrations/0005_sync.sql`). The server can read them: that was decided, so it can export them
+and work with them later. A connection's sign-in tokens never leave the phone's Keychain.
+
+Every route needs `Authorization: Bearer <session>` (`src/auth.ts`) and only ever reads or
+writes that person's own rows and photos.
+
+```
+GET  /api/sync?since=<cursor>&limit=200
+→ { "user", "items": [{ "kind", "id", "parent", "format", "updatedAt", "deleted", "body" }],
+    "cursor", "more", "reset", "now" }
+
+POST /api/sync  { "items": [ the same shape ] }
+→ { "applied", "stale": [ the server's versions ], "refused": [{ "kind", "id", "reason" }], "now" }
+```
+
+- **Items.** `kind` is `surface` (a page: template, the user's numbers, its conversation of
+  requests, answers and changes, its generation log, and its photo's id), `record` (a list entry,
+  whose `parent` is its page), `fact`, `connection` or `setting`. `id` is made on the phone.
+  `format` is the body's shape: the app reads every format up to its own, and keeps items in a
+  newer one until it updates. `deleted` items are tombstones with no body.
+- **The latest change wins.** `updatedAt` is when the change was made, in ms, by the server's
+  clock as the phone reckons it (each reply carries `now`, so phones correct their clocks). The
+  server keeps an incoming change only if it's later than what it has; a tie keeps what it has.
+  An older change comes back in `stale` with the server's version, which the phone takes. A time
+  more than ten minutes ahead of the server's clock is pulled back, so a wrong clock can't win
+  for ever. A deleted page takes its entries with it, except any changed after it was deleted.
+- **Reading changes.** Each person has a change counter; every batch the server takes gets the
+  next number, and each row keeps the number it was last written with. A cursor is where a
+  device left off (change number, kind, id), opaque to the app and tied to the account: a cursor
+  from another account reads from the beginning, with `reset: true`. Pages stop at `limit`
+  (at most 500) or after about 2 MB.
+- **Photos.** `PUT /api/photos/:id` with the bytes (JPEG, PNG, HEIC or WebP, recognised by their
+  first bytes, at most 4 MB) keeps a page's photo in R2 under `<user id>/<id>`; the page names it
+  in its `photo` field. When a page's photo changes, or the page is deleted, the server deletes
+  the photo it no longer has.
+- **Limits.** 2 MB a request, 200 changes a request, 256 KB an item, 50 MB of items and 500 MB
+  of photos a person (`507 Your account is full`; deleting always works), 300 requests a minute
+  a person (`SYNC_LIMIT`). A malformed change is refused on its own (`refused`), never the batch.
+- **Deleting an account** (workstream A): `deleteUserData(env, userID)` in `src/syncdata.ts`
+  removes the person's photos from R2, then their rows. `exportUserData` returns everything that
+  still exists, for "Export my data". The tables also go with the `users` row (`ON DELETE CASCADE`),
+  but R2 doesn't, so the function has to be called.
+
+To try it locally, put `DEV_LOGIN=1` in `.dev.vars`, run `npm run dev`, and get a session with
+`curl -X POST 'http://127.0.0.1:8787/api/dev/session?user=me'`. `npm test` checks every rule
+above (`test/sync.mjs`), and `../Tools/sync.sh` checks the app's side; with
+`DREAM_SYNC_URL=http://127.0.0.1:8787` it syncs two simulated phones through the Worker.
+
+To set it up:
+
+```sh
+npx wrangler r2 bucket create dream-photos
+npx wrangler d1 migrations apply dream-share --remote     # adds sync_items, sync_state and sync_photos
+npx wrangler deploy
+```
+
 ## Later: shared lists
 
 Shared lists, like a family grocery list, are out of scope for now. The plan:
@@ -299,8 +362,8 @@ Shared lists, like a family grocery list, are out of scope for now. The plan:
   last-writer-wins clock. The phone keeps working offline and sends what it queued when it's
   back.
 - **The list's shape stays in the surface.** The collection's fields are shared as part of the
-  template, as now. Only a list the user explicitly shares has its entries leave the phone; every
-  other list stays local.
+  template, as now. Only a list the user explicitly shares reaches other people; every other
+  list stays the user's own (in their account, once they sign in: see [Sync](#sync)).
 - **Membership by capability link:** sharing a list makes an invite link with a secret, and each
   member's token goes in their Keychain. The Durable Object checks it on every connection.
 - **The server needn't read entries.** The invite link's fragment (`#key`, which browsers and

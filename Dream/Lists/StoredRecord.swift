@@ -10,9 +10,10 @@ import SwiftData
 final class StoredRecord {
     #Index<StoredRecord>([\.surfaceID])
 
-    var surfaceID = UUID()
+    // Both kept in SwiftData's history after a delete, so sync can say which entry went, and from where.
+    @Attribute(.preserveValueOnDeletion) var surfaceID = UUID()
     var collection = ""
-    var recordID = UUID()
+    @Attribute(.preserveValueOnDeletion) var recordID = UUID()
     var valuesData = Data()
     var order = 0.0
     var createdAt = Date()

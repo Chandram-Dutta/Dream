@@ -17,10 +17,19 @@ private struct RecordKeeper: ViewModifier {
     let state: SurfaceState
     @Environment(\.modelContext) private var context
     @State private var store = RecordStore()
+    /// While this screen lives, deletions from the user's other devices wait (Sync).
+    @State private var hold = PageHold()
 
     func body(content: Content) -> some View {
         content
-            .task(id: surfaceID) { load() }
+            .task(id: surfaceID) {
+                load()
+                hold.hold(surfaceID)
+            }
+            // Entries changed on the user's other devices.
+            .onReceive(NotificationCenter.default.publisher(for: Sync.recordsDidChange)) { note in
+                if let surfaceID, (note.object as? Set<UUID>)?.contains(surfaceID) == true { load() }
+            }
             .onChange(of: state.records) { _, records in store.save(records, context: context) }
             .onChange(of: collections) { old, new in
                 // Only a saved surface's lists change by editing; while one streams in, its fields

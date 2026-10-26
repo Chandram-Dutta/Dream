@@ -8,7 +8,8 @@ import SwiftData
 /// what it's actually used for.
 @Model
 final class SavedSurface {
-    var id = UUID()
+    /// Kept in SwiftData's history after a delete, so sync can say which page went.
+    @Attribute(.preserveValueOnDeletion) var id = UUID()
     var createdAt = Date()
     var updatedAt = Date()
     var lastOpenedAt: Date?
@@ -26,6 +27,8 @@ final class SavedSurface {
     @Attribute(.externalStorage) var photoData: Data?
     /// The link it was opened from, when someone else shared it. Nil for the user's own.
     var sharedFrom: String?
+    /// The user's conversation with the page, as `[PageTurn]` (`history`).
+    var historyData = Data()
 
     init(intent: String, surface: Surface, modelName: String, log: [String]) {
         self.intent = intent

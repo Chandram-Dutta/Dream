@@ -267,6 +267,7 @@ struct SurfaceScreen: View {
         let saved = SavedSurface(intent: request.intent, surface: surface, modelName: composer.modelName, log: composer.log)
         saved.values = state.values
         saved.photoData = request.image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }
+        saved.history = [PageTurn(.asked, request.intent, answers: surface.answers ?? [])]
         context.insert(saved)
         try? context.save()
         self.saved = saved
@@ -278,8 +279,9 @@ struct SurfaceScreen: View {
         await composer.compose(intent: intent, image: request?.image)
         guard composer.phase == .done, let surface = composer.surface, let saved else { return }
         saved.surface = surface
-        saved.generationLog = composer.log
+        saved.generationLog.append(contentsOf: composer.log)
         saved.modelName = composer.modelName
+        saved.note(.rebuilt, intent, answers: surface.answers ?? [])
         try? context.save()
     }
 
@@ -300,6 +302,7 @@ struct SurfaceScreen: View {
             // On a list, "add milk" or "mark the first two done" changes the user's entries, not the screen.
             if await RecordTalk.handle(text, on: current, focus: target.block, state: state) {
                 changingID = nil
+                saved?.note(.listed, text)
                 return
             }
             await composer.edit(current, intent: intent, instruction: text, focus: target.block)
@@ -313,6 +316,7 @@ struct SurfaceScreen: View {
             if let saved {
                 saved.surface = updated
                 saved.editRequests.append(text)
+                saved.note(.changed, text)
                 saved.generationLog.append(contentsOf: composer.log)
                 saved.modelName = composer.modelName
                 try? context.save()
@@ -334,6 +338,7 @@ struct SurfaceScreen: View {
             if let saved {
                 saved.surface = updated
                 saved.editRequests.append(Prompts.changedAnswer(answer, to: choice))
+                saved.note(.answered, choice, answers: (updated.answers ?? []).filter { $0.question == answer.question })
                 saved.generationLog.append(contentsOf: composer.log)
                 saved.modelName = composer.modelName
                 try? context.save()

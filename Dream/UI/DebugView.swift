@@ -42,6 +42,7 @@ struct DebugView: View {
                 }
                 ShareServerSettings()
                 WebSearchSettings()
+                SyncSection()
                 Section {
                     NavigationLink("Connections") { ConnectionsView() }
                 }
