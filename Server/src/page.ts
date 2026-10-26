@@ -14,7 +14,8 @@ const obj = (value: unknown): JsonObject => (value !== null && typeof value === 
 const strings = (value: unknown): Record<string, string> =>
   Object.fromEntries(Object.entries(obj(value)).filter((entry): entry is [string, string] => typeof entry[1] === "string"));
 
-/** Images and links only ever point at Wikipedia and Wikimedia, where the app found them. */
+/** Images only ever come from Wikimedia, where the app found them; links go to Wikipedia, and to
+ * the http(s) pages a surface cites. */
 const isWikimediaImage = (url: unknown) => typeof url === "string" && /^https:\/\/upload\.wikimedia\.org\/[^\s"'<>]*$/.test(url);
 const isWikipedia = (url: unknown) => typeof url === "string" && /^https:\/\/[a-z0-9-]+(\.m)?\.wikipedia\.org\/[^\s"'<>]*$/.test(url);
 
@@ -64,11 +65,7 @@ export function surfacePage(stored: Stored, origin: string): string {
   const title = plain(surface.title, page.live) || "A shared screen";
   const summary = plain(surface.summary, page.live);
   const related = (Array.isArray(surface.related) ? surface.related : []).filter((topic): topic is string => typeof topic === "string" && topic.length > 0);
-  const source = isWikipedia(reference.url)
-    ? `<a href="${escape(reference.url)}">From Wikipedia: ${escape(reference.title)}</a><span class="tertiary">Wikipedia text is available under CC BY-SA 4.0.</span>`
-    : informative
-      ? `<span>Written without a source. Check anything important.</span>`
-      : "";
+  const source = sourceNote(surface, informative);
   const rtl = /^(ar|he|fa|ur|ps|yi|dv)(-|$)/i.test(page.language);
   const url = `${origin}/s/${stored.id}`;
 
@@ -97,6 +94,57 @@ ${related.length ? `<div class="chips">${related.map((topic) => `<span class="ch
 ${source ? `<footer class="source">${source}</footer>` : ""}`,
     open: `dream://s/${stored.id}`,
   });
+}
+
+interface Credit {
+  site: string;
+  title: string;
+  url: string;
+}
+
+/** A web address a credit may link to: http or https, with no name or password in it. */
+function webAddress(value: unknown): string | undefined {
+  if (typeof value !== "string" || value.length > 2_000 || !/^https?:\/\/[^\s"'<>\\]+$/.test(value)) return undefined;
+  try {
+    const url = new URL(value);
+    return (url.protocol === "https:" || url.protocol === "http:") && !url.username && !url.password ? url.href : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Who the facts came from, as the app's source note says it (Dream/UI/SourceNote.swift): the
+ * Wikipedia article first, then every page cited, each site linked to its first page. */
+function sourceNote(surface: JsonObject, informative: boolean): string {
+  const reference = obj(surface.reference);
+  const credits: Credit[] = [];
+  const seen = new Set<string>();
+  const add = (site: unknown, title: unknown, address: unknown) => {
+    const url = webAddress(address);
+    if (!url || credits.length >= 9) return;
+    const key = url.replace(/^https?:\/\/(www\.)?/, "").replace(/#.*$/, "").replace(/\/+$/, "");
+    if (seen.has(key)) return;
+    seen.add(key);
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    const name = typeof site === "string" && site.trim() ? site.trim().slice(0, 80) : host;
+    credits.push({ site: name, title: typeof title === "string" && title.trim() ? title.trim().slice(0, 200) : name, url });
+  };
+  if (isWikipedia(reference.url)) add("Wikipedia", reference.title, reference.url);
+  for (const citation of (Array.isArray(surface.citations) ? surface.citations : []).slice(0, 8).map(obj)) add(citation.site, citation.title, citation.url);
+
+  if (!credits.length) return informative ? `<span>Written without a source. Check anything important.</span>` : "";
+  const link = (credit: Credit, text: string) => `<a href="${escape(credit.url)}" title="${escape(credit.title)}" rel="nofollow noopener noreferrer">${escape(text)}</a>`;
+  let line: string;
+  if (credits.length === 1) {
+    const [only] = credits;
+    line = link(only, only.title === only.site ? only.site : `${only.site}: ${only.title}`);
+  } else {
+    const sites = credits.filter((credit, index) => credits.findIndex((other) => other.site === credit.site) === index);
+    const links = sites.map((credit) => link(credit, credit.site));
+    line = links.length === 1 ? links[0] : `${links.slice(0, -1).join(", ")} and ${links[links.length - 1]}`;
+  }
+  const wikipedia = credits.some((credit) => isWikipedia(credit.url));
+  return `<p>From ${line}</p>${wikipedia ? `<span class="tertiary">Wikipedia text is available under CC BY-SA 4.0.</span>` : ""}`;
 }
 
 export function messagePage(title: string, message: string): string {

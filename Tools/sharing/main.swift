@@ -68,6 +68,7 @@ func sample() -> Surface {
         Answer(question: Question(text: "Where do you live?", topic: "Home city", options: [], allowsTyping: true, isPersonal: true), choice: "Pune"),
     ]
     surface.locale = SurfaceLocale(language: "en", measurementSystem: "metric")
+    surface.citations = [Citation(title: "Pune travel guide", site: "Lonely Planet", url: "https://www.lonelyplanet.com/india/pune", date: "2026-10-01")]
     _ = Checker.checkLogic(&surface)
     _ = Checker.checkBlocks(&surface)
     return surface
@@ -110,6 +111,7 @@ expect(received.surface.answers == nil, "and no answers")
 expect(received.values == ["days": 7, "hotel": 4500], "the sharer's numbers")
 expect(received.surface.locale == surface.locale, "the locale it was written for, so it can be translated")
 expect(received.surface.sounds?.first?.recording != nil && received.surface.reference?.imageURL != nil, "Wikimedia recordings and images stay")
+expect(received.surface.citations == surface.citations && received.surface.credits.map(\.site) == ["Wikipedia", "Lonely Planet"], "the sources it credits, Wikipedia first")
 
 func tampered(_ change: (inout [String: Any]) -> Void) -> Data {
     var payload = object(upload)
@@ -142,6 +144,16 @@ let wikiImage = try! SharedSurface.received(tampered({ surface in
     surface["reference"] = ["title": "Pune", "extract": "", "url": "https://de.wikipedia.org/wiki/Pune", "imageURL": "http://upload.wikimedia.org/a.png"]
 }))
 expect(wikiImage.surface.reference?.url == "https://de.wikipedia.org/wiki/Pune" && wikiImage.surface.reference?.imageURL == nil, "an image not on Wikimedia over https is dropped, the source kept")
+let cited = try! SharedSurface.received(tampered({ surface in
+    let page = { (url: String) -> [String: Any] in ["title": "A page", "site": "", "url": url] }
+    surface["citations"] = [page("javascript:alert(1)"), page("ftp://files.example/a"), page("https://user:pw@evil.example/"), page("https://news.example/a"), page("https://news.example/a/#top"), page("https://en.wikipedia.org/wiki/Pune")]
+        + (0..<12).map { page("http://site\($0).example/") }
+}))
+let citedURLs = cited.surface.citations?.map(\.url) ?? []
+expect(!citedURLs.contains { !$0.hasPrefix("http://") && !$0.hasPrefix("https://") } && !citedURLs.contains { $0.contains("@") }, "only http(s) sources stay, without names or passwords in them")
+expect(citedURLs.first == "https://news.example/a" && citedURLs.filter { $0.hasPrefix("https://news.example") }.count == 1, "a source named twice is credited once")
+expect(!citedURLs.contains("https://en.wikipedia.org/wiki/Pune"), "the reference isn't credited twice")
+expect(citedURLs.count == Checker.citationLimit && cited.surface.citations?.first?.site == "news.example", "at most \(Checker.citationLimit), each with a site name")
 let answered = try! SharedSurface.received(tampered { $0["answers"] = [["question": ["text": "Where?", "topic": "City", "options": []], "choice": "Delhi"]] })
 expect(answered.surface.answers == nil, "answers sent anyway are dropped")
 let foreign = try! SharedSurface.received(tampered { $0["locale"] = nil })
@@ -207,6 +219,7 @@ if let server = ProcessInfo.processInfo.environment["DREAM_SHARE_URL"].flatMap(S
         let (page, _) = try await URLSession.shared.data(from: link.url)
         let html = String(decoding: page, as: UTF8.self)
         expect(html.contains("Pune trip budget") && html.contains("class=\"katex\"") && !html.contains("Vegetarian"), "and the web viewer shows it, without the answers")
+        expect(html.contains("href=\"https://www.lonelyplanet.com/india/pune\"") && html.contains("CC BY-SA 4.0"), "crediting every source, with Wikipedia's licence")
         print("  Web viewer: \(link.url.absoluteString)")
     } catch {
         expect(false, "the round trip through the Worker failed: \(error.localizedDescription)")

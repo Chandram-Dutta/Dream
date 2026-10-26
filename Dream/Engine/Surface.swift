@@ -20,6 +20,10 @@ struct Surface: Codable, Hashable {
     var related: [String]
     /// Where the facts came from. Nil when nothing was looked up.
     var reference: Reference?
+    /// Every other page the facts came from: web pages read, and further Wikipedia articles
+    /// (Citation.swift). `reference` keeps the article whose picture and extract the screen uses.
+    /// Nil when nothing else was read, and in surfaces made before citations existed.
+    var citations: [Citation]? = nil
     /// What the reader finds out by changing the numbers, in their words, like "How does the
     /// angle change the throw?". Nil when nothing's calculated. Remembered with the surface, so
     /// it can be found again for the same question.

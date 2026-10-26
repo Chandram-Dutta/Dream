@@ -51,14 +51,14 @@ enum Prompts {
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, sceneRules, soundRules, connectionRules, languageRules, sharingRules, liveRules].filter { !$0.isEmpty }
+        [memoryRules, listRules, figureRules, sceneRules, soundRules, connectionRules, languageRules, sharingRules, liveRules, webRules].filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
 
     static var surface: String {
         """
-        You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Use the lookup tool whenever facts, numbers, dates or names matter, and take them only from what it returns.
+        You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Use the lookup tool, or search and read for the web, whenever facts, numbers, dates or names matter, and take them only from what they return.
 
         \(whenToCalculate)
         If there's something worth changing, write the question it answers, then the calculation. Otherwise leave question, inputs and outputs empty.
@@ -74,7 +74,7 @@ enum Prompts {
     /// What the model is told alongside each request about the user and their device. Each
     /// feature adds its own lines from its own file.
     static func context(for intent: String) async -> [String] {
-        await memoryContext(for: intent) + languageContext(for: intent) + liveContext() + connectionContext(for: intent)
+        await memoryContext(for: intent) + languageContext(for: intent) + liveContext() + connectionContext(for: intent) + webContext()
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
@@ -206,6 +206,7 @@ extension Surface {
         all += liveOutline
         all += sceneOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
+        all += citationOutline
         return all.joined(separator: "\n")
     }
 }

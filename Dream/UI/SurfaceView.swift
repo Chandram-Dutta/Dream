@@ -70,7 +70,7 @@ struct SurfaceView: View {
                 RelatedTopics(topics: surface.related, palette: surface.palette, onExplore: onExplore)
                     .transition(.blurReplace)
             }
-            SourceNote(reference: surface.reference, hasInformation: surface.hasInformation)
+            SourceNote(surface: surface)
         }
         .animation(.smooth(duration: 0.5), value: blocks)
         .animation(.smooth(duration: 0.5), value: surface.related)
@@ -243,29 +243,6 @@ private struct RelatedTopics: View {
             }
         }
         .padding(.top, 4)
-    }
-}
-
-private struct SourceNote: View {
-    let reference: Reference?
-    let hasInformation: Bool
-
-    var body: some View {
-        Group {
-            if let reference, let url = URL(string: reference.url) {
-                VStack(alignment: .leading, spacing: 4) {
-                    Link(destination: url) {
-                        Label("From Wikipedia: \(reference.title)", systemImage: "book.closed")
-                    }
-                    Text("Wikipedia text is available under CC BY-SA 4.0.")
-                        .foregroundStyle(.tertiary)
-                }
-            } else if hasInformation {
-                Label("Written without a source. Check anything important.", systemImage: "exclamationmark.bubble")
-                    .foregroundStyle(.secondary)
-            }
-        }
-        .font(.footnote)
     }
 }
 

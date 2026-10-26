@@ -7,6 +7,7 @@
 //   GET  /s/:id               the web viewer; also the universal link the app opens
 //   GET  /.well-known/apple-app-site-association
 //   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
+//   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
@@ -15,8 +16,9 @@ import { directory } from "./directory";
 import { CSP, messagePage, surfacePage } from "./page";
 import { parseShared, readBody, Rejection } from "./payload";
 import { ID_PATTERN, load, save } from "./store";
+import { routeWeb, type WebEnv } from "./web";
 
-export interface Env {
+export interface Env extends WebEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -82,11 +84,13 @@ async function create(request: Request, env: Env, origin: string): Promise<Respo
 }
 
 export default {
-  async fetch(request, env): Promise<Response> {
+  async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
     const path = url.pathname;
     const reading = request.method === "GET" || request.method === "HEAD";
     try {
+      const web = await routeWeb(request, env, ctx, url);
+      if (web) return web;
       if (path === "/.well-known/apple-app-site-association" || path === "/apple-app-site-association") {
         return reading ? associatedDomains(env) : problem(405, "Only GET.", { Allow: "GET, HEAD" });
       }

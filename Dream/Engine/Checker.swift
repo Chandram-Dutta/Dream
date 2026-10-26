@@ -179,6 +179,7 @@ enum Checker {
         }
         issues += checkSounds(&surface)
         issues += checkActions(&surface)
+        issues += checkCitations(&surface)
         let reference = surface
 
         /// `{name}` placeholders the calculation can fill; others are dropped.

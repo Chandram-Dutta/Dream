@@ -14,6 +14,9 @@ list entries, photo and memory never leave the phone.
 | `GET /api/surfaces/:id` | The shared surface, for the app. |
 | `GET /s/:id` | The web viewer. Also the universal link the app opens. |
 | `GET /.well-known/apple-app-site-association` | Which app opens `/s/` links (`APP_IDS`). |
+| `POST /api/search` | Web search, for the app only. See [Web search and reading](#web-search-and-reading). |
+| `POST /api/read` | A web page's text, for the app only. |
+| `GET /reader` | What DreamReader is, for site owners who see it in their logs. |
 
 ## What's uploaded
 
@@ -62,8 +65,8 @@ R2 is the place for anything large later, like rendered share images for link pr
 - **Ids:** ten random base-62 characters (about 60 bits), so links can't be guessed or walked.
 - **The web viewer is static:** no scripts, and a content security policy that allows none.
   Every string is escaped. KaTeX runs on the server with `trust` off, so maths can't make links.
-  Images and audio load only from `upload.wikimedia.org`, and links go only to Wikipedia and
-  Wikimedia Commons.
+  Images and audio load only from `upload.wikimedia.org`. Links go to Wikipedia, Wikimedia
+  Commons and the http(s) pages a surface cites, marked `nofollow noopener noreferrer`.
 - **The app doesn't trust the server.** It bounds, strips and re-checks everything it opens
   (`SharedSurface.received`), with the same checker as anything the model writes.
 
@@ -156,6 +159,133 @@ always works where Dream is installed.
 The app ID in the association file comes from `APP_IDS` in `wrangler.jsonc`
 (`DR99P625RR.xyz.onlychan.Dream`). If the bundle ID changes, change it there and deploy again.
 Several IDs can be listed, separated by commas.
+
+## Web search and reading
+
+So a screen can rest on the whole web rather than Wikipedia alone, the model has `search` and
+`read` tools beside `lookup` (`Dream/Generation/WebSearch.swift`). They call these routes
+(`src/web.ts`), which call a provider (`src/providers.ts`). The app never talks to a provider.
+
+```
+POST /api/search  { "query": "best budget phones India", "objective": "Which budget phones are best in India now?",
+                    "count": 5, "freshness": "week", "region": "in" }
+→ { "results": [{ "title", "url", "snippet", "site", "date" }], "provider": "parallel", "cached": false }
+
+POST /api/read    { "url": "https://…", "focus": "new features", "maxChars": 4000, "language": "en" }
+→ { "url", "canonical", "title", "site", "date", "language", "text", "excerpted", "truncated", "via", "cached" }
+```
+
+Both need `Authorization: Bearer <app key>`. `count` is 1 to 8 (default 5); `freshness` is day,
+week, month or year; `region` is a two-letter country; `maxChars` is 500 to 12,000 (default 6,000).
+
+### Providers
+
+[Parallel](https://docs.parallel.ai) does both, behind a small interface, so another can be added
+without touching the app:
+
+- **Search:** `POST https://api.parallel.ai/v1/search`, header `x-api-key`, with
+  `objective`, `search_queries`, `mode: "fast"` (about 700 ms), `max_chars_total`, and
+  `advanced_settings` holding `max_results`, `excerpt_settings.max_chars_per_result`,
+  `source_policy.after_date` (freshness) and `location` (region). Results are
+  `{ url, title, publish_date, excerpts[] }`. **$1 per 1,000** in fast mode, 10 results included.
+- **Read:** `POST https://api.parallel.ai/v1/extract`, with `urls`, `objective` (the focus), and
+  `advanced_settings` holding `excerpt_settings`, `full_content` and `fetch_policy`. Results are
+  `{ url, title, publish_date, excerpts[], full_content }`, with failures in `errors[]`.
+  **$1 per 1,000 pages.** It reads pages that need JavaScript and PDFs, and with a focus returns
+  just the parts about it, which keeps what the model reads short.
+
+Alongside Parallel, the Worker fetches the page itself (free): that gives the page's own title,
+site name, canonical address and date, and its words when there's no Parallel key or Parallel
+can't read it. That fetch asks for Markdown first, for sites that serve it to agents, and
+otherwise reads HTML with the runtime's streaming `HTMLRewriter`, keeping `main` or `article`
+and dropping scripts, menus, headers and footers (`src/html.ts`).
+
+Cloudflare's Web Search API (beta, through AI Gateway) would slot in as another `SearchProvider`:
+`env.AI.websearch({ gatewayId, query, limit, provider })` with an `"ai": { "binding": "AI" }`
+binding returns a `Response` whose JSON is `{ items: [{ url, title, description, lastModifiedDate? }] }`;
+Ceramic.ai, its default, is $0.25 per 1,000. It has no freshness or region filter. Browser
+Rendering (`env.BROWSER.quickAction("markdown", …)`, or `POST /accounts/:id/browser-run/markdown`)
+isn't used: Parallel already reads pages that need JavaScript, without a browser per page.
+
+### Protection
+
+These cost money, so they mustn't become an open proxy:
+
+- **Only the app:** a shared app key in `Authorization`, checked in constant time against the
+  `DREAM_APP_KEYS` secret (several, comma-separated, so one can be rotated out). Without the
+  secret, both routes refuse everything. The app keeps the key in its Keychain (Under the hood ›
+  Web search). A key in an app can be extracted, so it's a speed bump: App Attest, below, is the
+  real answer.
+- **Rate limits:** per address, 30 searches and 30 page reads a minute (`SEARCH_LIMIT`,
+  `PAGE_LIMIT`), checked before anything else.
+- **A daily budget:** at most `WEB_DAILY_LIMIT` (2,000) paid calls of each kind a day, for
+  everyone together, counted in D1. Past it, searches stop until tomorrow and reads fall back to
+  the free fetch. At Parallel's prices that's at most $4 a day.
+- **A cache:** the same search is answered from D1 for an hour (15 minutes for the past day),
+  the same read for six hours, and robots.txt for a day. Keys are hashes of what was asked.
+- **Sizes and times:** bodies up to 4 KB; queries up to 300 characters; pages read up to 2 MB of
+  HTML and returned as at most 12,000 characters, without their links; 10 s for a search, 20 s
+  for a read.
+- **Only public pages:** http and https on the usual ports, without names or passwords. Private,
+  loopback, link-local, carrier-grade NAT, documentation and metadata addresses are refused, in
+  every way of writing them (`src/address.ts`), and so are names like `localhost` and `.local`.
+  Before fetching, the Worker asks Cloudflare's resolver (DNS over HTTPS) where a name points
+  and refuses one that points anywhere private. Each redirect is checked the same way, at most
+  five, never from https to http.
+- **Polite:** it says who it is (`DreamReader/1.0`, linking to `/reader`), follows robots.txt
+  for `DreamReader` or else `*` (RFC 9309), and reads a page only when someone asks.
+- **Nothing personal is logged:** no queries, addresses or page addresses; only a provider's
+  HTTP status when one fails.
+
+What the routes return is untrusted text from the web. The app fences it between random markers
+and labels it as data for the model, and the checker keeps only citations of pages that were read.
+
+### App Attest (designed, not built)
+
+[App Attest](https://developer.apple.com/documentation/devicecheck/establishing-your-app-s-integrity)
+proves a request comes from a real copy of Dream on a real iPhone, so an extracted key is no use:
+
+1. `GET /api/attest/challenge` returns a random challenge, kept in D1 for five minutes.
+2. The app makes a key with `DCAppAttestService.generateKey()`, then
+   `attestKey(keyId, clientDataHash: SHA256(challenge))`, and sends the key id and attestation.
+3. The Worker checks the attestation (CBOR): the certificate chain up to Apple's App Attest root
+   CA, the nonce (`SHA256(authData ‖ clientDataHash)`, in the certificate's
+   `1.2.840.113635.100.8.2` extension), `rpIdHash == SHA256("DR99P625RR.xyz.onlychan.Dream")`,
+   counter 0, the `appattest` or `appattestdevelop` AAGUID, and that the credential id is the
+   key id. It stores the public key and counter under the key id.
+4. Each search or read carries `X-Dream-Key-Id` and an assertion from
+   `generateAssertion(keyId, clientDataHash: SHA256(method ‖ path ‖ body ‖ timestamp))`. The
+   Worker checks the signature with the stored key, that the counter went up, and that the
+   timestamp is within a minute.
+5. Rate limits and budgets then count per attested key, not per address, and a key can be revoked.
+
+The shared key stays for the bench and `wrangler dev`, where App Attest can't run.
+
+### Setting it up
+
+```sh
+cd Server
+npx wrangler d1 migrations apply dream-share --remote     # adds web_cache and web_usage
+security find-generic-password -a parallel -s dream -w | tr -d '\n' | npx wrangler secret put PARALLEL_API_KEY
+security add-generic-password -U -a web -s dream -w "$(openssl rand -hex 32)"         # once: makes the app key
+security find-generic-password -a web -s dream -w | tr -d '\n' | npx wrangler secret put DREAM_APP_KEYS
+npx wrangler deploy
+```
+
+Then paste the same key into Dream on the phone, in Under the hood › Web search. The bench
+reads it from the login Keychain too.
+
+Locally, `wrangler dev` reads both secrets from `Server/.dev.vars` (gitignored):
+
+```
+PARALLEL_API_KEY="…"
+DREAM_APP_KEYS="a-long-random-local-key"
+```
+
+`npm test` doesn't use them: it points the Worker at a stand-in for Parallel on this Mac
+(`test/stub-parallel.mjs`), so nothing is paid for, and checks refusals, SSRF, caching, the
+budget and the rate limits. `node test/unit.mjs` checks the address rules, robots.txt and text
+tidying on their own. `../Tools/web.sh` checks the app's side.
 
 ## Later: shared lists
 

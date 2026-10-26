@@ -41,6 +41,8 @@ final class Composer {
     let consent = Consent()
     /// Services the request names that the user hasn't connected, which the screen offers to connect.
     private(set) var suggestions: [DirectoryEntry] = []
+    /// The web pages read while writing, which the surface may cite (WebSearch.swift).
+    private let web = WebLog()
 
     /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
     enum Provider: String, CaseIterable {
@@ -92,6 +94,7 @@ final class Composer {
         asking.start()
         live.start()
         connected.start()
+        web.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
         suggestions = Connections.unconnected(in: intent)
@@ -120,6 +123,7 @@ final class Composer {
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
         connected.start(keeping: current)
+        web.start(keeping: current.credits)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
         do {
@@ -169,12 +173,17 @@ final class Composer {
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
+            + WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } })
     }
 
     private func lookingUp(_ subject: String) {
+        researching("Lookup: \(subject)")
+    }
+
+    private func researching(_ line: String) {
         phase = .researching
         isThinking = true
-        note("Lookup: \(subject)")
+        note(line)
     }
 
     // MARK: - Asking
@@ -264,6 +273,7 @@ final class Composer {
         }
         await surface.findRecordings()
         await surface.findMolecules()
+        report(Checker.checkCitations(&surface, read: web.reading(with: found.all)))
         report(Checker.checkBlocks(&surface))
         surface = surface.answered(asking.answers)
         self.surface = surface

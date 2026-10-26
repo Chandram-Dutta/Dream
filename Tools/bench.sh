@@ -10,4 +10,8 @@ swiftc -target arm64-apple-macos27.0 -O -o "$out" Dream/Engine/*.swift Dream/Gen
 if [[ -z "$XAI_API_KEY" ]]; then
   export XAI_API_KEY="$(security find-generic-password -a xai -s dream -w 2>/dev/null || true)"
 fi
+# Web search: the server's app key (account web), with the server as -webServer.
+if [[ -z "$DREAM_WEB_KEY" ]]; then
+  export DREAM_WEB_KEY="$(security find-generic-password -a web -s dream -w 2>/dev/null || true)"
+fi
 "$out" "$@"
