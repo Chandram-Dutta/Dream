@@ -54,6 +54,9 @@ struct DreamExecutor: LanguageModelExecutor {
         urlRequest.setValue("application/json", forHTTPHeaderField: "Content-Type")
         Session.authorize(&urlRequest)
         if let page = configuration.page { urlRequest.setValue(page, forHTTPHeaderField: "X-Dream-Page") }
+        // The server counts what this request used, never what it says, only while the user lets
+        // Dream count what's used (Server/src/analytics.ts).
+        if Analytics.isOn { urlRequest.setValue("on", forHTTPHeaderField: "X-Dream-Analytics") }
         for (name, value) in await AppProof.headers(method: "POST", path: path, body: body) {
             urlRequest.setValue(value, forHTTPHeaderField: name)
         }

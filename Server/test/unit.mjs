@@ -9,7 +9,7 @@ import { readFileSync } from "node:fs";
 import { checkURL, isPublicIP, parseIP } from "../src/address.ts";
 import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
-import { capture, limitReached } from "../src/analytics.ts";
+import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
 import { MAX_REPORTS, MAX_STACK, parseReports, ReportError, signatureOf } from "../src/metrickit.ts";
 import { robotsAllows } from "../src/robots.ts";
 import { decodeCursor, deleteUserData, encodeCursor, imageType, parseChanges } from "../src/syncdata.ts";
@@ -277,6 +277,24 @@ try {
   threw = true;
 }
 expect(!threw, "a failure to send never throws");
+
+console.log("Model requests, for LLM analytics");
+const generations = [];
+const waiting = [];
+const later = { waitUntil: (promise) => waiting.push(promise) };
+globalThis.fetch = async (_url, init) => {
+  generations.push(JSON.parse(init.body));
+  return new Response("{}");
+};
+expect(countsAllowed(new Request("https://dream.example/api/model", { headers: { "X-Dream-Analytics": "on" } })) && !countsAllowed(new Request("https://dream.example/api/model")), "only when the app says the person allows it");
+aiGeneration({ POSTHOG_KEY: "phc_test" }, later, "user-1", { model: "grok-4.7", page: "PAGE-1234", plan: "free", tokensIn: 1000, tokensCached: 600, tokensOut: 300, cost: 0.0042, latency: 12.3456, firstToken: 1.2, stream: true, status: 200 });
+aiGeneration({ POSTHOG_KEY: "phc_test" }, later, "user-1", { model: "grok-4.7", page: null, plan: "plus", tokensIn: 0, tokensCached: 0, tokensOut: 0, cost: null, latency: 0.5, firstToken: null, stream: true, status: 429 });
+await Promise.all(waiting);
+const [built, failed] = generations;
+expect(built?.event === "$ai_generation" && built.distinct_id === "user-1" && built.properties.$ai_trace_id === "PAGE-1234" && built.properties.$ai_input_tokens === 1000 && built.properties.$ai_cache_read_input_tokens === 600, "a page's request, in its page's trace, with its tokens");
+expect(built?.properties.$ai_total_cost_usd === 0.0042 && built.properties.$ai_latency === 12.346 && built.properties.$ai_time_to_first_token === 1.2 && built.properties.$ai_provider === "xai", "its cost and times");
+expect(!Object.keys(built?.properties ?? {}).some((key) => key === "$ai_input" || key === "$ai_output_choices"), "never the messages or the answer");
+expect(failed?.properties.$ai_is_error === true && failed.properties.$ai_http_status === 429 && failed.properties.$ai_span_name === "lists" && !("$ai_total_cost_usd" in failed.properties) && typeof failed.properties.$ai_trace_id === "string", "a failure, with no cost and a trace of its own");
 globalThis.fetch = realFetch;
 
 console.log(failures ? `\n${failures} failed` : "\nAll passed");

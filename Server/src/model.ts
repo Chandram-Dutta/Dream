@@ -12,12 +12,13 @@
 //
 // Nothing that was asked or answered is logged or kept: only token counts and what they cost.
 
+import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
 import { proveApp, type ProofEnv } from "./attest";
 import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
 
-export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv {
+export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
   /** Secret. Dream's xAI API key. */
   XAI_API_KEY?: string;
   /** Where xAI's API is. Only tests change it, to a stand-in on this Mac. */
@@ -151,8 +152,9 @@ function priced(model: string, tokensIn: number, tokensCached: number, tokensOut
 
 /** Passes a server-sent event stream through untouched, watching for the usage chunk. If the
  * stream is cut short, what it used is estimated from its size. */
-function metered(upstream: ReadableStream<Uint8Array>, model: string, requestBytes: number, finished: (use: ModelUse) => void): ReadableStream<Uint8Array> {
+function metered(upstream: ReadableStream<Uint8Array>, model: string, requestBytes: number, finished: (use: ModelUse, firstAt: number | null) => void): ReadableStream<Uint8Array> {
   const reader = upstream.getReader();
+  let firstAt: number | null = null;
   const decoder = new TextDecoder();
   let pending = "";
   let lines = 0;
@@ -181,7 +183,7 @@ function metered(upstream: ReadableStream<Uint8Array>, model: string, requestByt
     if (done) return;
     done = true;
     const tokensIn = Math.ceil(requestBytes / 4);
-    finished(use ?? { tokensIn, tokensCached: 0, tokensOut: lines, cost: priced(model, tokensIn, 0, lines) });
+    finished(use ?? { tokensIn, tokensCached: 0, tokensOut: lines, cost: priced(model, tokensIn, 0, lines) }, firstAt);
   };
   return new ReadableStream<Uint8Array>({
     async pull(controller) {
@@ -193,6 +195,7 @@ function metered(upstream: ReadableStream<Uint8Array>, model: string, requestByt
           controller.close();
           return;
         }
+        firstAt ??= Date.now();
         scan(decoder.decode(value, { stream: true }));
         controller.enqueue(value);
       } catch (error) {
@@ -268,6 +271,25 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   if (refusal) return refusalResponse(refusal);
 
   const modelID = body.model as string;
+  // For PostHog's LLM analytics, only when the person lets Dream count what's used (analytics.ts).
+  const counted = countsAllowed(request);
+  const started = Date.now();
+  const generation = (use: ModelUse | null, status: number, firstAt: number | null = null) => {
+    if (!counted) return;
+    aiGeneration(env, ctx, user.id, {
+      model: modelID,
+      page: pageID,
+      plan: account.plan,
+      tokensIn: use?.tokensIn ?? 0,
+      tokensCached: use?.tokensCached ?? 0,
+      tokensOut: use?.tokensOut ?? 0,
+      cost: use ? use.cost / 1_000_000 : null,
+      latency: (Date.now() - started) / 1000,
+      firstToken: firstAt === null ? null : (firstAt - started) / 1000,
+      stream: body.stream === true,
+      status,
+    });
+  };
   let upstream: Response;
   try {
     upstream = await fetch(`${(env.XAI_BASE_URL?.trim() || "https://api.x.ai").replace(/\/$/, "")}/v1/chat/completions`, {
@@ -288,8 +310,14 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     console.error("Model provider unreachable");
     return problem(502, "The model didn't answer. Try again in a moment.");
   }
-  if (!upstream.ok) return upstreamProblem(upstream);
-  const record = (use: ModelUse) => ctx.waitUntil(recordModel(env, user.id, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
+  if (!upstream.ok) {
+    generation(null, upstream.status);
+    return upstreamProblem(upstream);
+  }
+  const record = (use: ModelUse, firstAt: number | null = null) => {
+    ctx.waitUntil(recordModel(env, user.id, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
+    generation(use, 200, firstAt);
+  };
 
   if (body.stream && upstream.body) {
     return new Response(metered(upstream.body, modelID, raw.length, record), {

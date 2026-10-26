@@ -81,6 +81,8 @@ async function startLocal(stub, xai) {
     `ALLOWANCES:${JSON.stringify(LOCAL_ALLOWANCES)}`,
     `APPSTORE_TEST_ROOT:${appStore.rootBase64}`,
     `ATTEST_TEST_ROOT:${attestCA.rootBase64}`,
+    // Nothing from the tests reaches PostHog.
+    "POSTHOG_KEY:",
   ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {

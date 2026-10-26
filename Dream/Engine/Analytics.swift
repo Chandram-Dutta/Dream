@@ -14,6 +14,9 @@ enum Analytics {
     /// Where events go: set by the app once the user agrees, and cleared if they change their mind.
     nonisolated(unsafe) static var sink: (@Sendable (_ name: String, _ properties: [String: any Sendable]) -> Void)?
 
+    /// Whether the user lets Dream count what's used, so events go somewhere.
+    static var isOn: Bool { sink != nil }
+
     static func send(_ event: Event) {
         guard let sink else { return }
         sink(event.name, event.properties)

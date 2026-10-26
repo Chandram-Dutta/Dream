@@ -83,7 +83,18 @@ belongs on Dream's own server.
 
 ## Server events
 
-`Server/src/analytics.ts` can send `limit_reached`, `subscription_started` and
-`subscription_ended` from the Worker, keyed by the same user id, when its `POSTHOG_KEY` var is
-set. The server can't see the user's "Help improve Dream" choice yet, so leave that var empty
-until the choice syncs to the account (workstream B), or check it before sending.
+While "Help improve Dream" is on, the app sends `X-Dream-Analytics: on` with its requests to
+Dream's server, and only then does the Worker send events of its own (`Server/src/analytics.ts`,
+`countsAllowed`), keyed by the same user id. Its `POSTHOG_KEY` var holds the same public project
+key as the app.
+
+| Event | Properties | Sent when | Where |
+|---|---|---|---|
+| `$ai_generation` | `$ai_trace_id` (the page's id; a page's tool rounds and repairs are one trace), `$ai_span_name` (`page` or `lists`), `$ai_provider`, `$ai_model`, `$ai_input_tokens`, `$ai_cache_read_input_tokens`, `$ai_output_tokens` (with reasoning), `$ai_total_cost_usd` (xAI's own figure when it gives one), `$ai_latency`, `$ai_time_to_first_token`, `$ai_stream`, `$ai_http_status`, `$ai_is_error`, `plan` | Each request through the model proxy, done or failed | `Server/src/model.ts` |
+
+They feed PostHog's LLM analytics: cost per person and per page, latency, cache use and errors.
+Never `$ai_input` or `$ai_output_choices`: no messages, answers or tool calls leave for PostHog.
+
+`limit_reached`, `subscription_started` and `subscription_ended` can also be sent from the Worker,
+after the same check. The App Store's notifications come from Apple, not the phone, so they send
+nothing; the app counts purchases itself.
