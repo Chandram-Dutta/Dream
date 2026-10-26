@@ -136,6 +136,10 @@ enum Prompts {
             return "the chart of \(block.refs.map { surface.label(of: $0) }.joined(separator: " and ")) along \(surface.label(of: block.over)) (#\(block.id))"
         case .hero, .metric, .slider, .stepper, .field, .toggle, .picker:
             return "the \(block.kind.rawValue) for \"\(surface.label(of: block.ref))\" (\(block.ref), #\(block.id))"
+        case .list:
+            return "the list of \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
+        case .add:
+            return "the bar for adding to \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
         case .equation where !block.ref.isEmpty:
             return "the equation for \"\(surface.label(of: block.ref))\" (\(block.ref), #\(block.id))"
         case .paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data:
@@ -190,7 +194,7 @@ extension Surface {
                 return result + lines(block.children, depth: depth + 1)
             }
         }
-        var all = ["\(title): \(summary)"] + lines(visibleBlocks, depth: 0)
+        var all = ["\(title): \(summary)"] + (collectionSummary.isEmpty ? [] : [collectionSummary]) + lines(visibleBlocks, depth: 0)
         all += soundOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
         return all.joined(separator: "\n")

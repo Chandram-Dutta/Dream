@@ -124,7 +124,10 @@ struct HomeView: View {
                 }
                 .buttonStyle(.plain)
                 .contextMenu {
-                    Button("Delete", systemImage: "trash", role: .destructive) { context.delete(saved) }
+                    Button("Delete", systemImage: "trash", role: .destructive) {
+                        RecordStore.deleteAll(of: saved.id, in: context)
+                        context.delete(saved)
+                    }
                 }
             }
         }
@@ -229,6 +232,14 @@ struct HomeView: View {
 /// answer; anything else, what it says.
 struct SurfaceTile: View {
     let saved: SavedSurface
+    /// The surface's entries, for totals worked out from its lists.
+    @Query private var stored: [StoredRecord]
+
+    init(saved: SavedSurface) {
+        self.saved = saved
+        let id = saved.id
+        _stored = Query(filter: #Predicate<StoredRecord> { $0.surfaceID == id })
+    }
 
     var body: some View {
         let surface = saved.surface
@@ -242,7 +253,7 @@ struct SurfaceTile: View {
                 .font(.display(.subheadline))
                 .lineLimit(2)
             if let main = surface.outputs.first {
-                Text(surface.display(main.name, surface.evaluate(saved.values).values[main.name]))
+                Text(surface.display(main.name, surface.evaluate(saved.values, records: StoredRecord.grouped(stored)).values[main.name]))
                     .font(.display(.title3))
                     .monospacedDigit()
                     .foregroundStyle(palette.numberGradient)

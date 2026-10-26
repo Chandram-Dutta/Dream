@@ -28,6 +28,9 @@ struct Surface: Codable, Hashable {
     var sounds: [Sound]?
     /// The questions asked before building it, with the user's answers. Nil when nothing was asked.
     var answers: [Answer]?
+    /// Lists the user keeps, like groceries or expenses: their fields, never their entries,
+    /// which stay on the phone. Nil on surfaces saved before lists existed.
+    var collections: [RecordCollection]?
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -39,7 +42,7 @@ struct Surface: Codable, Hashable {
 
     func input(_ name: String) -> Input? { inputs.first { $0.name == name } }
     func output(_ name: String) -> Output? { outputs.first { $0.name == name } }
-    func label(of name: String) -> String { input(name)?.label ?? output(name)?.label ?? sound(name)?.label ?? name }
+    func label(of name: String) -> String { input(name)?.label ?? output(name)?.label ?? sound(name)?.label ?? collectionLabel(name) ?? name }
 
     var initialValues: [String: Double] {
         Dictionary(inputs.map { ($0.name, $0.initial) }, uniquingKeysWith: { first, _ in first })
@@ -133,6 +136,8 @@ enum BlockKind: String, Codable {
     case section, row
     // Something to hear, from `Surface.sounds`.
     case sound
+    // The user's own entries in a collection: the entries themselves, and a bar to add more.
+    case list, add
 
     var isContainer: Bool { self == .section || self == .row }
     var isControl: Bool { [.slider, .stepper, .field, .toggle, .picker].contains(self) }

@@ -83,7 +83,7 @@ struct SurfaceScreen: View {
     /// The main result, so the field behind it can respond when it changes.
     private var mainValue: Double? {
         guard let surface, let main = surface.outputs.first else { return nil }
-        return surface.evaluate(state.values).values[main.name]
+        return surface.evaluate(state.values, records: state.records).values[main.name]
     }
 
     var body: some View {
@@ -166,6 +166,7 @@ struct SurfaceScreen: View {
         // Never leave the model waiting on questions nobody can see.
         .onDisappear { composer.asking.cancel() }
         .onChange(of: state.values) { _, values in saved?.values = values }
+        .keepingRecords(of: saved?.id, collections: surface?.recordCollections ?? [], in: state)
     }
 
     /// For checking whole pages on a device: launched with `-DreamTour 1`, a finished page
@@ -276,6 +277,11 @@ struct SurfaceScreen: View {
         instruction = ""
         instructionFocused = false
         Task {
+            // On a list, "add milk" or "mark the first two done" changes the user's entries, not the screen.
+            if await RecordTalk.handle(text, on: current, focus: target.block, state: state) {
+                changingID = nil
+                return
+            }
             await composer.edit(current, intent: intent, instruction: text, focus: target.block)
             changingID = nil
             guard composer.phase == .done, let updated = composer.surface else { return }

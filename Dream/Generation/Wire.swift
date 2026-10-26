@@ -57,6 +57,7 @@ enum WireBlockKind {
     case paragraph, facts, bullets, steps, timeline, stat, equation, data
     case section, row
     case sound
+    case list, add
 }
 
 @Generable
@@ -95,6 +96,9 @@ struct WireSurface {
     @Guide(description: "SF Symbols name for the subject")
     var symbol: String
     var accent: WireAccent
+    // Before the calculation, whose formulas can total them.
+    @Guide(description: "Lists the user keeps, only when they're keeping track of things like groceries, expenses, habits or packing. Usually empty.", .count(0...3))
+    var collections: [WireCollection]
     // Before the inputs, so the model decides whether there's anything worth changing first.
     @Guide(description: "If changing numbers here would help the user, the question they'd explore, in their words, like 'How much will I save?' or 'How does the angle change the throw?'. Empty when they want facts: then there are no inputs or outputs.")
     var question: String
@@ -125,7 +129,8 @@ extension Surface {
             blocks: Block.list(wire.blocks),
             related: wire.related,
             reference: reference,
-            question: wire.question.isEmpty ? nil : wire.question)
+            question: wire.question.isEmpty ? nil : wire.question,
+            collections: Surface.collections(wire.collections))
         sounds = Sound.list(wire.sounds)
     }
 
@@ -141,7 +146,8 @@ extension Surface {
             blocks: Block.list(partial: wire.blocks ?? []),
             related: wire.related ?? [],
             reference: reference,
-            question: wire.question.flatMap { $0.isEmpty ? nil : $0 })
+            question: wire.question.flatMap { $0.isEmpty ? nil : $0 },
+            collections: Surface.collections(partial: wire.collections))
         sounds = Sound.list(partial: wire.sounds)
     }
 }

@@ -22,7 +22,7 @@ struct ChartBlockView: View {
 
     var body: some View {
         let surface = context.surface
-        let curves = block.refs.map { Curve(name: $0, points: surface.series(of: $0, over: block.over, given: context.state.values)) }
+        let curves = block.refs.map { Curve(name: $0, points: surface.series(of: $0, over: block.over, given: context.state.values, records: context.state.records)) }
         let axis = surface.input(block.over)
         let x = axis.map { context.state.value($0) }
         let domain = Self.domain(of: curves + ghost)
@@ -160,7 +160,7 @@ struct ChartBlockView: View {
         if ghost.isEmpty {
             var values = before
             if let axis = context.surface.input(block.over) { values[axis.name] = context.state.value(axis) }
-            ghost = block.refs.map { Curve(name: $0, points: context.surface.series(of: $0, over: block.over, given: values)) }
+            ghost = block.refs.map { Curve(name: $0, points: context.surface.series(of: $0, over: block.over, given: values, records: context.state.records)) }
         }
         fade?.cancel()
         fade = Task { @MainActor in
