@@ -18,6 +18,8 @@ struct RenderContext {
     let state: SurfaceState
     let focusedID: String?
     let onChange: ((Block) -> Void)?
+    /// What's being read aloud, marked more gently than a change.
+    var readingID: String? = nil
 
     var palette: Palette { surface.palette }
     var accent: Color { palette.accent }
@@ -33,18 +35,21 @@ struct SurfaceView: View {
     /// What the model is doing right now, as a symbol beside the title.
     var stage: String?
     var focusedID: String?
+    var readingID: String?
     var onChange: ((Block) -> Void)?
     var onExplore: ((String) -> Void)?
 
     var body: some View {
-        let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values), state: state, focusedID: focusedID, onChange: onChange)
+        let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values), state: state, focusedID: focusedID, onChange: onChange, readingID: readingID)
         let blocks = surface.displayBlocks
         VStack(alignment: .leading, spacing: 26) {
             SurfaceHeader(surface: surface, stage: stage)
+                .readingMark(readingID == Narration.headerID, palette: surface.palette)
             SurfaceImage(photo: photo, url: surface.hasInformation ? surface.reference?.imageURL.flatMap { URL(string: $0) } : nil, palette: surface.palette)
             ForEach(blocks) { block in
                 BlockView(block: block, context: context, depth: 0)
                     .transition(.blurReplace)
+                    .id(block.id)
             }
             if !surface.related.isEmpty {
                 RelatedTopics(topics: surface.related, palette: surface.palette, onExplore: onExplore)

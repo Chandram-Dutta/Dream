@@ -9,6 +9,7 @@ struct BlockView: View {
 
     var body: some View {
         content
+            .readingMark(context.readingID == block.id, palette: context.palette)
             .overlay {
                 if context.focusedID == block.id {
                     RoundedRectangle(cornerRadius: 30)
@@ -115,6 +116,7 @@ struct BlockView: View {
                             .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 5 }
                         RichText(text: item.value, context: context).lineSpacing(3)
                     }
+                    .readingMark(context.readingID == Narration.stepID(block.id, index), palette: palette)
                 }
             }
         case .timeline:

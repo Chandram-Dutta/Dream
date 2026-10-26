@@ -30,6 +30,7 @@ struct SurfaceScreen: View {
     @State private var pulse = 0
     @State private var scroll = ScrollPosition(edge: .top)
     @State private var userScrolled = false
+    @State private var voice = PageVoice()
     @FocusState private var instructionFocused: Bool
 
     init(request: ComposeRequest) {
@@ -93,6 +94,7 @@ struct SurfaceScreen: View {
                     photo: photo,
                     stage: stage,
                     focusedID: changing?.block?.id ?? changingID,
+                    readingID: voice.readingID,
                     onChange: busy ? nil : { beginChange(ChangeTarget(block: $0)) },
                     onExplore: busy ? nil : { exploring = ComposeRequest(intent: $0, image: nil) })
                     .padding(.horizontal, 20)
@@ -112,8 +114,12 @@ struct SurfaceScreen: View {
         // Blocks stream in above ones already shown, and the scroll view follows those down.
         // Hold the top while the surface forms, until the user scrolls themselves.
         .onScrollPhaseChange { _, phase in
-            if phase == .interacting { userScrolled = true }
+            if phase == .interacting {
+                userScrolled = true
+                voice.userScrolled()
+            }
         }
+        .followsReading(voice, surface: surface, scroll: $scroll)
         .onChange(of: composer.surface) {
             if !userScrolled { scroll.scrollTo(edge: .top) }
         }
@@ -126,6 +132,9 @@ struct SurfaceScreen: View {
         .scrollDismissesKeyboard(.interactively)
         .safeAreaInset(edge: .top) { failure }
         .safeAreaInset(edge: .bottom) { changeBar }
+        .safeAreaInset(edge: .bottom) { VoiceBar(voice: voice, palette: palette) }
+        .onChange(of: composer.phase.isBusy) { if composer.phase.isBusy { voice.stop() } }
+        .onDisappear { voice.stop() }
         .animation(.smooth, value: composer.phase)
         .animation(.smooth, value: changing)
         .sensoryFeedback(trigger: composer.phase) { _, new in new == .done ? .success : nil }
@@ -134,6 +143,8 @@ struct SurfaceScreen: View {
         .navigationDestination(item: $exploring) { SurfaceScreen(request: $0) }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
+                ReadAloudButton(voice: voice, surface: surface, state: state)
+                    .disabled(busy || surface == nil)
                 Button("Change", systemImage: "wand.and.stars") { beginChange(ChangeTarget()) }
                     .disabled(busy || surface == nil)
                 Button("Under the hood", systemImage: "ladybug") { showingDebug = true }
@@ -187,13 +198,18 @@ struct SurfaceScreen: View {
                     .submitLabel(.go)
                     .onSubmit(submitChange)
                     .onAppear { instructionFocused = true }
-                Button("Send", systemImage: "arrow.up", action: submitChange)
-                    .labelStyle(.iconOnly)
-                    .font(.headline.weight(.bold))
-                    .foregroundStyle(.white)
-                    .frame(width: 38, height: 38)
-                    .background(palette.gradient, in: .circle)
-                    .disabled(instruction.trimmingCharacters(in: .whitespaces).isEmpty)
+                    .onChange(of: instructionFocused) { if instructionFocused, voice.listener.isActive { voice.listener.cancel() } }
+                if instruction.isEmpty || voice.listener.isActive {
+                    MicButton(listener: voice.listener, text: $instruction, palette: palette, onStart: { instructionFocused = false }) { _ in submitChange() }
+                } else {
+                    Button("Send", systemImage: "arrow.up", action: submitChange)
+                        .labelStyle(.iconOnly)
+                        .font(.headline.weight(.bold))
+                        .foregroundStyle(.white)
+                        .frame(width: 38, height: 38)
+                        .background(palette.gradient, in: .circle)
+                        .disabled(instruction.trimmingCharacters(in: .whitespaces).isEmpty)
+                }
                 Button("Cancel", systemImage: "xmark") { changing = nil }
                     .labelStyle(.iconOnly)
                     .font(.headline)
@@ -204,6 +220,7 @@ struct SurfaceScreen: View {
             .padding(.trailing, 6)
             .padding(.vertical, 6)
             .glassEffect(.regular.interactive(), in: .capsule)
+            .listeningGlow(voice.listener, palette: palette, in: .capsule)
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -238,6 +255,7 @@ struct SurfaceScreen: View {
     }
 
     private func beginChange(_ target: ChangeTarget) {
+        voice.stop()
         instruction = ""
         changing = target
     }
