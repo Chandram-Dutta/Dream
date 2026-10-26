@@ -51,7 +51,7 @@ enum Prompts {
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, soundRules, languageRules].filter { !$0.isEmpty }
+        [memoryRules, listRules, figureRules, sceneRules, soundRules, languageRules].filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
@@ -140,7 +140,7 @@ enum Prompts {
             return "the list of \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
         case .add:
             return "the bar for adding to \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
-        case .figure, .diagram:
+        case .figure, .diagram, .scene:
             return "the \(block.kind.rawValue) \"\(block.ref)\"\(block.title.isEmpty ? "" : ", titled \"\(block.title)\"") (#\(block.id))"
         case .equation where !block.ref.isEmpty:
             return "the equation for \"\(surface.label(of: block.ref))\" (\(block.ref), #\(block.id))"
@@ -199,6 +199,7 @@ extension Surface {
         var all = ["\(title): \(summary)"] + (collectionSummary.isEmpty ? [] : [collectionSummary]) + lines(visibleBlocks, depth: 0)
         all += soundOutline
         all += visualOutline
+        all += sceneOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
         return all.joined(separator: "\n")
     }

@@ -66,7 +66,7 @@ enum Checker {
         issues += checkUnits(&surface)
 
         if surface.inputs.isEmpty && !totalsRecords(surface) { problem("The calculation has results but no inputs, so nothing can change.") }
-        if surface.outputs.isEmpty { problem("The calculation has inputs but no results calculated from them.") }
+        if surface.outputs.isEmpty && !surface.drivesScenes { problem("The calculation has inputs but no results calculated from them.") }
 
         for index in surface.inputs.indices {
             surface.inputs[index] = checkedRange(surface.inputs[index], fixed: fixed, problem: problem)
@@ -166,9 +166,10 @@ enum Checker {
         var issues: [Issue] = []
         func fixed(_ message: String) { issues.append(Issue(kind: .fixed, message: message)) }
         issues += checkFigures(&surface)
+        issues += checkScenes(&surface)
 
         // A variable no chart runs along would have no control at all, so the reader sets it instead.
-        let axes = charts(in: surface.blocks).reduce(into: Set<String>()) { $0.insert($1.over) }.union(surface.figureAxes)
+        let axes = charts(in: surface.blocks).reduce(into: Set<String>()) { $0.insert($1.over) }.union(surface.figureAxes).union(surface.sceneAxes)
         for index in surface.inputs.indices where surface.inputs[index].role == .variable && !axes.contains(surface.inputs[index].name) {
             surface.inputs[index].role = .adjustable
             fixed("Gave '\(surface.inputs[index].name)' a control, since no chart runs along it.")
@@ -351,6 +352,10 @@ enum Checker {
                 guard let checked = visual(block, in: reference, fixed: fixed) else { return nil }
                 block = checked
 
+            case .scene:
+                guard let checked = sceneBlock(block, in: reference, fixed: fixed) else { return nil }
+                block = checked
+
             case .facts, .bullets, .steps, .timeline, .stat:
                 (block.ref, block.over, block.children) = ("", "", [])
                 if block.items.isEmpty {
@@ -369,6 +374,7 @@ enum Checker {
 
         surface.blocks = surface.blocks.compactMap { clean($0, depth: 0) }
         issues += placeVisuals(&surface)
+        issues += placeScenes(&surface)
         issues += removeRepeatedUnits(&surface)
 
         let title = surface.title.lowercased()

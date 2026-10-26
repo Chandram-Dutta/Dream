@@ -63,6 +63,7 @@ enum WireBlockKind {
     case sound
     case list, add
     case figure, diagram
+    case scene
 }
 
 @Generable
@@ -117,6 +118,8 @@ struct WireSurface {
     var figures: [WireFigure]
     @Guide(description: "Flows, cycles and hierarchies, each shown by a diagram block", .count(0...2))
     var diagrams: [WireDiagram]
+    @Guide(description: "3D scenes, only where depth teaches, each shown by a scene block", .count(0...2))
+    var scenes: [WireScene]
     @Guide(.count(1...12))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
@@ -142,6 +145,7 @@ extension Surface {
             collections: Surface.collections(wire.collections))
         sounds = Sound.list(wire.sounds)
         takeVisuals(figures: wire.figures.map(Figure.init), diagrams: wire.diagrams.map(Diagram.init))
+        takeScenes(wire.scenes.map(Scene3D.init))
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -160,6 +164,7 @@ extension Surface {
             collections: Surface.collections(partial: wire.collections))
         sounds = Sound.list(partial: wire.sounds)
         takeVisuals(figures: (wire.figures ?? []).compactMap(Figure.init(partial:)), diagrams: (wire.diagrams ?? []).compactMap(Diagram.init(partial:)))
+        takeScenes((wire.scenes ?? []).compactMap(Scene3D.init(partial:)))
     }
 }
 
