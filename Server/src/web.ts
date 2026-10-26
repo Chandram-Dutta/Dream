@@ -175,17 +175,13 @@ async function search(request: Request, env: WebEnv, ctx: ExecutionContext): Pro
   if (!provider) return problem(503, "Web search isn't set up on this server yet.");
   const refusal = await admitWeb(env, user.id, "search");
   if (refusal) return refusalResponse(refusal);
-  const key = await digest(`search:1:${provider.name}:${JSON.stringify([query.toLowerCase(), objective, count, freshness ?? "", region ?? ""])}`);
-  const hit = await cached<object>(env, key);
-  if (hit) return json({ ...hit, cached: true });
+  // Never cached: Parallel's terms (§2(b)(i), §2(c)(xi)) keep each answer for the one person who
+  // asked, so it's neither stored nor given to anyone else.
   if (!(await spend(env, "search"))) return problem(503, "Dream has searched the web as much as it can for today. Try again tomorrow.");
 
   try {
     const results = await provider.search({ query, objective: objective || undefined, count, freshness, region }, AbortSignal.timeout(10_000));
-    const answer = { results, provider: provider.name };
-    // Current events change by the hour; most other things don't.
-    ctx.waitUntil(keep(env, key, answer, freshness === "day" ? 900 : 3_600));
-    return json({ ...answer, cached: false });
+    return json({ results, provider: provider.name, cached: false });
   } catch (error) {
     return providerProblem(error, "search");
   }
@@ -247,7 +243,8 @@ async function read(request: Request, env: WebEnv, ctx: ExecutionContext, origin
   if (refusal) return refusalResponse(refusal);
 
   const provider = pageProvider(env);
-  const key = await digest(`read:1:${provider?.name ?? "fetch"}:${JSON.stringify([url.href, focus, maxChars])}`);
+  // Only Dream's own reads are kept; the provider's, like its searches, go only to who asked.
+  const key = await digest(`read:2:fetch:${JSON.stringify([url.href, focus, maxChars])}`);
   const hit = await cached<ReadAnswer>(env, key);
   if (hit) return json({ ...hit, cached: true });
 
@@ -307,7 +304,7 @@ async function read(request: Request, env: WebEnv, ctx: ExecutionContext, origin
     truncated: capped.truncated,
     via: fromProvider ? provider!.name : "fetch",
   };
-  ctx.waitUntil(keep(env, key, answer, 6 * 3_600));
+  if (!fromProvider) ctx.waitUntil(keep(env, key, answer, 6 * 3_600));
   return json({ ...answer, cached: false });
 }
 

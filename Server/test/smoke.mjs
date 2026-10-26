@@ -347,7 +347,7 @@ async function runWeb(base, key, session, stub) {
   expect(!text.includes("javascript:") && !text.includes("secret@") && found.results.every((result) => /^https?:\/\//.test(result.url)), "only http(s) addresses, without credentials");
   expect(found.results.length === 2 && second?.url === "https://www.91mobiles.com/list/phones-under-15000" && second?.title === "91mobiles.com", "repeats dropped, and a missing title filled with the site");
   response = await post("/api/search", { query: "Best budget phones   india", objective: "Which budget phones are best in India now?", count: 3, freshness: "week", region: "in" });
-  expect((await response.json()).cached === true && stub.calls.search.length === 1, "asked again, it comes from the cache");
+  expect((await response.json()).cached === false && stub.calls.search.length === 2, "asked again, Parallel is asked again: its answers are never kept or shared");
 
   console.log("Reading a page");
   response = await post("/api/read", { url: "https://example.com/#top", focus: "what the domain is for" });
@@ -359,7 +359,7 @@ async function runWeb(base, key, session, stub) {
   const asked = stub.calls.extract.at(-1);
   expect(asked?.urls?.[0] === "https://example.com/" && asked?.objective === "what the domain is for" && asked?.advanced_settings?.full_content, "the address without its fragment, the focus, and the page from the top too");
   response = await post("/api/read", { url: "https://example.com/", focus: "what the domain is for" });
-  expect((await response.json()).cached === true && stub.calls.extract.length === 1, "read again, it comes from the cache");
+  expect((await response.json()).cached === false && stub.calls.extract.length === 2, "read again, Parallel reads it again");
   response = await post("/api/read", { url: "https://example.org/", maxChars: 500 });
   const own = await response.json();
   expect(response.status === 200 && own.via === "fetch" && own.title === "Example Domain" && /this domain is for use/i.test(own.text ?? ""), `when the provider can't read a page, Dream's own fetch does (got ${response.status} ${own.error ?? own.via})`);
@@ -367,12 +367,12 @@ async function runWeb(base, key, session, stub) {
   expect(own.text.length <= 502 && own.excerpted === false, "text is capped");
 
   console.log("Daily budget");
-  // Spent so far: one search, and two reads. Each kind has its own budget.
+  // Spent so far: two searches, and three reads. Each kind has its own budget.
   let stopped = -1;
   for (let i = 0; i < 6 && stopped < 0; i++) {
     if ((await post("/api/search", { query: `budget check ${i}` })).status === 503) stopped = i;
   }
-  expect(stopped === LOCAL_DAILY_LIMIT - 1, `searches stop for the day at the limit (after ${stopped} more)`);
+  expect(stopped === LOCAL_DAILY_LIMIT - 2, `searches stop for the day at the limit (after ${stopped} more)`);
   expect(stub.calls.search.length === LOCAL_DAILY_LIMIT, "and the provider isn't asked past it");
 
   console.log("Web allowance per account");

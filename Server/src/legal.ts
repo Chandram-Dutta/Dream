@@ -184,7 +184,7 @@ const PRIVACY = [
       "<strong>Cloudflare</strong> runs Dream's server, database and file storage, so it holds everything Dream keeps.",
       "<strong>AI providers</strong> run the models that make pages. Today that's <strong>xAI</strong> (Grok). Dream may add or change providers, and this list will say so before it does. For each request a provider receives what you asked, the context needed to answer it (like facts from your memory you've confirmed, your answers, the page you're changing, or list entries you're talking to), any photo you attached, and what lookups returned. It doesn't receive your name, email or Apple ID. " +
         "xAI doesn't train its models on what it receives through its API, and deletes it after 30 days, keeping it until then only to look into abuse.",
-      "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account.",
+      "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account; Dream keeps names and personal details out of searches. Parallel may use searches and results to improve its own models, without linking them to anyone.",
       "<strong>Apple</strong> handles Sign in with Apple, App Store purchases, Weather and Maps.",
       "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds. It receives what's looked up.",
       "<strong>PostHog</strong> keeps usage counts, in the United States, unless you turn off “Help improve Dream”. It doesn't keep your IP address.",
@@ -292,7 +292,8 @@ const TERMS = [
       "harm, harass, threaten or deceive people;",
       "make or share sexual content involving minors, or content that exploits anyone;",
       "infringe anyone's rights, including copyright and privacy;",
-      "get around limits, extract keys, scrape Dream, or try to break or overload it.",
+      "get around limits, extract keys, scrape Dream, or try to break or overload it;",
+      "collect what Dream finds on the web into a database, resell it, or use it to train AI models or build a competing search service.",
     ]),
   ),
   section(
