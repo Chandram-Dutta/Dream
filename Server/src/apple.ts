@@ -127,36 +127,94 @@ interface PublishedKey {
 
 let published: { url: string; fetchedAt: number; keys: Map<string, CryptoKey> } | null = null;
 
-/** Apple's signing keys, fetched from `<base>/auth/keys` and kept for a day. Apple rotates them, so
- * an id that isn't known yet fetches them again, at most once a minute. */
-export function appleKeys(base: string = APPLE): KeyLookup {
+const DAY = 86_400_000;
+
+/** Where Apple's keys are kept between fetches, for every server to share. appleid.apple.com
+ * answers some of Cloudflare's servers with 501, so a sign-in can't count on fetching them. */
+export interface KeyStore {
+  read(url: string): Promise<{ body: string; fetchedAt: number } | null>;
+  write(url: string, body: string, fetchedAt: number): Promise<void>;
+}
+
+/** The keys in D1 (migrations/0009_apple_keys.sql). A newer copy is never replaced by an older one. */
+export function storedKeys(db: D1Database): KeyStore {
+  return {
+    read: (url) => db.prepare("SELECT body, fetched_at AS fetchedAt FROM apple_keys WHERE url = ?").bind(url).first<{ body: string; fetchedAt: number }>(),
+    async write(url, body, fetchedAt) {
+      await db
+        .prepare("INSERT INTO apple_keys (url, body, fetched_at) VALUES (?, ?, ?) ON CONFLICT (url) DO UPDATE SET body = excluded.body, fetched_at = excluded.fetched_at WHERE excluded.fetched_at > apple_keys.fetched_at")
+        .bind(url, body, fetchedAt)
+        .run();
+    },
+  };
+}
+
+/** Apple's published keys, as Apple sends them. Throws `AppleUnavailable`. */
+export async function fetchAppleKeys(base: string = APPLE): Promise<string> {
+  let body: string;
+  try {
+    const response = await fetch(`${base}/auth/keys`, { headers: { Accept: "application/json", "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(8_000) });
+    if (!response.ok) throw new AppleUnavailable(`Apple's keys: ${response.status}`);
+    body = await response.text();
+  } catch (error) {
+    throw error instanceof AppleUnavailable ? error : new AppleUnavailable(`Apple's keys: ${error instanceof Error ? error.name : typeof error}`);
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(body);
+  } catch {
+    throw new AppleUnavailable("Apple's keys: not JSON");
+  }
+  if (!parsed || typeof parsed !== "object" || !Array.isArray((parsed as { keys?: unknown }).keys)) throw new AppleUnavailable("Apple's keys: no keys");
+  return body;
+}
+
+async function readKeys(body: string): Promise<Map<string, CryptoKey>> {
+  const keys = new Map<string, CryptoKey>();
+  let published: PublishedKey[] = [];
+  try {
+    published = (JSON.parse(body) as { keys?: PublishedKey[] }).keys ?? [];
+  } catch {
+    return keys;
+  }
+  for (const jwk of published) {
+    if (jwk.kty !== "RSA" || !jwk.kid || !jwk.n || !jwk.e || (jwk.alg && jwk.alg !== "RS256")) continue;
+    try {
+      keys.set(jwk.kid, await crypto.subtle.importKey("jwk", { kty: "RSA", n: jwk.n, e: jwk.e, alg: "RS256", ext: true }, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]));
+    } catch {
+      // A key that can't be read is one nothing can be checked against.
+    }
+  }
+  return keys;
+}
+
+/** Apple's signing keys, from `<base>/auth/keys`: kept in memory, and in `store` for every server,
+ * for a day. Apple rotates them, so an id that isn't known yet fetches them again, at most once a
+ * minute. When Apple can't be reached, the last keys anyone fetched still check tokens: Apple keeps
+ * a key published long after it stops signing with it. */
+export function appleKeys(base: string = APPLE, store?: KeyStore): KeyLookup {
   const url = `${base}/auth/keys`;
   return async (kid) => {
     const now = Date.now();
-    const current = published?.url === url ? published : null;
-    if (current && now - current.fetchedAt < 86_400_000 && current.keys.has(kid)) return current.keys.get(kid)!;
+    let current = published?.url === url ? published : null;
+    if (current && now - current.fetchedAt < DAY && current.keys.has(kid)) return current.keys.get(kid)!;
+    const stored = store ? await store.read(url).catch(() => null) : null;
+    if (stored && (!current || stored.fetchedAt > current.fetchedAt)) {
+      current = published = { url, fetchedAt: stored.fetchedAt, keys: await readKeys(stored.body) };
+      if (now - current.fetchedAt < DAY && current.keys.has(kid)) return current.keys.get(kid)!;
+    }
     if (current && now - current.fetchedAt < 60_000) return current.keys.get(kid) ?? null;
-    let body: { keys?: PublishedKey[] };
+    let body: string;
     try {
-      const response = await fetch(url, { headers: { Accept: "application/json", "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(8_000) });
-      if (!response.ok) throw new AppleUnavailable(`Apple's keys: ${response.status}`);
-      body = await response.json();
+      body = await fetchAppleKeys(base);
     } catch (error) {
-      console.error("Apple's keys couldn't be fetched:", error instanceof AppleUnavailable ? error.message : error instanceof Error ? error.name : typeof error);
+      console.error("Apple's keys couldn't be fetched:", error instanceof Error ? error.message : typeof error);
       if (current) return current.keys.get(kid) ?? null;
-      throw error instanceof AppleUnavailable ? error : new AppleUnavailable("Apple's keys couldn't be fetched");
+      throw error;
     }
-    const keys = new Map<string, CryptoKey>();
-    for (const jwk of body.keys ?? []) {
-      if (jwk.kty !== "RSA" || !jwk.kid || !jwk.n || !jwk.e || (jwk.alg && jwk.alg !== "RS256")) continue;
-      try {
-        keys.set(jwk.kid, await crypto.subtle.importKey("jwk", { kty: "RSA", n: jwk.n, e: jwk.e, alg: "RS256", ext: true }, { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" }, false, ["verify"]));
-      } catch {
-        // A key that can't be read is one nothing can be checked against.
-      }
-    }
-    published = { url, fetchedAt: now, keys };
-    return keys.get(kid) ?? null;
+    published = { url, fetchedAt: now, keys: await readKeys(body) };
+    await store?.write(url, body, now).catch(() => undefined);
+    return published.keys.get(kid) ?? null;
   };
 }
 

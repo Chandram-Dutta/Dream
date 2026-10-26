@@ -19,7 +19,7 @@
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
 
-import { routeAccounts } from "./accounts";
+import { refreshAppleKeys, routeAccounts } from "./accounts";
 import type { AppleEnv } from "./apple";
 import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
@@ -124,5 +124,10 @@ export default {
       console.error("Request failed", error instanceof Error ? error.name : typeof error);
       return reading && !path.startsWith("/api/") ? html(messagePage("Something went wrong", "Try again in a moment."), 500) : problem(500, "Something went wrong. Try again in a moment.");
     }
+  },
+
+  // Every few hours (wrangler.jsonc): Apple's sign-in keys, kept in D1 for sign-ins to read.
+  async scheduled(_controller, env, ctx): Promise<void> {
+    ctx.waitUntil(refreshAppleKeys(env));
   },
 } satisfies ExportedHandler<Env>;

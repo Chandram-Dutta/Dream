@@ -13,7 +13,7 @@
 // once (migrations/0004). Nothing personal is logged: no tokens, names, emails or ids, only why
 // a sign-in was refused.
 
-import { appleBase, appleKeys, audiences, AppleUnavailable, isPrivateRelay, revoke, TokenRefused, verifyIdentityToken } from "./apple";
+import { appleBase, appleKeys, audiences, AppleUnavailable, fetchAppleKeys, isPrivateRelay, revoke, storedKeys, TokenRefused, verifyIdentityToken } from "./apple";
 import { hashToken, newUserID, signInNeeded, startSession, userFrom, type User } from "./auth";
 import type { Env } from "./index";
 import { readBody, Rejection } from "./payload";
@@ -30,6 +30,16 @@ function problem(status: number, message: string, headers: Record<string, string
 }
 
 const now = () => Math.floor(Date.now() / 1000);
+
+/** Fetches Apple's keys into D1 on a schedule (index.ts), so sign-ins rarely need Apple at all. */
+export async function refreshAppleKeys(env: Env): Promise<void> {
+  const base = appleBase(env);
+  try {
+    await storedKeys(env.DB).write(`${base}/auth/keys`, await fetchAppleKeys(base), Date.now());
+  } catch (error) {
+    console.error("Apple's keys couldn't be refreshed:", error instanceof Error ? error.message : typeof error);
+  }
+}
 
 /** The account routes, or null for any other path. */
 export async function routeAccounts(request: Request, env: Env, url: URL): Promise<Response | null> {
@@ -118,7 +128,7 @@ async function signIn(request: Request, env: Env): Promise<Response> {
 
   let identity;
   try {
-    identity = await verifyIdentityToken(identityToken, { audiences: clients, nonce, key: appleKeys(appleBase(env)) });
+    identity = await verifyIdentityToken(identityToken, { audiences: clients, nonce, key: appleKeys(appleBase(env), storedKeys(env.DB)) });
   } catch (error) {
     if (error instanceof TokenRefused) {
       console.warn("Sign in with Apple refused:", error.reason);

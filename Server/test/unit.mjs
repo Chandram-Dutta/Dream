@@ -9,6 +9,7 @@ import { readFileSync } from "node:fs";
 import { checkURL, isPublicIP, parseIP } from "../src/address.ts";
 import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
+import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
 import { MAX_REPORTS, MAX_STACK, parseReports, ReportError, signatureOf } from "../src/metrickit.ts";
 import { robotsAllows } from "../src/robots.ts";
@@ -295,6 +296,36 @@ expect(built?.event === "$ai_generation" && built.distinct_id === "user-1" && bu
 expect(built?.properties.$ai_total_cost_usd === 0.0042 && built.properties.$ai_latency === 12.346 && built.properties.$ai_time_to_first_token === 1.2 && built.properties.$ai_provider === "xai", "its cost and times");
 expect(!Object.keys(built?.properties ?? {}).some((key) => key === "$ai_input" || key === "$ai_output_choices"), "never the messages or the answer");
 expect(failed?.properties.$ai_is_error === true && failed.properties.$ai_http_status === 429 && failed.properties.$ai_span_name === "lists" && !("$ai_total_cost_usd" in failed.properties) && typeof failed.properties.$ai_trace_id === "string", "a failure, with no cost and a trace of its own");
+globalThis.fetch = realFetch;
+
+console.log("Apple's sign-in keys, kept for every server");
+const { publicKey } = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);
+const jwk = await crypto.subtle.exportKey("jwk", publicKey);
+const keysBody = JSON.stringify({ keys: [{ kty: "RSA", kid: "K1", use: "sig", alg: "RS256", n: jwk.n, e: jwk.e }] });
+const keptKeys = new Map();
+const store = { read: async (url) => keptKeys.get(url) ?? null, write: async (url, body, fetchedAt) => void keptKeys.set(url, { body, fetchedAt }) };
+let appleCalls = 0;
+globalThis.fetch = async () => {
+  appleCalls++;
+  return new Response("", { status: 501 });
+};
+let unavailable = false;
+try {
+  await appleKeys("https://refused.example", store)("K1");
+} catch (error) {
+  unavailable = error instanceof AppleUnavailable;
+}
+expect(unavailable, "with Apple refusing and nothing kept, signing in says Apple can't be reached");
+keptKeys.set("https://refused.example/auth/keys", { body: keysBody, fetchedAt: Date.now() - 3 * 86_400_000 });
+expect((await appleKeys("https://refused.example", store)("K1")) !== null, "with Apple refusing, keys kept days ago still check tokens");
+globalThis.fetch = async () => {
+  appleCalls++;
+  return new Response(keysBody);
+};
+expect((await appleKeys("https://fine.example", store)("K1")) !== null && keptKeys.get("https://fine.example/auth/keys")?.body === keysBody, "a good fetch is kept for every server");
+keptKeys.set("https://kept.example/auth/keys", { body: keysBody, fetchedAt: Date.now() });
+appleCalls = 0;
+expect((await appleKeys("https://kept.example", store)("K1")) !== null && appleCalls === 0, "keys kept today are used without asking Apple");
 globalThis.fetch = realFetch;
 
 console.log(failures ? `\n${failures} failed` : "\nAll passed");

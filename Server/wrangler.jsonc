@@ -69,6 +69,10 @@
   // Only what the Worker itself logs, which never includes addresses or surface content.
   "observability": { "enabled": true, "logs": { "invocation_logs": false } },
 
+  // Fetches Apple's sign-in keys into D1 (src/accounts.ts, refreshAppleKeys). Each run may land
+  // on a Cloudflare server Apple refuses, so it runs often enough for some to get through.
+  "triggers": { "crons": ["17 */3 * * *"] },
+
   "env": {
     // A second Worker for trying changes before production: `npx wrangler deploy --env staging`.
     // It's dream-share-staging.<subdomain>.workers.dev, with no custom domain, and its own
