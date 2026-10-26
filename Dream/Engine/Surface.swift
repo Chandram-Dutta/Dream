@@ -24,6 +24,11 @@ struct Surface: Codable, Hashable {
     /// angle change the throw?". Nil when nothing's calculated. Remembered with the surface, so
     /// it can be found again for the same question.
     var question: String?
+    /// Drawings whose shapes move with the calculation, shown by `figure` blocks. Nil in
+    /// surfaces made before figures existed.
+    var figures: [Figure]? = nil
+    /// Flows, cycles and hierarchies, shown by `diagram` blocks.
+    var diagrams: [Diagram]? = nil
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -127,10 +132,12 @@ enum BlockKind: String, Codable {
     case paragraph, facts, bullets, steps, timeline, stat, equation, data
     // Grouping.
     case section, row
+    // Drawn: a figure moves with the calculation; a diagram shows how parts connect.
+    case figure, diagram
 
     var isContainer: Bool { self == .section || self == .row }
     var isControl: Bool { [.slider, .stepper, .field, .toggle, .picker].contains(self) }
-    var isInformation: Bool { [.paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data].contains(self) }
+    var isInformation: Bool { [.paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data, .diagram].contains(self) }
 
     func fits(_ format: Format) -> Bool {
         switch self {
