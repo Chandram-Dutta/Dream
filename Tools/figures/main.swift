@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 
 // Checks the geometry behind figures and diagrams on this Mac: fitting, handles, labels and
@@ -61,25 +62,42 @@ do {
         check(near(clamped["a"] ?? 0, 8), "dragging past the range stops at its end (got \(clamped))")
     }
 
-    // The view covers the range, so it doesn't move while dragging, up to twice the starting size.
-    let extent = figure.extent(in: pythagoras)!
+    // The view fits the figure as it is, filling the panel but for the margin.
     let start = drawing.bounds!
-    let atMost = figure.drawing(in: pythagoras, given: ["a": 8, "b": 8]).bounds!
-    check(figure.rangeExtent(in: pythagoras).map { $0.union(atMost) == $0 } == true, "the range's extent includes the largest triangle")
-    check(extent.union(start) == extent && near(extent.width, start.width * 2) && near(extent.height, start.height * 2),
-          "the view at rest holds the starting figure, at twice its size (\(extent) for \(start))")
-    let viewport = FigureViewport(fitting: extent, width: 320, height: 320 * FigureViewport.aspect(of: extent))
+    check(figure.startBounds(in: pythagoras) == start, "the panel takes the shape of the starting figure")
+    let (width, height) = (317.0, 317 * FigureViewport.aspect(of: start))
+    let viewport = FigureViewport(fitting: start, width: width, height: height)
+    let shown = Rect2(containing: [viewport.screen(Vec2(x: start.minX, y: start.minY)), viewport.screen(Vec2(x: start.maxX, y: start.maxY))])!
+    check(shown.width >= width - 2 * FigureViewport.margin - 1 || shown.height >= height - 2 * FigureViewport.margin - 1,
+          "the figure fills its panel (\(Int(shown.width)) × \(Int(shown.height)) of \(Int(width)) × \(Int(height)))")
     let corner = viewport.screen(Vec2(x: 3, y: 4))
     check(near(viewport.model(corner).x, 3) && near(viewport.model(corner).y, 4), "screen and figure units convert both ways")
     check(viewport.screen(Vec2(x: 0, y: 1)).y < viewport.screen(Vec2(x: 0, y: 0)).y, "y points up")
 
-    // Labels don't land on each other.
-    let sizes = Dictionary(uniqueKeysWithValues: drawing.labels.map { ($0.id, Vec2(x: 34, y: 16)) })
-    let placed = drawing.placeLabels(in: viewport, sizes: sizes, bounds: Rect2(minX: 0, minY: 0, maxX: 320, maxY: 320 * FigureViewport.aspect(of: extent)))
+    // Labels at their real sizes sit clear of each other, of every line and of the right-angle mark.
+    let sizes: [Int: Vec2] = Dictionary(uniqueKeysWithValues: drawing.labels.map { label in
+        (label.id, Vec2(x: label.text.contains("{") ? 52 : label.text.contains("$") ? 22 : 12, y: 18))
+    })
+    let placed = drawing.placeLabels(in: viewport, sizes: sizes, bounds: Rect2(minX: 0, minY: 0, maxX: width, maxY: height))
     check(placed.count == drawing.labels.count, "every label is placed")
     let boxes = Array(placed.values)
     let overlapping = boxes.indices.flatMap { i in boxes.indices.filter { j in i < j && boxes[i].overlap(boxes[j]) > 1 } }
     check(overlapping.isEmpty, "labels don't overlap")
+    var lines: [(Vec2, Vec2)] = []
+    for mark in drawing.marks {
+        switch mark.geometry {
+        case .line(let points, let closed):
+            let screen = points.map(viewport.screen) + (closed ? [viewport.screen(points[0])] : [])
+            lines += zip(screen, screen.dropFirst()).map { ($0, $1) }
+        case .angle(let vertex, let a, let b):
+            let square = FigureMarks.rightAngle(viewport.screen(vertex), viewport.screen(a), viewport.screen(b), size: 11)
+            lines += zip(square, square.dropFirst()).map { ($0, $1) }
+        case .text:
+            break
+        }
+    }
+    let touching = placed.filter { _, box in lines.contains { box.insetBy(-1).crosses($0.0, $0.1) } }.map(\.key)
+    check(touching.isEmpty, "labels sit clear of lines and marks (\(touching.compactMap { id in drawing.labels.first { $0.id == id }?.text }))")
 
     // The checker keeps a good figure as it is.
     var checkedSurface = pythagoras
@@ -248,6 +266,81 @@ for width in [320.0, 353.0] {
     let broad = DiagramLayout.make(diagram(.tree, ["Vertebrates", "Fish", "Amphibians", "Reptiles", "Birds", "Mammals"], edges: [(0, 1), (0, 2), (0, 3), (0, 4), (0, 5)]), width: width)
     check(broad.isOutline && !broad.hasOverlaps, "a broad tree becomes an outline")
 }
+
+// Diagrams as Grok wrote them: nothing overlaps, no label sits on a line, no word is broken,
+// and labels along a cycle sit outside it.
+func written(_ name: String, _ shape: Diagram.Shape, _ nodes: [(String, String)], _ edges: [(String, String, String)]) -> Diagram {
+    Diagram(name: name, shape: shape, nodes: nodes.map { Diagram.Node(id: $0.0, label: $0.1, detail: "") },
+            edges: edges.map { Diagram.Edge(from: $0.0, to: $0.1, label: $0.2) })
+}
+
+let written: [Diagram] = [
+    // The one that was a tangle on the phone.
+    written("waterOnPhone", .cycle, [("evaporation", "Evaporation"), ("condensation", "Condensation"), ("precipitation", "Precipitation"), ("runoff", "Runoff"),
+                                     ("ocean", "Ocean"), ("transpiration", "Transpiration"), ("groundwater", "Groundwater")],
+            [("ocean", "evaporation", "Sun heats the sea"), ("evaporation", "condensation", "vapour rises"), ("condensation", "precipitation", "clouds form"),
+             ("precipitation", "runoff", "rain and snow"), ("runoff", "ocean", "rivers to sea"), ("precipitation", "groundwater", "soaks in"),
+             ("groundwater", "ocean", "springs and seepage"), ("transpiration", "condensation", "plants release vapour")]),
+    written("water", .cycle, [("ocean", "Ocean"), ("vapor", "Water vapour"), ("clouds", "Clouds"), ("land", "Land"), ("ground", "Groundwater"), ("ice", "Ice and snow")],
+            [("ocean", "vapor", "evaporation, transpiration"), ("ice", "vapor", "sublimation"), ("vapor", "clouds", "condensation"), ("clouds", "land", "precipitation"),
+             ("clouds", "ocean", "precipitation"), ("land", "ground", "infiltration"), ("land", "ocean", "runoff"), ("ground", "ocean", "subsurface flow"), ("ice", "ocean", "melt")]),
+    written("carbon", .cycle, [("air", "Atmosphere"), ("plants", "Plants"), ("life", "Soil and life"), ("ocean", "Ocean"), ("rocks", "Deep rock")],
+            [("air", "plants", "photosynthesis"), ("plants", "life", "growth and death"), ("life", "air", "respiration"), ("air", "ocean", "dissolves"),
+             ("ocean", "rocks", "burial"), ("life", "rocks", "fossilisation"), ("rocks", "air", "volcanoes and burning")]),
+    written("nitrogen", .cycle, [("n2", "Atmospheric N₂"), ("fixation", "Fixation"), ("ammonium", "Ammonium"), ("nitrification", "Nitrification"), ("nitrate", "Nitrate"),
+                                 ("organisms", "Living things"), ("ammonification", "Ammonification"), ("denitrification", "Denitrification")],
+            [("n2", "fixation", "N₂ to NH₃"), ("fixation", "ammonium", ""), ("ammonium", "nitrification", "to nitrite, then nitrate"), ("nitrification", "nitrate", ""),
+             ("nitrate", "organisms", "plants and microbes take it up"), ("organisms", "ammonification", "decay returns nitrogen"), ("ammonification", "ammonium", "back to ammonium"),
+             ("nitrate", "denitrification", "nitrate to N₂"), ("denitrification", "n2", "returns to the air")]),
+    written("bill", .flow, [("introduce", "First reading"), ("second", "Second reading"), ("third", "Third reading"), ("otherHouse", "Other House"),
+                            ("joint", "Joint sitting"), ("assent", "President's assent"), ("act", "The Act")],
+            [("introduce", "second", ""), ("second", "third", ""), ("third", "otherHouse", "passed"), ("otherHouse", "joint", "disagree"),
+             ("otherHouse", "assent", "agreed"), ("joint", "assent", ""), ("assent", "act", "")]),
+    written("photosynthesis", .flow, [("co2", "Carbon dioxide"), ("water", "Water"), ("light", "Light"), ("convert", "Photosynthesis"), ("sugar", "Glucose"), ("oxygen", "Oxygen")],
+            [("co2", "convert", "in"), ("water", "convert", "in"), ("light", "convert", "energy"), ("convert", "sugar", "stored"), ("convert", "oxygen", "out")]),
+    written("animals", .tree, [("animals", "Animals"), ("vertebrates", "Vertebrates"), ("invertebrates", "Invertebrates")],
+            [("animals", "vertebrates", "backbone"), ("animals", "invertebrates", "no backbone")]),
+]
+
+// Measured with the system font the app uses, at the sizes it uses.
+var measured = DiagramLayout.Metrics.standard
+measured.measureNode = { ($0 as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 15, weight: .semibold)]).width }
+measured.measureLabel = { ($0 as NSString).size(withAttributes: [.font: NSFont.systemFont(ofSize: 11, weight: .medium)]).width }
+
+for diagram in written {
+    for width in [320.0, 390.0] {
+        let layout = DiagramLayout.make(diagram, width: width, metrics: measured)
+        let metrics = measured.scaled(layout.textScale)
+        let at = "\(diagram.name) at \(Int(width))"
+        check(!layout.hasOverlaps, "\(at): no nodes overlap")
+        check(layout.crowdedLabels == 0, "\(at): no edge label overlaps a node or another label (\(layout.crowdedLabels) do)")
+        check(layout.textScale >= 0.82, "\(at): text stays close to full size (\(layout.textScale))")
+        // At 320 points the tightest cycles can't always keep every label off every line; they
+        // still never cover a node or another label.
+        if width >= 390 { check(layout.labelsOnLines == 0, "\(at): no edge label sits on a line (\(layout.labelsOnLines) do)") }
+        check(layout.routes.compactMap(\.labelFrame).allSatisfy { $0.minX >= 0 && $0.maxX <= width }, "\(at): labels stay inside the width")
+        check(layout.frames.values.allSatisfy { $0.minX >= 0 && $0.maxX <= width }, "\(at): nodes stay inside the width")
+        let broken = diagram.nodes.filter { node in
+            guard let frame = layout.frames[node.id], let lines = layout.lines[node.id] else { return true }
+            return lines.joined(separator: " ") != node.label || lines.contains { metrics.measureNode($0) > frame.width - 2 * metrics.nodePadding + 0.5 }
+        }
+        check(broken.isEmpty, "\(at): every word fits whole in its node (\(broken.map(\.label)))")
+        guard diagram.shape == .cycle else { continue }
+        // Along the ring, every label sits by its arc, never in the middle: outside it, or just
+        // inside where a stage beside the ring has taken the outside.
+        let ring = DiagramLayout.mainCycle(ids: diagram.nodes.map(\.id), edges: diagram.edges)
+        let middle = ring.compactMap { layout.frames[$0]?.center }.reduce(Vec2.zero, +) / Double(ring.count)
+        let inward = layout.routes.filter { route in
+            guard let i = ring.firstIndex(of: route.from), let j = ring.firstIndex(of: route.to), let label = route.labelFrame,
+                  (j - i + ring.count) % ring.count == 1 || (i - j + ring.count) % ring.count == 1 else { return false }
+            let line = route.points[route.points.count / 2]
+            return (label.center - middle).length < (line - middle).length * 0.6
+        }
+        check(inward.isEmpty, "\(at): labels along the ring sit by their arcs, not in the middle (\(inward.map(\.label)))")
+    }
+}
+check(DiagramLayout.mainCycle(ids: written[0].nodes.map(\.id), edges: written[0].edges) == ["evaporation", "condensation", "precipitation", "runoff", "ocean"],
+      "the water cycle goes round its longest loop, from the first stage")
 
 do {
     var surface = Surface.empty

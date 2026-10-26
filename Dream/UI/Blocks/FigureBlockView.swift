@@ -3,7 +3,9 @@ import SwiftUI
 /// A figure, drawn to scale in the surface's colours and moving as the numbers change. Points
 /// the inputs place are handles: drag one and the inputs follow, snapped to their steps. When
 /// the inputs change, the paths they had before linger as a faint trace, so you see what the
-/// change did. The geometry is the engine's (`Figure`, `FigureLayout`); this only draws it.
+/// change did. The view fits the figure as it is: it holds still while a handle is dragged,
+/// widens if the figure grows past it, and eases to the new fit once things settle. The
+/// geometry is the engine's (`Figure`, `FigureLayout`); this only draws it.
 struct FigureBlockView: View {
     let block: Block
     let context: RenderContext
@@ -12,9 +14,10 @@ struct FigureBlockView: View {
     @State private var dragging: FigureHandle?
     /// From the finger to the handle's centre, so grabbing it off-centre doesn't make it jump.
     @State private var grab = Vec2.zero
-    /// What the view shows while a handle is dragged: held still, so the figure doesn't
-    /// rescale under the finger even if it grows past the view.
-    @State private var frozen: Rect2?
+    /// What the view shows when that isn't simply the figure as it is: held still while a
+    /// handle is dragged, and widened while values change, until they settle.
+    @State private var shown: Rect2?
+    @State private var settle: Task<Void, Never>?
     @State private var ghost: [FigureDrawing.Mark] = []
     @State private var fade: Task<Void, Never>?
 
@@ -28,23 +31,22 @@ struct FigureBlockView: View {
         let surface = context.surface
         let drawing = figure.drawing(in: surface, given: context.state.values, values: context.evaluation.values)
         let handles = figure.handles(in: surface)
-        // The view keeps the shape of the figure at rest, and grows to keep all of it in sight.
-        let rest = figure.extent(in: surface) ?? drawing.bounds ?? Rect2(minX: -1, minY: -1, maxX: 1, maxY: 1)
-        let extent = frozen ?? drawing.bounds.map { rest.union($0) } ?? rest
+        let fit = drawing.bounds ?? Rect2(minX: -1, minY: -1, maxX: 1, maxY: 1)
+        // The panel keeps the shape the figure starts with, so the page doesn't move as it changes.
+        let aspect = FigureViewport.aspect(of: figure.startBounds(in: surface) ?? fit)
         let space = "figure-\(block.id)"
         return VStack(alignment: .leading, spacing: 12) {
             header
             Color.clear
                 .frame(maxWidth: .infinity)
-                .aspectRatio(1 / FigureViewport.aspect(of: rest), contentMode: .fit)
+                .aspectRatio(1 / aspect, contentMode: .fit)
                 .overlay {
-                    GeometryReader { geometry in
-                        let viewport = FigureViewport(fitting: extent, width: geometry.size.width, height: geometry.size.height)
+                    FigureFrame(extent: shown ?? fit) { viewport, size, extent in
                         let knobs = handles.compactMap { drawing.points[$0.point].map(viewport.screen) }
                         ZStack(alignment: .topLeading) {
                             FigureCanvas(drawing: drawing, ghost: ghost, viewport: viewport, knobs: knobs, context: context)
                                 .clipped()
-                            readout(at: dragging.flatMap { drawing.points[$0.point] }.map(viewport.screen), in: geometry.size)
+                            readout(at: dragging.flatMap { drawing.points[$0.point] }.map(viewport.screen), in: size)
                             ForEach(handles) { handle in
                                 if let point = drawing.points[handle.point] {
                                     knob(handle, at: viewport.screen(point), figure: figure, viewport: viewport, extent: extent, space: space)
@@ -58,7 +60,7 @@ struct FigureBlockView: View {
                 .accessibilityLabel(block.title.isEmpty ? "Figure" : block.title)
                 .accessibilityValue(spoken(drawing))
         }
-        .onChange(of: context.state.values) { old, _ in remember(figure, before: old) }
+        .onChange(of: context.state.values) { old, new in changed(figure, from: old, to: new) }
         .sensoryFeedback(.selection, trigger: feedback)
     }
 
@@ -110,7 +112,8 @@ struct FigureBlockView: View {
                         if dragging != handle {
                             withAnimation(.easeOut(duration: 0.2)) { dragging = handle }
                             grab = point - Vec2(x: drag.startLocation.x, y: drag.startLocation.y)
-                            frozen = extent
+                            settle?.cancel()
+                            shown = extent
                         }
                         let values = figure.dragged(handle, to: viewport.model(finger + grab), in: context.surface, given: context.state.values)
                         for (name, value) in values where context.state.values[name] != value {
@@ -119,7 +122,7 @@ struct FigureBlockView: View {
                     }
                     .onEnded { _ in
                         withAnimation(.easeOut(duration: 0.3)) { dragging = nil }
-                        frozen = nil
+                        refit(after: .milliseconds(150))
                     })
             .accessibilityHidden(true)
     }
@@ -132,16 +135,34 @@ struct FigureBlockView: View {
         }
     }
 
-    /// Keeps the paths from before a change began, and lets them go once things settle.
-    private func remember(_ figure: Figure, before: [String: Double]) {
+    /// When the numbers change: the view widens if the figure has grown past it, and eases to
+    /// the new fit once they settle. While a handle is dragged it holds still. The paths from
+    /// before the change linger, and go once things settle.
+    private func changed(_ figure: Figure, from old: [String: Double], to new: [String: Double]) {
+        let before = figure.drawing(in: context.surface, given: old)
+        if dragging == nil, let was = shown ?? before.bounds {
+            let now = figure.drawing(in: context.surface, given: new).bounds ?? was
+            shown = was.contains(now) ? was : was.union(now)
+            refit(after: .milliseconds(600))
+        }
         if ghost.isEmpty {
-            ghost = figure.drawing(in: context.surface, given: before).marks.filter { $0.shape.kind == .path }
+            ghost = before.marks.filter { $0.shape.kind == .path }
         }
         fade?.cancel()
         fade = Task { @MainActor in
             try? await Task.sleep(for: .seconds(1.6))
             guard !Task.isCancelled else { return }
             withAnimation(.easeOut(duration: 0.8)) { ghost = [] }
+        }
+    }
+
+    /// Eases the view to fit the figure as it is, once nothing has changed for a moment.
+    private func refit(after delay: Duration) {
+        settle?.cancel()
+        settle = Task { @MainActor in
+            try? await Task.sleep(for: delay)
+            guard !Task.isCancelled, dragging == nil else { return }
+            withAnimation(reduceMotion ? nil : .smooth(duration: 0.6)) { shown = nil }
         }
     }
 
@@ -158,6 +179,24 @@ struct FigureBlockView: View {
         }.joined(separator: ", ")
     }
 
+}
+
+/// Fits its content to `extent`, and eases from one extent to the next when it changes in an
+/// animation, so the figure glides to its new fit rather than jumping.
+private struct FigureFrame<Content: View>: View, Animatable {
+    var extent: Rect2
+    @ViewBuilder let content: (FigureViewport, CGSize, Rect2) -> Content
+
+    var animatableData: AnimatablePair<AnimatablePair<Double, Double>, AnimatablePair<Double, Double>> {
+        get { AnimatablePair(AnimatablePair(extent.minX, extent.minY), AnimatablePair(extent.maxX, extent.maxY)) }
+        set { extent = Rect2(minX: newValue.first.first, minY: newValue.first.second, maxX: newValue.second.first, maxY: newValue.second.second) }
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            content(FigureViewport(fitting: extent, width: geometry.size.width, height: geometry.size.height), geometry.size, extent)
+        }
+    }
 }
 
 /// The shapes and labels, in a Canvas. Labels are SwiftUI text drawn as symbols, so they can
