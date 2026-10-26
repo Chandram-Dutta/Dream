@@ -287,6 +287,88 @@ DREAM_APP_KEYS="a-long-random-local-key"
 budget and the rate limits. `node test/unit.mjs` checks the address rules, robots.txt and text
 tidying on their own. `../Tools/web.sh` checks the app's side.
 
+## Accounts
+
+People sign in with Apple; the account is Dream's own (`users`, `sessions`; migrations 0003 and
+0004). The app's side is `Dream/Account/`.
+
+| Request | What it does |
+|---|---|
+| `POST /api/auth/apple` | `{ identityToken, nonce, name?, device? }` → `201 { token, expiresAt, user, isNew }` |
+| `GET /api/me` | `{ id, name, email, isPrivateEmail, createdAt }` |
+| `GET /api/me/sessions` | `{ sessions: [{ id, device, createdAt, lastUsedAt, current }] }` |
+| `DELETE /api/me/sessions/:id` | Signs one device out (`current` is the one asking). `204`. |
+| `POST /api/me/export` | Everything kept for the person, as a JSON file. |
+| `DELETE /api/me` | `{ authorizationCode? }` → erases everything, then asks Apple to forget Dream. |
+
+Everything but signing in needs `Authorization: Bearer <session>` and answers `401` without one.
+
+### Signing in
+
+The app makes a random nonce for each sign-in and puts its SHA-256 in the request to Apple, which
+writes it into the identity token. The Worker (`src/apple.ts`) checks the token:
+
+- **Signature:** RS256 only, against Apple's keys (`https://appleid.apple.com/auth/keys`), kept
+  for a day and fetched again when Apple rotates them.
+- **Claims:** `iss` is `https://appleid.apple.com`; `aud` is the bundle ID (`APPLE_CLIENT_ID`);
+  `exp` hasn't passed and `iat` isn't in the future, a minute either way; and `nonce` is the hash of
+  the nonce the app sends.
+- **Once only:** each token's nonce is kept until the token expires (`apple_nonces`), so a token
+  can't sign in twice.
+
+It finds the person by Apple's `sub`, or makes a new account. The email comes from the token;
+the name comes from the app, since Apple gives it only to the app and only the first time. Both
+are kept from the first sign-in. Sign-ins are limited to 10 a minute per address.
+
+### Export and deletion
+
+`src/userdata.ts` lists everything kept for a person, and both export and deletion work from
+that list. **A table that holds someone's data needs one entry there:** `export` gives its rows
+as plain JSON, without secrets or hashes, and `erase` gives the D1 statements that remove them.
+The file's header has an example. All the statements run in one batch, so a deletion is all or
+nothing and can be tried again. Anything outside D1, like photos in R2, is removed inside
+`erase`.
+
+Deleting an account:
+
+1. Marks the user deleted, so every session stops at once.
+2. Erases every holding in one batch, sessions and the user last.
+3. Revokes Apple's tokens. The app asks the person to confirm with Apple first, which gives a
+   fresh authorization code. The Worker exchanges it at `/auth/token` for a refresh token, checks
+   it's the same Apple ID, and revokes it at `/auth/revoke`. Both calls take a client secret
+   signed with Dream's Sign in with Apple key (ES256).
+
+Without the key, or without a code, everything is still erased, and the Worker logs
+`Apple revocation pending` with the reason. The person can remove Dream in Settings, under Sign in
+with Apple, and the app tells them so.
+
+### Setting it up
+
+`APPLE_CLIENT_ID` (`xyz.onlychan.Dream`) and `APPLE_TEAM_ID` (`DR99P625RR`) are in
+`wrangler.jsonc`. The key needs two secrets. Make it in the developer portal under Certificates,
+Identifiers & Profiles › Keys: add a key, tick Sign in with Apple, and configure it for the primary
+App ID `xyz.onlychan.Dream`. Download the .p8 (Apple only lets you do this once) and note its Key ID.
+
+```sh
+cd Server
+npx wrangler d1 migrations apply dream-share --remote     # adds apple_nonces
+printf %s "ABC123DEFG" | npx wrangler secret put APPLE_KEY_ID
+npx wrangler secret put APPLE_PRIVATE_KEY < AuthKey_ABC123DEFG.p8
+npx wrangler deploy
+```
+
+Then delete the .p8 from the Mac, or keep it in a password manager.
+
+### Trying it locally
+
+`npm test` runs `test/accounts.mjs`. It checks the token rules with test keys, then signs in,
+lists and signs out devices, exports and deletes through `wrangler dev`, against a stand-in for
+Apple on this Mac (`test/stub-apple.mjs`). The stand-in is only used where `DEV_LOGIN` is `1`
+(`APPLE_BASE_URL`).
+
+For trying the app's other features under `wrangler dev`, put `DEV_LOGIN=1` in `.dev.vars` and
+take a session from `POST /api/dev/session?user=name`.
+
 ## Later: shared lists
 
 Shared lists, like a family grocery list, are out of scope for now. The plan:
