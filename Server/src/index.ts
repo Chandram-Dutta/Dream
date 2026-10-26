@@ -11,6 +11,7 @@
 //   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
 //   POST /api/dev/session     a test user's session, in local development only (auth.ts)
 //   POST /api/auth/apple, /api/me…   signing in with Apple, the account, export and deletion (accounts.ts)
+//   GET, POST /api/sync; GET, PUT, DELETE /api/photos/:id   a signed-in person's own data (sync.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
@@ -21,9 +22,10 @@ import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
 import { CSP, messagePage } from "./page";
 import { routeSharing, type SharingEnv } from "./sharing";
+import { routeSync, type SyncEnv } from "./sync";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv {
+export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv, SyncEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -90,6 +92,8 @@ export default {
         const account = await routeAccounts(request, env, url);
         if (account) return account;
       }
+      const synced = await routeSync(request, env, url);
+      if (synced) return synced;
       if (path === "/.well-known/apple-app-site-association" || path === "/apple-app-site-association") {
         return reading ? associatedDomains(env) : problem(405, "Only GET.", { Allow: "GET, HEAD" });
       }

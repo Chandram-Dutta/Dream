@@ -43,7 +43,7 @@ struct MemoryView: View {
                     }
                     Button("Add something", systemImage: "plus") { adding = true }
                 } footer: {
-                    Text("Kept on this iPhone. With each request, Dream tells the model what it knows about, like your home city, and sends the detail only when the page needs it.")
+                    Text("\(Session.isSignedIn ? "Kept in your account, on each device you use." : "Kept on this iPhone.") With each request, Dream tells the model what it knows about, like your home city, and sends the detail only when the page needs it.")
                 }
             }
             .overlay {

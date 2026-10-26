@@ -20,6 +20,7 @@
 
 import type { Env } from "./index";
 import { sharingErasure } from "./sharing";
+import { exportUserData, syncErasure } from "./syncdata";
 
 export interface Holding {
   name: string;
@@ -29,6 +30,13 @@ export interface Holding {
 
 /** Every workstream's tables. The account's own come after these, in `ACCOUNT`. */
 const HOLDINGS: Holding[] = [
+  {
+    name: "synced",
+    // Pages with their numbers and conversations, list entries, memory, connections (never their
+    // sign-ins) and settings, as sync keeps them; photos by id.
+    export: (env, user) => exportUserData(env, user),
+    erase: (env, user) => syncErasure(env, user),
+  },
   {
     name: "sharedLinks",
     // What was shared and how it went; the pages themselves are in the export's pages.

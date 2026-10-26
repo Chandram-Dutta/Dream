@@ -16,7 +16,8 @@ final class MemoryFact {
         case inferred
     }
 
-    var id = UUID()
+    /// Kept in SwiftData's history after a delete, so sync can say which fact went.
+    @Attribute(.preserveValueOnDeletion) var id = UUID()
     /// What it's about, like Home city or Diet.
     var topic = ""
     /// The fact itself, like Pune or Vegetarian.

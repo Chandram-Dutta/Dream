@@ -17,6 +17,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runSharing } from "./sharing.mjs";
 import { STUB_KEY, startStub } from "./stub-parallel.mjs";
+import { runSync } from "./sync.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = readFileSync(join(root, "test/fixtures/split-bill.json"), "utf8");
@@ -35,6 +36,8 @@ const LOCAL_DAILY_LIMIT = 4;
 const LOCAL_ADMIN_KEY = "test-admin-key-0123456789abcdef-0123456789";
 /** A link from before accounts, with no owner, stored straight into the local database. */
 const LEGACY_ID = `Old${Math.random().toString(36).slice(2, 9).padEnd(7, "0")}`.slice(0, 10);
+/** What one person may keep in sync, small enough to fill in a test. */
+const LOCAL_SYNC_QUOTA = 3_000_000;
 
 async function startLocal(stub) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
@@ -55,6 +58,7 @@ async function startLocal(stub) {
     // Test users sign in without Apple (auth.ts), and an admin can review reports.
     "DEV_LOGIN:1",
     `ADMIN_KEY:${LOCAL_ADMIN_KEY}`,
+    `SYNC_QUOTA_BYTES:${LOCAL_SYNC_QUOTA}`,
   ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
@@ -349,6 +353,7 @@ try {
   const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
   if (key) await runWeb(server.base, key, stub);
   else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY isn't set for this server.");
+  await runSync(server.base, expect, { quota: LOCAL_SYNC_QUOTA });
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;

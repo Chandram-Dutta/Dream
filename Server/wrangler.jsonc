@@ -30,8 +30,14 @@
     { "name": "SEARCH_LIMIT", "namespace_id": "4803", "simple": { "limit": 30, "period": 60 } },
     { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } },
     // Reports of shared pages (src/safety.ts), per address.
-    { "name": "REPORT_LIMIT", "namespace_id": "4861", "simple": { "limit": 5, "period": 60 } }
+    { "name": "REPORT_LIMIT", "namespace_id": "4861", "simple": { "limit": 5, "period": 60 } },
+    // Sync and photos (src/sync.ts), counted per signed-in person rather than per address.
+    { "name": "SYNC_LIMIT", "namespace_id": "4851", "simple": { "limit": 300, "period": 60 } }
   ],
+
+  // Photos from synced pages (src/sync.ts), kept under <user id>/<photo id>. Create the bucket
+  // once with `npx wrangler r2 bucket create dream-photos`.
+  "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "dream-photos" }],
 
   "vars": {
     // The apps that open /s/ links, as <Team ID>.<bundle ID>, separated by commas. Served in

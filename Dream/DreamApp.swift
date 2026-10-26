@@ -10,6 +10,7 @@ struct DreamApp: App {
         Memory.start(container)
         ConnectionStore.shared.start(container)
         Account.shared.start(container)
+        Sync.start(container)
     }
 
     var body: some Scene {

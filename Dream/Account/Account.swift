@@ -195,6 +195,8 @@ final class Account {
     /// session if it can be reached; if not, the session ends anyway when it's next unused for 90
     /// days, and nothing on the phone can use it.
     func signOut() async {
+        // Whatever hasn't reached the account yet goes now, while the session still works.
+        await Sync.flush()
         try? await AccountServer.signOut("current")
         await forget()
     }
@@ -218,7 +220,11 @@ final class Account {
         offeredMove = nil
         afterMove = nil
         signInRequest = nil
-        if erasing, let context = container?.mainContext { await LocalData.erase(in: context) }
+        if erasing {
+            // Sync's own record of what's sent goes too, so the next account starts clean.
+            await Sync.clearLocalData()
+            if let context = container?.mainContext { await LocalData.erase(in: context) }
+        }
         UserDefaults.standard.set(false, forKey: "welcomed")
         self.notice = notice
         showsWelcome = true

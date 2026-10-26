@@ -258,9 +258,25 @@ final class ConnectionStore {
 
     private func save() {
         Self.current.connections = connections
+        onSave?()
         guard let file, let data = try? JSONEncoder().encode(connections) else { return }
         try? FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
         try? data.write(to: file, options: [.atomic, .completeFileProtection])
+    }
+
+    // MARK: - Sync
+
+    /// Called after every change is saved, so sync can send it (Dream/Sync).
+    @ObservationIgnored var onSave: (@MainActor () -> Void)?
+
+    /// Takes the list as sync merged it with the user's account. Each keeps its status here, and
+    /// ones new to this iPhone are checked, which lists their tools or asks for a sign-in.
+    func replaceConnections(_ merged: [Connection]) {
+        let new = merged.filter { connection($0.id) == nil }
+        for id in status.keys where !merged.contains(where: { $0.id == id }) { status[id] = nil }
+        connections = merged
+        save()
+        Task { await refresh(new) }
     }
 
     /// An address as typed, made into a secure server endpoint.
