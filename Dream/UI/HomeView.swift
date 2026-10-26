@@ -15,6 +15,7 @@ struct HomeView: View {
     @State private var canCompose = Composer.canCompose
     @State private var showingSettings = false
     @State private var listener = Listener()
+    @State private var sharedLinks = SharedLinks()
     @FocusState private var focused: Bool
     @Namespace private var zoom
     @MainActor private static var startedAutomatically = false
@@ -63,7 +64,10 @@ struct HomeView: View {
                 SurfaceScreen(saved: saved)
                     .navigationTransition(.zoom(sourceID: saved.id, in: zoom))
             }
+            // Shared with the user, from a link (SharedLinks.swift).
+            .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
+        .receivingSharedScreens(sharedLinks)
         .sheet(isPresented: $showingSettings, onDismiss: { canCompose = Composer.canCompose }) {
             DebugView(surface: nil, values: [:], log: [], modelName: "")
         }
@@ -268,6 +272,15 @@ struct SurfaceTile: View {
         }
         .padding(16)
         .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
+        .overlay(alignment: .topTrailing) {
+            if saved.sharedFrom != nil {
+                Image(systemName: "person.2.fill")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .padding(16)
+                    .accessibilityLabel("Shared with you")
+            }
+        }
         .background {
             ZStack(alignment: .topTrailing) {
                 palette.wash

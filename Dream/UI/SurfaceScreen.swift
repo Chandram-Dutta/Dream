@@ -152,6 +152,8 @@ struct SurfaceScreen: View {
                     .disabled(busy || surface == nil)
                 Button("Change", systemImage: "wand.and.stars") { beginChange(ChangeTarget()) }
                     .disabled(busy || surface == nil)
+                ShareButton(surface: surface, values: state.values)
+                    .disabled(busy || surface == nil)
                 Button("Under the hood", systemImage: "ladybug") { showingDebug = true }
             }
         }

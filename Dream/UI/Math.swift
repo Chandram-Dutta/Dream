@@ -75,9 +75,18 @@ enum MathRenderer {
 struct MathView: View {
     let latex: String
     let size: CGFloat
+    @Environment(\.isPicture) private var isPicture
 
     var body: some View {
-        if let rendered = MathRenderer.render(latex, size: size, display: true) {
+        if let rendered = MathRenderer.render(latex, size: size, display: true), isPicture {
+            // A picture can't scroll, and ImageRenderer draws a scroll view empty: shrink to fit.
+            Image(uiImage: rendered.image)
+                .renderingMode(.template)
+                .resizable()
+                .scaledToFit()
+                .frame(maxWidth: rendered.image.size.width)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        } else if let rendered = MathRenderer.render(latex, size: size, display: true) {
             ScrollView(.horizontal) {
                 Image(uiImage: rendered.image)
                     .renderingMode(.template)
