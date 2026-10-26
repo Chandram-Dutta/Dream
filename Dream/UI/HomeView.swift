@@ -14,6 +14,7 @@ struct HomeView: View {
     @State private var ideas = Ideas()
     @State private var canCompose = Composer.canCompose
     @State private var showingSettings = false
+    @State private var listener = Listener()
     @FocusState private var focused: Bool
     @Namespace private var zoom
     @MainActor private static var startedAutomatically = false
@@ -163,24 +164,30 @@ struct HomeView: View {
                         .focused($focused)
                         .submitLabel(.go)
                         .onSubmit { make(intent) }
-                    Button("Make", systemImage: "arrow.up") { make(intent) }
-                        .labelStyle(.iconOnly)
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 38, height: 38)
-                        .background(palette.gradient, in: .circle)
-                        .disabled(!canMake)
-                        .opacity(canMake ? 1 : 0.4)
+                        .onChange(of: focused) { if focused, listener.isActive { listener.cancel() } }
+                    if intent.isEmpty || listener.isActive {
+                        MicButton(listener: listener, text: $intent, palette: palette, onStart: { focused = false }) { make($0) }
+                    }
+                    if canMake && !listener.isActive {
+                        Button("Make", systemImage: "arrow.up") { make(intent) }
+                            .labelStyle(.iconOnly)
+                            .font(.headline.weight(.bold))
+                            .foregroundStyle(.white)
+                            .frame(width: 38, height: 38)
+                            .background(palette.gradient, in: .circle)
+                    }
                 }
             }
             .padding(6)
             .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 26))
+            .listeningGlow(listener, palette: palette, in: .rect(cornerRadius: 26))
             .matchedTransitionSource(id: "composer", in: zoom)
             .padding(.horizontal, 16)
         }
         .padding(.bottom, 8)
         .animation(.smooth, value: photo)
         .animation(.smooth, value: focused)
+        .animation(.smooth, value: listener.isActive)
     }
 
     private var canMake: Bool {

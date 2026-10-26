@@ -113,16 +113,9 @@ enum TeX {
         return result
     }
 
-    /// Roughly how maths reads aloud, for VoiceOver.
+    /// How maths reads aloud, for VoiceOver and "Read this page": "a squared plus b squared".
     static func spoken(_ tex: String) -> String {
-        var result = compatible(tex)
-        for (command, words) in [("\\left", ""), ("\\right", ""), ("\\text", ""), ("\\frac", "fraction "), ("\\sqrt", "square root of "), ("^", " to the power "), ("_", " sub "), ("\\times", " times "),
-                                 ("\\cdot", " times "), ("\\le", " at most "), ("\\ge", " at least "), ("\\ne", " not equal to "), ("\\pi", " pi "),
-                                 ("\\theta", " theta "), ("\\", " ")] {
-            result = result.replacingOccurrences(of: command, with: words)
-        }
-        return result.replacingOccurrences(of: "{", with: " ").replacingOccurrences(of: "}", with: " ")
-            .split(whereSeparator: \.isWhitespace).joined(separator: " ")
+        SpokenMath.read(tex)
     }
 
     /// Plain words, safe inside `\text{}`.
@@ -208,11 +201,10 @@ extension Surface {
         }
     }
 
-    /// An output's formula in words, for VoiceOver.
+    /// An output's formula in words, for VoiceOver: the equation on screen, read as maths, with
+    /// symbols where it has them and labels where it doesn't.
     func spokenEquation(for name: String) -> String? {
-        guard let output = output(name), let expr = try? FormulaCache.parse(output.formula) else { return nil }
-        let labels = Dictionary((inputs.map { ($0.name, $0.label) } + outputs.map { ($0.name, $0.label) }), uniquingKeysWith: { first, _ in first })
-        return "\(output.label) equals \(expr.renamed(labels).description)"
+        equation(for: name).map(TeX.spoken)
     }
 }
 
