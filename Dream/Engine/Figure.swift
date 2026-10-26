@@ -165,6 +165,11 @@ struct Rect2: Hashable {
     }
 
     func contains(_ point: Vec2) -> Bool { point.x >= minX && point.x <= maxX && point.y >= minY && point.y <= maxY }
+    func contains(_ other: Rect2) -> Bool { other.minX >= minX && other.maxX <= maxX && other.minY >= minY && other.maxY <= maxY }
+
+    func offsetBy(_ delta: Vec2) -> Rect2 {
+        Rect2(minX: minX + delta.x, minY: minY + delta.y, maxX: maxX + delta.x, maxY: maxY + delta.y)
+    }
 
     /// How much area two boxes share.
     func overlap(_ other: Rect2) -> Double {

@@ -16,65 +16,15 @@ extension Figure {
         }
     }
 
-    /// What the view shows at rest: everything the figure can draw as the reader's inputs move
-    /// across their ranges, so it holds still as they change rather than rescaling under their
-    /// finger. But never more than twice the figure's starting size each way, so a throw that
-    /// could go five times further still starts large enough to read; past that, the view grows
-    /// to keep it in sight.
-    func extent(in surface: Surface, growth: Double = 2) -> Rect2? {
-        FigureMemo.extent(of: self, in: surface) {
-            guard let whole = rangeExtent(in: surface) else { return nil }
-            guard let start = drawing(in: surface, given: [:]).bounds else { return whole }
-            let least = Swift.max(start.width, start.height) / 4
-            /// The range along one axis, cut to `growth` times the start around where the figure
-            /// starts, with room each side in proportion to how far the range reaches that way.
-            func axis(_ low: Double, _ high: Double, _ first: Double, _ last: Double) -> (Double, Double) {
-                let limit = Swift.max(last - first, least) * growth
-                guard high - low > limit else { return (low, high) }
-                let room = limit - (last - first)
-                let before = first - low, after = high - last
-                let share = before + after > 0 ? before / (before + after) : 0.5
-                return (first - room * share, first - room * share + limit)
-            }
-            let x = axis(whole.minX, whole.maxX, start.minX, start.maxX)
-            let y = axis(whole.minY, whole.maxY, start.minY, start.maxY)
-            return Rect2(minX: x.0, minY: y.0, maxX: x.1, maxY: y.1)
-        }
-    }
-
-    /// Everything the figure can draw as its inputs move across their whole ranges.
-    func rangeExtent(in surface: Surface) -> Rect2? {
-        let used = inputs(in: surface)
-        let drivers = surface.inputs
-            .filter { $0.role == .adjustable && used.contains($0.name) }
-            .sorted { $0.name < $1.name }
-        func levels(_ input: Input, _ count: Int) -> [Double] {
-            let range = input.safeRange
-            return (0..<count).map { range.lowerBound + (range.upperBound - range.lowerBound) * Double($0) / Double(count - 1) }
-        }
-        // Every combination of a few values each, plus each input alone in finer steps, so
-        // turning an angle all the way round is seen at its quarters too.
-        var samples: [[String: Double]] = [[:]]
-        if drivers.count <= 4 {
-            for input in drivers {
-                samples = samples.flatMap { sample in levels(input, drivers.count <= 2 ? 5 : 3).map { sample.merging([input.name: $0]) { $1 } } }
-            }
-        } else {
-            samples.append(Dictionary(uniqueKeysWithValues: drivers.map { ($0.name, $0.safeRange.lowerBound) }))
-            samples.append(Dictionary(uniqueKeysWithValues: drivers.map { ($0.name, $0.safeRange.upperBound) }))
-        }
-        for input in drivers {
-            samples += levels(input, 9).map { [input.name: $0] }
-        }
-        return samples.reduce(nil as Rect2?) { extent, sample in
-            guard let bounds = drawing(in: surface, given: sample, values: surface.evaluate(sample).values, pathSamples: 32).bounds else { return extent }
-            return extent.map { $0.union(bounds) } ?? bounds
-        }
+    /// Everything drawn at the starting values, which sets the shape of the figure's view: the
+    /// view then fits the figure as it is, not the values the reader might choose.
+    func startBounds(in surface: Surface) -> Rect2? {
+        FigureMemo.startBounds(of: self, in: surface) { drawing(in: surface, given: [:]).bounds }
     }
 }
 
-/// Extents and handles take many evaluations to work out and are asked for on every frame, so
-/// they're kept for each figure and calculation.
+/// Starting bounds and handles take many evaluations to work out and are asked for on every
+/// frame, so they're kept for each figure and calculation.
 enum FigureMemo {
     private struct Key: Hashable {
         let figure: Figure
@@ -86,19 +36,19 @@ enum FigureMemo {
         }
     }
 
-    nonisolated(unsafe) private static var extents: [Key: Rect2?] = [:]
+    nonisolated(unsafe) private static var starts: [Key: Rect2?] = [:]
     nonisolated(unsafe) private static var handles: [Key: [FigureHandle]] = [:]
     private static let lock = NSLock()
 
-    static func extent(of figure: Figure, in surface: Surface, _ make: () -> Rect2?) -> Rect2? {
+    static func startBounds(of figure: Figure, in surface: Surface, _ make: () -> Rect2?) -> Rect2? {
         let key = Key(figure, surface)
-        if let hit = lock.withLock({ extents[key] }) { return hit }
-        let extent = make()
+        if let hit = lock.withLock({ starts[key] }) { return hit }
+        let bounds = make()
         lock.withLock {
-            if extents.count > 64 { extents.removeAll() }
-            extents[key] = extent
+            if starts.count > 64 { starts.removeAll() }
+            starts[key] = bounds
         }
-        return extent
+        return bounds
     }
 
     static func handles(of figure: Figure, in surface: Surface, _ make: () -> [FigureHandle]) -> [FigureHandle] {
@@ -155,23 +105,35 @@ struct FigureViewport {
 extension FigureDrawing {
     /// Where each label goes on screen, given the sizes they take there. Labels sit beside what
     /// they name, on the side away from the rest of the figure, and move round it rather than
-    /// cover another label, a point or a line.
+    /// cover another label, a point, a line or an angle's mark.
     func placeLabels(in viewport: FigureViewport, sizes: [Int: Vec2], bounds: Rect2, avoiding knobs: [Vec2] = [], markRadius: Double = 22) -> [Int: Rect2] {
         let center = self.bounds.map { viewport.screen($0.center) } ?? bounds.center
         var lines: [(Vec2, Vec2)] = []
-        for mark in marks {
-            guard case .line(let points, let closed) = mark.geometry else { continue }
-            let screen = points.map(viewport.screen)
-            lines += zip(screen, screen.dropFirst()).map { ($0, $1) }
-            if closed, let first = screen.first, let last = screen.last { lines.append((last, first)) }
-        }
-        let obstacles = dots.map { Rect2(center: viewport.screen($0), width: 10, height: 10) }
+        var obstacles = dots.map { Rect2(center: viewport.screen($0), width: 10, height: 10) }
             + knobs.map { Rect2(center: $0, width: 30, height: 30) }
+        for mark in marks {
+            var screen: [Vec2]
+            switch mark.geometry {
+            case .line(let points, let closed):
+                screen = points.map(viewport.screen)
+                if closed, let first = screen.first { screen.append(first) }
+            case .angle(let vertex, let a, let b):
+                // Marks are drawn at a fixed size, so they're as easy to collide with at any scale.
+                let (corner, first, second) = (viewport.screen(vertex), viewport.screen(a), viewport.screen(b))
+                screen = mark.shape.kind == .rightAngle
+                    ? FigureMarks.rightAngle(corner, first, second, size: 11)
+                    : FigureMarks.angleArc(corner, first, second, radius: markRadius)
+                if let box = Rect2(containing: screen + [corner]) { obstacles.append(box) }
+            case .text:
+                continue
+            }
+            lines += zip(screen, screen.dropFirst()).map { ($0, $1) }
+        }
 
         var requests: [LabelPlacement.Request] = []
         for label in labels {
             guard let size = sizes[label.id] else { continue }
-            var request = LabelPlacement.Request(id: label.id, anchor: .zero, size: size, direction: .zero, gap: 6)
+            var request = LabelPlacement.Request(id: label.id, anchor: .zero, size: size, direction: .zero, gap: 7)
             switch label.anchor {
             case .point(let point):
                 request.anchor = viewport.screen(point)
@@ -213,9 +175,10 @@ enum LabelPlacement {
     }
 
     /// Each label at the first spot around its anchor that's clear, in order of preference: its
-    /// own side first, then round the anchor, then further out. Where nothing is clear, the spot
+    /// own side first, then round the anchor, then further out. Clear means a few points off
+    /// every line, so a label never touches what it's next to. Where nothing is clear, the spot
     /// that covers least.
-    static func place(_ requests: [Request], obstacles: [Rect2], lines: [(Vec2, Vec2)], within bounds: Rect2) -> [Int: Rect2] {
+    static func place(_ requests: [Request], obstacles: [Rect2], lines: [(Vec2, Vec2)], within bounds: Rect2, clearance: Double = 3) -> [Int: Rect2] {
         var placed: [Int: Rect2] = [:]
         var taken: [Rect2] = []
         let compass = (0..<8).map { Vec2(x: cos(Double($0) * .pi / 4), y: sin(Double($0) * .pi / 4)) }
@@ -225,7 +188,7 @@ enum LabelPlacement {
             if request.direction == .zero { spots.append(Rect2(center: request.anchor, width: width, height: height)) }
             let preferred = request.direction == .zero ? Vec2(x: 0, y: -1) : request.direction
             let directions = ([preferred] + compass.sorted { $0.dot(preferred) > $1.dot(preferred) })
-            for distance in [request.gap, request.gap + 10] {
+            for distance in [request.gap, request.gap + 8, request.gap + 18] {
                 for direction in directions {
                     // Far enough along the direction that the box clears the anchor by the gap.
                     let reach = abs(direction.x) * width / 2 + abs(direction.y) * height / 2 + distance
@@ -233,9 +196,10 @@ enum LabelPlacement {
                 }
             }
             func cost(_ spot: Rect2, rank: Int) -> Double {
-                let crowding = taken.reduce(0) { $0 + spot.overlap($1) } * 100
-                let covering = obstacles.reduce(0) { $0 + spot.overlap($1) } * 30
-                let crossing = Double(lines.filter { spot.insetBy(1).crosses($0.0, $0.1) }.count) * 400
+                let room = spot.insetBy(-clearance)
+                let crowding = taken.reduce(0) { $0 + room.overlap($1) } * 100
+                let covering = obstacles.reduce(0) { $0 + room.overlap($1) } * 30
+                let crossing = Double(lines.filter { room.crosses($0.0, $0.1) }.count) * 400
                 return crowding + covering + crossing + spot.spill(outside: bounds) * 100 + Double(rank)
             }
             guard let best = spots.enumerated().min(by: { cost($0.element, rank: $0.offset) < cost($1.element, rank: $1.offset) })?.element else { continue }
