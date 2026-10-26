@@ -6,12 +6,11 @@ import UIKit
 
 /// Who's signed in to Dream on this iPhone, and everything that follows from it.
 ///
-/// Making pages, sync and sharing need an account: pages are built by a cloud model through
-/// Dream's server, which spends money and keeps limits per person. Without one, everything already
-/// on the phone still works, since it runs here: saved pages and their controls, lists, What Dream
-/// knows, and pages friends share by link. Holding that back would only keep people from their own
-/// things; anything that reaches the cloud asks them to sign in, at the moment it's needed
-/// (`askToSignIn`).
+/// Dream needs an account: pages are built by AI models through Dream's server, which spends money
+/// and keeps limits per person, and signing in is where someone agrees to the terms. So the welcome
+/// stays until they sign in, and comes back when they sign out. Only device tours and the bench,
+/// in testing builds, go without; for them, anything that reaches the cloud asks at the moment it's
+/// needed (`askToSignIn`).
 @MainActor @Observable
 final class Account {
     static let shared = Account()
@@ -34,7 +33,7 @@ final class Account {
 
     private(set) var isSignedIn = Session.isSignedIn
     private(set) var profile: Profile?
-    /// The welcome, shown until someone signs in or says "Not now".
+    /// The welcome, shown until someone signs in.
     var showsWelcome = false
     var signInRequest: SignInRequest?
     /// After signing in, what's on the phone, to offer to move into the account (LocalData.swift).
@@ -55,10 +54,9 @@ final class Account {
     func start(_ container: ModelContainer) {
         guard self.container == nil else { return }
         self.container = container
-        let defaults = UserDefaults.standard
         // Device tours and the bench have nobody to sign in.
         let isTour = Build.flag("DreamTour") || Build.argument("DreamAutoIntent") != nil
-        showsWelcome = !isSignedIn && !defaults.bool(forKey: "welcomed") && !isTour
+        showsWelcome = !isSignedIn && !isTour
         Task {
             for await _ in NotificationCenter.default.notifications(named: Session.didChange) {
                 isSignedIn = Session.isSignedIn
@@ -85,12 +83,6 @@ final class Account {
         signInRequest = SignInRequest(reason: reason, then: then)
     }
 
-    /// "Not now" on the welcome.
-    func skipWelcome() {
-        UserDefaults.standard.set(true, forKey: "welcomed")
-        showsWelcome = false
-        notice = nil
-    }
 
     // MARK: - Signing in
 
@@ -102,7 +94,6 @@ final class Account {
         // Signing in agrees to the terms and privacy policy, which say Dream counts how it's used.
         ImproveDream.signedIn()
         keep(signedIn.user)
-        UserDefaults.standard.set(true, forKey: "welcomed")
         Session.save(signedIn.token)
         isSignedIn = true
         notice = nil
@@ -228,7 +219,6 @@ final class Account {
             await Sync.clearLocalData()
             if let context = container?.mainContext { await LocalData.erase(in: context) }
         }
-        UserDefaults.standard.set(false, forKey: "welcomed")
         self.notice = notice
         showsWelcome = true
     }

@@ -2,7 +2,7 @@ import SwiftUI
 
 /// The first thing someone sees. Rather than describe Dream, it shows it: a request types itself
 /// in and becomes a small working page (a bill to split, the distance to the horizon, a week's
-/// groceries) that answers to the finger. Then it asks them to sign in, or to look around first.
+/// groceries) that answers to the finger. Then it asks them to sign in, which Dream needs.
 struct WelcomeView: View {
     private let account = Account.shared
     @State private var demo = Demo.bill
@@ -93,10 +93,6 @@ struct WelcomeView: View {
     private var signIn: some View {
         VStack(spacing: 12) {
             SignInButton()
-            Button("Not now") { account.skipWelcome() }
-                .font(.subheadline.weight(.medium))
-                .foregroundStyle(.secondary)
-                .padding(.vertical, 4)
             Text("Your account keeps your pages, lists and what Dream knows, on any iPhone you sign in on.")
                 .font(.caption)
                 .foregroundStyle(.secondary)

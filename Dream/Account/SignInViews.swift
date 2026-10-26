@@ -29,8 +29,6 @@ private struct AccountFlow: ViewModifier {
             .sheet(item: $account.signInRequest) { request in
                 SignInSheet(request: request)
             }
-            // Someone opening a page a friend shared sees it first; the welcome comes back next time.
-            .onOpenURL { _ in account.showsWelcome = false }
             .onChange(of: scenePhase) { _, phase in
                 if phase == .active { Task { await account.check() } }
             }
