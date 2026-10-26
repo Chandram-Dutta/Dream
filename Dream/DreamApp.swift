@@ -12,6 +12,7 @@ struct DreamApp: App {
         Account.shared.start(container)
         Sync.start(container)
         Plan.shared.start()
+        ImproveDream.start()
     }
 
     var body: some Scene {

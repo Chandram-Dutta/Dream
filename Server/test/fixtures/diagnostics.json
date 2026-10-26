@@ -1,0 +1,87 @@
+{
+  "format": 1,
+  "reports": [
+    {
+      "kind": "crash",
+      "app": "1.0",
+      "build": "7",
+      "os": "iPhone OS 27.0 (24A335)",
+      "device": "iPhone18,1",
+      "testFlight": true,
+      "start": 1761400000,
+      "end": 1761486400,
+      "exceptionType": 6,
+      "exceptionCode": 1,
+      "signal": 5,
+      "terminationReason": "Namespace SIGNAL, Code 5 Trace/BPT trap: 5",
+      "stack": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": false,
+            "callStackRootFrames": [
+              { "binaryUUID": "11111111-2222-3333-4444-555555555555", "offsetIntoBinaryTextSegment": 4096, "sampleCount": 1, "binaryName": "libsystem_kernel.dylib", "address": 7516192768 }
+            ]
+          },
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              {
+                "binaryUUID": "66666666-7777-8888-9999-000000000000",
+                "offsetIntoBinaryTextSegment": 123456,
+                "sampleCount": 1,
+                "binaryName": "libswiftCore.dylib",
+                "address": 7516316224,
+                "subFrames": [
+                  {
+                    "binaryUUID": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE",
+                    "offsetIntoBinaryTextSegment": 107188,
+                    "sampleCount": 1,
+                    "binaryName": "Dream",
+                    "address": 4295074996,
+                    "subFrames": [
+                      { "binaryUUID": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE", "offsetIntoBinaryTextSegment": 9000, "sampleCount": 1, "binaryName": "Dream", "address": 4294976808 }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "hang",
+      "app": "1.0",
+      "build": "7",
+      "os": "iPhone OS 27.0 (24A335)",
+      "device": "iPhone18,1",
+      "testFlight": false,
+      "start": 1761400000,
+      "end": 1761486400,
+      "duration": 2.5,
+      "stack": {
+        "callStackPerThread": true,
+        "callStacks": [
+          {
+            "threadAttributed": true,
+            "callStackRootFrames": [
+              { "binaryUUID": "AAAAAAAA-BBBB-CCCC-DDDD-EEEEEEEEEEEE", "offsetIntoBinaryTextSegment": 48879, "sampleCount": 10, "binaryName": "Dream", "address": 4295016175 }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "kind": "launch",
+      "app": "1.0",
+      "build": "7",
+      "os": "iPhone OS 27.0 (24A335)",
+      "device": "iPhone18,1",
+      "testFlight": false,
+      "start": 1761400000,
+      "end": 1761486400,
+      "duration": 4.25
+    }
+  ]
+}

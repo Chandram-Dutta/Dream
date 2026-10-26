@@ -29,6 +29,9 @@ their own account instead, for their devices only: see [Sync](#sync).
 | `POST /api/appstore/transactions` | Dream Plus purchases the app made or restored. See [Dream Plus](#dream-plus). |
 | `POST /api/appstore/notifications` | App Store Server Notifications v2. |
 | `POST /api/attest/challenge`, `POST /api/attest/key` | App Attest. See [App Attest](#app-attest). |
+| `GET /privacy`, `/terms`, `/support` | The privacy policy, terms of use and support page. Drafts, see [Policy pages](#policy-pages). |
+| `POST /api/diagnostics` | Crash, hang and slow-launch reports from the app, anonymous. See [Diagnostics](#diagnostics). |
+| `GET /api/admin/diagnostics` | A summary of them, with the operator's key. |
 
 ## What's uploaded
 
@@ -179,8 +182,9 @@ Checks:
 
 ```sh
 npm run check             # TypeScript
-npm test                  # starts wrangler dev on a free port and checks every endpoint
+npm test                  # unit checks, then wrangler dev on a free port and every endpoint
 ../Tools/sharing.sh       # the app's side: what's shared, the preview, opening as untrusted
+npx wrangler deploy --dry-run --env staging   # the staging config, without deploying
 
 # The app's encoding through the real Worker and back, as a test user (with npm run dev
 # running, and DEV_LOGIN=1 in .dev.vars):
@@ -681,6 +685,113 @@ pages through the proxy, as the app does. `npm test` uses a stand-in for xAI
 (`test/stub-xai.mjs`) and test roots for the App Store and App Attest (`test/vectors.mjs`, trusted
 only with `DEV_LOGIN=1`), so nothing is paid for. `node test/billing.mjs` checks JWS and App
 Attest verification, the counter window and what the proxy forwards, on their own.
+## Policy pages
+
+`/privacy`, `/terms` and `/support` (`src/legal.ts`) are what the app links from its first run and
+Account, and what App Store Connect asks for: the privacy policy URL is
+`https://dream.onlychan.xyz/privacy`, the support URL `https://dream.onlychan.xyz/support`. They're
+plain HTML in the web viewer's style, with no scripts.
+
+All three are **drafts that need a lawyer's review**, and say so at the top. Everything still to
+be decided is in highlighted `[brackets]`: the company's name and address, contact addresses, the
+DPDP grievance officer, legal bases, retention for usage and purchase records, PostHog's region,
+the minimum age, the subscription's names and prices, liability and governing law. When the text
+changes, change `UPDATED` in `src/legal.ts` too.
+
+## Diagnostics
+
+When someone turns on "Help improve Dream", the app sends MetricKit's crash, hang and slow-launch
+reports (`Dream/Privacy/Diagnostics.swift`) to `POST /api/diagnostics`:
+
+```json
+{ "format": 1, "reports": [{ "kind": "crash", "app": "1.0", "build": "7", "os": "iPhone OS 27.0 (24A335)",
+  "device": "iPhone18,1", "testFlight": false, "start": 1761400000, "end": 1761486400,
+  "exceptionType": 6, "exceptionCode": 1, "signal": 5, "terminationReason": "…", "stack": { "callStacks": [] } }] }
+```
+
+- **Anonymous.** The app sends no session, and the Worker stores no address, account or region.
+  An Objective-C exception's message is never sent, since it can quote the app's data; only its
+  name and class.
+- **Checked** (`src/metrickit.ts`): at most 20 reports and 256 KB an upload, every string bounded
+  and printable, numbers finite, and the kind one of crash, hang or launch. A stack bigger than
+  64 KB is dropped and the rest of its report kept. 10 uploads a minute per address
+  (`DIAGNOSTICS_LIMIT`). Answers `202 { accepted }`.
+- **Grouped:** each report gets a `signature`, the innermost frame in Dream's own code (or else the
+  innermost frame), after the crash's kind: `EXC_BREAKPOINT SIGTRAP Dream+0x1a2b4`.
+- **Kept 90 days** (`diagnostics` table, migrations/0008), deleted as new reports arrive.
+- **Symbolication:** stacks are binary names and offsets. To turn `Dream+0x1a2b4` into a function
+  and line, use the dSYM of that exact build (App Store Connect keeps one for every upload; Xcode's
+  Organizer can download it). The offset counts from the start of Dream's code, which `atos`
+  places at `0x100000000`, so `Dream+0x1a2b4` is
+  `atos -o Dream.app.dSYM/Contents/Resources/DWARF/Dream -arch arm64 -l 0x100000000 0x10001a2b4`.
+  The stored `stack` is MetricKit's own JSON, for tools that read it.
+
+The summary is for whoever runs Dream, with the `ADMIN_KEY` secret in `X-Admin-Key`. Without the
+secret the route doesn't exist (404); with a wrong key it's 403.
+
+```sh
+curl -s -H "X-Admin-Key: $(security find-generic-password -a admin -s dream -w)" \
+  "https://dream.onlychan.xyz/api/admin/diagnostics?days=7"
+→ { "days": 7, "total": 12, "byKind": { "crash": 2, "hang": 9, "launch": 1 },
+    "byVersion": [{ "app": "1.0", "build": "7", "crash": 2, "hang": 9, "launch": 1 }],
+    "perDay": [{ "day": "2026-10-26", "crash": 1, "hang": 4, "launch": 0 }],
+    "topSignatures": [{ "kind": "hang", "signature": "Dream+0xbeef", "count": 6, "lastSeen": "…", "latest": "1.0 (7)" }],
+    "durations": { "hang": { "count": 9, "average": 1.8, "median": 1.2, "p90": 4.1, "max": 6 }, "launch": { … } } }
+```
+
+`days` is 1 to 90 (default 7). Make the key once and keep it in the login Keychain:
+
+```sh
+security add-generic-password -U -a admin -s dream -w "$(openssl rand -hex 32)"
+security find-generic-password -a admin -s dream -w | tr -d '\n' | npx wrangler secret put ADMIN_KEY
+```
+
+## Server analytics events
+
+The app sends its own usage events to PostHog (`Dream/Engine/Analytics.swift`,
+`docs/Analytics.md`). A few things only the server knows, so `src/analytics.ts` can send them
+itself, under the same person (Dream's own user id, never Apple's or an email):
+
+| Helper | Event | Properties |
+|---|---|---|
+| `limitReached(env, ctx, user.id, "pages")` | `limit_reached` | `kind`: pages, tokens or searches |
+| `subscriptionStarted(env, ctx, user.id, productID)` | `subscription_started` | `product` |
+| `subscriptionEnded(env, ctx, user.id)` | `subscription_ended` | |
+
+Metering and subscriptions (workstream D) call them. They send after the response, never throw
+and never log, and do nothing while the `POSTHOG_KEY` var is empty. Set it, and `POSTHOG_HOST`
+(`https://us.i.posthog.com` or `https://eu.i.posthog.com`), in `wrangler.jsonc`: the project key
+is public, like the app's. The server can't see whether the person turned on "Help improve
+Dream" on their phone, so keep `POSTHOG_KEY` empty here until that choice reaches the server
+with the account's settings, or check it before calling these.
+
+## Staging
+
+`wrangler.jsonc` has a `staging` environment: a second Worker, `dream-share-staging`, on
+`dream-share-staging.<subdomain>.workers.dev` with no custom domain, its own D1 database, rate
+limits counted apart from production's, and a tenth of the web search budget. Cloudflare doesn't
+copy bindings between environments, so a binding added at the top of `wrangler.jsonc` (an R2
+bucket, a new rate limit) must be added under `env.staging` too.
+
+To set it up, once:
+
+```sh
+cd Server
+npx wrangler d1 create dream-share-staging      # put the database_id it prints into env.staging
+npx wrangler d1 migrations apply dream-share-staging --remote --env staging
+# Secrets are per environment. Use different keys from production's.
+npx wrangler secret put PARALLEL_API_KEY --env staging
+npx wrangler secret put DREAM_APP_KEYS --env staging
+npx wrangler secret put ADMIN_KEY --env staging
+npx wrangler deploy --env staging
+DREAM_SHARE_URL=https://dream-share-staging.<subdomain>.workers.dev npm test
+```
+
+After that, `npx wrangler deploy --env staging` to try a change, and
+`npx wrangler d1 migrations apply dream-share-staging --remote --env staging` before deploying a
+migration to production. To point a Debug build of the app at staging, enter its address in Under
+the hood › Sharing; universal links still name production. Leave `DEV_LOGIN` unset on staging:
+it's public, and anyone could make sessions there.
 
 ## Later: shared lists
 

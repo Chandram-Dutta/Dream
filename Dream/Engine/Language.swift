@@ -108,7 +108,7 @@ enum Languages {
 
     /// The reader's languages in Settings.
     private static var settings: [String] {
-        if isOverridden, let only = UserDefaults.standard.string(forKey: "DreamReadIn") { return [recognizerCode(only)] }
+        if let only = Build.argument("DreamReadIn") { return [recognizerCode(only)] }
         return Locale.preferredLanguages.map(recognizerCode)
     }
 
@@ -126,7 +126,7 @@ enum Languages {
     }
 
     private static var isOverridden: Bool {
-        !(UserDefaults.standard.string(forKey: "DreamReadIn") ?? "").isEmpty
+        Build.argument("DreamReadIn") != nil
     }
 
     /// The language a surface in another one is translated into.

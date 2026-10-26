@@ -1,12 +1,14 @@
 #!/bin/zsh
-# Checks connected services on this Mac without a model: JSON Schemas made into generation
+# Checks connected services on this Mac without a model. First what needs no server
+# (DreamTests/ConnectionsTests.swift, run by Tools/tests.sh): JSON Schemas made into generation
 # schemas, picking tools, when Dream asks before a tool runs and what each answer does, readings
-# and the lists they fill, refreshing a source, service buttons, services a request names, and
-# what sharing leaves out. It starts the local test server (Tools/mcp-test-server.py) and talks
-# to it through the MCP SDK.
+# and the lists they fill, service buttons, services a request names, and what sharing leaves out.
+# Then it starts the local test server (Tools/mcp-test-server.py) and talks to it through the MCP
+# SDK: connecting, calling tools as the model does, reading one again, and a button's tap.
 # Usage: Tools/connections.sh
 set -e
 cd "$(dirname "$0")/.."
+Tools/tests.sh ConnectionsTests
 out="${TMPDIR:-/tmp}/dream-connections"
 mcp=$(Tools/mcp-sdk.sh)
 swiftc -target arm64-apple-macos27.0 -o "$out" Dream/Engine/*.swift Dream/Generation/*.swift Dream/Generation/Providers/*.swift Dream/Connections/*.swift Tools/connections/main.swift ${=mcp}

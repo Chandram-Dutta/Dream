@@ -9,7 +9,7 @@ enum Session {
 
     /// The token: from the Keychain on the phone, or DREAM_SESSION on the Mac bench.
     static var token: String? {
-        if let token = ProcessInfo.processInfo.environment["DREAM_SESSION"], !token.isEmpty { return token }
+        if let token = Build.environment("DREAM_SESSION") { return token }
         return Keychain.read("session")
     }
 
@@ -31,7 +31,7 @@ extension ServerAddress {
     /// Dream's own server: the one set in Under the hood, else the one this build was made for
     /// (the `DREAM_SHARE_HOST` build setting).
     static var dream: URL? {
-        if let custom = UserDefaults.standard.string(forKey: "shareServer"), let url = normalized(custom) { return url }
+        if let custom = Build.setting("shareServer"), let url = normalized(custom) { return url }
         return (Bundle.main.object(forInfoDictionaryKey: "DreamShareHost") as? String).flatMap(normalized)
     }
 }

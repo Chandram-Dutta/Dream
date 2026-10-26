@@ -202,7 +202,7 @@ export function messagePage(title: string, message: string): string {
   return document({ language: "en", rtl: false, title, accent: "indigo", head: "", body: `<header><h1>${escape(title)}</h1><p class="summary">${escape(message)}</p></header>` });
 }
 
-function document(parts: { language: string; rtl: boolean; title: string; accent: string; head: string; body: string; open?: string }): string {
+export function document(parts: { language: string; rtl: boolean; title: string; accent: string; head: string; body: string; open?: string }): string {
   return `<!doctype html>
 <html lang="${escape(parts.language)}"${parts.rtl ? ' dir="rtl"' : ""}>
 <head>

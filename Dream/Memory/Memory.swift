@@ -17,7 +17,7 @@ enum Memory {
             facts: { await Memory.facts(about: $0) })
         Asking.answerer = .user
         // Device tours have nobody to tap an answer.
-        if UserDefaults.standard.bool(forKey: "DreamTour") { Asking.patience = .seconds(8) }
+        if Build.flag("DreamTour") { Asking.patience = .seconds(8) }
     }
 
     // MARK: - Recalling

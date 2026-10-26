@@ -16,7 +16,7 @@ enum WebService {
     /// The server: the one set for web search in Under the hood, else the one links are shared on.
     static var base: URL? {
         for setting in ["webServer", "shareServer"] {
-            if let custom = UserDefaults.standard.string(forKey: setting), let url = ServerAddress.normalized(custom) { return url }
+            if let custom = Build.setting(setting), let url = ServerAddress.normalized(custom) { return url }
         }
         return (Bundle.main.object(forInfoDictionaryKey: "DreamShareHost") as? String).flatMap(ServerAddress.normalized)
     }

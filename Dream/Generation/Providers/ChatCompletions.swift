@@ -179,9 +179,9 @@ enum ChatCompletions {
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }
 
-    /// Shows in the console when debugging, like the composer's own log.
-    private static func trace(_ label: String, _ line: String) {
-        print("[Dream/\(label)] \(line)")
+    /// Shows in the console when debugging, like the composer's own log. Never in Release.
+    private static func trace(_ label: String, _ line: @autoclosure () -> String) {
+        Build.trace("[Dream/\(label)] \(line())")
     }
 
     private static func tokens(in text: String) -> Int {

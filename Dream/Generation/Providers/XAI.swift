@@ -24,7 +24,7 @@ struct XAILanguageModel: LanguageModel {
 
     /// The key from the environment (for the Mac bench), else the Keychain.
     static var savedKey: String? {
-        if let key = ProcessInfo.processInfo.environment["XAI_API_KEY"], !key.isEmpty { return key }
+        if let key = Build.environment("XAI_API_KEY") { return key }
         return Keychain.read("xai")
     }
 }

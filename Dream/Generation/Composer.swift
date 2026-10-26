@@ -70,8 +70,8 @@ final class Composer {
         }
     }
 
-    nonisolated static var provider: Provider { Provider(rawValue: UserDefaults.standard.string(forKey: "provider") ?? "") ?? .dream }
-    nonisolated static var xaiModelID: String { UserDefaults.standard.string(forKey: "xaiModel").flatMap { $0.isEmpty ? nil : $0 } ?? "grok-4.7" }
+    nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .dream }
+    nonisolated static var xaiModelID: String { Build.setting("xaiModel") ?? "grok-4.7" }
 
     /// Whether any model can make screens right now.
     static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
@@ -99,6 +99,7 @@ final class Composer {
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         page = UUID().uuidString
+        Analytics.send(.pageRequested(withPhoto: image != nil))
         asking.start()
         live.start()
         connected.start()
@@ -115,8 +116,10 @@ final class Composer {
             recordLocale(likely: Languages.guess(intent)?.rawValue)
             phase = .done
             note("Done in \(elapsed(since: started))")
+            countFinished(changing: false, since: started)
         } catch {
             fail(error)
+            countFailure(error, changing: false, since: started)
         }
     }
 
@@ -144,9 +147,11 @@ final class Composer {
             recordLocale(likely: current.locale?.language, editing: current.locale)
             phase = .done
             note("Done in \(elapsed(since: started))")
+            countFinished(changing: true, pointed: focus != nil, since: started)
         } catch {
             surface = current
             fail(error)
+            countFailure(error, changing: true, since: started)
         }
     }
 
@@ -459,7 +464,7 @@ final class Composer {
 
     private func note(_ line: String) {
         log.append(line)
-        print("[Dream] \(line)")
+        Build.trace("[Dream] \(line)")
     }
 
     private func elapsed(since date: Date) -> String {

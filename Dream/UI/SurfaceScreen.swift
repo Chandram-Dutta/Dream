@@ -160,7 +160,9 @@ struct SurfaceScreen: View {
                     .disabled(busy || surface == nil)
                 // Someone else's page: report it, or stop seeing pages from them (SharedPageMenu.swift).
                 if let saved, saved.sharedFrom != nil { SharedPageMenu(saved: saved) }
-                Button("Under the hood", systemImage: "ladybug") { showingDebug = true }
+                if Build.hasTestingHooks {
+                    Button("Under the hood", systemImage: "ladybug") { showingDebug = true }
+                }
             }
         }
         .sheet(isPresented: $showingDebug) {
@@ -177,13 +179,14 @@ struct SurfaceScreen: View {
             composer.consent.cancel()
         }
         .onChange(of: state.values) { _, values in saved?.values = values }
+        .countingControlUses(state.values, of: surface, settled: !busy)
         .keepingRecords(of: saved?.id, collections: surface?.recordCollections ?? [], in: state)
     }
 
     /// For checking whole pages on a device: launched with `-DreamTour 1`, a finished page
     /// scrolls down most of a screen at a time, slowly enough to take screenshots.
     private func tour() async {
-        guard UserDefaults.standard.bool(forKey: "DreamTour") else { return }
+        guard Build.flag("DreamTour") else { return }
         for step in 1...8 {
             try? await Task.sleep(for: .seconds(5))
             withAnimation(.smooth(duration: 0.8)) { scroll.scrollTo(y: CGFloat(step) * 560) }

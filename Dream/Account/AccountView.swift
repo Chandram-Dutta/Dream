@@ -68,6 +68,7 @@ struct AccountView: View {
                 email
                 PlanSection()
                 devicesSection
+                ImproveDreamSection()
                 if LocalData.move == .declined, !onPhone.isEmpty {
                     Section {
                         Button("Move this iPhone's things to your account", systemImage: "icloud.and.arrow.up") {

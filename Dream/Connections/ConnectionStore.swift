@@ -137,6 +137,7 @@ final class ConnectionStore {
         }
         connections.append(connection)
         save()
+        Analytics.send(.connectionAdded(needsSignIn: challenges[connection.id] != nil))
         return connection
     }
 

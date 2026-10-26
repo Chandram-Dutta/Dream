@@ -9,16 +9,33 @@
 /* Begin PBXBuildFile section */
 		DA0000000000000000000020 /* SwiftMath in Frameworks */ = {isa = PBXBuildFile; productRef = DA0000000000000000000021 /* SwiftMath */; };
 		DA0000000000000000000801 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = DA0000000000000000000802 /* MCP */; };
+		DAE0000000000000000000A1 /* PostHog in Frameworks */ = {isa = PBXBuildFile; productRef = DAE0000000000000000000A2 /* PostHog */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		DAE0000000000000000000B5 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA0000000000000000000009 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = DA0000000000000000000006;
+			remoteInfo = Dream;
+		};
+/* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		DA0000000000000000000001 /* Dream.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Dream.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		DAE0000000000000000000B1 /* DreamTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = DreamTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		DA0000000000000000000002 /* Dream */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Dream;
+			sourceTree = "<group>";
+		};
+		DAE0000000000000000000B2 /* DreamTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = DreamTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -30,6 +47,14 @@
 			files = (
 				DA0000000000000000000020 /* SwiftMath in Frameworks */,
 				DA0000000000000000000801 /* MCP in Frameworks */,
+				DAE0000000000000000000A1 /* PostHog in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAE0000000000000000000B3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +65,7 @@
 			isa = PBXGroup;
 			children = (
 				DA0000000000000000000002 /* Dream */,
+				DAE0000000000000000000B2 /* DreamTests */,
 				DA0000000000000000000005 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -48,6 +74,7 @@
 			isa = PBXGroup;
 			children = (
 				DA0000000000000000000001 /* Dream.app */,
+				DAE0000000000000000000B1 /* DreamTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -74,10 +101,34 @@
 			packageProductDependencies = (
 				DA0000000000000000000021 /* SwiftMath */,
 				DA0000000000000000000802 /* MCP */,
+				DAE0000000000000000000A2 /* PostHog */,
 			);
 			productName = Dream;
 			productReference = DA0000000000000000000001 /* Dream.app */;
 			productType = "com.apple.product-type.application";
+		};
+		DAE0000000000000000000B0 /* DreamTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = DAE0000000000000000000BA /* Build configuration list for PBXNativeTarget "DreamTests" */;
+			buildPhases = (
+				DAE0000000000000000000B4 /* Sources */,
+				DAE0000000000000000000B3 /* Frameworks */,
+				DAE0000000000000000000B7 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				DAE0000000000000000000B6 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				DAE0000000000000000000B2 /* DreamTests */,
+			);
+			name = DreamTests;
+			packageProductDependencies = (
+			);
+			productName = DreamTests;
+			productReference = DAE0000000000000000000B1 /* DreamTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -91,6 +142,10 @@
 				TargetAttributes = {
 					DA0000000000000000000006 = {
 						CreatedOnToolsVersion = 27.0;
+					};
+					DAE0000000000000000000B0 = {
+						CreatedOnToolsVersion = 27.0;
+						TestTargetID = DA0000000000000000000006;
 					};
 				};
 			};
@@ -106,6 +161,7 @@
 			packageReferences = (
 				DA0000000000000000000022 /* XCRemoteSwiftPackageReference "SwiftMath" */,
 				DA0000000000000000000803 /* XCRemoteSwiftPackageReference "swift-sdk" */,
+				DAE0000000000000000000A3 /* XCRemoteSwiftPackageReference "posthog-ios" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DA0000000000000000000005 /* Products */;
@@ -113,12 +169,20 @@
 			projectRoot = "";
 			targets = (
 				DA0000000000000000000006 /* Dream */,
+				DAE0000000000000000000B0 /* DreamTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		DA0000000000000000000008 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		DAE0000000000000000000B7 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -135,7 +199,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		DAE0000000000000000000B4 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		DAE0000000000000000000B6 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = DA0000000000000000000006 /* Dream */;
+			targetProxy = DAE0000000000000000000B5 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		DA000000000000000000000C /* Debug */ = {
@@ -194,11 +273,13 @@
 		DA000000000000000000000E /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
+				DREAM_APPLINKS_MODE = "?mode=developer";
 				DREAM_SHARE_HOST = dream.onlychan.xyz;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -217,7 +298,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 1.0;
+				POSTHOG_HOST = "https://us.i.posthog.com";
+				POSTHOG_KEY = phc_tPZv7XGN6GCg95kK4HKDTMRyVTFzmEpSDfXgFF3LHrGT;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.Dream;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -232,11 +315,13 @@
 		DA000000000000000000000F /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = Dream/Dream.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
+				DREAM_APPLINKS_MODE = "";
 				DREAM_SHARE_HOST = dream.onlychan.xyz;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
@@ -255,7 +340,9 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 1.0;
+				POSTHOG_HOST = "https://us.i.posthog.com";
+				POSTHOG_KEY = phc_tPZv7XGN6GCg95kK4HKDTMRyVTFzmEpSDfXgFF3LHrGT;
 				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.Dream;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -264,6 +351,46 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		DAE0000000000000000000B8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DR99P625RR;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.DreamTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dream.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dream";
+			};
+			name = Debug;
+		};
+		DAE0000000000000000000B9 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = DR99P625RR;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = xyz.onlychan.DreamTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Dream.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Dream";
 			};
 			name = Release;
 		};
@@ -288,6 +415,15 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		DAE0000000000000000000BA /* Build configuration list for PBXNativeTarget "DreamTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				DAE0000000000000000000B8 /* Debug */,
+				DAE0000000000000000000B9 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
@@ -307,6 +443,14 @@
 				minimumVersion = 0.12.1;
 			};
 		};
+		DAE0000000000000000000A3 /* XCRemoteSwiftPackageReference "posthog-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/PostHog/posthog-ios.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.92.5;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -319,6 +463,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DA0000000000000000000803 /* XCRemoteSwiftPackageReference "swift-sdk" */;
 			productName = MCP;
+		};
+		DAE0000000000000000000A2 /* PostHog */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DAE0000000000000000000A3 /* XCRemoteSwiftPackageReference "posthog-ios" */;
+			productName = PostHog;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

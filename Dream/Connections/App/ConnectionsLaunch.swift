@@ -7,7 +7,7 @@ extension ConnectionStore {
     /// carry any of it is always shown first, and with the directory on Dream's sharing server.
     func start(_ container: ModelContainer) {
         // The card goes where the page is forming. Device tours have nobody to tap it.
-        Consent.answerer = UserDefaults.standard.bool(forKey: "DreamTour") ? .automatic(.once) : .user
+        Consent.answerer = Build.flag("DreamTour") ? .automatic(.once) : .user
         start(personalDetails: {
             await MainActor.run {
                 let context = container.mainContext

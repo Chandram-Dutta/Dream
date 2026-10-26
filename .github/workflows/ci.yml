@@ -1,0 +1,95 @@
+# Builds Dream, runs its tests, and checks the Worker, on every push and pull request.
+#
+# The app needs Xcode 27 (the iOS 27 SDK), and DreamTests on the Mac need macOS 27 to run, since
+# the engine is built for it. Until GitHub's hosted runners have both, point the Mac jobs at a
+# runner that does with repository variables (Settings › Secrets and variables › Actions ›
+# Variables): MACOS_RUNNER (a runner label, like a self-hosted Mac's) and XCODE (the version in
+# /Applications/Xcode_<XCODE>.app). SIMULATOR (like "iPhone 17") turns on the Simulator tests.
+#
+# No secrets are used: the app builds unsigned, and the Worker's tests run against wrangler dev
+# on the runner, with a stand-in for the paid web search provider.
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  XCODE: ${{ vars.XCODE || '27.0' }}
+
+jobs:
+  app:
+    name: Build the app
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Xcode ${{ env.XCODE }}
+        run: |
+          if [ -d "/Applications/Xcode_${XCODE}.app" ]; then sudo xcode-select -s "/Applications/Xcode_${XCODE}.app"; fi
+          xcodebuild -version
+          xcodebuild -showsdks | grep -q "iphoneos27" || { echo "This Xcode has no iOS 27 SDK."; exit 1; }
+      - name: Build for iPhone, unsigned
+        run: |
+          xcodebuild build -project Dream.xcodeproj -scheme Dream -destination 'generic/platform=iOS' \
+            -derivedDataPath "$RUNNER_TEMP/dd" CODE_SIGNING_ALLOWED=NO
+      - name: Build the tests for the Simulator, without running them
+        run: |
+          xcodebuild build-for-testing -project Dream.xcodeproj -scheme Dream -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/dd" CODE_SIGNING_ALLOWED=NO
+
+  tests:
+    name: DreamTests on the Mac
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Xcode ${{ env.XCODE }}
+        run: |
+          if [ -d "/Applications/Xcode_${XCODE}.app" ]; then sudo xcode-select -s "/Applications/Xcode_${XCODE}.app"; fi
+          swift --version
+      - name: Run DreamTests
+        run: Tools/tests.sh
+        env:
+          TMPDIR: ${{ runner.temp }}
+
+  simulator:
+    name: DreamTests in the Simulator
+    # Needs an iOS 27 Simulator runtime on the runner (Xcode › Settings › Components, or
+    # `xcodebuild -downloadPlatform iOS`) and a device of that name.
+    if: ${{ vars.SIMULATOR != '' }}
+    runs-on: ${{ vars.MACOS_RUNNER || 'macos-26' }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Xcode ${{ env.XCODE }}
+        run: |
+          if [ -d "/Applications/Xcode_${XCODE}.app" ]; then sudo xcode-select -s "/Applications/Xcode_${XCODE}.app"; fi
+          xcrun simctl list runtimes | grep -q "iOS 27" || xcodebuild -downloadPlatform iOS
+      - name: Test
+        run: |
+          xcodebuild test -project Dream.xcodeproj -scheme Dream \
+            -destination "platform=iOS Simulator,name=${{ vars.SIMULATOR }}" \
+            -derivedDataPath "$RUNNER_TEMP/dd" CODE_SIGNING_ALLOWED=NO
+
+  worker:
+    name: Check the Worker
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: Server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: Server/package-lock.json
+      - run: npm ci
+      - run: npm run check
+      - name: Test (starts wrangler dev locally; no Cloudflare login)
+        run: npm test
+        env:
+          WRANGLER_SEND_METRICS: "false"

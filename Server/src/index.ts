@@ -13,6 +13,8 @@
 //   POST /api/auth/apple, /api/me…   signing in with Apple, the account, export and deletion (accounts.ts)
 //   GET, POST /api/sync; GET, PUT, DELETE /api/photos/:id   a signed-in person's own data (sync.ts)
 //   POST /api/model, GET /api/usage, /api/appstore/*, /api/attest/*   the model, limits and Dream Plus (plan.ts)
+//   GET  /privacy, /terms, /support   the policy, terms and help (legal.ts)
+//   POST /api/diagnostics     crash and hang reports, anonymous; GET /api/admin/diagnostics (diagnostics.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
@@ -23,11 +25,12 @@ import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
 import { CSP, messagePage } from "./page";
 import { routePlan, type PlanEnv } from "./plan";
+import { routeRelease, type ReleaseEnv } from "./release";
 import { routeSharing, type SharingEnv } from "./sharing";
 import { routeSync, type SyncEnv } from "./sync";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv, SyncEnv, PlanEnv {
+export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv, SyncEnv, PlanEnv, ReleaseEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -88,6 +91,8 @@ export default {
       if (web) return web;
       const plan = await routePlan(request, env, ctx, url);
       if (plan) return plan;
+      const release = await routeRelease(request, env, ctx, url);
+      if (release) return release;
       if (path === "/api/dev/session") {
         const session = await devSession(request, env);
         if (session) return session;

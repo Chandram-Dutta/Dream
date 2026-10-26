@@ -7,9 +7,12 @@
 		<string>Default</string>
 	</array>
 	<key>com.apple.developer.associated-domains</key>
+	<!-- Debug builds add developer mode (DREAM_APPLINKS_MODE is "?mode=developer"), which fetches
+	     the association file straight from the server. Release leaves it empty, so both entries
+	     are the plain production one. -->
 	<array>
 		<string>applinks:$(DREAM_SHARE_HOST)</string>
-		<string>applinks:$(DREAM_SHARE_HOST)?mode=developer</string>
+		<string>applinks:$(DREAM_SHARE_HOST)$(DREAM_APPLINKS_MODE)</string>
 	</array>
 	<key>com.apple.developer.weatherkit</key>
 	<true/>

@@ -90,6 +90,7 @@ final class Plan {
     }
 
     private func ranOut(reason: String, upgrade: Bool) {
+        Analytics.send(.limitReached(kind: "pages"))
         Task { await refresh() }
         // A subscriber who's used a day's pages is told so where they are; there's nothing to sell them.
         if upgrade, offer == nil { offer = Offer(reason: reason) }
@@ -115,6 +116,7 @@ final class Plan {
         problem = nil
         switch result {
         case .success(.success(let verification)):
+            if case .verified(let transaction) = verification { Analytics.send(.subscriptionStarted(product: transaction.productID)) }
             await handle(verification)
         case .success(.pending):
             problem = "Your purchase is waiting for approval. Dream Plus starts once it's approved."

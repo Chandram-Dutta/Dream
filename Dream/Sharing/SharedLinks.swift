@@ -30,6 +30,7 @@ final class SharedLinks {
         let known = FetchDescriptor<SavedSurface>(predicate: #Predicate { $0.sharedFrom == address })
         if let existing = try? context.fetch(known).first {
             opened = existing
+            Analytics.send(.openedShared(again: true))
             return
         }
         status = .opening
@@ -44,6 +45,7 @@ final class SharedLinks {
             try? context.save()
             status = .idle
             opened = saved
+            Analytics.send(.openedShared(again: false))
         } catch {
             status = .failed(error.localizedDescription)
         }

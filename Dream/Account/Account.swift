@@ -57,7 +57,7 @@ final class Account {
         self.container = container
         let defaults = UserDefaults.standard
         // Device tours and the bench have nobody to sign in.
-        let isTour = defaults.bool(forKey: "DreamTour") || !(defaults.string(forKey: "DreamAutoIntent") ?? "").isEmpty
+        let isTour = Build.flag("DreamTour") || Build.argument("DreamAutoIntent") != nil
         showsWelcome = !isSignedIn && !defaults.bool(forKey: "welcomed") && !isTour
         Task {
             for await _ in NotificationCenter.default.notifications(named: Session.didChange) {
@@ -184,6 +184,7 @@ final class Account {
 
     private func keep(_ profile: Profile) {
         self.profile = profile
+        ProductAnalytics.signedIn(userID: profile.id)
         if let data = try? JSONEncoder().encode(profile) {
             Keychain.save(String(decoding: data, as: UTF8.self), for: "account")
         }

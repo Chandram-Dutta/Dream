@@ -13,7 +13,7 @@ enum AppProof {
     /// The shared app key: from the environment on the Mac bench, else the Keychain, where Under
     /// the hood › Web search saves it.
     static var key: String? {
-        if let key = ProcessInfo.processInfo.environment["DREAM_WEB_KEY"], !key.isEmpty { return key }
+        if let key = Build.environment("DREAM_WEB_KEY") { return key }
         return Keychain.read("web")
     }
 
@@ -129,7 +129,7 @@ actor Attestation {
     }
 
     private func note(_ line: String) {
-        print("[Dream/AppAttest] \(line)")
+        Build.trace("[Dream/AppAttest] \(line)")
     }
 }
 #endif

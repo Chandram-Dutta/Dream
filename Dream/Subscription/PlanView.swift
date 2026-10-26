@@ -30,6 +30,7 @@ struct PlanView: View {
         }
         .tint(palette.accent)
         .task { await Plan.shared.refresh() }
+        .onAppear { Analytics.send(.paywallShown) }
         // A restore from the store's own button reaches the server here.
         .onDisappear { Task { await Plan.shared.resync() } }
     }

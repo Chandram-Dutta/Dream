@@ -1,6 +1,6 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
-// domains file, web search and reading, the model proxy, allowances, Dream Plus, App Attest, and
-// the protections. With no address given, it applies the migrations to a local database and
+// domains file, web search and reading, the policy pages, crash reports, the model proxy,
+// allowances, Dream Plus, App Attest, and the protections. With no address given, it applies the migrations to a local database and
 // starts `wrangler dev` itself, with web search pointed at a stand-in for Parallel and the model
 // at a stand-in for xAI on this Mac (test/stub-parallel.mjs, test/stub-xai.mjs), so nothing is
 // paid for, and with test roots for the App Store and App Attest (test/vectors.mjs). Reading
@@ -12,7 +12,8 @@
 //
 // Against a server that's already running, the web and model checks need its app key in
 // DREAM_WEB_KEY and a session in DREAM_SESSION, and only the ones refused before anything is
-// paid for run.
+// paid for run. Crash reports are only stored locally, and the diagnostics summary is only read
+// there, with a key made for the test.
 
 import { spawn, execFileSync } from "node:child_process";
 import { randomUUID } from "node:crypto";
@@ -28,6 +29,7 @@ import { appStoreChain, assertion, attest, attestRoot, jws, requestData, transac
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = readFileSync(join(root, "test/fixtures/split-bill.json"), "utf8");
+const diagnostics = readFileSync(join(root, "test/fixtures/diagnostics.json"), "utf8");
 let failures = 0;
 
 function expect(condition, message) {
@@ -51,7 +53,7 @@ const LOCAL_ALLOWANCES = { free: { pagesPerDay: 2, searchesPerDay: 10 } };
 const appStore = appStoreChain();
 const attestCA = attestRoot();
 /** Everything the test writes, cleared before and after so runs don't affect each other. */
-const CLEAR = ["web_cache", "web_usage", "usage", "usage_pages", "spend", "subscriptions", "appstore_notifications", "attest_keys", "attest_challenges"].map((table) => `DELETE FROM ${table};`).join(" ");
+const CLEAR = ["web_cache", "web_usage", "usage", "usage_pages", "spend", "subscriptions", "appstore_notifications", "attest_keys", "attest_challenges", "diagnostics"].map((table) => `DELETE FROM ${table};`).join(" ");
 
 async function startLocal(stub, xai) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
@@ -573,6 +575,64 @@ async function runPlan(base, xai) {
   expect(response.status === 401 && response.headers.get("x-dream-attest") === "again", "a key the server doesn't know asks the app to attest again");
 }
 
+/** The policy pages, crash reports and their summary. Reports are only stored by a local
+ * server, and the summary only read there. */
+async function runRelease(base, local) {
+  console.log("Privacy policy, terms and support");
+  for (const [path, title] of [["/privacy", "Privacy policy"], ["/terms", "Terms of use"], ["/support", "Support"]]) {
+    const response = await fetch(`${base}${path}`);
+    const page = await response.text();
+    expect(response.status === 200 && response.headers.get("content-type")?.startsWith("text/html"), `${path} is a page`);
+    expect(page.includes(`<h1>${title}</h1>`) && page.includes("Draft, needs legal review"), `${path} says it's a draft`);
+    expect(response.headers.get("content-security-policy")?.includes("default-src 'none'") && !page.includes("<script"), `${path} has no scripts`);
+  }
+  let response = await fetch(`${base}/privacy/`);
+  expect(response.status === 200, "a trailing slash works too");
+  const policy = await (await fetch(`${base}/privacy`)).text();
+  expect(["Cloudflare", "xAI", "Parallel", "Apple", "Wikimedia", "PostHog"].every((name) => policy.includes(name)), "the policy names every company that handles data");
+  expect(policy.includes("Digital Personal Data Protection Act") && policy.includes("GDPR"), "and rights under the GDPR and India's DPDP Act");
+  response = await fetch(`${base}/terms`, { method: "POST" });
+  expect(response.status === 405, "the pages are read-only");
+
+  console.log("Crash and hang reports");
+  const report = (body, type = "application/json") => fetch(`${base}/api/diagnostics`, { method: "POST", headers: { "Content-Type": type }, body });
+  if (local) {
+    response = await report(diagnostics);
+    expect(response.status === 202 && (await response.json()).accepted === 3, "a day's reports are accepted");
+  }
+  response = await fetch(`${base}/api/diagnostics`);
+  expect(response.status === 405, "only POST");
+  response = await report(diagnostics, "text/plain");
+  expect(response.status === 415, "only application/json");
+  const one = JSON.parse(diagnostics);
+  response = await report(JSON.stringify({ ...one, reports: [{ ...one.reports[2], kind: "freeze" }] }));
+  expect(response.status === 400, "a report of another kind is refused");
+  response = await report(JSON.stringify({ ...one, padding: "x".repeat(300_000) }));
+  expect(response.status === 413, "a body over 256 KB is refused");
+
+  console.log("The diagnostics summary");
+  const summary = (key) => fetch(`${base}/api/admin/diagnostics?days=7`, { headers: key ? { "X-Admin-Key": key } : {} });
+  response = await summary();
+  expect(local ? response.status === 403 : [403, 404].includes(response.status), "not without the operator's key");
+  if (local) {
+    response = await summary("a-wrong-admin-key-of-good-length");
+    expect(response.status === 403, "not with a wrong key");
+    response = await summary(LOCAL_ADMIN_KEY);
+    const seen = await response.json();
+    expect(response.status === 200 && response.headers.get("cache-control") === "no-store", "200 with the key, and never cached");
+    expect(seen.total === 3 && seen.byKind?.crash === 1 && seen.byKind?.hang === 1 && seen.byKind?.launch === 1, "counts by kind");
+    expect(seen.byVersion?.[0]?.app === "1.0" && seen.byVersion?.[0]?.build === "7" && seen.perDay?.length === 1, "by version and by day");
+    expect(seen.topSignatures?.some((item) => item.signature === "EXC_BREAKPOINT SIGTRAP Dream+0x1a2b4" && item.count === 1 && item.latest === "1.0 (7)"), "grouped by where they happened");
+    expect(seen.durations?.hang?.max === 2.5 && seen.durations?.launch?.average === 4.25, "how long hangs and launches took");
+    response = await fetch(`${base}/api/admin/diagnostics?days=900`, { headers: { "X-Admin-Key": LOCAL_ADMIN_KEY } });
+    expect(response.status === 400, "at most 90 days");
+
+    let limited = false;
+    for (let i = 0; i < 15 && !limited; i++) limited = (await report("{nope")).status === 429;
+    expect(limited, "too many reports from one address are refused for a while");
+  }
+}
+
 const remote = process.env.DREAM_SHARE_URL;
 const stub = remote ? null : await startStub();
 const xai = remote ? null : await startXAIStub();
@@ -581,6 +641,7 @@ try {
   await run(server.base);
   // Owners, reports, blocks and the admin need several test users, so only run locally.
   if (!remote) await runSharing(server.base, { expect, signIn: (name) => signIn(server.base, name), fixture, adminKey: LOCAL_ADMIN_KEY, legacyID: LEGACY_ID });
+  await runRelease(server.base, !remote);
   const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
   const session = remote ? process.env.DREAM_SESSION : (await signIn(server.base, "smoke"))?.token;
   if (key && session) await runWeb(server.base, key, session, stub);

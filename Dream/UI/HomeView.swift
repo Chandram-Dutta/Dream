@@ -31,7 +31,8 @@ struct HomeView: View {
                         .padding(.top, 24)
                         .frame(maxWidth: .infinity, alignment: .leading)
                         .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { SyncNote(); YourLinksButton(); ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
-                    if !canCompose {
+                    // The key goes in Under the hood, which only testing builds have.
+                    if !canCompose, Build.hasTestingHooks {
                         Button { showingSettings = true } label: {
                             Label("Add an xAI API key to start making screens.", systemImage: "key.fill")
                                 .font(.subheadline)
@@ -40,6 +41,7 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .panel(palette)
                     }
+                    ImproveDreamQuestion(palette: palette)
                     if !surfaces.isEmpty {
                         shelf
                     }
@@ -227,16 +229,16 @@ struct HomeView: View {
 
     /// For testing on a device: launch with `-DreamAutoIntent "split a bill"`. `-DreamXAIKey`
     /// moves an xAI key into this device's Keychain and switches to Grok; `-DreamWebKey` does
-    /// the same for the key the web search server expects.
+    /// the same for the key the web search server expects. Release builds ignore all three.
     private func startFromLaunchArgument() {
-        if let key = UserDefaults.standard.string(forKey: "DreamXAIKey"), !key.isEmpty {
+        if let key = Build.argument("DreamXAIKey") {
             Keychain.save(key, for: "xai")
             UserDefaults.standard.set(Composer.Provider.xai.rawValue, forKey: "provider")
         }
-        if let key = UserDefaults.standard.string(forKey: "DreamWebKey"), !key.isEmpty {
+        if let key = Build.argument("DreamWebKey") {
             Keychain.save(key, for: "web")
         }
-        guard !Self.startedAutomatically, let auto = UserDefaults.standard.string(forKey: "DreamAutoIntent"), !auto.isEmpty else { return }
+        guard !Self.startedAutomatically, let auto = Build.argument("DreamAutoIntent") else { return }
         Self.startedAutomatically = true
         request = ComposeRequest(intent: auto, image: nil)
     }

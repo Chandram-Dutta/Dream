@@ -98,7 +98,7 @@ enum RecordTalk {
     }
 
     private static func note(_ line: String) {
-        print("[Dream] Lists: \(line)")
+        Build.trace("[Dream] Lists: \(line)")
     }
 
     private static func elapsed(since date: Date) -> String {
