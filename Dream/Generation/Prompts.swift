@@ -51,7 +51,7 @@ enum Prompts {
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, soundRules, languageRules, sharingRules, liveRules].filter { !$0.isEmpty }
+        [memoryRules, listRules, figureRules, soundRules, connectionRules, languageRules, sharingRules, liveRules].filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
@@ -74,7 +74,7 @@ enum Prompts {
     /// What the model is told alongside each request about the user and their device. Each
     /// feature adds its own lines from its own file.
     static func context(for intent: String) async -> [String] {
-        await memoryContext(for: intent) + languageContext(for: intent) + liveContext()
+        await memoryContext(for: intent) + languageContext(for: intent) + liveContext() + connectionContext(for: intent)
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {

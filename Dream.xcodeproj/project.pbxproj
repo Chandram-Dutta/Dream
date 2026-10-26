@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		DA0000000000000000000020 /* SwiftMath in Frameworks */ = {isa = PBXBuildFile; productRef = DA0000000000000000000021 /* SwiftMath */; };
+		DA0000000000000000000801 /* MCP in Frameworks */ = {isa = PBXBuildFile; productRef = DA0000000000000000000802 /* MCP */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +29,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DA0000000000000000000020 /* SwiftMath in Frameworks */,
+				DA0000000000000000000801 /* MCP in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -71,6 +73,7 @@
 			name = Dream;
 			packageProductDependencies = (
 				DA0000000000000000000021 /* SwiftMath */,
+				DA0000000000000000000802 /* MCP */,
 			);
 			productName = Dream;
 			productReference = DA0000000000000000000001 /* Dream.app */;
@@ -102,6 +105,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				DA0000000000000000000022 /* XCRemoteSwiftPackageReference "SwiftMath" */,
+				DA0000000000000000000803 /* XCRemoteSwiftPackageReference "swift-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = DA0000000000000000000005 /* Products */;
@@ -295,6 +299,14 @@
 				minimumVersion = 1.7.3;
 			};
 		};
+		DA0000000000000000000803 /* XCRemoteSwiftPackageReference "swift-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/modelcontextprotocol/swift-sdk.git";
+			requirement = {
+				kind = upToNextMinorVersion;
+				minimumVersion = 0.12.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -302,6 +314,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = DA0000000000000000000022 /* XCRemoteSwiftPackageReference "SwiftMath" */;
 			productName = SwiftMath;
+		};
+		DA0000000000000000000802 /* MCP */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = DA0000000000000000000803 /* XCRemoteSwiftPackageReference "swift-sdk" */;
+			productName = MCP;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

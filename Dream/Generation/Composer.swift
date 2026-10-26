@@ -73,6 +73,8 @@ final class Composer {
     private var isChecking = false
     private var held: Surface?
     private var holdUntil = Date.distantPast
+    /// What the user asked for, which picks the connected services' tools worth offering.
+    private var request = ""
 
     func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
@@ -84,6 +86,7 @@ final class Composer {
         asking.start()
         live.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
+        request = intent
         do {
             let context = await Prompts.context(for: intent)
             try await withModel {
@@ -109,6 +112,7 @@ final class Composer {
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
+        request = "\(intent). \(instruction)"
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt(Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context))
@@ -155,6 +159,7 @@ final class Composer {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+            + ConnectionTool.offered(for: request, asking: asking, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
     }
 
     private func lookingUp(_ subject: String) {

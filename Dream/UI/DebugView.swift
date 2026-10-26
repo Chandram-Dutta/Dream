@@ -41,6 +41,9 @@ struct DebugView: View {
                     Text("Grok sends requests to xAI with your API key, kept in the Keychain. Private Cloud Compute needs an entitlement Apple grants on request. If the chosen model can't be used, Dream tries the other one.")
                 }
                 ShareServerSettings()
+                Section {
+                    NavigationLink("Connections") { ConnectionsView() }
+                }
                 Section("Log") {
                     ForEach(Array(log.enumerated()), id: \.offset) { _, line in
                         Text(line).font(.caption.monospaced())
