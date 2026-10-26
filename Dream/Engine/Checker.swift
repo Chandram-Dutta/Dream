@@ -12,8 +12,10 @@ struct Issue: Hashable, CustomStringConvertible {
 /// structure right (guided generation guarantees it) but often get logic wrong.
 enum Checker {
     static func checkLogic(_ surface: inout Surface) -> [Issue] {
-        guard surface.hasLogic else { return [] }
-        var issues: [Issue] = []
+        // Collections first: formulas can total them.
+        let listIssues = checkCollections(&surface)
+        guard surface.hasLogic else { return listIssues }
+        var issues: [Issue] = listIssues
         func fixed(_ message: String) { issues.append(Issue(kind: .fixed, message: message)) }
         func problem(_ message: String) { issues.append(Issue(kind: .needsModel, message: message)) }
         func warning(_ message: String) { issues.append(Issue(kind: .warning, message: message)) }
@@ -62,7 +64,7 @@ enum Checker {
         }
         if !madeCurrency.isEmpty { fixed("Showed \(madeCurrency.map { "'\($0)'" }.joined(separator: ", ")) as money.") }
 
-        if surface.inputs.isEmpty { problem("The calculation has results but no inputs, so nothing can change.") }
+        if surface.inputs.isEmpty && !totalsRecords(surface) { problem("The calculation has results but no inputs, so nothing can change.") }
         if surface.outputs.isEmpty { problem("The calculation has inputs but no results calculated from them.") }
 
         for index in surface.inputs.indices {
@@ -79,7 +81,7 @@ enum Checker {
         }
 
         // Formulas must parse and only use names that exist. Near-misses are renamed.
-        let names = inputNames.union(outputNames)
+        let names = inputNames.union(outputNames).union(surface.columnNames)
         for index in surface.outputs.indices {
             let output = surface.outputs[index]
             let expr: Expr
@@ -94,7 +96,7 @@ enum Checker {
             }
             var renames: [String: String] = [:]
             for name in expr.names.subtracting(names).subtracting(Expr.constants.keys).sorted() {
-                if let match = closestName(to: name, in: names) {
+                if let match = closestName(to: name, in: names) ?? closestColumn(to: name, in: surface) {
                     renames[name] = match
                 } else {
                     problem("The formula for '\(output.name)' uses '\(name)', which isn't an input or output. Add it as an input, or use one of: \(names.sorted().joined(separator: ", ")).")
@@ -121,13 +123,13 @@ enum Checker {
                 }
             }
         }
-        let start = surface.evaluate(surface.initialValues)
+        let start = surface.evaluate(surface.initialValues, records: surface.sampleRecords)
         for output in surface.outputs {
             if let error = start.errors[output.name] {
                 problem("'\(output.name)' can't be calculated: \(error).")
             } else if !(start.values[output.name]?.isFinite ?? false) {
                 problem("'\(output.name)' isn't a number at the starting values (\(output.formula)). Avoid dividing by something that can be zero.")
-            } else if surface.inputs(feeding: output.name).isEmpty {
+            } else if surface.inputs(feeding: output.name).isEmpty && surface.collections(feeding: output.name).isEmpty {
                 problem("'\(output.name)' doesn't use any input, so it never changes. Calculate it from the inputs, or make it an input if the user should enter it.")
             }
         }
@@ -312,7 +314,14 @@ enum Checker {
                     }
                 }
 
+            case .list, .add:
+                let (keep, fix) = recordBlock(&block, in: reference)
+                if let fix { fixed(fix) }
+                guard keep else { return nil }
+
             case .data:
+                // A chart of the user's entries.
+                if boundData(&block, in: reference) { break }
                 (block.ref, block.over, block.children, block.text) = ("", "", [], "")
                 let points = block.items.filter { $0.number != nil && !$0.label.isEmpty }
                 if points.count >= 2 {
@@ -355,6 +364,8 @@ enum Checker {
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty && $0.lowercased() != title && seenTopics.insert($0.lowercased()).inserted }
             .prefix(6))
+
+        issues += placeLists(&surface)
 
         // A calculation the blocks don't show is still placed, so it's never lost.
         guard surface.hasLogic else { return issues }
@@ -540,7 +551,7 @@ enum Checker {
 
     /// How many outputs aren't finite numbers at these values.
     private static func broken(_ surface: Surface, _ values: [String: Double]) -> Int {
-        let evaluation = surface.evaluate(values)
+        let evaluation = surface.evaluate(values, records: surface.sampleRecords)
         return surface.outputs.filter { !(evaluation.values[$0.name]?.isFinite ?? false) }.count
     }
 

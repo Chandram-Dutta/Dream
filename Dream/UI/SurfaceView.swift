@@ -4,6 +4,10 @@ import SwiftUI
 @MainActor @Observable
 final class SurfaceState {
     var values: [String: Double] = [:]
+    /// The user's entries in the surface's lists, by collection. Kept on the phone by
+    /// `keepingRecords`, never in the template.
+    var records: [String: [Record]] = [:]
+    var lists = ListActivity()
 
     func value(_ input: Input) -> Double { values[input.name] ?? input.initial }
 
@@ -37,7 +41,7 @@ struct SurfaceView: View {
     var onExplore: ((String) -> Void)?
 
     var body: some View {
-        let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values), state: state, focusedID: focusedID, onChange: onChange)
+        let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values, records: state.records), state: state, focusedID: focusedID, onChange: onChange)
         let blocks = surface.displayBlocks
         VStack(alignment: .leading, spacing: 26) {
             SurfaceHeader(surface: surface, stage: stage)

@@ -58,7 +58,15 @@ struct BlockView: View {
         case .equation:
             EquationBlockView(block: block, context: context)
         case .data:
-            DataChartView(block: block, context: context)
+            if block.ref.isEmpty {
+                DataChartView(block: block, context: context)
+            } else {
+                RecordChartView(block: block, context: context).panel(palette, enabled: depth == 0)
+            }
+        case .list:
+            ListBlockView(block: block, context: context, depth: depth)
+        case .add:
+            AddBarView(block: block, context: context, depth: depth)
         case .slider, .stepper, .field, .toggle, .picker:
             if let input = context.surface.input(block.ref) {
                 ControlView(kind: block.kind, input: input, context: context).panel(palette, enabled: depth == 0)

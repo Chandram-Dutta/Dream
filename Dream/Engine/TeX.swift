@@ -284,8 +284,25 @@ private struct TeXWriter {
             return conditional(condition, then, otherwise, whole: expr)
         case .call("if", let arguments) where arguments.count == 3:
             return conditional(arguments[0], arguments[1], arguments[2], whole: .conditional(arguments[0], arguments[1], arguments[2]))
+        case .call(let function, let arguments) where Expr.aggregates.contains(function) && arguments.count == 1 && surface.columnNames.contains(arguments[0].description):
+            return total(function, of: arguments[0].description)
         case .call(let function, let arguments):
             return call(function, arguments.map(write))
+        }
+    }
+
+    /// A total over the user's entries: its value when worked through, otherwise what it adds
+    /// up, like `\sum \text{Amount}`.
+    private func total(_ function: String, of name: String) -> Piece {
+        if let values {
+            let value = values[Expr.call(function, [.name(name)]).description] ?? .nan
+            return Piece(tex: TeX.number(value), level: value < 0 ? .unary : .atom)
+        }
+        let label = "\\text{\(TeX.escaped(surface.label(of: name)))}"
+        switch function {
+        case "sum": return Piece(tex: "\\sum " + label, level: .application)
+        case "min", "max": return Piece(tex: "\\\(function) " + label, level: .application)
+        default: return Piece(tex: "\\text{\(function)}(\(label))", level: .application)
         }
     }
 

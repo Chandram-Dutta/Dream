@@ -21,7 +21,7 @@ extension Expr {
     static let functions: Set<String> = [
         "min", "max", "round", "floor", "ceil", "abs", "sqrt", "cbrt", "pow", "exp", "log", "ln", "log10", "log2",
         "sin", "cos", "tan", "asin", "acos", "atan", "atan2", "sinh", "cosh", "tanh", "hypot",
-        "sign", "mod", "fact", "choose", "if", "clamp", "sum", "avg",
+        "sign", "mod", "fact", "choose", "if", "clamp", "sum", "avg", "count", "first", "last",
     ]
 
     /// Names every formula can use. An input or output with the same name wins.
@@ -74,17 +74,23 @@ extension Expr {
 
     /// Booleans are numbers: comparisons give 1 or 0, and anything non-zero is true.
     func evaluate(_ lookup: (String) throws -> Double) throws -> Double {
+        try evaluate(lookup, column: { _ in nil })
+    }
+
+    /// `column` gives a list's values, like `expenses.amount`, for totals such as
+    /// `sum(expenses.amount)`; nil for anything that isn't one.
+    func evaluate(_ lookup: (String) throws -> Double, column: (String) throws -> [Double]?) throws -> Double {
         switch self {
         case .number(let value):
             return value
         case .name(let name):
             return try lookup(name)
         case .unary(let op, let operand):
-            let value = try operand.evaluate(lookup)
+            let value = try operand.evaluate(lookup, column: column)
             return op == "!" ? (value == 0 ? 1 : 0) : -value
         case .binary(let op, let lhs, let rhs):
-            let a = try lhs.evaluate(lookup)
-            let b = try rhs.evaluate(lookup)
+            let a = try lhs.evaluate(lookup, column: column)
+            let b = try rhs.evaluate(lookup, column: column)
             switch op {
             case "+": return a + b
             case "-": return a - b
@@ -103,12 +109,15 @@ extension Expr {
             default: throw FormulaError("unknown operator \(op)")
             }
         case .conditional(let condition, let then, let otherwise):
-            return try condition.evaluate(lookup) != 0 ? then.evaluate(lookup) : otherwise.evaluate(lookup)
+            return try condition.evaluate(lookup, column: column) != 0 ? then.evaluate(lookup, column: column) : otherwise.evaluate(lookup, column: column)
         case .call("if", let arguments):
             guard arguments.count == 3 else { throw FormulaError("if() needs a condition and two values") }
-            return try arguments[0].evaluate(lookup) != 0 ? arguments[1].evaluate(lookup) : arguments[2].evaluate(lookup)
+            return try arguments[0].evaluate(lookup, column: column) != 0 ? arguments[1].evaluate(lookup, column: column) : arguments[2].evaluate(lookup, column: column)
         case .call(let function, let arguments):
-            let values = try arguments.map { try $0.evaluate(lookup) }
+            if arguments.count == 1, case .name(let name) = arguments[0], let values = try column(name) {
+                return try Self.aggregate(function, of: values)
+            }
+            let values = try arguments.map { try $0.evaluate(lookup, column: column) }
             func needs(_ count: Int) throws {
                 guard values.count == count else {
                     throw FormulaError("\(function)() needs \(count) value\(count == 1 ? "" : "s")")
@@ -123,6 +132,14 @@ extension Expr {
                 return result
             case "sum":
                 return values.reduce(0, +)
+            case "count":
+                return Double(values.filter { $0 != 0 }.count)
+            case "first":
+                guard let result = values.first else { throw FormulaError("first() needs values") }
+                return result
+            case "last":
+                guard let result = values.last else { throw FormulaError("last() needs values") }
+                return result
             case "avg":
                 guard !values.isEmpty else { throw FormulaError("avg() needs values") }
                 return values.reduce(0, +) / Double(values.count)
