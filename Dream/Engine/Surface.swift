@@ -39,6 +39,11 @@ struct Surface: Codable, Hashable {
     /// The language and measurement system it was written for, so a reader elsewhere sees it in
     /// theirs. Nil while it's being written, and for surfaces saved before this was recorded.
     var locale: SurfaceLocale?
+    /// Where live values come from, like the weather or an exchange rate (Live.swift). Nil in
+    /// surfaces made before sources existed.
+    var sources: [Source]? = nil
+    /// What the user can do with one tap, like adding an event to their calendar (Action.swift).
+    var actions: [Action]? = nil
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -148,6 +153,8 @@ enum BlockKind: String, Codable {
     case list, add
     // Drawn: a figure moves with the calculation; a diagram shows how parts connect.
     case figure, diagram
+    // A button that does something for the user, from `Surface.actions`.
+    case action
 
     var isContainer: Bool { self == .section || self == .row }
     var isControl: Bool { [.slider, .stepper, .field, .toggle, .picker].contains(self) }
@@ -205,6 +212,8 @@ enum InputRole: String, Codable {
     case given
     /// What a chart runs along, like time or x. The chart is its control.
     case variable
+    /// Read from a source and kept current, like the chance of rain. Shown, never adjusted.
+    case live
 }
 
 struct Input: Codable, Hashable {
@@ -223,6 +232,9 @@ struct Input: Codable, Hashable {
     /// What it's measured in, as its symbol, like m/s or °C. Formulas calculate in it. Empty for
     /// money, percentages, counts and pure numbers.
     var unit = ""
+    /// For a live input, the source field it shows, like `weather.rainChance`. An adjustable
+    /// one can name a field too, to start at its value. Empty otherwise.
+    var source = ""
 
     /// The control to use when the model hasn't picked one, or picked one that doesn't fit.
     var defaultControl: BlockKind {
@@ -284,6 +296,7 @@ extension Input {
         role = try container.decodeIfPresent(InputRole.self, forKey: .role) ?? .adjustable
         symbol = try container.decodeIfPresent(String.self, forKey: .symbol) ?? ""
         unit = try container.decodeIfPresent(String.self, forKey: .unit) ?? ""
+        source = try container.decodeIfPresent(String.self, forKey: .source) ?? ""
     }
 }
 

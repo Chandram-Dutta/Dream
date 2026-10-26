@@ -58,9 +58,10 @@ struct WebPreview: Codable, Hashable {
 
 extension Surface {
     /// The template as it leaves the phone: the questions asked before building keep their
-    /// answers here, and those can be personal (a city, a diet), so they're left out.
+    /// answers here, and those can be personal (a city, a diet), so they're left out. So is
+    /// anything live data read about where the user is.
     var shareable: Surface {
-        var surface = self
+        var surface = forgettingLocation
         surface.answers = nil
         return surface
     }

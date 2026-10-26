@@ -33,6 +33,8 @@ final class Composer {
     private(set) var isThinking = false
     /// The model's questions before it builds, and the user's answers. The screen shows them while the model waits.
     let asking = Asking()
+    /// The live data fetched while writing, which the surface's live inputs bind to.
+    private let live = LiveLog()
 
     /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
     enum Provider: String, CaseIterable {
@@ -80,6 +82,7 @@ final class Composer {
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         asking.start()
+        live.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         do {
             let context = await Prompts.context(for: intent)
@@ -104,6 +107,7 @@ final class Composer {
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
         asking.start(keeping: current.answers)
+        live.start(keeping: current.sources)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         do {
             let context = await Prompts.context(for: intent)
@@ -149,7 +153,8 @@ final class Composer {
     /// The tools a surface is written with. Features that give the model a tool add it here.
     private func tools(found: ReferenceLog) -> [any Tool] {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
-         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
+         LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
     }
 
     private func lookingUp(_ subject: String) {
@@ -233,7 +238,7 @@ final class Composer {
         phase = .composing
         let found = ReferenceLog()
         let session = session(Prompts.surface, tools: tools(found: found))
-        var surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+        var surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming).fetched(live)
         for round in 0...2 {
             let issues = Checker.checkLogic(&surface)
             report(issues)
@@ -241,7 +246,7 @@ final class Composer {
             if problems.isEmpty || round == 2 { break }
             phase = .fixing(problems.count)
             let wire = try await generate(WireSurface.self, in: session, step: "Repair \(round + 1)", prompt: Prompt(Prompts.repair(problems)))
-            surface = Surface(wire, reference: found.first ?? fallback)
+            surface = Surface(wire, reference: found.first ?? fallback).fetched(live)
         }
         await surface.findRecordings()
         report(Checker.checkBlocks(&surface))

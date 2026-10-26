@@ -279,7 +279,7 @@ struct FieldControl: View {
             Text(input.label).foregroundStyle(.secondary)
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 if input.format == .currency {
-                    Text(Currency.symbol)
+                    Text(context.surface.currency(of: input.name).map(Currency.symbol(for:)) ?? Currency.symbol)
                         .font(.display(.title2))
                         .foregroundStyle(.secondary)
                 }

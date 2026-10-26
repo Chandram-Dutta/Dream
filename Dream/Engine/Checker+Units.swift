@@ -33,12 +33,19 @@ extension Checker {
             let shownByFormat = (format == .percent && inside == "%")
                 || (format == .currency && (inside == Currency.symbol || inside.uppercased() == Currency.code || "$€£¥₹".contains(inside)))
             let isUnit = format.isMeasured && (unit.isEmpty ? Units.isUnit(inside) : Units.tidy(inside) == unit)
-            if shownByFormat || isUnit {
+            let isCurrency = format == .currency && Currency.isCode(inside.uppercased())
+            if shownByFormat || isUnit || isCurrency {
                 label = String(match.output.1)
                 if unit.isEmpty, isUnit { unit = Units.tidy(inside) }
+                if unit.isEmpty, isCurrency { unit = inside.uppercased() }
             }
         }
-        if !format.isMeasured { unit = "" }
+        // Money in another currency keeps its code, like USD.
+        if format == .currency, Currency.isCode(unit.uppercased()) {
+            unit = unit.uppercased()
+        } else if !format.isMeasured {
+            unit = ""
+        }
         return (label, unit)
     }
 

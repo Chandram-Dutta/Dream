@@ -8,6 +8,8 @@ final class SurfaceState {
     /// `keepingRecords`, never in the template.
     var records: [String: [Record]] = [:]
     var lists = ListActivity()
+    /// What the surface's live sources last read (LiveFeed.swift).
+    var live = LiveFeed()
 
     func value(_ input: Input) -> Double { values[input.name] ?? input.initial }
 
@@ -73,6 +75,7 @@ struct SurfaceView: View {
         .animation(.smooth(duration: 0.5), value: blocks)
         .animation(.smooth(duration: 0.5), value: surface.related)
         .translating(self.surface, with: translation)
+        .keepingLive(self.surface, state: state)
     }
 }
 

@@ -51,7 +51,7 @@ enum Prompts {
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, soundRules, languageRules, sharingRules].filter { !$0.isEmpty }
+        [memoryRules, listRules, figureRules, soundRules, languageRules, sharingRules, liveRules].filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
@@ -74,7 +74,7 @@ enum Prompts {
     /// What the model is told alongside each request about the user and their device. Each
     /// feature adds its own lines from its own file.
     static func context(for intent: String) async -> [String] {
-        await memoryContext(for: intent) + languageContext(for: intent)
+        await memoryContext(for: intent) + languageContext(for: intent) + liveContext()
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
@@ -148,6 +148,8 @@ enum Prompts {
             return "the \(block.kind.rawValue) block\(block.title.isEmpty ? "" : " \"\(block.title)\"") (#\(block.id))"
         case .sound:
             return "the sound \"\(surface.sound(block.ref)?.label ?? block.ref)\" (\(block.ref), #\(block.id))"
+        case .action:
+            return "the button for \(describeAction(block.ref, in: surface)) (\(block.ref), #\(block.id))"
         }
     }
 }
@@ -171,6 +173,8 @@ extension Surface {
                     lines.append("- \(input.name): \"\(input.label)\", variable \(input.format.rawValue), \(input.min.plain) to \(input.max.plain)\(symbol)")
                 case .adjustable:
                     lines.append("- \(input.name): \"\(input.label)\", \(input.format.rawValue), starts at \(input.initial.plain), \(input.min.plain) to \(input.max.plain), step \(input.step.plain)\(symbol)")
+                case .live:
+                    lines.append("- \(input.name): \"\(input.label)\", live \(input.format.rawValue) from \(input.source), now \(input.initial.plain)\(symbol)")
                 }
             }
         }
@@ -199,6 +203,7 @@ extension Surface {
         var all = ["\(title): \(summary)"] + (collectionSummary.isEmpty ? [] : [collectionSummary]) + lines(visibleBlocks, depth: 0)
         all += soundOutline
         all += visualOutline
+        all += liveOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
         return all.joined(separator: "\n")
     }

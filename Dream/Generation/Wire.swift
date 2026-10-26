@@ -14,7 +14,7 @@ enum WireFormat { case number, integer, currency, percent, toggle, choice }
 enum WireAccent { case blue, teal, green, mint, orange, pink, purple, indigo, red, yellow, cyan, brown }
 
 @Generable
-enum WireRole { case adjustable, given, variable }
+enum WireRole { case adjustable, given, variable, live }
 
 @Generable
 struct WireInput {
@@ -22,8 +22,10 @@ struct WireInput {
     var name: String
     @Guide(description: "Short label the user sees")
     var label: String
-    @Guide(description: "adjustable: the user sets it. given: a fixed known value the formulas need, shown but never changed. variable: what a chart runs along, like time or x")
+    @Guide(description: "adjustable: the user sets it. given: a fixed known value the formulas need, shown but never changed. variable: what a chart runs along, like time or x. live: a value from the live tool, kept current, shown but never changed")
     var role: WireRole
+    @Guide(description: "live: the field it shows, as the live tool named it, like weather.rainChance. Otherwise empty.")
+    var source: String
     @Guide(description: "How it's written in an equation, in LaTeX, like x, \\theta or v_0. Empty for everyday quantities.")
     var symbol: String
     @Guide(description: "What it's measured in, as its symbol, like m, m/s, s, kg, °C, km/h or years. Empty for money, percentages, counts and pure numbers.")
@@ -63,6 +65,7 @@ enum WireBlockKind {
     case sound
     case list, add
     case figure, diagram
+    case action
 }
 
 @Generable
@@ -117,6 +120,8 @@ struct WireSurface {
     var figures: [WireFigure]
     @Guide(description: "Flows, cycles and hierarchies, each shown by a diagram block", .count(0...2))
     var diagrams: [WireDiagram]
+    @Guide(description: "Things the user can do with one tap, each shown by an action block. Usually empty.", .count(0...3))
+    var actions: [WireAction]
     @Guide(.count(1...12))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
@@ -142,6 +147,7 @@ extension Surface {
             collections: Surface.collections(wire.collections))
         sounds = Sound.list(wire.sounds)
         takeVisuals(figures: wire.figures.map(Figure.init), diagrams: wire.diagrams.map(Diagram.init))
+        actions = Action.list(wire.actions)
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -160,6 +166,7 @@ extension Surface {
             collections: Surface.collections(partial: wire.collections))
         sounds = Sound.list(partial: wire.sounds)
         takeVisuals(figures: (wire.figures ?? []).compactMap(Figure.init(partial:)), diagrams: (wire.diagrams ?? []).compactMap(Diagram.init(partial:)))
+        actions = Action.list(partial: wire.actions)
     }
 }
 
@@ -221,7 +228,7 @@ extension Input {
     init(_ wire: WireInput) {
         self.init(name: wire.name, label: wire.label, format: Format(wire.format), initial: wire.initial,
                   min: wire.min, max: wire.max, step: wire.step, options: wire.options,
-                  role: InputRole(wire.role), symbol: wire.symbol, unit: wire.unit)
+                  role: InputRole(wire.role), symbol: wire.symbol, unit: wire.unit, source: wire.source)
     }
 
     init?(partial wire: WireInput.PartiallyGenerated) {
@@ -239,7 +246,8 @@ extension Input {
             options: wire.options ?? [],
             role: wire.role.map { InputRole($0) } ?? .adjustable,
             symbol: wire.symbol ?? "",
-            unit: wire.unit ?? "")
+            unit: wire.unit ?? "",
+            source: wire.source ?? "")
     }
 }
 

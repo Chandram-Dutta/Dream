@@ -12,7 +12,7 @@ extension Prompts {
         Units:
         - Give an input or output a unit whenever it measures something physical or a span of time: m, km, m/s, km/h, s, min, h, kg, °C, L, kWh, years. Use the user's measurement system for everyday things like a trip, a recipe or the weather, and SI units for science and maths, everywhere.
         - The unit goes in unit, as its symbol, never in the label: label Distance, unit km; not Distance (km).
-        - Money, percentages and counts take no unit: their format shows what they are.
+        - Money, percentages and counts take no unit: their format shows what they are. Money in another currency than the user's, like an amount to convert, has format currency and the currency's ISO code as its unit, like USD.
         - Formulas calculate in the units you give, so convert inside a formula when units differ, like speed / 3.6 for km/h in m/s.
         - {name} and \\val{name} show a value with its unit, so never write the unit after them.
         """

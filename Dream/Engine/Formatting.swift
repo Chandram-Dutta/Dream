@@ -3,6 +3,18 @@ import Foundation
 enum Currency {
     static var code: String { Locale.current.currency?.identifier ?? "USD" }
     static var symbol: String { Locale.current.currencySymbol ?? "$" }
+
+    /// Whether a unit is an ISO currency code, like USD: money in a currency other than the
+    /// user's, as a converter shows it.
+    static func isCode(_ unit: String) -> Bool {
+        unit.count == 3 && unit == unit.uppercased() && Locale.commonISOCurrencyCodes.contains(unit)
+    }
+
+    /// The symbol for a currency, as this reader writes it: $ for USD in the US, US$ elsewhere.
+    static func symbol(for code: String) -> String {
+        guard code != self.code else { return symbol }
+        return 0.formatted(.currency(code: code).precision(.fractionLength(0))).filter { !$0.isNumber && !$0.isWhitespace }
+    }
 }
 
 extension Double {
@@ -17,8 +29,7 @@ extension Format {
         guard value.isFinite else { return "—" }
         switch self {
         case .currency:
-            let whole = Swift.abs(value) >= 1000 || value == value.rounded()
-            return value.formatted(.currency(code: Currency.code).precision(.fractionLength(whole ? 0 : 2)))
+            return Self.money(value, code: Currency.code)
         case .percent:
             return (value / 100).formatted(.percent.precision(.fractionLength(0...1)))
         case .integer:
@@ -28,6 +39,12 @@ extension Format {
         case .number, .choice:
             return Self.number(value)
         }
+    }
+
+    /// Whole amounts from a thousand up; cents below that, unless there are none.
+    static func money(_ value: Double, code: String) -> String {
+        let whole = Swift.abs(value) >= 1000 || value == value.rounded()
+        return value.formatted(.currency(code: code).precision(.fractionLength(whole ? 0 : 2)))
     }
 
     /// Two decimals for everyday sizes; significant digits for small ones, so 1/440 isn't 0;
