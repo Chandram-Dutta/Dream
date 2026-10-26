@@ -134,7 +134,7 @@ const refused = (body) => {
     return true;
   }
 };
-expect(refused({ model: "grok-5-ultra", messages: [{ role: "user", content: "hi" }] }), "a model that isn't on the list is refused");
+expect(!refused({ model: "grok-5-ultra", messages: [{ role: "user", content: "hi" }] }) && model.upstreamBody({ model: "grok-5-ultra", messages: [{ role: "user", content: "hi" }] }, env).model === "grok-5-ultra", "a model that isn't on the list isn't refused here: the default answers instead (models.ts)");
 expect(refused({ model: "grok-4.7", messages: [] }), "no messages is refused");
 expect(refused({ model: "grok-4.7", messages: [{ role: "user", content: "hi" }], tools: [{ type: "web_search" }] }), "server-side tools are refused");
 expect(refused({ model: "grok-4.7", messages: [{ role: "user", content: [{ type: "image_url", image_url: { url: "https://example.com/a.png" } }] }] }), "pictures by address are refused; only data: pictures go");

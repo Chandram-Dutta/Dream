@@ -533,6 +533,26 @@ model thinking. The app's xAI adapter and the Dream adapter share one translatio
 (`ChatCompletions.swift`); Grok with your own key and Private Cloud Compute stay in Under the
 hood as developer options.
 
+### Which model
+
+`src/models.ts` lists the models Dream offers, and `MODELS` (wrangler.jsonc) which of them this
+server offers, in Account's order. Everyone gets the first that isn't Dream Plus only, **DeepSeek
+V4.1 Flash** on Workers AI; Dream Plus can pick **Grok 4.7** in Account. The app names the model
+it was given, or none; the server checks the plan on every request, and anything it can't give (a
+Plus model on the free plan, a retired model, an unknown id) gets the default. `GET /api/usage`
+lists the models for Account.
+
+They were chosen with the page bench through a local server (`DREAM_SERVER=http://127.0.0.1:8787
+Tools/bench-many.sh out -xaiModel <id> "request" …`, with `DEV_LOGIN=1`, which lets test accounts
+use any model): on four everyday requests, DeepSeek made every page at about $0.004 each, Grok the
+most careful at about $0.05, GLM 5.3 Flash wrote a rupee page in Spanish, and Kimi K2.6 took up to
+six minutes. Bench a model before adding it.
+
+Workers AI's models go through the same gateway by the AI binding, billed to the account in
+neurons (10,000 a day free, then $0.011 per 1,000), with each account's `x-session-affinity` for
+prompt caching. `src/workersai.ts` joins a tool call's streamed pieces into one call, keeps one
+usage total, and turns neurons into dollars, so usage and limits work the same as for Grok.
+
 ### Through Cloudflare's AI Gateway
 
 Requests go to xAI's **Responses API** through the AI Gateway named in `AI_GATEWAY` (`dream`),

@@ -25,42 +25,29 @@ export interface Model {
   price: { input: number; cached: number; output: number };
 }
 
+// Chosen by running Dream's page bench (Tools/bench-many.sh) through the server, 2026-10-27:
+// DeepSeek V4.1 Flash made every page, in the right language and currency, at about $0.004 a page;
+// Grok 4.7 made the most careful ones (it looks facts up and explains more) at about $0.05. GLM 5.3
+// Flash wrote a rupee page in Spanish pesos, and Kimi K2.6 took up to six minutes a page, so
+// neither is offered.
 export const CATALOG: Model[] = [
   {
-    id: "glm-5.3-flash",
-    name: "GLM 5.3 Flash",
-    note: "Fast, and the one everyone has",
+    id: "deepseek-v4.1-flash",
+    name: "DeepSeek V4.1 Flash",
+    note: "Fast, for everyday pages",
     provider: "workers-ai",
-    upstream: "@cf/zai-org/glm-5.3-flash",
+    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
     plus: false,
-    price: { input: 0.15, cached: 0.03, output: 0.5 },
+    price: { input: 0.3, cached: 0.006, output: 1.2 },
   },
   {
     id: "grok-4.7",
     name: "Grok 4.7",
-    note: "The most careful, for detailed pages",
+    note: "The most careful: looks things up and explains more",
     provider: "xai",
     upstream: "grok-4.7",
     plus: true,
     price: { input: 2, cached: 0.5, output: 6 },
-  },
-  {
-    id: "deepseek-v4.1-flash",
-    name: "DeepSeek V4.1 Flash",
-    note: "Quick, with a long memory for big pages",
-    provider: "workers-ai",
-    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
-    plus: true,
-    price: { input: 0.3, cached: 0.006, output: 1.2 },
-  },
-  {
-    id: "kimi-k2.6",
-    name: "Kimi K2.6",
-    note: "Thinks longer before it answers",
-    provider: "workers-ai",
-    upstream: "@cf/moonshotai/kimi-k2.6",
-    plus: true,
-    price: { input: 0.95, cached: 0.16, output: 4 },
   },
 ];
 

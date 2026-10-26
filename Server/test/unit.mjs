@@ -340,12 +340,12 @@ const failedStream = await new Response(chatStream(events([{ type: "response.cre
 expect(failedStream.trimEnd().endsWith("data: [DONE]") && !failedStream.includes("secret prompt words"), "a failed answer ends without passing on what xAI said");
 
 console.log("Which model answers");
-const all = offered("glm-5.3-flash,grok-4.7,nonsense,kimi-k2.6");
-expect(all.map((model) => model.id).join() === "glm-5.3-flash,grok-4.7,kimi-k2.6" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
-expect(choose(undefined, "free", all)?.id === "glm-5.3-flash" && choose("default", "plus", all)?.id === "glm-5.3-flash", "nothing asked for is the default, on either plan");
-expect(choose("grok-4.7", "plus", all)?.id === "grok-4.7" && choose("grok-4.7", "free", all)?.id === "glm-5.3-flash", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
+const all = offered("deepseek-v4.1-flash,nonsense,grok-4.7");
+expect(all.map((model) => model.id).join() === "deepseek-v4.1-flash,grok-4.7" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
+expect(choose(undefined, "free", all)?.id === "deepseek-v4.1-flash" && choose("default", "plus", all)?.id === "deepseek-v4.1-flash", "nothing asked for is the default, on either plan");
+expect(choose("grok-4.7", "plus", all)?.id === "grok-4.7" && choose("grok-4.7", "free", all)?.id === "deepseek-v4.1-flash", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
 expect(choose("grok-4.7", "free", all, true)?.id === "grok-4.7", "test accounts on the bench may use any");
-expect(choose("grok-5-heavy", "plus", all).id === "glm-5.3-flash" && choose(42, "plus", all).id === "glm-5.3-flash", "a model nobody offers, or one since retired, gets the default instead");
+expect(choose("grok-5-heavy", "plus", all).id === "deepseek-v4.1-flash" && choose(42, "plus", all).id === "deepseek-v4.1-flash", "a model nobody offers, or one since retired, gets the default instead");
 expect(choose(undefined, "free", offered("grok-4.7"))?.id === "grok-4.7", "with only Plus models offered, the first is everyone's");
 
 console.log("Workers AI, as the app reads it");
@@ -364,7 +364,7 @@ const workers = await new Response(
       { response: "", usage: { prompt_tokens: 183, completion_tokens: 37, total_tokens: 220, prompt_tokens_details: { cached_tokens: 128 }, neurons: 4 } },
       "[DONE]",
     ]),
-    "glm-5.3-flash",
+    "deepseek-v4.1-flash",
   ),
 ).text();
 const workerChunks = workers.split("\n").filter((line) => line.startsWith("data:") && !line.includes("[DONE]")).map((line) => JSON.parse(line.slice(5)));
@@ -373,7 +373,7 @@ expect(wholeCalls.length === 1 && wholeCalls[0].id === "call_1" && wholeCalls[0]
 expect(workers.includes('"reasoning_content":"Thinking"') && workers.includes('"finish_reason":"tool_calls"') && workers.trimEnd().endsWith("data: [DONE]"), "reasoning as it comes, then the finish and [DONE]");
 const workerUsage = workerChunks.filter((chunk) => chunk.usage);
 expect(workerUsage.length === 1 && workerUsage[0].usage.total_tokens === 220 && workerUsage[0].usage.prompt_tokens_details.cached_tokens === 128 && workerUsage[0].usage.cost_in_usd_ticks === 440_000, "one usage, the total, with neurons as dollars");
-expect(workersUsage({ prompt_tokens: 10, completion_tokens: 5, neurons: 1 })?.cost_in_usd_ticks === 110_000 && workersCompletion({ choices: [], usage: { prompt_tokens: 1, neurons: 2 } }, "glm-5.3-flash").usage.cost_in_usd_ticks === 220_000, "a neuron is $0.000011");
+expect(workersUsage({ prompt_tokens: 10, completion_tokens: 5, neurons: 1 })?.cost_in_usd_ticks === 110_000 && workersCompletion({ choices: [], usage: { prompt_tokens: 1, neurons: 2 } }, "deepseek-v4.1-flash").usage.cost_in_usd_ticks === 220_000, "a neuron is $0.000011");
 
 console.log("Apple's sign-in keys, kept for every server");
 const { publicKey } = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);
