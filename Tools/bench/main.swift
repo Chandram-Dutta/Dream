@@ -38,10 +38,30 @@ while let argument = remaining.popFirst() {
 }
 // The bench has no one to ask, so questions are printed and left to the model. "-memory
 // 'Home city=Pune; Diet=Vegetarian'" stands in for what the app remembers about the user.
+var remembered: [Remembered] = []
 if let memory = UserDefaults.standard.string(forKey: "memory") {
-    Recall.source = .fixed(memory.split(separator: ";").compactMap { pair in
+    remembered = memory.split(separator: ";").compactMap { pair in
         let parts = pair.split(separator: "=", maxSplits: 1).map { $0.trimmingCharacters(in: .whitespaces) }
         return parts.count == 2 ? Remembered(topic: parts[0], detail: parts[1]) : nil
-    })
+    }
+    Recall.source = .fixed(remembered)
+}
+// "-signIn https://mcp.linear.app/mcp" tries a sign-in as far as it can go without a browser:
+// discovery, registering Dream with the server's sign-in service as a real sign-in would, and
+// the page it would open. Nothing is saved on this Mac.
+if let address = UserDefaults.standard.string(forKey: "signIn") {
+    await BenchConnections.trySignIn(address)
+    exit(0)
+}
+// "-mcp https://mcp.deepwiki.com/mcp" connects servers for the run (several, separated by
+// spaces), offered the way the app offers them. "-mcpReads all", or a list of tool names,
+// stands in for the user saying tools whose servers don't mark them only read. "-pickOnly 1"
+// shows which tools each request would be offered, without running the model.
+if let servers = UserDefaults.standard.string(forKey: "mcp") {
+    await BenchConnections.connect(servers.split(separator: " ").map(String.init), reads: UserDefaults.standard.string(forKey: "mcpReads") ?? "", remembered: remembered)
+}
+if UserDefaults.standard.bool(forKey: "pickOnly") {
+    BenchConnections.showPicks(arguments)
+    exit(0)
 }
 await run(arguments.isEmpty ? defaultRequests : arguments)

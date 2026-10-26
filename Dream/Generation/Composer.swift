@@ -66,6 +66,8 @@ final class Composer {
     private var active: Provider = .xai
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
+    /// What the user asked for, which picks the connected services' tools worth offering.
+    private var request = ""
 
     func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
@@ -76,6 +78,7 @@ final class Composer {
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         asking.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
+        request = intent
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt {
@@ -104,6 +107,7 @@ final class Composer {
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
         asking.start(keeping: current.answers)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
+        request = "\(intent). \(instruction)"
         do {
             let context = await Prompts.context(for: intent)
             let prompt = Prompt(Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context))
@@ -150,6 +154,7 @@ final class Composer {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          AskTool(asking: asking, onAsk: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+            + ConnectionTool.offered(for: request, asking: asking, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
     }
 
     private func lookingUp(_ subject: String) {
