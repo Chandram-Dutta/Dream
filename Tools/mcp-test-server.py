@@ -10,6 +10,20 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 
 TOOLS = [
     {
+        "name": "list_tasks",
+        "description": "List the team's tasks in the user's team notes, with how many are still open.",
+        "annotations": {"title": "List tasks", "readOnlyHint": True},
+        "inputSchema": {"type": "object", "properties": {"status": {"enum": ["open", "all"]}}},
+    },
+    {
+        "name": "add_task",
+        "description": "Add a task to the user's team notes.",
+        "annotations": {"title": "Add task", "readOnlyHint": False, "destructiveHint": False},
+        "inputSchema": {"type": "object", "properties": {
+            "title": {"type": "string"}, "due_date": {"type": "string", "format": "date"}, "points": {"type": "integer"}},
+            "required": ["title"]},
+    },
+    {
         "name": "search_notes",
         "description": "Search the user's team notes by keyword. Returns matching notes with their text.",
         "annotations": {"title": "Search notes", "readOnlyHint": True},
@@ -57,6 +71,8 @@ RESULT = (
 
 
 class Handler(BaseHTTPRequestHandler):
+    calls = 0
+
     def log_message(self, *args):
         pass
 
@@ -82,7 +98,17 @@ class Handler(BaseHTTPRequestHandler):
         elif method == "tools/call":
             params = body.get("params", {})
             print("CALL", json.dumps(params), flush=True)
-            result = {"content": [{"type": "text", "text": RESULT}], "isError": False}
+            if params.get("name") == "list_tasks":
+                # One more task each time, so a refresh visibly changes.
+                Handler.calls += 1
+                tasks = [{"id": f"T{i}", "title": title, "done": i == 1, "due_date": f"2026-11-0{i}", "points": i * 2}
+                         for i, title in enumerate(["Book the venue", "Send the agenda", "Order lunch", "Print badges", "Plan the dinner"][: 2 + Handler.calls], 1)]
+                data = {"open": sum(not t["done"] for t in tasks), "tasks": tasks}
+                result = {"content": [{"type": "text", "text": json.dumps(data)}], "structuredContent": data, "isError": False}
+            elif params.get("name") in ("add_task", "delete_note", "append_note"):
+                result = {"content": [{"type": "text", "text": "Done."}], "isError": False}
+            else:
+                result = {"content": [{"type": "text", "text": RESULT}], "isError": False}
         else:
             print("OTHER", method, flush=True)
             result = {}

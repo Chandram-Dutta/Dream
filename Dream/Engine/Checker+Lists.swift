@@ -158,7 +158,8 @@ extension Checker {
             blocks.flatMap { block -> [Block] in
                 var block = block
                 block.children = withAddBars(block.children)
-                guard block.kind == .list, !adding.contains(block.ref), let collection = surface.collection(block.ref) else { return [block] }
+                // A list a service fills is the service's to add to.
+                guard block.kind == .list, !adding.contains(block.ref), let collection = surface.collection(block.ref), collection.source == nil else { return [block] }
                 issues.append(Issue(kind: .fixed, message: "Added a bar for adding to '\(collection.name)'."))
                 return [Block(id: uniqueID("\(collection.name)-add"), kind: .add, ref: collection.name), block]
             }

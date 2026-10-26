@@ -21,6 +21,9 @@ struct Source: Codable, Hashable, Sendable {
     var parameters: [String: String]
     /// What it read when it was fetched while writing.
     var fields: [SourceField]
+    /// Lists it reads, like a service's open issues, which collections can show. Nil for the
+    /// sources that read only numbers.
+    var lists: [SourceList]? = nil
 
     subscript(parameter: String) -> String { parameters[parameter] ?? "" }
     func field(_ name: String) -> SourceField? { fields.first { $0.name == name } }
@@ -52,6 +55,8 @@ struct SourceReading: Hashable, Sendable {
     /// Not real: on the bench a provider that can't authorize stands values in, so the format
     /// can still be tried. Always shown as such.
     var isStandIn = false
+    /// The rows of each list it read, by list name, each row's values by key.
+    var lists: [String: [[String: RecordValue]]] = [:]
 
     func field(_ name: String) -> SourceField? { fields.first { $0.name == name } }
 }
@@ -114,6 +119,7 @@ extension Surface {
                 if let input = input(name), input.role == .live, let binding = input.binding, !found.contains(binding.source) {
                     found.append(binding.source)
                 }
+                if let bound = collection(name)?.listSource, !found.contains(bound.source) { found.append(bound.source) }
             }
             block.children.forEach(walk)
         }

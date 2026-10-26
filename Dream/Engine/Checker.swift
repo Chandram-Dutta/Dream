@@ -66,6 +66,7 @@ enum Checker {
         if !madeCurrency.isEmpty { fixed("Showed \(madeCurrency.map { "'\($0)'" }.joined(separator: ", ")) as money.") }
         issues += checkUnits(&surface)
         issues += checkLive(&surface)
+        issues += checkServiceLists(&surface)
 
         if surface.inputs.isEmpty && !totalsRecords(surface) { problem("The calculation has results but no inputs, so nothing can change.") }
         if surface.outputs.isEmpty && !surface.showsLiveValues { problem("The calculation has inputs but no results calculated from them.") }

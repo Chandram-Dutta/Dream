@@ -44,6 +44,9 @@ struct Surface: Codable, Hashable {
     var sources: [Source]? = nil
     /// What the user can do with one tap, like adding an event to their calendar (Action.swift).
     var actions: [Action]? = nil
+    /// The connected services whose data was read into it, like Linear, by name. What a service
+    /// returned is written into the page, so sharing says so first (Live+Connections.swift).
+    var services: [String]? = nil
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 

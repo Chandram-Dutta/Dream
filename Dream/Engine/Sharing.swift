@@ -61,7 +61,7 @@ extension Surface {
     /// answers here, and those can be personal (a city, a diet), so they're left out. So is
     /// anything live data read about where the user is.
     var shareable: Surface {
-        var surface = forgettingLocation
+        var surface = forgettingLocation.forgettingConnections
         surface.answers = nil
         return surface
     }
@@ -224,7 +224,7 @@ extension SharedSurface {
         }
         guard shared.format <= currentFormat else { throw ShareError.newer }
 
-        var surface = shared.surface.bounded
+        var surface = shared.surface.bounded.forgettingConnections
         surface.answers = nil
         surface.reference = surface.reference?.trusted
         surface.sounds = surface.sounds?.map { sound in

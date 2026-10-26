@@ -41,6 +41,10 @@ extension SurfaceState {
                     for (input, value) in surface.liveValues(reading, from: name) where values[input] != value {
                         values[input] = value
                     }
+                    // A list a connected service fills, like open issues, takes its rows as they are now.
+                    for (collection, entries) in surface.serviceRecords(reading, from: name) where records[collection] != entries {
+                        records[collection] = entries
+                    }
                 }
             }
         }
