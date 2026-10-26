@@ -17,6 +17,8 @@ let defaultRequests = [
         print("\n==================== \(request)")
         let composer = Composer()
         await composer.compose(intent: request)
+        let answers = composer.surface?.answers ?? []
+        print(answers.isEmpty ? "Asked: nothing" : "Asked: " + answers.map { "\($0.question.text)\($0.isRemembered ? " (remembered: \($0.choice))" : "")" }.joined(separator: "; "))
         guard let surface = composer.surface, surface.hasLogic else { continue }
         print(surface.logicSummary)
         let evaluation = surface.evaluate(surface.initialValues)

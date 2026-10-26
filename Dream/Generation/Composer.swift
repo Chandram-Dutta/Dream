@@ -66,6 +66,11 @@ final class Composer {
     private var active: Provider = .xai
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
+    /// While the gap check decides, the page streams in out of sight for a few seconds, so it
+    /// rarely appears only to give way to questions.
+    private var isChecking = false
+    private var held: Surface?
+    private var holdUntil = Date.distantPast
 
     func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
@@ -78,12 +83,8 @@ final class Composer {
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         do {
             let context = await Prompts.context(for: intent)
-            let prompt = Prompt {
-                Prompts.surfaceRequest(intent, hasImage: image != nil, context: context)
-                if let image { Attachment(image) }
-            }
             try await withModel {
-                try await self.write(prompt: prompt, fallback: nil, streaming: true)
+                try await self.write(request: intent, image: image, context: context)
             }
             guard let surface, !surface.isEmpty else { throw ComposeError("Nothing came out of this. Try asking another way.") }
             recordLocale(likely: Languages.guess(intent)?.rawValue)
@@ -148,7 +149,6 @@ final class Composer {
     /// The tools a surface is written with. Features that give the model a tool add it here.
     private func tools(found: ReferenceLog) -> [any Tool] {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
-         AskTool(asking: asking, onAsk: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
     }
 
@@ -156,6 +156,73 @@ final class Composer {
         phase = .researching
         isThinking = true
         note("Lookup: \(subject)")
+    }
+
+    // MARK: - Asking
+
+    /// Writes the surface for a request while a quick check, in its own session, looks for what
+    /// the request leaves out that only the user can tell (`GapCheck`). If it finds nothing, the
+    /// writing carries on untouched. If it has questions, the writing stops, what Dream remembers
+    /// or the user answers them, and it starts again with the answers.
+    private func write(request intent: String, image: CGImage?, context: [String]) async throws {
+        func prompt(_ answers: [Answer]) -> Prompt {
+            Prompt {
+                Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.answersContext(answers))
+                if let image { Attachment(image) }
+            }
+        }
+        // A photo usually settles what it's about; and on a second model, the answers are in.
+        guard image == nil, asking.answers.isEmpty else {
+            return try await write(prompt: prompt(asking.answers), fallback: nil, streaming: true)
+        }
+        let started = Date()
+        let first = prompt([])
+        isChecking = true
+        held = nil
+        holdUntil = started.addingTimeInterval(GapCheck.hold)
+        defer { isChecking = false; held = nil }
+        let checking = Task { await self.gaps(in: intent) }
+        let writing = Task { try await self.write(prompt: first, fallback: nil, streaming: true) }
+        try await withTaskCancellationHandler {
+            let gaps = await checking.value
+            guard !gaps.questions.isEmpty else {
+                note(String(format: "Check: nothing to ask (%.1fs%@)", gaps.seconds, held == nil ? "" : ", while the page was held back"))
+                isChecking = false
+                if surface == nil, let held { surface = held }
+                try await writing.value
+                return
+            }
+            writing.cancel()
+            note(String(format: "Check: %d to ask after %.1fs, so the screen stopped %@: ", gaps.questions.count, gaps.seconds, surface != nil ? "after it showed" : held != nil ? "before it showed" : "before it began")
+                 + gaps.questions.map { "\($0.text) (\($0.options.joined(separator: " / "))\($0.allowsTyping ? ", or typed" : ""))" }.joined(separator: "; "))
+            for answer in gaps.remembered { note("Remembered: \(answer.question.topic)") }
+            let answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
+            note("Answered: " + answers.map { $0.isLeftToDream ? "You choose" : $0.isRemembered ? "\($0.choice) (remembered)" : $0.choice }.joined(separator: "; ")
+                 + " after \(elapsed(since: started))")
+            _ = await writing.result
+            surface = nil
+            isChecking = false
+            try await write(prompt: prompt(answers), fallback: nil, streaming: true)
+        } onCancel: {
+            checking.cancel()
+            writing.cancel()
+        }
+    }
+
+    /// A partial surface goes on screen, unless the gap check has only just started deciding.
+    private func show(_ partial: Surface) {
+        if isChecking, Date.now < holdUntil { held = partial } else { surface = partial }
+    }
+
+    /// The gap check, on the model this request runs on. If it fails, nothing is asked.
+    private func gaps(in intent: String) async -> GapCheck.Gaps {
+        let started = Date()
+        do {
+            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []))
+        } catch {
+            note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
+            return GapCheck.Gaps()
+        }
     }
 
     // MARK: - Writing
@@ -185,7 +252,7 @@ final class Composer {
 
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
     private func generateSurface(in session: LanguageModelSession, prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
-        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.surface = Surface(partial: $0, reference: found.first ?? fallback).answered(self.asking.answers) } : nil
+        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.show(Surface(partial: $0, reference: found.first ?? fallback).answered(self.asking.answers)) } : nil
         do {
             let wire = try await generate(WireSurface.self, in: session, step: "Surface", options: GenerationOptions(temperature: 0.4), prompt: prompt,
                                           onPartial: onPartial, isRunaway: { Surface(partial: $0, reference: nil).isRepeatingItself })
@@ -255,8 +322,6 @@ final class Composer {
         let watchdog = Task { @MainActor in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
-                // Waiting for the user to answer isn't a stall.
-                if self.asking.isWaiting { continue }
                 if !self.isThinking, Date.now.timeIntervalSince(watch.lastChange) > 1.5 { self.isThinking = true }
                 let latest = max(watch.lastChange, ModelActivity.lastSeen)
                 if Date.now.timeIntervalSince(latest) > patience {
