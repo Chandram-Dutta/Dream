@@ -316,6 +316,8 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
   body.model = chosen.upstream;
+  if (chosen.effort === null) delete body.reasoning_effort;
+  else if (chosen.effort !== undefined) body.reasoning_effort = chosen.effort;
   const refusal = await admitModel(env, user.id, pageID, account);
   if (refusal) return refusalResponse(refusal);
 

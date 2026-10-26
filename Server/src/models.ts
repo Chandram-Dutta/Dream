@@ -23,6 +23,9 @@ export interface Model {
   plus: boolean;
   /** Dollars per million tokens, for when the provider doesn't say what a request cost. */
   price: { input: number; cached: number; output: number };
+  /** How much it thinks first, in place of what the app asks: "none" to answer at once, or null
+   * for a model that doesn't think and takes no setting. Left out, the app's choice stands. */
+  effort?: string | null;
 }
 
 // Chosen by running Dream's page bench (Tools/bench-many.sh) through the server, 2026-10-27:
@@ -48,6 +51,47 @@ export const CATALOG: Model[] = [
     upstream: "grok-4.7",
     plus: true,
     price: { input: 2, cached: 0.5, output: 6 },
+  },
+  // Faster candidates, thinking little or not at all, to bench before offering (MODELS decides).
+  {
+    id: "deepseek-v4.1-flash-instant",
+    name: "DeepSeek V4.1 Flash, instant",
+    note: "Answers without thinking first",
+    provider: "workers-ai",
+    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    plus: false,
+    price: { input: 0.3, cached: 0.006, output: 1.2 },
+    effort: "none",
+  },
+  {
+    id: "grok-4.20-fast",
+    name: "Grok 4.20 Fast",
+    note: "Grok without the thinking",
+    provider: "xai",
+    upstream: "grok-4.20-0309-non-reasoning",
+    plus: true,
+    price: { input: 2, cached: 0.5, output: 6 },
+    effort: null,
+  },
+  {
+    id: "mistral-small-3.1",
+    name: "Mistral Small 3.1",
+    note: "Quick, no thinking",
+    provider: "workers-ai",
+    upstream: "@cf/mistralai/mistral-small-3.1-24b-instruct",
+    plus: false,
+    price: { input: 0.351, cached: 0.351, output: 0.555 },
+    effort: null,
+  },
+  {
+    id: "llama-4-scout",
+    name: "Llama 4 Scout",
+    note: "Quick, no thinking",
+    provider: "workers-ai",
+    upstream: "@cf/meta/llama-4-scout-17b-16e-instruct",
+    plus: false,
+    price: { input: 0.27, cached: 0.27, output: 0.85 },
+    effort: null,
   },
 ];
 
