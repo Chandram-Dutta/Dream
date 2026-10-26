@@ -33,6 +33,8 @@ extension SurfaceState {
         if undoable {
             lists.undo = RecordUndo(message: Self.describe(operations, in: surface, before: before), before: before, collections: Set(operations.map(\.collection)))
         }
+        let added = operations.filter { if case .insert = $0 { true } else { false } }.count
+        if added > 0 { Analytics.send(.listEntriesAdded(count: added)) }
     }
 
     func undoLastChange() {

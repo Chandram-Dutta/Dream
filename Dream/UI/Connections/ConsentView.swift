@@ -9,8 +9,12 @@ struct ConsentView: View {
 
     var body: some View {
         if let request = consent.pending {
-            ConsentCard(request: request, palette: palette) { consent.answer($0) }
+            ConsentCard(request: request, palette: palette) { answer in
+                Analytics.send(.toolPromptAnswered(answer == .always ? .always : answer == .once ? .once : .deny))
+                consent.answer(answer)
+            }
                 .id(request.id)
+                .onAppear { Analytics.send(.toolPromptShown) }
                 .transition(.scale(scale: 0.96, anchor: .top).combined(with: .opacity))
         }
     }

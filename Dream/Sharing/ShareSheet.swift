@@ -153,6 +153,7 @@ struct ShareSheet: View {
                 ShareLink(item: Image(uiImage: picture), preview: SharePreview(title, image: Image(uiImage: picture))) {
                     action("Share picture", symbol: "photo", prominent: false)
                 }
+                .simultaneousGesture(TapGesture().onEnded { Analytics.send(.shared(.picture, withNumbers: includesNumbers)) })
             } else {
                 action("Share picture", symbol: "photo", prominent: false)
                     .opacity(0.5)
@@ -205,6 +206,7 @@ struct ShareSheet: View {
         do {
             let link = try await ShareServer.upload(shared, to: server)
             links[mode] = link.url
+            Analytics.send(.shared(.link, withNumbers: mode))
         } catch {
             failure = error.localizedDescription
         }

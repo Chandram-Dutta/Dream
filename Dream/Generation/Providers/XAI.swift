@@ -25,7 +25,7 @@ struct XAILanguageModel: LanguageModel {
 
     /// The key from the environment (for the Mac bench), else the Keychain.
     static var savedKey: String? {
-        if let key = ProcessInfo.processInfo.environment["XAI_API_KEY"], !key.isEmpty { return key }
+        if let key = Build.environment("XAI_API_KEY") { return key }
         return Keychain.read("xai")
     }
 }
@@ -202,9 +202,9 @@ struct XAIExecutor: LanguageModelExecutor {
         return CGImageDestinationFinalize(destination) ? data as Data : nil
     }
 
-    /// Shows in the console when debugging, like the composer's own log.
-    private static func trace(_ line: String) {
-        print("[Dream/xAI] \(line)")
+    /// Shows in the console when debugging, like the composer's own log. Never in Release.
+    private static func trace(_ line: @autoclosure () -> String) {
+        Build.trace("[Dream/xAI] \(line())")
     }
 
     private static func tokens(in text: String) -> Int {

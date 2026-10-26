@@ -17,5 +17,11 @@
 	</array>
 	<key>DreamShareHost</key>
 	<string>$(DREAM_SHARE_HOST)</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
+	<key>PostHogHost</key>
+	<string>$(POSTHOG_HOST)</string>
+	<key>PostHogKey</key>
+	<string>$(POSTHOG_KEY)</string>
 </dict>
 </plist>

@@ -1,5 +1,6 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
-// domains file, web search and reading, and the protections. With no address given, it applies
+// domains file, web search and reading, the policy pages, crash reports, and the protections.
+// With no address given, it applies
 // the migrations to a local database and starts `wrangler dev` itself, with web search pointed at
 // a stand-in for Parallel on this Mac (test/stub-parallel.mjs), so no search is paid for. Reading
 // fetches example.com and example.org, and asks Cloudflare's resolver about names, so it needs
@@ -9,7 +10,8 @@
 //   DREAM_SHARE_URL=http://127.0.0.1:8787 npm test   against a server that's already running
 //
 // Against a server that's already running, the web checks need its app key in DREAM_WEB_KEY, and
-// only the ones refused before anything is paid for run.
+// only the ones refused before anything is paid for run. Crash reports are only stored locally,
+// and the diagnostics summary is only read there, with a key made for the test.
 
 import { spawn, execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -19,6 +21,7 @@ import { STUB_KEY, startStub } from "./stub-parallel.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = readFileSync(join(root, "test/fixtures/split-bill.json"), "utf8");
+const diagnostics = readFileSync(join(root, "test/fixtures/diagnostics.json"), "utf8");
 let failures = 0;
 
 function expect(condition, message) {
@@ -30,15 +33,17 @@ function expect(condition, message) {
 const LOCAL_APP_KEY = "test-app-key-0123456789abcdef";
 /** Provider calls a day, low enough to reach in a test. */
 const LOCAL_DAILY_LIMIT = 4;
+/** The operator's key the local server is started with, for the diagnostics summary. */
+const LOCAL_ADMIN_KEY = "test-admin-key-0123456789abcdef";
 
 async function startLocal(stub) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
   execFileSync("npx", ["wrangler", "d1", "migrations", "apply", "dream-share", "--local"], { cwd: root, env, stdio: "ignore" });
   // Each run starts with nothing cached and nothing spent today.
-  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage; DELETE FROM diagnostics;"], { cwd: root, env, stdio: "ignore" });
   const port = 18_000 + Math.floor(Math.random() * 2_000);
   // These take the place of anything in .dev.vars, so the real Parallel key is never used here.
-  const vars = [`PARALLEL_BASE_URL:${stub.base}`, `PARALLEL_API_KEY:${STUB_KEY}`, `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`, `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`].flatMap((pair) => ["--var", pair]);
+  const vars = [`PARALLEL_BASE_URL:${stub.base}`, `PARALLEL_API_KEY:${STUB_KEY}`, `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`, `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`, `ADMIN_KEY:${LOCAL_ADMIN_KEY}`].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
@@ -57,7 +62,7 @@ async function startLocal(stub) {
     stop() {
       child.kill("SIGTERM");
       // What the test spent and cached would otherwise hold back a `wrangler dev` run afterwards.
-      execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+      execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage; DELETE FROM diagnostics;"], { cwd: root, env, stdio: "ignore" });
     },
   };
 }
@@ -299,11 +304,70 @@ async function runWeb(base, key, stub) {
   expect(limited, "and too many reads");
 }
 
+/** The policy pages, crash reports and their summary. Reports are only stored by a local
+ * server, and the summary only read there. */
+async function runRelease(base, local) {
+  console.log("Privacy policy, terms and support");
+  for (const [path, title] of [["/privacy", "Privacy policy"], ["/terms", "Terms of use"], ["/support", "Support"]]) {
+    const response = await fetch(`${base}${path}`);
+    const page = await response.text();
+    expect(response.status === 200 && response.headers.get("content-type")?.startsWith("text/html"), `${path} is a page`);
+    expect(page.includes(`<h1>${title}</h1>`) && page.includes("Draft, needs legal review"), `${path} says it's a draft`);
+    expect(response.headers.get("content-security-policy")?.includes("default-src 'none'") && !page.includes("<script"), `${path} has no scripts`);
+  }
+  let response = await fetch(`${base}/privacy/`);
+  expect(response.status === 200, "a trailing slash works too");
+  const policy = await (await fetch(`${base}/privacy`)).text();
+  expect(["Cloudflare", "xAI", "Parallel", "Apple", "Wikimedia", "PostHog"].every((name) => policy.includes(name)), "the policy names every company that handles data");
+  expect(policy.includes("Digital Personal Data Protection Act") && policy.includes("GDPR"), "and rights under the GDPR and India's DPDP Act");
+  response = await fetch(`${base}/terms`, { method: "POST" });
+  expect(response.status === 405, "the pages are read-only");
+
+  console.log("Crash and hang reports");
+  const report = (body, type = "application/json") => fetch(`${base}/api/diagnostics`, { method: "POST", headers: { "Content-Type": type }, body });
+  if (local) {
+    response = await report(diagnostics);
+    expect(response.status === 202 && (await response.json()).accepted === 3, "a day's reports are accepted");
+  }
+  response = await fetch(`${base}/api/diagnostics`);
+  expect(response.status === 405, "only POST");
+  response = await report(diagnostics, "text/plain");
+  expect(response.status === 415, "only application/json");
+  const one = JSON.parse(diagnostics);
+  response = await report(JSON.stringify({ ...one, reports: [{ ...one.reports[2], kind: "freeze" }] }));
+  expect(response.status === 400, "a report of another kind is refused");
+  response = await report(JSON.stringify({ ...one, padding: "x".repeat(300_000) }));
+  expect(response.status === 413, "a body over 256 KB is refused");
+
+  console.log("The diagnostics summary");
+  const summary = (key) => fetch(`${base}/api/admin/diagnostics?days=7`, { headers: key ? { "X-Admin-Key": key } : {} });
+  response = await summary();
+  expect(local ? response.status === 403 : [403, 404].includes(response.status), "not without the operator's key");
+  if (local) {
+    response = await summary("a-wrong-admin-key-of-good-length");
+    expect(response.status === 403, "not with a wrong key");
+    response = await summary(LOCAL_ADMIN_KEY);
+    const seen = await response.json();
+    expect(response.status === 200 && response.headers.get("cache-control") === "no-store", "200 with the key, and never cached");
+    expect(seen.total === 3 && seen.byKind?.crash === 1 && seen.byKind?.hang === 1 && seen.byKind?.launch === 1, "counts by kind");
+    expect(seen.byVersion?.[0]?.app === "1.0" && seen.byVersion?.[0]?.build === "7" && seen.perDay?.length === 1, "by version and by day");
+    expect(seen.topSignatures?.some((item) => item.signature === "EXC_BREAKPOINT SIGTRAP Dream+0x1a2b4" && item.count === 1 && item.latest === "1.0 (7)"), "grouped by where they happened");
+    expect(seen.durations?.hang?.max === 2.5 && seen.durations?.launch?.average === 4.25, "how long hangs and launches took");
+    response = await fetch(`${base}/api/admin/diagnostics?days=900`, { headers: { "X-Admin-Key": LOCAL_ADMIN_KEY } });
+    expect(response.status === 400, "at most 90 days");
+
+    let limited = false;
+    for (let i = 0; i < 15 && !limited; i++) limited = (await report("{nope")).status === 429;
+    expect(limited, "too many reports from one address are refused for a while");
+  }
+}
+
 const remote = process.env.DREAM_SHARE_URL;
 const stub = remote ? null : await startStub();
 const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub);
 try {
   await run(server.base);
+  await runRelease(server.base, !remote);
   const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
   if (key) await runWeb(server.base, key, stub);
   else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY isn't set for this server.");

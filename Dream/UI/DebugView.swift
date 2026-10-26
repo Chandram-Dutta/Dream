@@ -42,6 +42,8 @@ struct DebugView: View {
                 }
                 ShareServerSettings()
                 WebSearchSettings()
+                // Until Account has it (workstream A), the choice can be changed here while testing.
+                ImproveDreamSection()
                 Section {
                     NavigationLink("Connections") { ConnectionsView() }
                 }

@@ -35,7 +35,7 @@ struct WeatherProvider: LiveProvider {
         } catch {
             if LiveSources.standIns { return forecast.standIn() }
             // The reason stays in the console: it's for whoever set WeatherKit up, not the reader.
-            print("[Dream] WeatherKit failed: \(error)")
+            Build.trace("[Dream] WeatherKit failed: \(error)")
             throw LiveError(.unavailable, "The weather isn't available right now.")
         }
     }

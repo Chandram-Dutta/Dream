@@ -9,6 +9,7 @@ struct DreamApp: App {
     init() {
         Memory.start(container)
         ConnectionStore.shared.start(container)
+        ImproveDream.start()
     }
 
     var body: some Scene {

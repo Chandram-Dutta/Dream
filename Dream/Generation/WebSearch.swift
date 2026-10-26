@@ -16,7 +16,7 @@ enum WebService {
     /// The server: the one set for web search in Under the hood, else the one links are shared on.
     static var base: URL? {
         for setting in ["webServer", "shareServer"] {
-            if let custom = UserDefaults.standard.string(forKey: setting), let url = ServerAddress.normalized(custom) { return url }
+            if let custom = Build.setting(setting), let url = ServerAddress.normalized(custom) { return url }
         }
         return (Bundle.main.object(forInfoDictionaryKey: "DreamShareHost") as? String).flatMap(ServerAddress.normalized)
     }
@@ -24,7 +24,7 @@ enum WebService {
     /// What shows the server it's Dream asking (Server/README.md). On the Mac bench it comes from
     /// the environment; on the phone, from the Keychain, where Under the hood saves it.
     static var key: String? {
-        if let key = ProcessInfo.processInfo.environment["DREAM_WEB_KEY"], !key.isEmpty { return key }
+        if let key = Build.environment("DREAM_WEB_KEY") { return key }
         return Keychain.read("web")
     }
 

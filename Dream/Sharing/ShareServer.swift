@@ -7,7 +7,7 @@ enum ShareServer {
     /// made for (the `DREAM_SHARE_HOST` build setting, which also names the universal-link
     /// domain). Nil until one is set.
     static var base: URL? {
-        if let custom = UserDefaults.standard.string(forKey: "shareServer"), let url = normalized(custom) { return url }
+        if let custom = Build.setting("shareServer"), let url = normalized(custom) { return url }
         return builtIn
     }
 

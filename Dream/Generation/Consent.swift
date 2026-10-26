@@ -137,7 +137,7 @@ final class Consent {
             var answer = ConsentAnswer.deny
             if case .automatic(let given) = Self.answerer { answer = given == .always && request.always == nil ? .once : given }
             let named: [ConsentAnswer: String] = [.once: "Allow once", .always: request.always ?? "", .deny: "Don't allow"]
-            print("[Dream] Asked: \(request.question)\(request.note.map { " (\($0))" } ?? "") — "
+            Build.trace("[Dream] Asked: \(request.question)\(request.note.map { " (\($0))" } ?? "") — "
                   + (request.values.map { "\($0.name): \($0.text)" } + request.personal.map { "personal: \($0.text), from \($0.from)" }).joined(separator: "; ")
                   + (request.always.map { " [Allow once / \($0) / Don't allow]" } ?? " [Allow once / Don't allow]") + " → \(named[answer] ?? "")")
             return answer
