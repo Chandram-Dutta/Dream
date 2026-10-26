@@ -119,6 +119,7 @@ Sizes: S is up to half a day, M about a day, L more than a day.
 
 **9. Sharing (M–L)** (on Cloudflare)
 - What gets shared is a surface, not a chat. Blank by default; your numbers only when you choose.
+- Strip `Surface.answers` before sharing: personal answers (city, diet, household) are stored on the surface.
 - Three levels:
   1. An image, via `ImageRenderer`.
   2. A link that opens in Dream: surfaces stored on Cloudflare (a Worker, with R2, D1 or KV).
