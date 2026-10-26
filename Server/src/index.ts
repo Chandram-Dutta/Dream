@@ -9,10 +9,13 @@
 //   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
 //   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
 //   POST /api/dev/session     a test user's session, in local development only (auth.ts)
+//   POST /api/auth/apple, /api/me…   signing in with Apple, the account, export and deletion (accounts.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
 
+import { routeAccounts } from "./accounts";
+import type { AppleEnv } from "./apple";
 import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
 import { CSP, messagePage, surfacePage } from "./page";
@@ -20,7 +23,7 @@ import { parseShared, readBody, Rejection } from "./payload";
 import { ID_PATTERN, load, save } from "./store";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv {
+export interface Env extends WebEnv, AuthEnv, AppleEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -96,6 +99,10 @@ export default {
       if (path === "/api/dev/session") {
         const session = await devSession(request, env);
         if (session) return session;
+      }
+      if (path === "/api/auth/apple" || path.startsWith("/api/me")) {
+        const account = await routeAccounts(request, env, url);
+        if (account) return account;
       }
       if (path === "/.well-known/apple-app-site-association" || path === "/apple-app-site-association") {
         return reading ? associatedDomains(env) : problem(405, "Only GET.", { Allow: "GET, HEAD" });

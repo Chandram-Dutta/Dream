@@ -30,7 +30,7 @@ struct HomeView: View {
                         .font(.display(.largeTitle, weight: .bold))
                         .padding(.top, 24)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { ConnectionsButton(); MemoryButton(palette: palette) } }
+                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
                     if !canCompose {
                         Button { showingSettings = true } label: {
                             Label("Add an xAI API key to start making screens.", systemImage: "key.fill")
@@ -207,6 +207,12 @@ struct HomeView: View {
     private func make(_ text: String) {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty || photo != nil else { return }
+        // Pages are made through Dream's server, so they need an account (Account.swift).
+        guard Account.shared.mayMake else {
+            focused = false
+            Account.shared.askToSignIn("Sign in to make pages") { make(text) }
+            return
+        }
         request = ComposeRequest(intent: text.isEmpty ? "What is this?" : text, image: photo?.cgImage)
         intent = ""
         photo = nil
