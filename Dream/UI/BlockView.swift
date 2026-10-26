@@ -59,6 +59,8 @@ struct BlockView: View {
             EquationBlockView(block: block, context: context)
         case .data:
             DataChartView(block: block, context: context)
+        case .sound:
+            SoundBlockView(block: block, context: context).panel(palette, enabled: depth == 0)
         case .slider, .stepper, .field, .toggle, .picker:
             if let input = context.surface.input(block.ref) {
                 ControlView(kind: block.kind, input: input, context: context).panel(palette, enabled: depth == 0)

@@ -108,6 +108,7 @@ struct ChartBlockView: View {
             }
             .frame(height: 200)
             .animation(.smooth(duration: 0.5), value: ghost.isEmpty)
+            .accessibilityChartDescriptor(CurveChartDescriptor(block: block, surface: surface, curves: curves, domain: domain))
         }
         .onChange(of: shape) { old, _ in remember(old) }
         .sensoryFeedback(.selection, trigger: dragging && (axis?.hasFewSteps ?? false) ? x ?? 0 : 0)
@@ -258,6 +259,7 @@ struct DataChartView: View {
             }
         }
         .frame(height: CGFloat(points.count) * 38 + 8)
+        .accessibilityChartDescriptor(DataChartDescriptor(title: block.title, points: points.map { ($0.label, $0.value) }, overTime: false))
     }
 
     private func timeline(_ points: [Point], years: [Double]) -> some View {
@@ -309,5 +311,6 @@ struct DataChartView: View {
         }
         .chartXSelection(value: $selectedYear)
         .frame(height: 200)
+        .accessibilityChartDescriptor(DataChartDescriptor(title: block.title, points: points.map { ($0.label, $0.value) }, overTime: true))
     }
 }
