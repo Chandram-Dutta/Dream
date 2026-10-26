@@ -88,7 +88,7 @@ enum RecordTalk {
         case .onDevice:
             session = LanguageModelSession(instructions: Prompts.recordInstructions)
         case .cloud(.dream):
-            session = LanguageModelSession(model: DreamLanguageModel(modelID: Composer.xaiModelID, page: nil), instructions: Prompts.recordInstructions)
+            session = LanguageModelSession(model: DreamLanguageModel(modelID: Composer.dreamModelID, page: nil), instructions: Prompts.recordInstructions)
         case .cloud(.xai):
             session = LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Composer.xaiModelID), instructions: Prompts.recordInstructions)
         case .cloud(.privateCloud):

@@ -36,7 +36,7 @@ struct PlanView: View {
     }
 }
 
-/// What Dream Plus is: more pages, and nothing else held back.
+/// What Dream Plus is: more pages and a choice of model, and nothing else held back.
 private struct PlanPitch: View {
     let reason: String?
     let palette: Palette
@@ -91,7 +91,7 @@ private struct Comparison: View {
             row("Pages a month", free: status.free?.pagesPerMonth, plus: status.plus?.pagesPerMonth)
         }
         .padding(.vertical, 4)
-        Text("A change to a page counts as a page. Everything else, from web search to sharing, is the same on both.")
+        Text("Plus also lets you choose the model that makes your pages. A change to a page counts as a page. Everything else, from web search to sharing, is the same on both.")
             .font(.footnote)
             .foregroundStyle(.secondary)
             .fixedSize(horizontal: false, vertical: true)

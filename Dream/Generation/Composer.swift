@@ -55,7 +55,7 @@ final class Composer {
 
         var name: String {
             switch self {
-            case .dream: "Dream (\(Composer.xaiModelID))"
+            case .dream: "Dream (\(Composer.dreamModelID.isEmpty ? "default" : Composer.dreamModelID))"
             case .xai: "Grok (\(Composer.xaiModelID))"
             case .privateCloud: "Private Cloud Compute"
             }
@@ -72,6 +72,10 @@ final class Composer {
 
     nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .dream }
     nonisolated static var xaiModelID: String { Build.setting("xaiModel") ?? "grok-4.7" }
+    /// The model Dream's server is asked for: the one picked in Account, which only Dream Plus
+    /// can use, or none, for the server's default (Server/src/models.ts). Testing builds can name
+    /// one at launch, like `-xaiModel grok-4.7`.
+    nonisolated static var dreamModelID: String { Build.setting("xaiModel") ?? ModelChoice.picked ?? "" }
 
     /// Whether any model can make screens right now.
     static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
@@ -176,7 +180,7 @@ final class Composer {
 
     private func session(_ instructions: String, tools: [any Tool]) -> LanguageModelSession {
         switch active {
-        case .dream: LanguageModelSession(model: DreamLanguageModel(modelID: Self.xaiModelID, page: page), tools: tools, instructions: instructions)
+        case .dream: LanguageModelSession(model: DreamLanguageModel(modelID: Self.dreamModelID, page: page), tools: tools, instructions: instructions)
         case .xai: LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Self.xaiModelID), tools: tools, instructions: instructions)
         case .privateCloud: LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: tools, instructions: instructions)
         }

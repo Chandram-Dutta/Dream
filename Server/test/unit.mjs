@@ -345,7 +345,7 @@ expect(all.map((model) => model.id).join() === "glm-5.3-flash,grok-4.7,kimi-k2.6
 expect(choose(undefined, "free", all)?.id === "glm-5.3-flash" && choose("default", "plus", all)?.id === "glm-5.3-flash", "nothing asked for is the default, on either plan");
 expect(choose("grok-4.7", "plus", all)?.id === "grok-4.7" && choose("grok-4.7", "free", all)?.id === "glm-5.3-flash", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
 expect(choose("grok-4.7", "free", all, true)?.id === "grok-4.7", "test accounts on the bench may use any");
-expect(choose("grok-5-heavy", "plus", all) === null && choose(42, "plus", all) === null, "a model nobody offers is refused");
+expect(choose("grok-5-heavy", "plus", all).id === "glm-5.3-flash" && choose(42, "plus", all).id === "glm-5.3-flash", "a model nobody offers, or one since retired, gets the default instead");
 expect(choose(undefined, "free", offered("grok-4.7"))?.id === "grok-4.7", "with only Plus models offered, the first is everyone's");
 
 console.log("Workers AI, as the app reads it");

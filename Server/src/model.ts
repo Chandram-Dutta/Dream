@@ -79,10 +79,8 @@ function checkContent(content: unknown): number {
 
 /** What goes to xAI: the fields Dream uses, checked, and nothing else. */
 export function upstreamBody(body: Record<string, unknown>, env: ModelEnv): Record<string, unknown> {
-  // Which model is decided once the account is known (models.ts); here only that it's one Dream offers.
-  const models = offered(env.MODELS);
-  const model = body.model ?? null;
-  if (model !== null && model !== "default" && (typeof model !== "string" || !models.some((each) => each.id === model))) throw new Invalid(`Dream doesn't offer that model. It offers ${models.map((each) => each.id).join(", ")}.`);
+  // Which model answers is decided once the account is known (models.ts): one Dream offers, whatever's asked.
+  const model = typeof body.model === "string" ? body.model.slice(0, 64) : null;
 
   const messages = body.messages;
   if (!Array.isArray(messages) || messages.length < 1 || messages.length > 400) throw new Invalid("Send from 1 to 400 messages.");
@@ -314,7 +312,6 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const pageID = page && /^[A-Za-z0-9-]{8,64}$/.test(page) ? page : null;
   const account = await accountOf(env, user.id);
   const chosen = choose(body.model, account.plan, offered(env.MODELS), env.DEV_LOGIN === "1");
-  if (!chosen) return problem(400, "Dream doesn't offer that model.");
   const key = env.XAI_API_KEY?.trim();
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");

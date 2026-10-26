@@ -76,13 +76,11 @@ export function offered(list: string | undefined): Model[] {
 }
 
 /** The model a request runs on: the one asked for, if this server offers it and the account may
- * use it; otherwise the default, so a lapsed subscription or an older app still gets a page.
- * Null only for an id nobody offers, which is refused. */
-export function choose(asked: unknown, plan: string, models: Model[], anyModel = false): Model | null {
+ * use it; otherwise the default, so a lapsed subscription, an older app, or a pick from a model
+ * since retired still gets a page. Nothing outside the catalogue is ever asked. */
+export function choose(asked: unknown, plan: string, models: Model[], anyModel = false): Model {
   const fallback = models.find((model) => !model.plus) ?? models[0];
-  if (asked === undefined || asked === null || asked === "" || asked === "default") return fallback;
-  if (typeof asked !== "string") return null;
-  const model = models.find((each) => each.id === asked);
-  if (!model) return null;
+  const model = typeof asked === "string" ? models.find((each) => each.id === asked) : undefined;
+  if (!model) return fallback;
   return !model.plus || plan === "plus" || anyModel ? model : fallback;
 }

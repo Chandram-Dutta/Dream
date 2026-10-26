@@ -106,3 +106,14 @@ enum Allowance {
         NotificationCenter.default.post(name: didRunOut, object: nil, userInfo: ["message": message, "upgrade": upgrade])
     }
 }
+
+/// The model picked in Account. Only Dream Plus can pick; the server checks the plan on every
+/// request, and anyone else gets the default.
+enum ModelChoice {
+    /// The UserDefaults key, which views can watch with `@AppStorage`. Empty is the default.
+    static let key = "model"
+
+    static var picked: String? {
+        UserDefaults.standard.string(forKey: key).flatMap { $0.isEmpty ? nil : $0 }
+    }
+}

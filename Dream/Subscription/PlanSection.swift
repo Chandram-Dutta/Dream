@@ -1,8 +1,9 @@
 import StoreKit
 import SwiftUI
 
-/// The account's plan, for the account screen: pages used today, Dream Plus, restoring
-/// purchases, and managing the subscription in the system's own sheet.
+/// The account's plan, for the account screen: pages used today, the model that makes them (Dream
+/// Plus picks), Dream Plus, restoring purchases, and managing the subscription in the system's own
+/// sheet.
 struct PlanSection: View {
     @State private var showingPlans = false
     @State private var managing = false
@@ -14,6 +15,9 @@ struct PlanSection: View {
             if let status = plan.status {
                 PagesMeter(status: status, palette: palette)
                     .padding(.vertical, 4)
+                if let models = status.models, !models.isEmpty {
+                    ModelRow(models: models, canPick: status.isPlus)
+                }
                 if status.isPlus {
                     Button("Manage subscription") { managing = true }
                 } else {
@@ -41,5 +45,34 @@ struct PlanSection: View {
         .onChange(of: managing) { if !managing { Task { await plan.refresh() } } }
         .sheet(isPresented: $showingPlans) { PlanView() }
         .task { await plan.refresh() }
+    }
+}
+
+/// The model that makes pages. Dream Plus picks from the server's list, each with a line on what
+/// it's good for; everyone else sees the one theirs are made with.
+private struct ModelRow: View {
+    let models: [Plan.Status.ModelOption]
+    let canPick: Bool
+    @AppStorage(ModelChoice.key) private var picked = ""
+
+    var body: some View {
+        // The default is the first; a pick the server no longer offers falls back to it.
+        let current = models.first { $0.id == picked } ?? models[0]
+        if canPick {
+            Picker("Model", selection: Binding(get: { current.id }, set: { picked = $0 == models[0].id ? "" : $0 })) {
+                ForEach(models) { model in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(model.name)
+                        Text(model.note)
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .tag(model.id)
+                }
+            }
+            .pickerStyle(.navigationLink)
+        } else {
+            LabeledContent("Model", value: models[0].name)
+        }
     }
 }

@@ -38,6 +38,16 @@ final class Plan {
         let accountToken: String
         let subscription: Subscription?
         let plans: [String: Allowance]
+        /// What Account can offer, the default first. Older servers don't send it.
+        let models: [ModelOption]?
+
+        struct ModelOption: Decodable, Equatable, Identifiable {
+            let id: String
+            let name: String
+            let note: String
+            /// Only for Dream Plus.
+            let plus: Bool
+        }
 
         var isPlus: Bool { plan == "plus" }
         var free: Allowance? { plans["free"] }

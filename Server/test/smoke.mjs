@@ -427,8 +427,6 @@ async function runPlan(base, xai) {
   expect(response.status === 405, "only POST");
   response = await ask(JSON.stringify(hello()), { headers: { "Content-Type": "text/plain" } });
   expect(response.status === 415, "only application/json");
-  response = await ask(hello({ model: "grok-5-heavy" }));
-  expect(response.status === 400 && /doesn't offer that model/.test((await response.json()).error), "a model that isn't on the list is refused");
   response = await ask(hello({ tools: [{ type: "web_search" }] }));
   expect(response.status === 400, "a provider's paid server-side tools are refused");
   response = await ask(hello({ messages: [{ role: "user", content: "x".repeat(2_100_000) }] }));

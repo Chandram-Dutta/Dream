@@ -11,10 +11,11 @@ enum ChatCompletions {
     /// The request's JSON, and a line describing it for the log.
     static func body(for request: LanguageModelExecutorGenerationRequest, modelID: String) throws -> (data: Data, summary: String) {
         var body: [String: Any] = [
-            "model": modelID,
             "messages": messages(from: request.transcript),
             "stream": true,
         ]
+        // Dream's server picks when none is named (Server/src/models.ts).
+        if !modelID.isEmpty { body["model"] = modelID }
         if let schema = request.schema {
             body["response_format"] = [
                 "type": "json_schema",
