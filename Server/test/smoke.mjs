@@ -79,7 +79,8 @@ async function run(base) {
   const created = await response.json();
   expect(response.status === 201, `201 Created (got ${response.status})`);
   expect(/^[0-9A-Za-z]{10}$/.test(created.id ?? ""), "a ten-character id");
-  expect(created.url === `${base}/s/${created.id}`, "a link to the web viewer");
+  // Under `wrangler dev` with the custom domain configured, links name the production host.
+  expect(typeof created.url === "string" && new URL(created.url).pathname === `/s/${created.id}`, "a link to the web viewer");
   const second = await (await create(base, fixture)).json();
   expect(second.id && second.id !== created.id, "each share gets its own id");
 
