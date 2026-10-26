@@ -150,8 +150,9 @@ final class Account {
     // MARK: - Staying signed in
 
     /// Fetches the profile again, at most every few minutes unless `force`. A session the server
-    /// no longer knows (signed out from another device, or the account deleted there) signs this
-    /// iPhone out too, removing what's personal from it.
+    /// no longer knows (signed out from another device, the account deleted there, or a server
+    /// fault) signs this iPhone out, but keeps what's on it: a 401 can't tell those apart, and
+    /// erasing someone's pages on a server's word alone can't be undone.
     func check(force: Bool = false) async {
         guard isSignedIn, issuedHere else { return }
         if !force, let checkedAt, -checkedAt.timeIntervalSinceNow < 300 { return }
@@ -159,7 +160,7 @@ final class Account {
         do {
             keep(try await AccountServer.profile())
         } catch AccountServer.Failure.signedOut {
-            await forget(notice: "This iPhone was signed out, so your pages, lists and what Dream knows were removed from it. What's in your account comes back when you sign in.")
+            await forget(notice: "This iPhone was signed out. Your pages, lists and what Dream knows are still here; sign in to keep them in your account.", erasing: false)
         } catch {
             // Offline, or the server's having a moment: stay as we are.
         }
@@ -207,8 +208,9 @@ final class Account {
     }
 
     /// Nobody's signed in here any more. The session goes first, so sync stops before anything is
-    /// erased and never sends the erasing as deletions (LocalData.swift).
-    private func forget(notice: String? = nil) async {
+    /// erased and never sends the erasing as deletions (LocalData.swift). Only what the user chose
+    /// (signing out, deleting the account, revoking Apple ID access) erases.
+    private func forget(notice: String? = nil, erasing: Bool = true) async {
         Session.save(nil)
         isSignedIn = false
         for item in ["account", "appleUser", "sessionServer"] { Keychain.save("", for: item) }
@@ -216,7 +218,7 @@ final class Account {
         offeredMove = nil
         afterMove = nil
         signInRequest = nil
-        if let context = container?.mainContext { await LocalData.erase(in: context) }
+        if erasing, let context = container?.mainContext { await LocalData.erase(in: context) }
         UserDefaults.standard.set(false, forKey: "welcomed")
         self.notice = notice
         showsWelcome = true

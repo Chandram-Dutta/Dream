@@ -225,7 +225,7 @@ struct AccountView: View {
         } header: {
             Text("Signed in on")
         } footer: {
-            Text("Swipe to sign a device out. It also loses your pages, lists and what Dream knows, the next time it opens Dream.")
+            Text("Swipe to sign a device out. It stops syncing the next time it opens Dream.")
         }
     }
 
