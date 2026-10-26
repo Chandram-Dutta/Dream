@@ -3,6 +3,22 @@
 Features planned on 2026-10-26, to be built in parallel by several agents from 2026-10-27.
 Each workstream below says what it owns, what it depends on, and how to check it works.
 
+## Status (2026-10-27)
+
+All ten workstreams are merged into `main` and run on the iPhone:
+- **Wave 1:** memory and questions, lists, speech, language and units, figures and diagrams, sounds.
+- **Wave 2:** live data and actions, the MCP client with live sources and action buttons, sharing on Cloudflare, 3D.
+- **Also merged:** the asking gap check.
+
+Open items:
+- **WeatherKit** still fails on the device with an authentication error (WDSJWTAuthenticatorServiceListener code 2), although the provisioning profile includes it. Check that the App Services tab has WeatherKit on for xyz.onlychan.Dream, and allow time.
+- **Not yet tried by hand:** a full MCP sign-in (Linear or Notion), and universal links. Universal links need Settings › Developer › Associated Domains Development.
+- **Web viewer:** figures and tones are placeholders, and there's no live calculation.
+- **Picture share:** always uses the page's original language.
+- **Totals:** totals over list entries can't filter by date yet, so "this month" isn't possible.
+- **Not built:** NASA models and AR placement.
+- **Asking check:** takes 13–21 s before trip questions appear.
+
 ## Principles every workstream follows
 
 - **The model writes structure; the engine draws it.** The engine also checks the structure and ties it to live values. New capabilities are new parts of the surface format (`Dream/Engine/Surface.swift`, `Dream/Generation/Wire.swift`). Each one also needs checker rules (`Checker.swift`), a renderer (`Dream/UI/`) and prompt rules (`Prompts.swift`). They are never one-off prompt patches.
