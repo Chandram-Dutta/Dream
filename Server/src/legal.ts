@@ -328,23 +328,55 @@ const SUPPORT = [
   section(
     "Get help",
     p(
-      `Write to ${SUPPORT_CONTACT}. Say which iPhone and version of iOS you have, and what happened. Please don't send passwords, or anything personal that isn't needed.`,
+      `Write to ${SUPPORT_CONTACT}. Say which iPhone and version of iOS you have, and what happened. Please don't send passwords, or anything personal that isn't needed. Dream is made by one person, so answers can take a few days.`,
     ),
   ),
   section(
-    "Questions",
-    `<h3>How do I delete my account?</h3>`,
-    p("In Dream, open Account and choose Delete my account. Everything Dream keeps on its server is erased at once, and backups are gone within 30 days."),
-    `<h3>How do I get a copy of my data?</h3>`,
-    p("Open Account and choose Export my data."),
+    "Getting started",
+    `<h3>Why do I need to sign in?</h3>`,
+    p("Pages are made through your account, which keeps your pages, lists and what Dream knows on every iPhone you sign in on. Dream uses Sign in with Apple, so you can keep your email private."),
+    `<h3>I can't sign in</h3>`,
+    p(
+      `Check you're signed in to your Apple Account in Settings and connected to the internet, then try again. If it still fails, open Settings › your name › Sign in with Apple, remove Dream, and sign in again. If that doesn't help, write to ${SUPPORT_CONTACT} with what the message says.`,
+    ),
+    `<h3>I have a new iPhone</h3>`,
+    p("Install Dream and sign in with the same Apple Account. Your pages, lists and what Dream knows come back by themselves."),
+  ),
+  section(
+    "Pages",
+    `<h3>A page I made is wrong</h3>`,
+    p("Tap Change (the wand) to ask for a fix, or point at the part that's wrong. Pages say where their facts came from at the bottom; check anything important."),
+    `<h3>Which AI makes my pages?</h3>`,
+    p('Models from Dream\'s AI providers, today Grok by xAI. What you ask, and what\'s needed to answer it, goes to them through Dream\'s server; never your name, email or Apple ID. The <a href="/privacy">privacy policy</a> lists who gets what.'),
+    `<h3>How many pages can I make?</h3>`,
+    p("Free: 5 a day and 30 a month. Dream Plus: 25 a day and 150 a month. Making a page, or asking for a change to one, counts once; opening and using the pages you have never counts. Dream shows how many are left in Account."),
+    `<h3>Can other people see my pages?</h3>`,
+    p("Only pages you share, and only by their link. Your numbers go with a shared page only if you choose. See and stop your links in Your shared links."),
     `<h3>A shared page is wrong, offensive or harmful</h3>`,
     p(`Open the link and use Report, or send the link to ${SUPPORT_CONTACT}. Dream can take shared pages down.`),
-    `<h3>A page I made is wrong</h3>`,
-    p("Tap the wand to ask for a change, or point at the part that's wrong. Pages say where their facts came from at the bottom; check anything important."),
-    `<h3>How do I cancel my subscription, or get a refund?</h3>`,
+  ),
+  section(
+    "Your account and data",
+    `<h3>How do I get a copy of my data?</h3>`,
+    p("Open Account and choose Export my data."),
+    `<h3>How do I delete my account?</h3>`,
+    p(
+      "In Dream, open Account and choose Delete my account. Everything Dream keeps on its server is erased at once, and backups are gone within 30 days. Deleting the app doesn't delete your account, and deleting your account doesn't cancel Dream Plus: cancel that first.",
+    ),
+    `<h3>How do I turn “Help improve Dream” off?</h3>`,
+    p("In Account. It's on from when you sign in, and sends crash reports and counts of what you use, never what you ask, what pages say, or your lists and memory. When it's off, nothing is sent."),
+  ),
+  section(
+    "Dream Plus",
+    `<h3>How do I cancel, or get a refund?</h3>`,
     p(
       'Subscriptions are handled by Apple. Cancel in Settings › your name › Subscriptions. For a refund, go to <a href="https://reportaproblem.apple.com" rel="noopener noreferrer">reportaproblem.apple.com</a>.',
     ),
+    `<h3>I paid but still have the free limits</h3>`,
+    p("Open Account and tap Restore purchases, signed in to the same Apple Account you paid with."),
+  ),
+  section(
+    "Permissions",
     `<h3>Why does Dream ask to use…</h3>`,
     list([
       "<strong>Your location:</strong> for the weather and travel times you ask about. It goes from your iPhone to Apple, not to Dream's server.",
@@ -352,8 +384,6 @@ const SUPPORT = [
       "<strong>Calendars and reminders:</strong> only to add an event or reminder when you tap a button that says exactly what it will add.",
       "<strong>Photos:</strong> only the photo you pick, to ask about it.",
     ]),
-    `<h3>How do I turn “Help improve Dream” on or off?</h3>`,
-    p("In Account. When it's off, Dream sends no crash reports or usage counts."),
   ),
 ];
 
