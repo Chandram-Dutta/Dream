@@ -3,6 +3,8 @@ import Foundation
 // Runs the composer on this Mac and prints what came out, so prompt and checker changes can be
 // judged without the app. Build and run with Tools/bench.sh. It uses Grok, with XAI_API_KEY set
 // (bench.sh reads it from the login Keychain). Settings go as "-name value", like "-xaiModel grok-4.7".
+// Web search needs a server, like "-webServer http://127.0.0.1:8787" for `wrangler dev` in
+// Server/, and its key in DREAM_WEB_KEY; without them the bench builds with Wikipedia alone and says so.
 
 let defaultRequests = [
     "what is compound interest",
@@ -20,6 +22,9 @@ let defaultRequests = [
         let answers = composer.surface?.answers ?? []
         print(answers.isEmpty ? "Asked: nothing" : "Asked: " + answers.map { "\($0.question.text)\($0.isRemembered ? " (remembered: \($0.choice))" : "")" }.joined(separator: "; "))
         if let surface = composer.surface { await BenchConnections.showLive(surface) }
+        if let credits = composer.surface?.credits {
+            print(credits.isEmpty ? "Credits: none" : "Credits: " + credits.map { "\($0.site) <\($0.url)>" }.joined(separator: "; "))
+        }
         guard let surface = composer.surface, surface.hasLogic else { continue }
         print(surface.logicSummary)
         let evaluation = surface.evaluate(surface.initialValues)

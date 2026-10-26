@@ -28,7 +28,7 @@ struct LookupTool: Tool {
             return "Nothing found for \"\(arguments.subject)\"."
         }
         found.append(reference)
-        return "Wikipedia, \"\(reference.title)\":\n\(reference.extract)"
+        return "Wikipedia, \"\(reference.title)\" (cite it as \(reference.url)):\n\(reference.extract)"
     }
 }
 
@@ -43,6 +43,11 @@ final class ReferenceLog: @unchecked Sendable {
 
     var first: Reference? {
         lock.withLock { references.first }
+    }
+
+    /// Every article looked up, which the surface may also cite.
+    var all: [Reference] {
+        lock.withLock { references }
     }
 }
 

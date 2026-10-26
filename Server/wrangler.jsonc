@@ -22,13 +22,20 @@
   // Per-address limits, counted by Cloudflare and never stored by the Worker.
   "ratelimits": [
     { "name": "CREATE_LIMIT", "namespace_id": "4801", "simple": { "limit": 10, "period": 60 } },
-    { "name": "READ_LIMIT", "namespace_id": "4802", "simple": { "limit": 120, "period": 60 } }
+    { "name": "READ_LIMIT", "namespace_id": "4802", "simple": { "limit": 120, "period": 60 } },
+    // Web search and page reads (src/web.ts), which cost money. A screen uses a few of each.
+    { "name": "SEARCH_LIMIT", "namespace_id": "4803", "simple": { "limit": 30, "period": 60 } },
+    { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } }
   ],
 
   "vars": {
     // The apps that open /s/ links, as <Team ID>.<bundle ID>, separated by commas. Served in
     // /.well-known/apple-app-site-association; change it here when the app's ID changes.
-    "APP_IDS": "DR99P625RR.xyz.onlychan.Dream"
+    "APP_IDS": "DR99P625RR.xyz.onlychan.Dream",
+    // Paid provider calls a day for everyone together, of each kind: searches, and page reads.
+    // At Parallel's prices (fast search $1, extract $1 per 1,000) that's at most $4 a day.
+    "WEB_DAILY_LIMIT": "2000"
+    // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS.
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.

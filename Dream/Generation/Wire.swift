@@ -130,6 +130,9 @@ struct WireSurface {
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
     @Guide(description: "3 to 6 nearby topics the user might explore next, as short titles", .maximumCount(6))
     var related: [String]
+    // Last, so a model that stops early has finished everything the reader sees.
+    @Guide(description: "The address of each page you took facts from, exactly as the read or lookup tool gave it. Empty if you used none.", .maximumCount(8))
+    var citations: [String]
 }
 
 // MARK: - Conversion
@@ -152,6 +155,7 @@ extension Surface {
         takeVisuals(figures: wire.figures.map(Figure.init), diagrams: wire.diagrams.map(Diagram.init))
         actions = Action.list(wire.actions)
         takeScenes(wire.scenes.map(Scene3D.init))
+        citations = wire.citations.isEmpty ? nil : wire.citations.map(Citation.named)
     }
 
     /// While the model is still writing: show whatever has arrived.

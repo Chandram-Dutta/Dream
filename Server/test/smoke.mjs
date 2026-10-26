@@ -1,14 +1,21 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
-// domains file, and the protections. With no address given, it applies the migrations to a local
-// database and starts `wrangler dev` itself.
+// domains file, web search and reading, and the protections. With no address given, it applies
+// the migrations to a local database and starts `wrangler dev` itself, with web search pointed at
+// a stand-in for Parallel on this Mac (test/stub-parallel.mjs), so no search is paid for. Reading
+// fetches example.com and example.org, and asks Cloudflare's resolver about names, so it needs
+// the network.
 //
 //   npm test                                  local, on a free port
 //   DREAM_SHARE_URL=http://127.0.0.1:8787 npm test   against a server that's already running
+//
+// Against a server that's already running, the web checks need its app key in DREAM_WEB_KEY, and
+// only the ones refused before anything is paid for run.
 
 import { spawn, execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { STUB_KEY, startStub } from "./stub-parallel.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = readFileSync(join(root, "test/fixtures/split-bill.json"), "utf8");
@@ -19,11 +26,20 @@ function expect(condition, message) {
   if (!condition) failures++;
 }
 
-async function startLocal() {
+/** The app key the local server is started with, beside another to show keys can be rotated. */
+const LOCAL_APP_KEY = "test-app-key-0123456789abcdef";
+/** Provider calls a day, low enough to reach in a test. */
+const LOCAL_DAILY_LIMIT = 4;
+
+async function startLocal(stub) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
   execFileSync("npx", ["wrangler", "d1", "migrations", "apply", "dream-share", "--local"], { cwd: root, env, stdio: "ignore" });
+  // Each run starts with nothing cached and nothing spent today.
+  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
   const port = 18_000 + Math.floor(Math.random() * 2_000);
-  const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1"], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
+  // These take the place of anything in .dev.vars, so the real Parallel key is never used here.
+  const vars = [`PARALLEL_BASE_URL:${stub.base}`, `PARALLEL_API_KEY:${STUB_KEY}`, `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`, `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`].flatMap((pair) => ["--var", pair]);
+  const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
     const watch = (chunk) => {
@@ -36,7 +52,14 @@ async function startLocal() {
     child.stderr.on("data", watch);
     child.on("exit", (code) => reject(new Error(`wrangler dev exited with ${code}`)));
   });
-  return { base: `http://127.0.0.1:${port}`, stop: () => child.kill("SIGTERM") };
+  return {
+    base: `http://127.0.0.1:${port}`,
+    stop() {
+      child.kill("SIGTERM");
+      // What the test spent and cached would otherwise hold back a `wrangler dev` run afterwards.
+      execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+    },
+  };
 }
 
 const create = (base, body, type = "application/json") => fetch(`${base}/api/surfaces`, { method: "POST", headers: { "Content-Type": type }, body });
@@ -89,6 +112,25 @@ async function run(base) {
   response = await fetch(`${base}/katex/katex.min.css`);
   expect(response.status === 200 && response.headers.get("content-type")?.includes("css"), "KaTeX's stylesheet is served by the Worker");
 
+  console.log("Credits in the web viewer");
+  const cited = JSON.parse(fixture);
+  cited.surface.blocks.push({ id: "about", kind: "paragraph", title: "", text: "Tipping customs vary.", ref: "", over: "", items: [], children: [] });
+  cited.surface.reference = { title: "Gratuity", extract: "", url: "https://en.wikipedia.org/wiki/Gratuity", imageURL: "https://evil.example/a.png" };
+  cited.surface.citations = [
+    { title: "Tipping in restaurants, 2026", site: "Etiquette Weekly", url: "https://www.etiquette.example/tipping", date: "2026-10-01" },
+    { title: "Bad", site: "Bad", url: "javascript:alert(1)" },
+    { title: "Also bad", site: "Bad", url: "https://user:pw@evil.example/" },
+    { title: "Quoted\" onmouseover=\"x", site: "<b>Loud</b>", url: "https://loud.example/a?b=1&c=2" },
+  ];
+  const citedID = (await (await create(base, JSON.stringify(cited))).json()).id;
+  const citedPage = await (await fetch(`${base}/s/${citedID}`)).text();
+  const footer = citedPage.slice(citedPage.indexOf('<footer class="source">'));
+  expect(footer.includes('href="https://en.wikipedia.org/wiki/Gratuity"') && footer.includes('href="https://www.etiquette.example/tipping"'), "every source is linked, Wikipedia first");
+  expect(footer.includes(">Wikipedia</a>, ") && footer.includes(">Etiquette Weekly</a>") && footer.includes("CC BY-SA 4.0"), "by site name, with Wikipedia's licence");
+  expect(!footer.includes("javascript:") && !footer.includes("user:pw") && !citedPage.includes("evil.example/a.png"), "only http(s) pages, and no pictures from elsewhere");
+  expect(footer.includes("&lt;b&gt;Loud&lt;/b&gt;") && !footer.includes('" onmouseover') && footer.includes("b=1&amp;c=2"), "names, titles and addresses are escaped");
+  expect(footer.includes('rel="nofollow noopener noreferrer"'), "links don't vouch for the pages or tell them who sent the reader");
+
   console.log("Missing and malformed");
   response = await fetch(`${base}/api/surfaces/ABCDEFGHIJ`);
   expect(response.status === 404, "an unknown id is 404");
@@ -117,14 +159,135 @@ async function run(base) {
   expect(limited, "too many shares from one address are refused for a while");
 }
 
-const server = process.env.DREAM_SHARE_URL ? { base: process.env.DREAM_SHARE_URL.replace(/\/$/, ""), stop() {} } : await startLocal();
+/** Web search and reading. With the stand-in (`stub`), everything; against a running server,
+ * only what's refused before anything is paid for. */
+async function runWeb(base, key, stub) {
+  const local = stub !== null;
+  const post = (path, body, { auth = key, type = "application/json" } = {}) =>
+    fetch(`${base}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": type, ...(auth ? { Authorization: `Bearer ${auth}` } : {}) },
+      body: typeof body === "string" ? body : JSON.stringify(body),
+    });
+
+  console.log("Web search: who may ask, and what");
+  let response = await post("/api/search", { query: "budget phones" }, { auth: null });
+  expect(response.status === 401, "no app key is refused");
+  response = await post("/api/search", { query: "budget phones" }, { auth: "a-wrong-key-of-a-good-length" });
+  expect(response.status === 401, "a wrong key is refused");
+  response = await fetch(`${base}/api/search`);
+  expect(response.status === 405, "only POST");
+  response = await post("/api/search", "query=phones", { type: "text/plain" });
+  expect(response.status === 415, "only application/json");
+  response = await post("/api/search", { query: "  " });
+  expect(response.status === 400, "an empty query is refused");
+  response = await post("/api/search", { query: "phones ".repeat(60) });
+  expect(response.status === 400, "a query over 300 characters is refused");
+  response = await post("/api/search", { query: "phones", count: "lots" });
+  expect(response.status === 400, "count is a number");
+  response = await post("/api/search", { query: "phones", freshness: "hourly" });
+  expect(response.status === 400, "freshness is day, week, month or year");
+  response = await post("/api/search", { query: "x".repeat(5_000) });
+  expect(response.status === 413, "a large body is refused before it's read");
+  if (local) expect(stub.calls.search.length === 0 && stub.calls.unauthorized === 0, "nothing refused reached the provider");
+
+  console.log("Reading: addresses it refuses");
+  const refused = [
+    "file:///etc/passwd",
+    "ftp://example.com/",
+    "javascript:alert(1)",
+    "http://127.0.0.1:8787/api/surfaces",
+    "http://localhost/",
+    "http://[::1]/",
+    "http://10.0.0.5/",
+    "http://192.168.1.1/",
+    "http://169.254.169.254/latest/meta-data/",
+    "http://2130706433/",
+    "http://0x7f000001/",
+    "http://[::ffff:127.0.0.1]/",
+    "http://user:pw@example.com/",
+    "https://example.com:22/",
+    "http://printer.local/",
+    "http://metadata.google.internal/",
+    // A public-looking name that resolves to this machine.
+    "http://127.0.0.1.nip.io/",
+  ];
+  for (const url of refused) {
+    response = await post("/api/read", { url });
+    expect(response.status === 400, `${url} is refused`);
+  }
+  if (local) expect(stub.calls.extract.length === 0, "none of them reached the provider");
+  response = await fetch(`${base}/reader`);
+  expect(response.status === 200 && (await response.text()).includes("User-agent: DreamReader"), "the reader explains itself to site owners");
+  if (!local) return;
+
+  console.log("Web search");
+  response = await post("/api/search", { query: "best budget phones India", objective: "Which budget phones are best in India now?", count: 3, freshness: "week", region: "IN" });
+  const found = await response.json();
+  expect(response.status === 200 && found.cached === false && found.provider === "parallel", "200, from the provider");
+  const sent = stub.calls.search.at(-1);
+  expect(sent?.search_queries?.[0] === "best budget phones India" && sent?.objective === "Which budget phones are best in India now?", "the query and objective, as Parallel takes them");
+  expect(sent?.mode === "fast" && sent?.advanced_settings?.max_results === 3 && sent?.advanced_settings?.location === "in", "fast mode, the count and the region");
+  const week = new Date(Date.now() - 7 * 86_400_000).toISOString().slice(0, 10);
+  expect(sent?.advanced_settings?.source_policy?.after_date === week, "freshness as the first day to look from");
+  const [first, second] = found.results ?? [];
+  expect(first?.title === "Best budget phones, October 2026" && first?.site === "gsmarena.com" && first?.date === "2026-10-20", "title, site and date");
+  expect(first?.snippet?.startsWith("Top picks The Redmi 15 costs ₹12,999") && !first.snippet.includes("]("), "the snippet as plain text");
+  const text = JSON.stringify(found);
+  expect(!text.includes("javascript:") && !text.includes("secret@") && found.results.every((result) => /^https?:\/\//.test(result.url)), "only http(s) addresses, without credentials");
+  expect(found.results.length === 2 && second?.url === "https://www.91mobiles.com/list/phones-under-15000" && second?.title === "91mobiles.com", "repeats dropped, and a missing title filled with the site");
+  response = await post("/api/search", { query: "Best budget phones   india", objective: "Which budget phones are best in India now?", count: 3, freshness: "week", region: "in" });
+  expect((await response.json()).cached === true && stub.calls.search.length === 1, "asked again, it comes from the cache");
+
+  console.log("Reading a page");
+  response = await post("/api/read", { url: "https://example.com/#top", focus: "what the domain is for" });
+  const page = await response.json();
+  expect(response.status === 200 && page.via === "parallel" && page.cached === false, `read through the provider (got ${response.status} ${page.error ?? page.via})`);
+  expect(page.text?.includes("STUB EXCERPT") && page.excerpted === true, "the parts about the focus");
+  expect(page.title === "Example Domain" && page.site === "example.com", "the title from the page itself, and the site");
+  expect(page.canonical?.startsWith("https://example.com/"), "a canonical address");
+  const asked = stub.calls.extract.at(-1);
+  expect(asked?.urls?.[0] === "https://example.com/" && asked?.objective === "what the domain is for" && asked?.advanced_settings?.full_content, "the address without its fragment, the focus, and the page from the top too");
+  response = await post("/api/read", { url: "https://example.com/", focus: "what the domain is for" });
+  expect((await response.json()).cached === true && stub.calls.extract.length === 1, "read again, it comes from the cache");
+  response = await post("/api/read", { url: "https://example.org/", maxChars: 500 });
+  const own = await response.json();
+  expect(response.status === 200 && own.via === "fetch" && own.title === "Example Domain" && /this domain is for use/i.test(own.text ?? ""), `when the provider can't read a page, Dream's own fetch does (got ${response.status} ${own.error ?? own.via})`);
+  expect(!/<|s\.js|color-scheme/.test(own.text), "only the page's words: no markup, styles or scripts");
+  expect(own.text.length <= 502 && own.excerpted === false, "text is capped");
+
+  console.log("Daily budget");
+  // Spent so far: one search, and two reads. Each kind has its own budget.
+  let stopped = -1;
+  for (let i = 0; i < 6 && stopped < 0; i++) {
+    if ((await post("/api/search", { query: `budget check ${i}` })).status === 503) stopped = i;
+  }
+  expect(stopped === LOCAL_DAILY_LIMIT - 1, `searches stop for the day at the limit (after ${stopped} more)`);
+  expect(stub.calls.search.length === LOCAL_DAILY_LIMIT, "and the provider isn't asked past it");
+
+  console.log("Rate limiting");
+  let limited = false;
+  for (let i = 0; i < 40 && !limited; i++) limited = (await post("/api/search", { query: "budget phones" })).status === 429;
+  expect(limited, "too many searches from one address are refused for a while");
+  limited = false;
+  for (let i = 0; i < 40 && !limited; i++) limited = (await post("/api/read", { url: "http://localhost/" })).status === 429;
+  expect(limited, "and too many reads");
+}
+
+const remote = process.env.DREAM_SHARE_URL;
+const stub = remote ? null : await startStub();
+const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub);
 try {
   await run(server.base);
+  const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
+  if (key) await runWeb(server.base, key, stub);
+  else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY isn't set for this server.");
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;
 } finally {
   server.stop();
+  stub?.stop();
 }
 console.log(failures ? `\n${failures} failed` : "\nAll passed");
 process.exit(failures ? 1 : 0);
