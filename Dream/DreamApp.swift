@@ -20,7 +20,6 @@ struct DreamApp: App {
             HomeView()
                 .accountFlow()
                 .offeringPlans()
-                .askingAIConsent()
         }
         .modelContainer(container)
     }

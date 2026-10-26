@@ -63,6 +63,7 @@ struct SignInButton: View {
             .overlay {
                 if working { ProgressView() }
             }
+            agreement
             if let failure {
                 Text(failure)
                     .font(.footnote)
@@ -73,6 +74,20 @@ struct SignInButton: View {
         }
         .animation(.smooth, value: working)
         .animation(.smooth, value: failure)
+    }
+
+    /// What signing in agrees to, said where it's agreed to. The terms and privacy policy
+    /// (Server/src/legal.ts) name the AI providers and what each receives, so this doesn't have to
+    /// change when they do.
+    private var agreement: some View {
+        let link = { (title: String, page: LegalLinks.Page) in page.url.map { "[\(title)](\($0.absoluteString))" } ?? title }
+        let text = "Dream sends what you ask to its AI providers to make your pages, and counts how it's used, which you can turn off in Account. By continuing, you agree to the \(link("Terms", .terms)) and \(link("Privacy Policy", .privacy))."
+        return Text((try? AttributedString(markdown: text)) ?? AttributedString(text))
+            .font(.caption)
+            .foregroundStyle(.secondary)
+            .tint(.primary)
+            .multilineTextAlignment(.center)
+            .fixedSize(horizontal: false, vertical: true)
     }
 
     private func finish(_ result: Result<ASAuthorization, any Error>, nonce: String) async {

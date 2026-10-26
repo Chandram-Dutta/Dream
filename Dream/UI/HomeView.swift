@@ -41,7 +41,6 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .panel(palette)
                     }
-                    ImproveDreamQuestion(palette: palette)
                     if !surfaces.isEmpty {
                         shelf
                     }

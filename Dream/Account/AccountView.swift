@@ -68,7 +68,6 @@ struct AccountView: View {
                 email
                 PlanSection()
                 devicesSection
-                AIConsentSection()
                 ImproveDreamSection()
                 if LocalData.move == .declined, !onPhone.isEmpty {
                     Section {

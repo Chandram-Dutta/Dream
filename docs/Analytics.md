@@ -1,9 +1,10 @@
 # Product analytics
 
-Dream counts how it's used through PostHog, only after the user says yes to "Help improve Dream"
-(the first-run question on the home screen, or Account). The same choice sends crash and hang
-reports to Dream's own server (Dream/Privacy/Diagnostics.swift). It's off until answered, and
-turning it off calls PostHog's `optOut()` at once.
+Dream counts how it's used through PostHog once someone signs in: "Help improve Dream" turns on at
+sign-in, which agrees to the terms and privacy policy that say so (the line under Sign in with
+Apple), unless they turned it off before. The same choice sends crash and hang reports to Dream's
+own server (Dream/Privacy/Diagnostics.swift). Before sign-in nothing is sent, and turning it off in
+Account calls PostHog's `optOut()` at once.
 
 Events say what happened, never what anyone wrote: no requests, page text, values, list entries,
 memory, names or addresses. Every name and property lives in `Dream/Engine/Analytics.swift`;

@@ -36,8 +36,6 @@ enum RecordTalk {
         let request = Prompts.recordRequest(text, surface: surface, records: records, hasImage: image != nil, adding: adding, now: now)
         var best: [RecordOperation]?
         for model in await models(hasImage: image != nil, privateFirst: adding != nil) {
-            // Entries only go to xAI with the user's say-so (AIConsent.swift); else the next model tries.
-            if case .cloud(let provider) = model, provider.sendsToXAI, await !AIConsent.shared.ask() { continue }
             let started = Date()
             do {
                 let content = try await respond(on: model, to: request, image: image, schema: schema)

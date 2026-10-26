@@ -68,8 +68,8 @@ const PRIVACY = [
     "The short version",
     list([
       "Your account, saved pages, lists and memory are kept on Dream's server, so they're there on every iPhone you sign in on. Dream's server can read them: they aren't end-to-end encrypted.",
-      "To make a page, what you ask goes through Dream's server to xAI's model, with what's needed to answer it.",
-      "Crash reports and usage counts are sent only if you turn on “Help improve Dream”. They never include what you ask, what pages say, or your lists and memory.",
+      "To make a page, what you ask goes through Dream's server to an AI provider's model (today, xAI), with what's needed to answer it. You agree to this when you sign in.",
+      "Once you sign in, Dream sends crash reports and usage counts, which you can turn off in Account under “Help improve Dream”. They never include what you ask, what pages say, or your lists and memory.",
       "Dream doesn't sell your data, show ads, or track you across other companies' apps and websites.",
       "You can export or delete everything from Account in the app, at any time.",
     ]),
@@ -149,16 +149,16 @@ const PRIVACY = [
         how: "15 minutes to 6 hours",
       },
       {
-        what: "Crash and hang reports, only if you turn on “Help improve Dream”",
+        what: "Crash and hang reports, unless you turn off “Help improve Dream”",
         detail:
           "The version of Dream and iOS, the kind of iPhone, and where in Dream's code a crash, hang or slow launch happened. No account, no location, and nothing you wrote.",
         where: SERVER,
         how: "90 days",
       },
       {
-        what: "Usage counts, only if you turn on “Help improve Dream”",
+        what: "Usage counts, unless you turn off “Help improve Dream”",
         detail:
-          "Events like “page built”, with how long it took, how many parts it had and of which kinds, and whether it used the web. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
+          "Events like “page built”, with how long it took, how many parts it had and of which kinds, and whether it used the web; and for each request to an AI model, how much it used, what it cost and how long it took. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
         where: "PostHog, in the United States",
         how: todo("retention set in PostHog, for example 12 months"),
       },
@@ -181,12 +181,12 @@ const PRIVACY = [
     p("Dream uses these companies to run. Each gets only what its job needs."),
     list([
       "<strong>Cloudflare</strong> runs Dream's server, database and file storage, so it holds everything Dream keeps.",
-      "<strong>xAI</strong> runs the model that makes pages. For each request it receives what you asked, the context needed to answer it (like facts from your memory you've confirmed, your answers, or the page you're changing), any photo you attached, and what lookups returned. It doesn't receive your account details. " +
-        todo("confirm xAI's retention and training terms for API data"),
+      "<strong>AI providers</strong> run the models that make pages. Today that's <strong>xAI</strong> (Grok). Dream may add or change providers, and this list will say so before it does. For each request a provider receives what you asked, the context needed to answer it (like facts from your memory you've confirmed, your answers, the page you're changing, or list entries you're talking to), any photo you attached, and what lookups returned. It doesn't receive your name, email or Apple ID. " +
+        todo("each provider's retention and training terms for API data, starting with xAI's"),
       "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account.",
       "<strong>Apple</strong> handles Sign in with Apple, App Store purchases, Weather and Maps.",
       "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds. It receives what's looked up.",
-      `<strong>PostHog</strong> keeps usage counts, only if you turn on “Help improve Dream”, in the United States.`,
+      "<strong>PostHog</strong> keeps usage counts, in the United States, unless you turn off “Help improve Dream”. It doesn't keep your IP address.",
     ]),
     p(
       "Services you connect yourself, like Linear or Notion, talk to your iPhone directly, under their own terms. Dream shows you what it will send before one of their tools runs.",
@@ -196,8 +196,8 @@ const PRIVACY = [
     "Why Dream uses it",
     p(todo("legal bases, for a lawyer to confirm")),
     list([
-      "To provide Dream: your account, pages, lists, memory and subscription (performing the contract with you).",
-      "With your consent: crash reports and usage counts, which you can turn off at any time in Account.",
+      "To provide Dream: your account, pages, lists, memory and subscription, and sending what you ask to AI providers to make your pages (performing the contract with you, which you agree to when you sign in).",
+      `To improve Dream: crash reports and usage counts, which you can turn off at any time in Account (${todo("consent given at sign-in, or legitimate interests, for a lawyer to confirm")}).`,
       "To keep Dream safe and working: rate limits, preventing abuse, and fixing problems (legitimate interests).",
       "Because the law requires it: purchase records.",
     ]),
@@ -209,7 +209,7 @@ const PRIVACY = [
       "See what Dream keeps about you, and get a copy in a format other services can read: Account › Export my data.",
       "Correct it: change or delete facts in “What Dream knows”, and edit your pages and lists.",
       "Delete it: delete pages, lists and facts one by one, or everything at once with Account › Delete my account.",
-      "Withdraw consent: turn off “Help improve Dream” in Account. Nothing more is sent from then on.",
+      "Stop crash reports and usage counts: turn off “Help improve Dream” in Account. Nothing more is sent from then on.",
     ]),
     p(
       "<strong>In the EU, the UK and elsewhere under the GDPR</strong>, you also have the right to restrict or object to how your data is used, and to complain to your data protection authority. Dream answers requests within one month.",
@@ -237,7 +237,7 @@ const PRIVACY = [
   section(
     "Moving data between countries",
     p(
-      `Cloudflare runs Dream's server around the world; xAI and Parallel are in the United States; and so is PostHog. When data leaves your country, ${todo("the safeguards used, such as the EU's standard contractual clauses")}.`,
+      `Cloudflare runs Dream's server around the world; xAI, Parallel and PostHog are in the United States. When data leaves your country, ${todo("the safeguards used, such as the EU's standard contractual clauses")}.`,
     ),
   ),
   section(
@@ -253,7 +253,7 @@ const TERMS = [
   section(
     "Agreeing to these terms",
     p(
-      `These terms are between you and ${COMPANY}. By using Dream you agree to them, and to the ${'<a href="/privacy">privacy policy</a>'}. If you don't agree, please don't use Dream.`,
+      `These terms are between you and ${COMPANY}. By signing in to Dream, or otherwise using it, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including what it says about AI providers and usage counts. If you don't agree, please don't use Dream.`,
     ),
   ),
   section("Who can use Dream", p(`You need to be at least ${todo("minimum age")} and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
@@ -264,7 +264,8 @@ const TERMS = [
   section(
     "What Dream makes",
     list([
-      "Pages are written by an AI model. They can be wrong, out of date or incomplete, even when they look certain.",
+      "Pages are written by AI models from other companies, today xAI. What you ask, and what's needed to answer it, goes to them through Dream's server, as the privacy policy describes. Dream may change which providers it uses.",
+      "AI-made pages can be wrong, out of date or incomplete, even when they look certain.",
       "Dream isn't professional advice: not medical, legal, financial, tax or safety advice. Check anything important with someone qualified.",
       "Calculations follow the formulas on the page. Check them before you rely on the numbers.",
       "When a page uses the web, it says which pages it read. Those pages, and the pictures and sounds from Wikimedia, belong to their owners and keep their own licences.",

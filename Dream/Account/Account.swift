@@ -99,6 +99,8 @@ final class Account {
         let signedIn = try await AccountServer.signIn(credential, device: Self.deviceName)
         Keychain.save(credential.user, for: "appleUser")
         Keychain.save(ServerAddress.dream?.absoluteString ?? "", for: "sessionServer")
+        // Signing in agrees to the terms and privacy policy, which say Dream counts how it's used.
+        ImproveDream.signedIn()
         keep(signedIn.user)
         UserDefaults.standard.set(true, forKey: "welcomed")
         Session.save(signedIn.token)

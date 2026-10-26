@@ -16,9 +16,9 @@ Draft, needs review: the person who submits the app answers these, and the priva
   search history, purchase history, product interaction, other usage data, performance data.
 - **Data not linked to you:** crash data, other diagnostic data.
 
-Data collected only after the user agrees ("Help improve Dream": product interaction, device ID,
-performance data, crash data, other diagnostic data) must still be declared. Apple's rule is that
-optional collection is still collection.
+Data collected while "Help improve Dream" is on (product interaction, device ID, performance data,
+crash data, other diagnostic data) must be declared. It's on from sign-in and can be turned off, and
+Apple's rule is that optional collection is still collection.
 
 ## Per data type
 
@@ -60,8 +60,9 @@ optional collection is still collection.
   Location › Coarse location: collected, linked, app functionality.
 - **Third parties count.** xAI (the model), Parallel (web search) and PostHog (analytics) receive
   data on Dream's behalf. Their data is covered by the rows above; the privacy policy names them.
-- **"Help improve Dream" is opt-in.** It's off until the user answers the first-run question, and
-  turning it off in Account stops both MetricKit reports and PostHog at once.
+- **"Help improve Dream" is on from sign-in.** The line under Sign in with Apple says so, with the
+  terms and privacy policy; turning it off in Account stops both MetricKit reports and PostHog at
+  once. Nothing is sent before sign-in.
 - **Deletion.** Account deletion in the app (workstream A) erases everything server-side; D1's
   Time Travel backups age out within 30 days. Analytics in PostHog are deleted by person id on
   request (see the privacy policy).

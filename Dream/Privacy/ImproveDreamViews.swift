@@ -1,53 +1,7 @@
 import SwiftUI
 
-/// The first-run question, on the home screen until it's answered: may Dream send crash reports
-/// and counts of what's used? Nothing is sent until the user says yes. Account has the same
-/// choice later (`ImproveDreamSection`).
-struct ImproveDreamQuestion: View {
-    let palette: Palette
-    @AppStorage(ImproveDream.key) private var choice: Bool?
-
-    var body: some View {
-        if choice == nil {
-            VStack(alignment: .leading, spacing: 14) {
-                Text("Help improve Dream?")
-                    .font(.display(.title3))
-                    .accessibilityAddTraits(.isHeader)
-                VStack(alignment: .leading, spacing: 8) {
-                    point("Crash and hang reports", symbol: "waveform.path.ecg")
-                    point("Counts, like how long pages take", symbol: "chart.bar")
-                    point("Never what you ask, make or keep", symbol: "eye.slash")
-                }
-                .font(.subheadline)
-                HStack(spacing: 8) {
-                    Button("Help improve") { answer(true) }
-                        .buttonStyle(AnswerStyle(palette: palette, isMain: true))
-                    Button("Not now") { answer(false) }
-                        .buttonStyle(AnswerStyle(palette: palette, isMain: false))
-                    Spacer(minLength: 0)
-                }
-                LegalLinks()
-            }
-            .panel(palette)
-            .transition(.scale(scale: 0.96, anchor: .top).combined(with: .opacity))
-        }
-    }
-
-    private func point(_ text: String, symbol: String) -> some View {
-        Label {
-            Text(text)
-        } icon: {
-            Image(systemName: symbol)
-                .foregroundStyle(palette.gradient)
-        }
-    }
-
-    private func answer(_ on: Bool) {
-        withAnimation(.smooth) { ImproveDream.set(on) }
-    }
-}
-
-/// The same choice in Account, with the policy beside it. It goes in a `List` or `Form`.
+/// "Help improve Dream" in Account, with the policy beside it: on from sign-in, off here. It goes
+/// in a `List` or `Form`.
 struct ImproveDreamSection: View {
     @AppStorage(ImproveDream.key) private var choice: Bool?
 
@@ -120,26 +74,5 @@ struct LegalLinks: View {
                 }
             }
         }
-    }
-}
-
-/// Saying yes stands out; "Not now" stays quiet but just as easy to tap.
-struct AnswerStyle: ButtonStyle {
-    let palette: Palette
-    let isMain: Bool
-
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.subheadline.weight(isMain ? .semibold : .medium))
-            .foregroundStyle(isMain ? AnyShapeStyle(.white) : AnyShapeStyle(.secondary))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background {
-                if isMain { Capsule().fill(palette.gradient) }
-            }
-            .overlay(Capsule().strokeBorder(palette.edge, lineWidth: isMain ? 0 : 1))
-            .contentShape(.capsule)
-            .scaleEffect(configuration.isPressed ? 0.96 : 1)
-            .animation(.snappy(duration: 0.2), value: configuration.isPressed)
     }
 }

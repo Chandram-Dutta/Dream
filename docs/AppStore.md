@@ -73,7 +73,8 @@ Promotional text can change without a new build, so it's the place for what's ne
 > change or delete what Dream remembers at any time. Share a page as a picture or a link that opens
 > in Dream or in any browser. A shared page is blank by default; your numbers go only if you choose.
 >
-> Help improve Dream is off until you say yes, and it never sends what you ask or make.
+> Help improve Dream (crash reports and usage counts) is on once you sign in, as the line under
+> Sign in with Apple says, and Account turns it off. It never sends what you ask or make.
 >
 > **[Subscription paragraph, once workstream D settles it: what's free, what the subscription adds,
 > the price is shown in the app, it renews automatically unless cancelled at least 24 hours before
@@ -190,10 +191,10 @@ Paste into App Review Information › Notes, after filling in the placeholders:
 >
 > AI and the web: pages are written by **[xAI's Grok]** through Dream's own server. Pages that
 > state facts cite Wikipedia or the web pages that were read, and link to them; web text is shown
-> as short excerpts and summaries, never as a browser. The first time a page would go to xAI, Dream
-> says what's sent (what you ask, photos you add, relevant memory, and list entries you talk to)
-> and asks permission, guideline 5.1.2(i). "Not now" sends nothing; Account › Make pages with
-> Grok takes the permission back.
+> as short excerpts and summaries, never as a browser. Nothing is sent to an AI provider before
+> sign-in. The line under Sign in with Apple says that what you ask goes to Dream's AI providers,
+> and that continuing agrees to the terms and privacy policy, which name xAI and list what it
+> receives (guideline 5.1.2(i)).
 >
 > Shared pages: anyone with a link can view a shared page in Dream or on the web. Each one has a
 > report button, reports reach a queue we review within **[24 hours]**, and pages can be taken down
@@ -269,7 +270,9 @@ submitted together with a new app version.
       traffic in the console (Dream/Engine/Build.swift).
 - [ ] Privacy manifest included, and the App Privacy answers entered from AppPrivacy.md.
 - [ ] Privacy policy, terms and support pages live and reviewed by a lawyer.
-- [x] Permission before a request first goes to the AI provider (5.1.2(i)): `Dream/Generation/AIConsent.swift`.
+- [ ] Permission before a request first goes to the AI provider (5.1.2(i)): agreed at sign-in, with
+  the providers named in the privacy policy (`SignInButton.agreement`). Decide whether review needs
+  more than that.
 - [ ] Sign in with Apple, account deletion in the app, Apple token revocation (A).
 - [ ] Shared pages: report, takedown, a check before publishing, blocking abusive sharers (C).
 - [ ] The free allowance is enough for a full review, and the subscription works in sandbox (D).
