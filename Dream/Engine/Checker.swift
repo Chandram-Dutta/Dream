@@ -164,9 +164,10 @@ enum Checker {
     static func checkBlocks(_ surface: inout Surface) -> [Issue] {
         var issues: [Issue] = []
         func fixed(_ message: String) { issues.append(Issue(kind: .fixed, message: message)) }
+        issues += checkFigures(&surface)
 
         // A variable no chart runs along would have no control at all, so the reader sets it instead.
-        let axes = charts(in: surface.blocks).reduce(into: Set<String>()) { $0.insert($1.over) }
+        let axes = charts(in: surface.blocks).reduce(into: Set<String>()) { $0.insert($1.over) }.union(surface.figureAxes)
         for index in surface.inputs.indices where surface.inputs[index].role == .variable && !axes.contains(surface.inputs[index].name) {
             surface.inputs[index].role = .adjustable
             fixed("Gave '\(surface.inputs[index].name)' a control, since no chart runs along it.")
@@ -345,6 +346,10 @@ enum Checker {
                 guard let checked = soundBlock(block, in: reference, fixed: fixed) else { return nil }
                 block = checked
 
+            case .figure, .diagram:
+                guard let checked = visual(block, in: reference, fixed: fixed) else { return nil }
+                block = checked
+
             case .facts, .bullets, .steps, .timeline, .stat:
                 (block.ref, block.over, block.children) = ("", "", [])
                 if block.items.isEmpty {
@@ -362,6 +367,7 @@ enum Checker {
         }
 
         surface.blocks = surface.blocks.compactMap { clean($0, depth: 0) }
+        issues += placeVisuals(&surface)
 
         let title = surface.title.lowercased()
         var seenTopics: Set<String> = []

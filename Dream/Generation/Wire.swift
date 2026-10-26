@@ -58,6 +58,7 @@ enum WireBlockKind {
     case section, row
     case sound
     case list, add
+    case figure, diagram
 }
 
 @Generable
@@ -108,6 +109,10 @@ struct WireSurface {
     var outputs: [WireOutput]
     @Guide(description: "Sounds the user can play, only when hearing something teaches", .count(0...3))
     var sounds: [WireSound]
+    @Guide(description: "Drawings for geometry and physics, each shown by a figure block", .count(0...2))
+    var figures: [WireFigure]
+    @Guide(description: "Flows, cycles and hierarchies, each shown by a diagram block", .count(0...2))
+    var diagrams: [WireDiagram]
     @Guide(.count(1...12))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
@@ -132,6 +137,7 @@ extension Surface {
             question: wire.question.isEmpty ? nil : wire.question,
             collections: Surface.collections(wire.collections))
         sounds = Sound.list(wire.sounds)
+        takeVisuals(figures: wire.figures.map(Figure.init), diagrams: wire.diagrams.map(Diagram.init))
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -149,6 +155,7 @@ extension Surface {
             question: wire.question.flatMap { $0.isEmpty ? nil : $0 },
             collections: Surface.collections(partial: wire.collections))
         sounds = Sound.list(partial: wire.sounds)
+        takeVisuals(figures: (wire.figures ?? []).compactMap(Figure.init(partial:)), diagrams: (wire.diagrams ?? []).compactMap(Diagram.init(partial:)))
     }
 }
 

@@ -140,6 +140,8 @@ enum Prompts {
             return "the list of \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
         case .add:
             return "the bar for adding to \(surface.label(of: block.ref).lowercased()) (\(block.ref), #\(block.id))"
+        case .figure, .diagram:
+            return "the \(block.kind.rawValue) \"\(block.ref)\"\(block.title.isEmpty ? "" : ", titled \"\(block.title)\"") (#\(block.id))"
         case .equation where !block.ref.isEmpty:
             return "the equation for \"\(surface.label(of: block.ref))\" (\(block.ref), #\(block.id))"
         case .paragraph, .facts, .bullets, .steps, .timeline, .stat, .equation, .data:
@@ -196,6 +198,7 @@ extension Surface {
         }
         var all = ["\(title): \(summary)"] + (collectionSummary.isEmpty ? [] : [collectionSummary]) + lines(visibleBlocks, depth: 0)
         all += soundOutline
+        all += visualOutline
         if !related.isEmpty { all.append("related: " + related.joined(separator: ", ")) }
         return all.joined(separator: "\n")
     }
