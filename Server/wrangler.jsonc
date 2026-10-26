@@ -1,6 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "dream-share",
+  // Production links live on dream.onlychan.xyz; workers.dev keeps older links working.
+  "routes": [{ "pattern": "dream.onlychan.xyz", "custom_domain": true }],
+  "workers_dev": true,
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
 

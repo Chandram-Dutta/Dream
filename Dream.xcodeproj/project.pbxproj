@@ -199,7 +199,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
-				DREAM_SHARE_HOST = dream-share.chandramdutta.workers.dev;
+				DREAM_SHARE_HOST = dream.onlychan.xyz;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
@@ -237,7 +237,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = DR99P625RR;
-				DREAM_SHARE_HOST = dream-share.chandramdutta.workers.dev;
+				DREAM_SHARE_HOST = dream.onlychan.xyz;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = Config/Info.plist;
