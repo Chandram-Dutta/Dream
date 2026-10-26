@@ -1,0 +1,36 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "dream-share",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+
+  // KaTeX's stylesheet and fonts, copied from node_modules before every dev run and deploy.
+  // Requests for files in ./public are answered before the Worker runs.
+  "build": { "command": "node scripts/copy-katex.mjs" },
+  "assets": { "directory": "./public" },
+
+  // Shared surfaces. Replace database_id with the id `npx wrangler d1 create dream-share` prints.
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "dream-share",
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "migrations"
+    }
+  ],
+
+  // Per-address limits, counted by Cloudflare and never stored by the Worker.
+  "ratelimits": [
+    { "name": "CREATE_LIMIT", "namespace_id": "4801", "simple": { "limit": 10, "period": 60 } },
+    { "name": "READ_LIMIT", "namespace_id": "4802", "simple": { "limit": 120, "period": 60 } }
+  ],
+
+  "vars": {
+    // The apps that open /s/ links, as <Team ID>.<bundle ID>, separated by commas. Served in
+    // /.well-known/apple-app-site-association; change it here when the app's ID changes.
+    "APP_IDS": "DR99P625RR.xyz.onlychan.Dream"
+  },
+
+  // Only what the Worker itself logs, which never includes addresses or surface content.
+  "observability": { "enabled": true, "logs": { "invocation_logs": false } }
+}

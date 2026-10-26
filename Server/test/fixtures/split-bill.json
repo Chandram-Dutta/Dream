@@ -1,0 +1,64 @@
+{
+  "format": 1,
+  "currency": "USD",
+  "surface": {
+    "title": "Split a bill",
+    "summary": "Share the bill and the tip between {people} people.",
+    "symbol": "fork.knife",
+    "accent": "orange",
+    "inputs": [
+      { "name": "bill", "label": "Bill", "format": "currency", "initial": 120, "min": 0, "max": 1000, "step": 5, "options": [] },
+      { "name": "people", "label": "People", "format": "integer", "initial": 4, "min": 1, "max": 12, "step": 1, "options": [] },
+      { "name": "tip", "label": "Tip", "format": "percent", "initial": 15, "min": 0, "max": 30, "step": 1, "options": [] },
+      { "name": "round", "label": "Round up", "format": "toggle", "initial": 1, "min": 0, "max": 1, "step": 1, "options": [] },
+      { "name": "service", "label": "Service", "format": "choice", "initial": 1, "min": 0, "max": 2, "step": 1, "options": ["Poor", "Good", "Great"] }
+    ],
+    "outputs": [
+      { "name": "each", "label": "Each pays", "formula": "bill * (1 + tip / 100) / people", "format": "currency" },
+      { "name": "total", "label": "Total", "formula": "bill * (1 + tip / 100)", "format": "currency" }
+    ],
+    "blocks": [
+      { "id": "hero", "kind": "hero", "ref": "each" },
+      {
+        "id": "numbers",
+        "kind": "section",
+        "title": "Your numbers",
+        "children": [
+          { "id": "bill-slider", "kind": "slider", "ref": "bill" },
+          { "id": "people-stepper", "kind": "stepper", "ref": "people" },
+          { "id": "tip-slider", "kind": "slider", "ref": "tip" },
+          { "id": "round-toggle", "kind": "toggle", "ref": "round" },
+          { "id": "service-picker", "kind": "picker", "ref": "service" }
+        ]
+      },
+      { "id": "totals", "kind": "row", "children": [{ "id": "total-metric", "kind": "metric", "ref": "total" }] },
+      { "id": "each-chart", "kind": "chart", "ref": "each", "over": "people" },
+      { "id": "formula", "kind": "equation", "ref": "each" },
+      { "id": "how", "kind": "paragraph", "title": "How it works", "text": "Each person pays $\\frac{B(1+t)}{n}$, which is {each} <script>alert(1)</script> here." },
+      { "id": "customs", "kind": "facts", "title": "Tipping", "items": [{ "label": "US", "value": "15–20%" }, { "label": "Japan", "value": "None" }] },
+      { "id": "tips", "kind": "data", "title": "Usual tip (%)", "items": [{ "label": "US", "value": "18" }, { "label": "UK", "value": "12.5" }, { "label": "France", "value": "5" }] },
+      { "id": "steps", "kind": "steps", "title": "Splitting fairly", "items": [{ "label": "", "value": "Add the tip to the bill." }, { "label": "", "value": "Divide by the number of people." }] },
+      { "id": "history", "kind": "timeline", "items": [{ "label": "1900s", "value": "Tipping spreads in US restaurants." }, { "label": "2020s", "value": "Card readers suggest a tip." }] },
+      { "id": "stat", "kind": "stat", "items": [{ "label": "$3.80", "value": "the average tip on a $20 bill" }] }
+    ],
+    "related": ["Tipping customs", "Sales tax"],
+    "question": "How does the tip change what each person pays?",
+    "answers": [{ "question": { "text": "Where are you?", "topic": "City", "options": [], "allowsTyping": true, "isPersonal": true }, "choice": "Pune" }],
+    "locale": { "language": "en", "measurementSystem": "metric" }
+  },
+  "values": { "bill": 240 },
+  "preview": {
+    "values": { "bill": "$240", "people": "4", "tip": "15%", "round": "On", "service": "Good", "each": "$69", "total": "$276" },
+    "tex": { "each": "\\$69", "total": "\\$276" },
+    "equations": {
+      "each": {
+        "equation": "\\text{Each pays} = \\frac{\\text{Bill} \\left(1 + \\frac{\\text{Tip}}{100}\\right)}{\\text{People}}",
+        "worked": "= \\frac{240 \\left(1 + \\frac{15}{100}\\right)}{4} = \\$69",
+        "legend": [{ "symbol": "B", "meaning": "Bill" }, { "symbol": "n", "meaning": "People" }]
+      }
+    },
+    "charts": {
+      "each-chart": { "axis": "People", "lines": [{ "label": "Each pays", "points": [[1, 276], [2, 138], [3, 92], [4, 69], [6, 46], [12, 23]] }] }
+    }
+  }
+}

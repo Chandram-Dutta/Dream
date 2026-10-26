@@ -1,0 +1,4 @@
+# Shared screens are unlisted: whoever has a link can open it, but nothing lists them.
+User-agent: *
+Disallow: /s/
+Disallow: /api/

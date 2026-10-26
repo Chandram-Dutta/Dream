@@ -24,6 +24,8 @@ final class SavedSurface {
     var valuesData = Data()
     /// The user's photo, if they started from one.
     @Attribute(.externalStorage) var photoData: Data?
+    /// The link it was opened from, when someone else shared it. Nil for the user's own.
+    var sharedFrom: String?
 
     init(intent: String, surface: Surface, modelName: String, log: [String]) {
         self.intent = intent

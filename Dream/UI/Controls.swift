@@ -4,8 +4,18 @@ struct ControlView: View {
     let kind: BlockKind
     let input: Input
     let context: RenderContext
+    @Environment(\.isPicture) private var isPicture
 
     var body: some View {
+        // In a shared picture, controls UIKit draws are drawn still (SurfacePicture.swift).
+        if isPicture, let still = StillControl(kind: kind, input: input, context: context) {
+            still
+        } else {
+            control
+        }
+    }
+
+    @ViewBuilder private var control: some View {
         switch kind {
         case .toggle: ToggleControl(input: input, context: context)
         case .picker: PickerControl(input: input, context: context)

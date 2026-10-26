@@ -30,6 +30,9 @@ extension Expr {
     static func parse(_ source: String) throws -> Expr {
         var parser = Parser(tokens: try tokenize(source))
         guard !parser.tokens.isEmpty else { throw FormulaError("the formula is empty") }
+        // Parsing and evaluating recurse as deep as a formula nests. Real formulas are a few
+        // dozen tokens; a shared surface could hold one built to exhaust the stack.
+        guard parser.tokens.count <= 300 else { throw FormulaError("the formula is too long") }
         let expr = try parser.parse(0)
         if let extra = parser.peek { throw FormulaError("unexpected \(extra)") }
         return expr

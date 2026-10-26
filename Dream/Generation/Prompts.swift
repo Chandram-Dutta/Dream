@@ -51,7 +51,7 @@ enum Prompts {
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, soundRules, languageRules].filter { !$0.isEmpty }
+        [memoryRules, listRules, figureRules, soundRules, languageRules, sharingRules].filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
