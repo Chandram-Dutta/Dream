@@ -44,6 +44,9 @@ export interface UsageEnv extends StoreEnv {
   MODEL_DAILY_BUDGET?: string;
   /** The models offered, ids from models.ts separated by commas, the first the default. */
   MODELS?: string;
+  /** Secret. Accounts that have Dream Plus without paying, by Dream's user id, separated by commas:
+   * the developer's own, and testers'. Set with `wrangler secret put PLUS_ACCOUNTS`. */
+  PLUS_ACCOUNTS?: string;
 }
 
 export function allowances(env: UsageEnv): Record<Plan, Allowance> {
@@ -75,7 +78,8 @@ export interface Account {
 
 export async function accountOf(env: UsageEnv, userID: string): Promise<Account> {
   const subscription = await activeSubscription(env, userID);
-  return { plan: subscription ? "plus" : "free", subscription };
+  const complimentary = (env.PLUS_ACCOUNTS ?? "").split(",").some((id) => id.trim() === userID);
+  return { plan: subscription || complimentary ? "plus" : "free", subscription };
 }
 
 interface Row {
