@@ -141,9 +141,11 @@ struct FormingView: View {
     let stage: String?
     let palette: Palette
     var asking: Asking?
+    /// A connected service's tool waiting to be allowed.
+    var consent: Consent?
 
     var body: some View {
-        let isAsking = asking?.isWaiting ?? false
+        let isAsking = (asking?.isWaiting ?? false) || (consent?.isWaiting ?? false)
         VStack(alignment: .leading, spacing: 22) {
             HStack(alignment: .firstTextBaseline, spacing: 12) {
                 // Waiting on the user isn't working.
@@ -159,6 +161,7 @@ struct FormingView: View {
             if let asking, asking.isWaiting || !asking.answers.isEmpty {
                 AskingView(asking: asking, palette: palette)
             }
+            if let consent { ConsentView(consent: consent, palette: palette) }
             if !isAsking {
                 VStack(alignment: .leading, spacing: 12) {
                     Capsule().frame(height: 14).frame(maxWidth: .infinity)

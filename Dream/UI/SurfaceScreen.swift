@@ -76,7 +76,7 @@ struct SurfaceScreen: View {
     private var energy: Double {
         guard composer.phase.isBusy else { return 0 }
         // Waiting for answers: calmer than writing, still awake.
-        if composer.asking.isWaiting { return 0.25 }
+        if composer.asking.isWaiting || composer.consent.isWaiting { return 0.25 }
         return composer.isThinking ? 1 : 0.45
     }
 
@@ -89,8 +89,11 @@ struct SurfaceScreen: View {
     var body: some View {
         let busy = composer.phase.isBusy
         ScrollView {
+            // A service the request names, which the user could connect.
+            ConnectSuggestions(entries: composer.suggestions, palette: palette) { Task { await runAgain() } }
+                .padding(.horizontal, 20)
             // Questions waiting on the user always show, even over a page that's begun.
-            if let surface, !surface.isEmpty, !composer.asking.isWaiting {
+            if let surface, !surface.isEmpty, !composer.asking.isWaiting, !composer.consent.isWaiting {
                 SurfaceView(
                     surface: surface,
                     state: state,
@@ -104,7 +107,7 @@ struct SurfaceScreen: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
             } else {
-                FormingView(intent: intent, stage: stage, palette: palette, asking: composer.asking)
+                FormingView(intent: intent, stage: stage, palette: palette, asking: composer.asking, consent: composer.consent)
                     .padding(.horizontal, 20)
             }
         }
@@ -167,7 +170,10 @@ struct SurfaceScreen: View {
         }
         .task { await start() }
         // Never leave the model waiting on questions nobody can see.
-        .onDisappear { composer.asking.cancel() }
+        .onDisappear {
+            composer.asking.cancel()
+            composer.consent.cancel()
+        }
         .onChange(of: state.values) { _, values in saved?.values = values }
         .keepingRecords(of: saved?.id, collections: surface?.recordCollections ?? [], in: state)
     }
@@ -265,6 +271,16 @@ struct SurfaceScreen: View {
         try? context.save()
         self.saved = saved
         Memory.learn(from: request.intent, answers: surface.answers ?? [], in: context)
+    }
+
+    /// After connecting a service the request named, the request runs again, now able to read it.
+    private func runAgain() async {
+        await composer.compose(intent: intent, image: request?.image)
+        guard composer.phase == .done, let surface = composer.surface, let saved else { return }
+        saved.surface = surface
+        saved.generationLog = composer.log
+        saved.modelName = composer.modelName
+        try? context.save()
     }
 
     private func beginChange(_ target: ChangeTarget) {

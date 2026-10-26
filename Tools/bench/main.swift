@@ -19,7 +19,7 @@ let defaultRequests = [
         await composer.compose(intent: request)
         let answers = composer.surface?.answers ?? []
         print(answers.isEmpty ? "Asked: nothing" : "Asked: " + answers.map { "\($0.question.text)\($0.isRemembered ? " (remembered: \($0.choice))" : "")" }.joined(separator: "; "))
-        if let surface = composer.surface { await BenchConnections.showLive(surface) }
+        if let surface = composer.surface { await BenchConnections.showLive(surface, suggesting: composer.suggestions) }
         guard let surface = composer.surface, surface.hasLogic else { continue }
         print(surface.logicSummary)
         let evaluation = surface.evaluate(surface.initialValues)
@@ -57,11 +57,21 @@ if let address = UserDefaults.standard.string(forKey: "signIn") {
     exit(0)
 }
 // "-mcp https://mcp.deepwiki.com/mcp" connects servers for the run (several, separated by
-// spaces), offered the way the app offers them. "-mcpReads all", or a list of tool names,
-// stands in for the user saying tools whose servers don't mark them only read. "-pickOnly 1"
-// shows which tools each request would be offered, without running the model.
+// spaces), offered the way the app offers them. Before a tool runs, the app may ask the user;
+// the bench prints the question and answers it with "-consent once" (the default), "always" or
+// "deny". "-directory http://127.0.0.1:8787" reads the featured services from a Worker, so a
+// request naming one that isn't connected gets its card. "-pickOnly 1" shows which tools each
+// request would be offered, without running the model.
+switch UserDefaults.standard.string(forKey: "consent") {
+case "always": Consent.answerer = .automatic(.always)
+case "deny": Consent.answerer = .automatic(.deny)
+default: Consent.answerer = .automatic(.once)
+}
 if let servers = UserDefaults.standard.string(forKey: "mcp") {
-    await BenchConnections.connect(servers.split(separator: " ").map(String.init), reads: UserDefaults.standard.string(forKey: "mcpReads") ?? "", remembered: remembered)
+    await BenchConnections.connect(servers.split(separator: " ").map(String.init), remembered: remembered)
+}
+if let directory = UserDefaults.standard.string(forKey: "directory") {
+    await BenchConnections.loadDirectory(directory)
 }
 if UserDefaults.standard.bool(forKey: "pickOnly") {
     BenchConnections.showPicks(arguments)

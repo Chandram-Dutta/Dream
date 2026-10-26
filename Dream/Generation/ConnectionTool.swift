@@ -8,30 +8,31 @@ import FoundationModels
 /// parameters are built at runtime from the tool's JSON Schema, so its arguments arrive as
 /// generated content in the shape the tool takes.
 ///
-/// A tool that only reads runs, through the live layer: the call declares a source, so the
-/// numbers and lists it returns stay current on the screen without writing it again
-/// (ConnectionLive.swift). A tool that changes things never runs here: calling it proposes a
-/// button that runs it only when the user taps. What a tool returns goes back marked as
-/// untrusted data, and a call that would send what Dream remembers about the user to a service
-/// not allowed it isn't made.
+/// Any relevant tool is offered, whatever its hints. When the model calls one, Dream decides
+/// whether to ask the user first (`ConsentPolicy`), and the call waits on their answer: once per
+/// service for look-ups, every time for anything that may change something, and always for a
+/// call carrying something personal. "Don't allow" goes back to the model as a plain refusal.
+///
+/// A look-up the user has allowed always declares a live source, so the numbers and lists it
+/// returns stay current on the screen without writing it again (ConnectionLive.swift). What a
+/// tool returns goes back marked as untrusted data.
 struct ConnectionTool: Tool {
     typealias Arguments = GeneratedContent
-
-    enum Mode { case read, propose }
 
     let name: String
     let description: String
     let parameters: GenerationSchema
-    let mode: Mode
     let connection: Connection
     let tool: ConnectedTool
-    /// What the user asked, whose own words may go to any service.
+    /// What the user asked, whose own words aren't personal details: they chose to say them.
     let request: String
     /// For the answers given before building, which may be about the user.
     let asking: Asking
-    /// Where reads declare their sources.
+    /// Where calls that need the user's word wait for it.
+    let consent: Consent
+    /// Where look-ups declare their sources.
     let live: LiveLog
-    /// Where buttons are proposed, and services that were read are noted.
+    /// Where services that were read, and changes that were tried, are noted.
     let log: ConnectionLog
     /// Told what's called, and how it went, for the log.
     var onUse: @Sendable (String) -> Void = { _ in }
@@ -44,28 +45,57 @@ struct ConnectionTool: Tool {
     func call(arguments: GeneratedContent) async throws -> String {
         let values = JSONValue(arguments)
         onUse("\(connection.name): \(tool.name) \(values.jsonString.prefix(160))")
-        let answers = await asking.answers.filter { $0.question.isPersonal && !$0.isLeftToDream }.map(\.choice)
-        let carried = PersonalCheck.carried(in: values, details: await Connections.source.personalDetails() + answers, request: request)
-        if !carried.isEmpty && !connection.mayReceiveMemory {
-            onUse("Not sent to \(connection.name): it would carry something Dream remembers about the user.")
-            return "Not \(mode == .read ? "sent" : "offered"). That would give \(connection.name) something Dream remembers about the user, which the user hasn't allowed it to receive. Call it again with only what the request says, or build the screen without it."
+        if !tool.readsOnly { log.tried(tool.name) }
+        // The connection as it stands now: an earlier answer may have said "Always".
+        let current = Connections.source.connections().first { $0.id == connection.id } ?? connection
+        let tool = current.tools.first { $0.name == self.tool.name } ?? self.tool
+        let answers = await asking.answers.filter { $0.question.isPersonal && !$0.isLeftToDream }
+            .map { PersonalDetail(text: $0.choice, from: "your answer about \($0.question.topic.lowercased())") }
+        let personal = PersonalCheck.carried(in: values, details: await Connections.source.personalDetails() + answers, request: request)
+        var allowedAlways = current.alwaysLooksUp || tool.alwaysAllowed
+        if let question = ConsentPolicy.request(current, tool, values: values, personal: personal) {
+            onUse("Asking: \(question.question)")
+            switch await whileAsking({ await consent.ask(question) }) {
+            case .deny:
+                onUse("\(connection.name): not allowed")
+                return "The user didn't allow this, so it wasn't run. Carry on without it: don't call it again for this, don't ask them to allow it, and don't claim anything about what it would have returned or done."
+            case .always:
+                await Connections.source.allowAlways(connection.id, question.kind == .lookUp ? nil : tool.name)
+                allowedAlways = true
+                onUse("\(connection.name): allowed always")
+            case .once:
+                onUse("\(connection.name): allowed once")
+            }
         }
-        switch mode {
-        case .read: return await read(values, carriesMemory: !carried.isEmpty)
-        case .propose: return propose(values, carriesMemory: !carried.isEmpty)
+        // A look-up the user lets run without asking can be read again when the page opens.
+        if tool.readsOnly, allowedAlways, personal.isEmpty {
+            return await readLive(values)
+        }
+        return await run(values, tool: tool)
+    }
+
+    // MARK: - Running
+
+    private func run(_ values: JSONValue, tool: ConnectedTool) async -> String {
+        do {
+            let result = try await whileWaiting { try await Connections.source.call(connection, tool.name, values) }
+            log.use(connection.name)
+            onUse("\(connection.name) answered\(result.isError ? " with an error" : ""): \(result.text.count) characters")
+            let done = tool.readsOnly || result.isError ? "" : "\nIt's done: \(connection.name) has made this change. Say so plainly on the screen, without a button for it."
+            return Self.untrusted(result, from: connection.name, tool: tool.name) + done
+        } catch {
+            onUse("\(connection.name) failed: \(error.localizedDescription)")
+            return "\(connection.name) couldn't answer this time. Build the screen without it, and don't claim anything about what it holds."
         }
     }
 
-    // MARK: - Reading
-
-    private func read(_ values: JSONValue, carriesMemory: Bool) async -> String {
+    private func readLive(_ values: JSONValue) async -> String {
         var source = Source(name: sourceName(for: values), kind: Source.connectionKind, parameters: [
             "service": connection.name,
             "server": connection.url.absoluteString,
             "tool": tool.name,
             "arguments": values.jsonString,
         ], fields: [])
-        if carriesMemory { source.parameters["memory"] = "yes" }
         do {
             let asked = source
             let reading = try await whileWaiting { try await LiveSources.read(asked) }
@@ -112,28 +142,19 @@ struct ConnectionTool: Tool {
         return lines.joined(separator: "\n")
     }
 
-    // MARK: - Proposing
-
-    private func propose(_ values: JSONValue, carriesMemory: Bool) -> String {
-        let name = log.name(for: ConnectionReading.name([tool.name], or: "serviceAction"))
-        var fields = [
-            "service": connection.name,
-            "server": connection.url.absoluteString,
-            "tool": tool.name,
-            "label": tool.title.map { ToolSchema.text($0) ?? "" } ?? "",
-            "inputs": ConnectionPerformer.encode(values),
-        ]
-        if carriesMemory { fields["memory"] = "yes" }
-        let action = Action(name: name, kind: Action.connectionKind, fields: fields.filter { !$0.value.isEmpty })
-        log.propose(action)
-        let shown = ConnectionPerformer().sentence(ResolvedAction(name: name, kind: action.kind, text: action.fields, start: nil, hasTime: false, minutes: nil))
-        onUse("Proposed a button: \(shown)")
-        return """
-            Not done: \(connection.name) changes things only when the user taps. Dream puts a button on the screen that says “\(shown)” and sends exactly these values. Show it with an action block whose ref is \(name), after what it's about; don't define it in actions, since this call did. Never say it's done, or that it will happen without a tap. To change a value, call this again.
-            """
-    }
-
     // MARK: - Pieces
+
+    /// Waits on the user without the composer taking the quiet for a stalled model.
+    private func whileAsking(_ ask: @escaping @Sendable () async -> ConsentAnswer) async -> ConsentAnswer {
+        let heartbeat = Task {
+            while !Task.isCancelled {
+                ModelActivity.touch()
+                try? await Task.sleep(for: .seconds(2))
+            }
+        }
+        defer { heartbeat.cancel() }
+        return await ask()
+    }
 
     /// Waits for a service without the composer taking the silence for a stalled model, and
     /// gives up after `patience` even if the call doesn't stop when asked.
@@ -210,16 +231,14 @@ private final class Once: @unchecked Sendable {
 
 extension ConnectionTool {
     /// The tools worth offering for this request, from switched-on services and relevant to
-    /// what's asked (`ToolPicker`): ones that only read, and when the request asks to do
-    /// something, ones that change things, as buttons. Usually none.
-    static func offered(for request: String, asking: Asking, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
-        let reads = ToolPicker.pick(for: request, from: Connections.readingTools).map { ($0.connection, $0.tool, Mode.read) }
-        let writes = ToolPicker.asksToAct(request)
-            ? ToolPicker.pick(for: request, from: Connections.writingTools, limit: 2, perService: 2).map { ($0.connection, $0.tool, Mode.propose) }
-            : []
-        guard !reads.isEmpty || !writes.isEmpty else { return [] }
+    /// what's asked (`ToolPicker`), whatever their hints: ones that look things up or don't say,
+    /// and when the request asks to do something, ones that change things. Usually none.
+    static func offered(for request: String, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
+        let looking = ToolPicker.pick(for: request, from: Connections.lookingTools)
+        let changing = ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : []
+        guard !looking.isEmpty || !changing.isEmpty else { return [] }
         var names: Set<String> = ["lookup", "ask", "recall", "live"]
-        let tools = (reads + writes).compactMap { connection, tool, mode -> ConnectionTool? in
+        let tools = (looking + changing).compactMap { connection, tool -> ConnectionTool? in
             var name = String(ToolSchema.identifier("\(connection.slug)_\(tool.name)").prefix(60))
             while names.contains(name) { name += "_" }
             guard let parameters = ToolSchema.generationSchema(for: tool.inputSchema, name: name) else {
@@ -229,32 +248,32 @@ extension ConnectionTool {
             names.insert(name)
             return ConnectionTool(
                 name: name,
-                description: description(of: tool, from: connection, mode: mode),
+                description: description(of: tool, from: connection),
                 parameters: parameters,
-                mode: mode,
                 connection: connection,
                 tool: tool,
                 request: request,
                 asking: asking,
+                consent: consent,
                 live: live,
                 log: log,
                 onUse: onUse)
         }
-        log.offer(tools.filter { $0.mode == .propose }.map(\.name))
+        log.offer(tools.filter { $0.tool.readOnlyHint == false }.map(\.name))
         if !tools.isEmpty {
-            onUse("Offered from connections: " + tools.map { "\($0.connection.name) \($0.tool.name)\($0.mode == .propose ? " (as a button)" : "")" }.joined(separator: ", "))
+            onUse("Offered from connections: " + tools.map { "\($0.connection.name) \($0.tool.name)" }.joined(separator: ", "))
         }
         return tools
     }
 
     /// The service's own words, kept short and said to be theirs.
-    private static func description(of tool: ConnectedTool, from connection: Connection, mode: Mode) -> String {
+    private static func description(of tool: ConnectedTool, from connection: Connection) -> String {
         let summary = ToolSchema.text(tool.summary) ?? tool.label
-        let personal = connection.mayReceiveMemory ? "" : " Never send it details Dream remembers about the user."
-        let what = switch mode {
-        case .read: "It only reads, and Dream keeps what it returns current on the screen."
-        case .propose: "It changes things there, so calling it doesn't do it: it puts a button on the screen that does it only when the user taps, with the values you give. Use it only when the request asks to do this."
+        let what = switch tool.readOnlyHint {
+        case true?: "It only looks things up."
+        case nil: "Its service doesn't say whether it changes anything, so Dream may ask the user before it runs."
+        case false?: "It changes things there, so Dream shows the user exactly what it sends and asks them first; it runs only if they allow it. Use it only when the request asks to do this."
         }
-        return "From \(connection.name), a service the user connected. \(what) \(connection.name) describes it as: \(summary)\(personal)"
+        return "From \(connection.name), a service the user connected. \(what) \(connection.name) describes it as: \(summary) Send it only what this needs; anything personal is shown to the user first."
     }
 }

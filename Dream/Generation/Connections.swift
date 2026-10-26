@@ -3,10 +3,10 @@ import NaturalLanguage
 
 // Connected services (ROADMAP.md, workstream 8): remote MCP servers the user adds, and what
 // building a screen may do with them. The app's store (Dream/Connections) talks to the servers;
-// this side decides what the model sees and may call.
+// this side decides what the model sees, and asks the user before a tool runs (Consent.swift).
 
-/// A remote MCP server the user connected, with the tools it offers and what the user allows it.
-/// Kept on the phone; a sign-in's tokens are in the Keychain, never here.
+/// A remote MCP server the user connected, with the tools it offers and what the user has let it
+/// do without asking. Kept on the phone; a sign-in's tokens are in the Keychain, never here.
 struct Connection: Codable, Hashable, Identifiable, Sendable {
     var id = UUID()
     /// The server's MCP endpoint, like https://mcp.linear.app/mcp.
@@ -16,10 +16,9 @@ struct Connection: Codable, Hashable, Identifiable, Sendable {
     /// Off, none of its tools are offered or called.
     var isOn = true
     var tools: [ConnectedTool] = []
-    /// Whether details Dream remembers about the user may be sent to it. Off until the user turns it on.
-    var mayReceiveMemory = false
-    /// Whether entries from the user's lists may be sent to it. Off until the user turns it on.
-    var mayReceiveLists = false
+    /// The user chose "Always" for its tools that only look things up: they run without asking,
+    /// unless a call carries something personal.
+    var alwaysLooksUp = false
     /// When its tools were last listed.
     var checkedAt: Date?
 
@@ -36,7 +35,8 @@ struct Connection: Codable, Hashable, Identifiable, Sendable {
         return String((name == "value" ? ToolSchema.identifier(host.lowercased()) : name).prefix(20))
     }
 
-    // Later versions may add settings; older saved connections still load.
+    // Later versions may add settings, and earlier ones had switches that blocked tools; older
+    // saved connections still load, without them.
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         id = try container.decode(UUID.self, forKey: .id)
@@ -44,8 +44,7 @@ struct Connection: Codable, Hashable, Identifiable, Sendable {
         name = try container.decode(String.self, forKey: .name)
         isOn = try container.decodeIfPresent(Bool.self, forKey: .isOn) ?? true
         tools = try container.decodeIfPresent([ConnectedTool].self, forKey: .tools) ?? []
-        mayReceiveMemory = try container.decodeIfPresent(Bool.self, forKey: .mayReceiveMemory) ?? false
-        mayReceiveLists = try container.decodeIfPresent(Bool.self, forKey: .mayReceiveLists) ?? false
+        alwaysLooksUp = try container.decodeIfPresent(Bool.self, forKey: .alwaysLooksUp) ?? false
         checkedAt = try container.decodeIfPresent(Date.self, forKey: .checkedAt)
     }
 }
@@ -64,8 +63,9 @@ struct ConnectedTool: Codable, Hashable, Identifiable, Sendable {
     var openWorldHint: Bool?
     /// Off, it's never offered or called.
     var isOn = true
-    /// The user says it only reads, for a tool whose server doesn't say either way.
-    var userSaysReadsOnly = false
+    /// The user chose "Always allow this action": it runs without asking, unless a call carries
+    /// something personal.
+    var alwaysAllowed = false
 
     init(name: String, title: String?, summary: String, inputSchema: JSONValue, readOnlyHint: Bool?, destructiveHint: Bool?, idempotentHint: Bool?, openWorldHint: Bool?) {
         self.name = name
@@ -89,18 +89,17 @@ struct ConnectedTool: Codable, Hashable, Identifiable, Sendable {
         idempotentHint = try container.decodeIfPresent(Bool.self, forKey: .idempotentHint)
         openWorldHint = try container.decodeIfPresent(Bool.self, forKey: .openWorldHint)
         isOn = try container.decodeIfPresent(Bool.self, forKey: .isOn) ?? true
-        userSaysReadsOnly = try container.decodeIfPresent(Bool.self, forKey: .userSaysReadsOnly) ?? false
+        alwaysAllowed = try container.decodeIfPresent(Bool.self, forKey: .alwaysAllowed) ?? false
     }
 
     var id: String { name }
     var label: String { title?.isEmpty == false ? title! : name }
 
-    /// Whether it only reads, by the server's word, or by the user's when the server doesn't say.
-    /// Only these may run while a screen is built.
-    var readsOnly: Bool { readOnlyHint == true || (readOnlyHint == nil && userSaysReadsOnly) }
+    /// Whether its service says it only reads.
+    var readsOnly: Bool { readOnlyHint == true }
 
-    /// What running it does, by the hints. Writes are never run by the model; when action buttons
-    /// run them on a tap, the ones that may destroy something ask first.
+    /// What running it does, by the hints. A tool whose service doesn't say counts as one that
+    /// may destroy something.
     enum Effect { case reads, changes, destroys }
 
     var effect: Effect {
@@ -108,7 +107,7 @@ struct ConnectedTool: Codable, Hashable, Identifiable, Sendable {
         return destructiveHint == false ? .changes : .destroys
     }
 
-    /// Whether a tap should be confirmed before it runs.
+    /// Whether a tap on its button should be confirmed before it runs.
     var needsConfirmation: Bool { effect == .destroys }
 
     /// Whether the model can be given it: its inputs have a shape guided generation can fill.
@@ -128,7 +127,6 @@ enum ConnectionError: LocalizedError, Equatable {
     case unavailable
     case off(String)
     case toolOff(String)
-    case notAllowed(String)
     case needsSignIn(String)
     case timedOut(String)
     case failed(String)
@@ -138,11 +136,40 @@ enum ConnectionError: LocalizedError, Equatable {
         case .unavailable: "Connections aren't available here."
         case .off(let name): "\(name) is switched off."
         case .toolOff(let tool): "\(tool) is switched off."
-        case .notAllowed(let name): "\(name) isn't allowed to receive that."
         case .needsSignIn(let name): "\(name) needs you to sign in."
         case .timedOut(let name): "\(name) didn't answer in time."
         case .failed(let message): message
         }
+    }
+}
+
+/// A service in the directory of MCP servers (the Worker's /api/mcp/, from the MCP Registry).
+struct DirectoryEntry: Codable, Hashable, Identifiable, Sendable {
+    var id: String
+    var name: String
+    var summary: String
+    var url: URL
+    var website: URL?
+    var icon: URL?
+    /// Nil when nobody has checked.
+    var signIn: Bool?
+    var category: String?
+    /// Other names for it, like Jira for Atlassian.
+    var aliases: [String] = []
+    var featured = false
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        summary = try container.decodeIfPresent(String.self, forKey: .summary) ?? ""
+        url = try container.decode(URL.self, forKey: .url)
+        website = try? container.decodeIfPresent(URL.self, forKey: .website)
+        icon = try? container.decodeIfPresent(URL.self, forKey: .icon)
+        signIn = try container.decodeIfPresent(Bool.self, forKey: .signIn)
+        category = try container.decodeIfPresent(String.self, forKey: .category)
+        aliases = try container.decodeIfPresent([String].self, forKey: .aliases) ?? []
+        featured = try container.decodeIfPresent(Bool.self, forKey: .featured) ?? false
     }
 }
 
@@ -152,10 +179,12 @@ enum Connections {
     struct Source: Sendable {
         /// The connections as they stand. Called while a session is set up, so it can't wait.
         var connections: @Sendable () -> [Connection]
-        /// Runs a tool. The checks are the caller's: switched on, allowed, and who asked.
+        /// Runs a tool. Whether to ask first is the caller's to decide (`ConsentPolicy`).
         var call: @Sendable (_ connection: Connection, _ tool: String, _ arguments: JSONValue) async throws -> ToolResult
-        /// The details Dream remembers about the user, to keep from services not allowed them.
-        var personalDetails: @Sendable () async -> [String]
+        /// The details Dream remembers about the user, so a call that carries one is always shown.
+        var personalDetails: @Sendable () async -> [PersonalDetail]
+        /// Keeps an "Always": for a service's look-ups (a nil tool), or for one tool.
+        var allowAlways: @Sendable (_ connection: Connection.ID, _ tool: String?) async -> Void = { _, _ in }
     }
 
     nonisolated(unsafe) static var source = Source(
@@ -163,44 +192,58 @@ enum Connections {
         call: { _, _, _ in throw ConnectionError.unavailable },
         personalDetails: { [] })
 
-    /// What a call sends that belongs to the user. The caller says, since only it knows where the
-    /// arguments came from; the model's own calls are checked by `ConnectionTool`.
-    enum Personal: Hashable, Sendable {
-        /// Details Dream remembers about the user.
-        case memory
-        /// Entries from the user's lists.
-        case lists
-    }
+    /// The directory's featured services, as last fetched, for noticing one in a request.
+    nonisolated(unsafe) static var directory: [DirectoryEntry] = []
 
-    /// Runs any switched-on tool on the user's behalf, writes included, so it must only follow a
-    /// tap: this is where action buttons and live sources plug in. It refuses to send what the
-    /// user hasn't allowed this service to receive.
-    static func call(_ tool: String, on id: Connection.ID, arguments: JSONValue, carrying personal: Set<Personal> = []) async throws -> ToolResult {
+    /// Runs a switched-on tool for the user: live sources reading again, and action buttons on a
+    /// tap. Nothing here asks; those callers already have the user's word.
+    static func call(_ tool: String, on id: Connection.ID, arguments: JSONValue) async throws -> ToolResult {
         guard let connection = source.connections().first(where: { $0.id == id }) else { throw ConnectionError.unavailable }
         guard connection.isOn else { throw ConnectionError.off(connection.name) }
         guard connection.tools.first(where: { $0.name == tool })?.isOn == true else { throw ConnectionError.toolOff(tool) }
-        if personal.contains(.memory) && !connection.mayReceiveMemory || personal.contains(.lists) && !connection.mayReceiveLists {
-            throw ConnectionError.notAllowed(connection.name)
-        }
         return try await source.call(connection, tool, arguments)
     }
 
-    /// Every tool the model may be given while building: switched on, only reading, and with
-    /// inputs it can fill.
-    static var readingTools: [(connection: Connection, tool: ConnectedTool)] {
+    /// Every tool the model may be given while building: switched on, with inputs it can fill.
+    /// What its hints say decides only whether the user is asked first.
+    static var usableTools: [(connection: Connection, tool: ConnectedTool)] {
         source.connections().filter(\.isOn).flatMap { connection in
-            connection.tools.filter { $0.isOn && $0.readsOnly && $0.isRepresentable }.map { (connection, $0) }
+            connection.tools.filter { $0.isOn && $0.isRepresentable }.map { (connection, $0) }
         }
     }
 
-    /// Every tool that changes things the model may turn into a button while building. Calling
-    /// one never runs it.
-    static var writingTools: [(connection: Connection, tool: ConnectedTool)] {
-        source.connections().filter(\.isOn).flatMap { connection in
-            connection.tools.filter { $0.isOn && !$0.readsOnly && $0.isRepresentable }.map { (connection, $0) }
+    /// Tools offered by relevance alone: those that only look things up, and those whose service
+    /// doesn't say, which may.
+    static var lookingTools: [(connection: Connection, tool: ConnectedTool)] {
+        usableTools.filter { $0.tool.readOnlyHint != false }
+    }
+
+    /// Tools that say they change things, offered when the request asks to do something.
+    static var changingTools: [(connection: Connection, tool: ConnectedTool)] {
+        usableTools.filter { $0.tool.readOnlyHint == false }
+    }
+
+    /// Services from the directory a request names as holding the user's own things, but that
+    /// the user hasn't connected: "my Linear issues", "the sprint in Jira", "add it to Notion".
+    /// Naming one in passing ("Linear vs Jira") isn't asking for what's in it, and "linear
+    /// regression in linear algebra" isn't naming one at all.
+    static func unconnected(in request: String) -> [DirectoryEntry] {
+        let connected = Set(source.connections().compactMap { $0.url.host()?.lowercased() })
+        return directory.filter { entry in
+            guard !connected.contains(entry.url.host()?.lowercased() ?? "") else { return false }
+            return ([entry.name] + entry.aliases).contains { Self.names($0, in: request) }
         }
     }
+
+    private static func names(_ service: String, in request: String) -> Bool {
+        let escaped = NSRegularExpression.escapedPattern(for: service)
+        // Theirs, however it's written.
+        if request.range(of: "\\b(my|our)\\s+(own\\s+)?\(escaped)\\b", options: [.regularExpression, .caseInsensitive]) != nil { return true }
+        // Somewhere things are kept, written with its capital.
+        return request.range(of: "(?i:\\b(in|on|from|to|into|inside|with|using|via)\\s+(the\\s+)?)\(escaped)\\b", options: .regularExpression) != nil
+    }
 }
+
 
 // MARK: - Picking
 
@@ -334,16 +377,18 @@ enum ToolPicker {
 
 // MARK: - What may be sent
 
-/// Keeps what Dream remembers about the user away from services the user hasn't allowed it,
-/// when the model tries to send it. Words the request itself uses are always fine: the user
-/// chose to say them.
+/// Finds what's personal in a call: details Dream remembers about the user, or entries from their
+/// lists, which the model may have put in its arguments. Such a call is always shown to the user
+/// first, naming them. Words the request itself uses don't count: the user chose to say them.
 enum PersonalCheck {
-    /// The remembered details these arguments would carry that the request didn't say.
-    static func carried(in arguments: JSONValue, details: [String], request: String) -> [String] {
+    /// The details these arguments would carry that the request didn't say.
+    static func carried(in arguments: JSONValue, details: [PersonalDetail], request: String) -> [PersonalDetail] {
         let sent = " " + plain(arguments.strings.joined(separator: " ")) + " "
         let said = " " + plain(request) + " "
+        var seen: Set<String> = []
         return details.filter { detail in
-            let whole = plain(detail)
+            let whole = plain(detail.text)
+            guard seen.insert(whole).inserted else { return false }
             guard whole.count >= 3 else { return false }
             if sent.contains(" \(whole) ") && !said.contains(" \(whole) ") { return true }
             // A part of a short detail is enough: "Pune" from "Pune, Maharashtra". A single word

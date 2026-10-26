@@ -37,6 +37,10 @@ final class Composer {
     private let live = LiveLog()
     /// Buttons proposed for connected services' write tools, and which services were read.
     private let connected = ConnectionLog()
+    /// What a connected service's tool waits on the user to allow. The screen shows it like the questions.
+    let consent = Consent()
+    /// Services the request names that the user hasn't connected, which the screen offers to connect.
+    private(set) var suggestions: [DirectoryEntry] = []
 
     /// Which model writes surfaces. If the chosen one can't be used or fails, the other is tried.
     enum Provider: String, CaseIterable {
@@ -90,6 +94,7 @@ final class Composer {
         connected.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
+        suggestions = Connections.unconnected(in: intent)
         do {
             let context = await Prompts.context(for: intent)
             try await withModel {
@@ -163,7 +168,7 @@ final class Composer {
         [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
-            + ConnectionTool.offered(for: request, asking: asking, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
+            + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
     }
 
     private func lookingUp(_ subject: String) {

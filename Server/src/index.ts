@@ -6,10 +6,12 @@
 //   GET  /api/surfaces/:id    the shared surface, for the app
 //   GET  /s/:id               the web viewer; also the universal link the app opens
 //   GET  /.well-known/apple-app-site-association
+//   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
 
+import { directory } from "./directory";
 import { CSP, messagePage, surfacePage } from "./page";
 import { parseShared, readBody, Rejection } from "./payload";
 import { ID_PATTERN, load, save } from "./store";
@@ -107,6 +109,12 @@ export default {
         }
         if (!stored) return html(messagePage("This screen isn't here", "The link may be incomplete, or the screen was taken down."), 404);
         return html(surfacePage(stored, url.origin), 200, "public, max-age=300");
+      }
+      if (path.startsWith("/api/mcp/")) {
+        if (!reading) return problem(405, "Only GET.", { Allow: "GET, HEAD" });
+        if (!(await allowed(env.READ_LIMIT, request, "directory"))) return problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" });
+        const answer = await directory(request, url);
+        if (answer) return answer;
       }
       if (path === "/" && reading) {
         return html(messagePage("Dream", "Screens shared from Dream open here. Ask for something on your iPhone, and Dream makes a screen that explains it, works it out, or both."), 200, "public, max-age=3600");
