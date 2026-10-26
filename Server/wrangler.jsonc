@@ -28,7 +28,9 @@
     { "name": "READ_LIMIT", "namespace_id": "4802", "simple": { "limit": 120, "period": 60 } },
     // Web search and page reads (src/web.ts), which cost money. A screen uses a few of each.
     { "name": "SEARCH_LIMIT", "namespace_id": "4803", "simple": { "limit": 30, "period": 60 } },
-    { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } }
+    { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } },
+    // Reports of shared pages (src/safety.ts), per address.
+    { "name": "REPORT_LIMIT", "namespace_id": "4861", "simple": { "limit": 5, "period": 60 } }
   ],
 
   "vars": {
@@ -43,7 +45,7 @@
     "APPLE_CLIENT_ID": "xyz.onlychan.Dream",
     "APPLE_TEAM_ID": "DR99P625RR"
     // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS,
-    // APPLE_KEY_ID and APPLE_PRIVATE_KEY.
+    // APPLE_KEY_ID and APPLE_PRIVATE_KEY, and ADMIN_KEY (reviewing reported pages, src/safety.ts).
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.

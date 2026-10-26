@@ -30,7 +30,7 @@ struct HomeView: View {
                         .font(.display(.largeTitle, weight: .bold))
                         .padding(.top, 24)
                         .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
+                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { YourLinksButton(); ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
                     if !canCompose {
                         Button { showingSettings = true } label: {
                             Label("Add an xAI API key to start making screens.", systemImage: "key.fill")

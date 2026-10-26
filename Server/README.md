@@ -10,9 +10,13 @@ list entries, photo and memory never leave the phone.
 
 | Request | What it does |
 |---|---|
-| `POST /api/surfaces` | Stores a shared surface (`application/json`, at most 200 KB). Answers `201 { id, url }`. |
-| `GET /api/surfaces/:id` | The shared surface, for the app. |
+| `POST /api/surfaces` | Stores a shared surface (`application/json`, at most 200 KB), for a signed-in user. Answers `201 { id, url }`, or `200 { id, url, reused: true }` when it updates the page's link. See [Owners, reports and safety](#owners-reports-and-safety). |
+| `GET /api/surfaces/:id` | The shared surface, for the app; `410` once it's stopped. `PUT` and `DELETE` are its owner's. |
 | `GET /s/:id` | The web viewer. Also the universal link the app opens. |
+| `GET /api/me/shares` | The signed-in user's links. |
+| `/s/:id/report`, `POST /api/surfaces/:id/report` | Reporting a page, on the web or from the app. |
+| `POST /api/surfaces/:id/block`, `/api/me/blocked` | Not seeing a sharer's pages again. |
+| `/admin`, `/api/admin/…` | Reviewing reports, behind `ADMIN_KEY`. |
 | `GET /.well-known/apple-app-site-association` | Which app opens `/s/` links (`APP_IDS`). |
 | `POST /api/search` | Web search, for the app only. See [Web search and reading](#web-search-and-reading). |
 | `POST /api/read` | A web page's text, for the app only. |
@@ -58,8 +62,9 @@ R2 is the place for anything large later, like rendered share images for link pr
 - **Size:** bodies over 200 KB are refused before they're read in full. JSON is also bounded in
   nesting depth (20), node count (25,000), string length (4,000) and list length (400).
 - **Content type:** only `application/json` is accepted.
-- **Rate limits:** per address, 10 shares and 120 reads a minute, through Cloudflare's rate
-  limiting binding. Addresses are only rate-limit keys: the Worker never stores or logs them.
+- **Rate limits:** 10 shares a minute per account, and 120 reads and 5 reports a minute per
+  address, through Cloudflare's rate limiting binding. Addresses are only rate-limit keys: the
+  Worker never stores or logs them.
 - **No personal data in logs:** the Worker logs only the kind of an unexpected failure.
   Invocation logs (which carry request details) are turned off in `wrangler.jsonc`.
 - **Ids:** ten random base-62 characters (about 60 bits), so links can't be guessed or walked.
@@ -69,6 +74,86 @@ R2 is the place for anything large later, like rendered share images for link pr
   Commons and the http(s) pages a surface cites, marked `nofollow noopener noreferrer`.
 - **The app doesn't trust the server.** It bounds, strips and re-checks everything it opens
   (`SharedSurface.received`), with the same checker as anything the model writes.
+
+## Owners, reports and safety
+
+Shared pages are content anyone with a link can read, so App Store guideline 1.2 applies:
+there's a check before publishing, a way to report, a takedown, and a way to block. The code is
+in `src/shares.ts`, `src/safety.ts` and `src/moderation.ts`; the tables in
+`migrations/0006_sharing.sql`.
+
+**Links belong to an account.** Making one needs a session (`src/auth.ts`). Links made before
+accounts have no owner and keep working, read-only.
+
+```
+POST   /api/surfaces?page=<app's page id>[&new=1]   → 201 { id, url, reused: false }, or 200 { id, url, reused: true }
+GET    /api/me/shares                              → { shares: [{ id, url, page, title, accent, symbol, created, updated,
+                                                                   hasValues, views, expiresAt, state }] }
+PUT    /api/surfaces/:id   the page's newest version, and/or { "expiresAt": <unix seconds> | null }   (owner only)
+DELETE /api/surfaces/:id   stops sharing                                                          (owner only)
+```
+
+- **Sharing a page again reuses its link**, with the new version behind it, unless the app asks
+  for a new one (`new=1`). A link with the sharer's numbers and one without are separate links.
+  A link that's stopped or expired is never reused.
+- **Views** are a count, bumped after each page is sent. Link previews and crawlers (by their
+  user agent), `HEAD` requests and the owner's own opens don't count. Nothing about viewers is kept.
+- **Stopping** keeps the id: `/s/:id` says "This page is no longer shared" and the API answers
+  `410` with `{ state }`. The page itself is erased; only its title stays, for the owner's list,
+  which shows stopped links for 30 days.
+- **Expiry** is optional, up to a year ahead. An expired link answers like a stopped one.
+- **Limits:** 10 new links a minute and 100 a day per account; updates and stops share the
+  read limit, per account.
+
+**The publish check** runs before a page is stored or updated (`checkPublish` in
+`src/moderation.ts`). A refusal is `422 { error, reason }`, with `reason` one of `slur`,
+`minors` or `private`; the app shows its own words for each.
+
+It's a short word list and a few patterns, not a model. Llama Guard on Workers AI was the other
+choice, and was turned down: Dream's pages are mostly explanations (history, the body, crime,
+the law), which classifiers flag far more often than real abuse; it costs time and money on
+every share; it can give different answers to the same page; and it can't run in `npm test`.
+Each rule asks for something an honest page has almost no reason to contain:
+
+| Reason | What's refused | Where it could be wrong |
+|---|---|---|
+| `slur` | One of a few racial and ethnic slurs with no other everyday meaning, as a whole word, after folding accents, l33t spelling, stretched and spelled-out letters. | A page that quotes a slur, like a history of the word. Words that are also innocent (a meatball, a lime, an idiom) aren't listed, so the list misses them as slurs. English only. |
+| `minors` | A word for a child, or an age under 16, in the same sentence as an explicit sex word; slang for pornography right after a word for a child; a few words that only mean sexual material of children. Clinical words (sex, sexual, abuse) don't count. | Quoted lyrics or swearing next to "kids". It misses anything written clinically, which is left to reports. |
+| `private` | A US Social Security number, an Indian Aadhaar number (check digit), or a payment card number (Luhn, card prefixes), apart from well-known examples; or "his/her/their address" given with "his/her/their phone". | A number that happens to have the right shape and checksum, about 1 in 10 for card-shaped numbers. |
+
+Listed words are stored as hashes. To add one, `node scripts/blockword.mjs <word>` and add what
+it prints to the right list. Each list holds a made-up test word too (`dreamslurcheck` and the
+like), so the tests never quote a real one.
+
+**Reports** come from the web viewer's "Report this page" (a form, no script) and the app's
+report sheet, with a reason (`hate`, `sexual`, `violence`, `private`, `spam`, `other`) and an
+optional note of up to 500 characters. Nothing about the reporter is kept, and the app sends
+reports without its session. Limits: 5 a minute per address (`REPORT_LIMIT`), and at most 50
+open reports per page.
+
+**Blocking a sharer** is for someone in the app who doesn't want to see a person's pages again.
+It's kept with their account (`blocked_sharers`); their list names the page they blocked from,
+never the sharer. `GET /api/surfaces/:id` answers `403 { reason: "blocked" }` to them for that
+sharer's pages. The web viewer has no accounts, so it can't block.
+
+**Admin.** Set the secret `ADMIN_KEY` (32 characters or more). Without it, the admin routes don't
+exist.
+
+- **The page:** open `https://dream.onlychan.xyz/admin` and enter the key. It lists pages with
+  open reports, the most reported first: reasons, notes, views, and the sharer's account id. For
+  each: Look (the page as shared, even after a takedown), Take down, Take down and block sharer,
+  and Dismiss (close the reports and leave it up). Below: taking down any link by its id, and the
+  accounts blocked from sharing. The key travels in each form; there's no script or cookie.
+- **The API**, with `X-Admin-Key: <key>`: `GET /api/admin/reports`;
+  `POST /api/admin/surfaces/:id/remove` (body `{ "block": true }` also blocks the sharer);
+  `POST /api/admin/surfaces/:id/dismiss`; `POST /api/admin/users/:id/block` and `/unblock`.
+- A takedown shows "This page was removed" and keeps the page, unserved, for review. Blocking a
+  sharer takes down everything they still share, and refuses new links (`403 { reason: "banned" }`).
+- The key is compared as a hash, in constant time, and attempts are rate limited per address.
+
+**Deleting an account** calls `deleteUserData(env, userID)` (`src/sharing.ts`): every link it made
+stops, its pages and titles are erased (the ids stay, so old links say they're gone), its blocks
+and others' blocks of it go, and open reports on its pages are closed.
 
 ## Develop and test locally
 
@@ -89,9 +174,14 @@ npm run check             # TypeScript
 npm test                  # starts wrangler dev on a free port and checks every endpoint
 ../Tools/sharing.sh       # the app's side: what's shared, the preview, opening as untrusted
 
-# The app's encoding through the real Worker and back (with npm run dev running):
+# The app's encoding through the real Worker and back, as a test user (with npm run dev
+# running, and DEV_LOGIN=1 in .dev.vars):
 DREAM_SHARE_URL=http://127.0.0.1:8787 ../Tools/sharing.sh
 ```
+
+`npm test` starts its own server with the dev sign-in and a test admin key, so it can check
+owners, reports, blocks and the admin with several test users. Against a server that's already
+running, those parts are skipped, and making links needs `DREAM_SESSION`.
 
 ## Deploy
 
@@ -132,8 +222,15 @@ DREAM_SHARE_URL=http://127.0.0.1:8787 ../Tools/sharing.sh
    DREAM_SHARE_URL=https://dream-share.<your-subdomain>.workers.dev npm test
    ```
 
-   The test stores about 15 copies of a sample surface and ends by tripping the share rate
-   limit for a minute.
+   With `DREAM_SESSION` set to a real session, the test stores about 15 copies of a sample
+   surface and ends by tripping the share rate limit for a minute.
+
+7. For reviewing reports, set the admin key once, and keep it in the login Keychain:
+
+   ```sh
+   security add-generic-password -U -a admin -s dream -w "$(openssl rand -hex 32)"
+   security find-generic-password -a admin -s dream -w | tr -d '\n' | npx wrangler secret put ADMIN_KEY
+   ```
 
 6. Point the app at it. In Xcode, set the Dream target's `DREAM_SHARE_HOST` build setting (Debug
    and Release) to `dream-share.<your-subdomain>.workers.dev`. It sets both:

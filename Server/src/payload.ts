@@ -80,18 +80,26 @@ export function withinLimits(value: unknown): boolean {
   return visit(value, 0);
 }
 
-const isObject = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);
+export const isObject = (value: unknown): value is JsonObject => value !== null && typeof value === "object" && !Array.isArray(value);
 const NAME = /^[A-Za-z_][A-Za-z0-9_]{0,63}$/;
 
 /** Checks an upload and returns what's stored. Personal answers are dropped even though the
  * app never sends them. */
 export function parseShared(text: string): Shared {
-  let parsed: unknown;
+  return checkShared(parseJSON(text));
+}
+
+/** Parses an upload, or rejects it as malformed. */
+export function parseJSON(text: string): unknown {
   try {
-    parsed = JSON.parse(text);
+    return JSON.parse(text);
   } catch {
     throw new Rejection(400, "That isn't JSON.");
   }
+}
+
+/** Checks an upload that's already parsed, as `parseShared` does. */
+export function checkShared(parsed: unknown): Shared {
   if (!withinLimits(parsed)) throw new Rejection(413, "That screen is too big or too deeply nested to share.");
   if (!isObject(parsed)) throw new Rejection(400, "Expected a shared surface.");
   if (parsed.format !== FORMAT) throw new Rejection(400, `Expected format ${FORMAT}.`);

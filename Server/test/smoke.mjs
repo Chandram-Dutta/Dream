@@ -15,6 +15,7 @@ import { spawn, execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { runSharing } from "./sharing.mjs";
 import { STUB_KEY, startStub } from "./stub-parallel.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -30,15 +31,31 @@ function expect(condition, message) {
 const LOCAL_APP_KEY = "test-app-key-0123456789abcdef";
 /** Provider calls a day, low enough to reach in a test. */
 const LOCAL_DAILY_LIMIT = 4;
+/** The admin key the local server is started with (safety.ts). */
+const LOCAL_ADMIN_KEY = "test-admin-key-0123456789abcdef-0123456789";
+/** A link from before accounts, with no owner, stored straight into the local database. */
+const LEGACY_ID = `Old${Math.random().toString(36).slice(2, 9).padEnd(7, "0")}`.slice(0, 10);
 
 async function startLocal(stub) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
   execFileSync("npx", ["wrangler", "d1", "migrations", "apply", "dream-share", "--local"], { cwd: root, env, stdio: "ignore" });
   // Each run starts with nothing cached and nothing spent today.
   execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+  const { answers: _, ...surface } = JSON.parse(fixture).surface;
+  const legacy = JSON.stringify({ format: 1, surface }).replace(/'/g, "''");
+  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command",
+    `INSERT INTO surfaces (id, created_at, format, title, summary, has_values, size, body) VALUES ('${LEGACY_ID}', 1767225600, 1, 'Split a bill', '', 0, ${legacy.length}, '${legacy}')`], { cwd: root, env, stdio: "ignore" });
   const port = 18_000 + Math.floor(Math.random() * 2_000);
   // These take the place of anything in .dev.vars, so the real Parallel key is never used here.
-  const vars = [`PARALLEL_BASE_URL:${stub.base}`, `PARALLEL_API_KEY:${STUB_KEY}`, `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`, `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`].flatMap((pair) => ["--var", pair]);
+  const vars = [
+    `PARALLEL_BASE_URL:${stub.base}`,
+    `PARALLEL_API_KEY:${STUB_KEY}`,
+    `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`,
+    `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`,
+    // Test users sign in without Apple (auth.ts), and an admin can review reports.
+    "DEV_LOGIN:1",
+    `ADMIN_KEY:${LOCAL_ADMIN_KEY}`,
+  ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
@@ -62,7 +79,25 @@ async function startLocal(stub) {
   };
 }
 
-const create = (base, body, type = "application/json") => fetch(`${base}/api/surfaces`, { method: "POST", headers: { "Content-Type": type }, body });
+/** Test users' names carry this run's time, so links made in earlier runs don't count against
+ * today's limit. */
+const RUN = Date.now().toString(36);
+
+/** A session for a test user: from the server's dev sign-in (auth.ts), or DREAM_SESSION for a
+ * server without one. */
+async function signIn(base, name) {
+  const response = await fetch(`${base}/api/dev/session?user=${encodeURIComponent(`${name}-${RUN}`)}`, { method: "POST" });
+  if (response.status === 201) {
+    const { user, token } = await response.json();
+    return { user, token, auth: { Authorization: `Bearer ${token}` } };
+  }
+  const token = process.env.DREAM_SESSION;
+  return token ? { user: null, token, auth: { Authorization: `Bearer ${token}` } } : null;
+}
+
+/** Making links needs a signed-in user; this one makes the links `run` checks. */
+let sharer = null;
+const create = (base, body, type = "application/json") => fetch(`${base}/api/surfaces`, { method: "POST", headers: { "Content-Type": type, ...sharer?.auth }, body });
 
 async function run(base) {
   console.log("Associated domains");
@@ -74,6 +109,11 @@ async function run(base) {
   expect(association.applinks?.details?.[0]?.appIDs?.includes(appID), `names Dream's app ID, ${appID}`);
   expect(association.applinks?.details?.[0]?.components?.[0]?.["/"] === "/s/*", "claims /s/ links");
 
+  sharer = await signIn(base, "smoke");
+  if (!sharer) {
+    console.log("\nSharing: skipped, since this server has no dev sign-in and DREAM_SESSION isn't set.");
+    return;
+  }
   console.log("Creating");
   response = await create(base, fixture);
   const created = await response.json();
@@ -181,7 +221,7 @@ async function run(base) {
   console.log("Rate limiting");
   let limited = false;
   for (let i = 0; i < 15 && !limited; i++) limited = (await create(base, fixture)).status === 429;
-  expect(limited, "too many shares from one address are refused for a while");
+  expect(limited, "too many shares from one account are refused for a while");
 }
 
 /** Web search and reading. With the stand-in (`stub`), everything; against a running server,
@@ -304,6 +344,8 @@ const stub = remote ? null : await startStub();
 const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub);
 try {
   await run(server.base);
+  // Owners, reports, blocks and the admin need several test users, so only run locally.
+  if (!remote) await runSharing(server.base, { expect, signIn: (name) => signIn(server.base, name), fixture, adminKey: LOCAL_ADMIN_KEY, legacyID: LEGACY_ID });
   const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
   if (key) await runWeb(server.base, key, stub);
   else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY isn't set for this server.");

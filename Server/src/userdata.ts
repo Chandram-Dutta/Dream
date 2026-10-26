@@ -19,6 +19,7 @@
 //   last, so tables that refer to `users(id)` are emptied before it.
 
 import type { Env } from "./index";
+import { sharingErasure } from "./sharing";
 
 export interface Holding {
   name: string;
@@ -27,7 +28,24 @@ export interface Holding {
 }
 
 /** Every workstream's tables. The account's own come after these, in `ACCOUNT`. */
-const HOLDINGS: Holding[] = [];
+const HOLDINGS: Holding[] = [
+  {
+    name: "sharedLinks",
+    // What was shared and how it went; the pages themselves are in the export's pages.
+    export: async (env, user) =>
+      (await rows(env, "SELECT id, title, created_at, updated_at, expires_at, revoked_at, views, has_values FROM surfaces WHERE owner_id = ? ORDER BY created_at", user)).map((row) => ({
+        id: row.id,
+        title: row.title,
+        sharedAt: date(row.created_at),
+        updatedAt: date(row.updated_at),
+        expiresAt: date(row.expires_at),
+        stoppedAt: date(row.revoked_at),
+        views: row.views,
+        withNumbers: row.has_values === 1,
+      })),
+    erase: async (env, user) => sharingErasure(env, user),
+  },
+];
 
 /** Who the person is, and where they're signed in. Always last. */
 const ACCOUNT: Holding[] = [

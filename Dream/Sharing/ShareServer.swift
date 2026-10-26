@@ -21,7 +21,7 @@ enum ShareServer {
         ServerAddress.normalized(text)
     }
 
-    private static let session: URLSession = {
+    static let session: URLSession = {
         let configuration = URLSessionConfiguration.ephemeral
         configuration.timeoutIntervalForRequest = 20
         configuration.httpShouldSetCookies = false
@@ -29,30 +29,52 @@ enum ShareServer {
         return URLSession(configuration: configuration)
     }()
 
-    /// Uploads a surface and returns its link.
-    static func upload(_ shared: SharedSurface, to base: URL) async throws -> SharedLink {
-        var request = URLRequest(url: base.appending(path: "api/surfaces"))
+    /// A link made, or the one this page already had, now showing this version.
+    struct Upload {
+        let link: SharedLink
+        let reused: Bool
+    }
+
+    /// Uploads a surface and returns its link. Links belong to the signed-in user. Sharing the
+    /// same `page` again reuses its link, now with this version, unless `fresh` asks for a new one.
+    static func upload(_ shared: SharedSurface, to base: URL, page: UUID? = nil, fresh: Bool = false) async throws -> Upload {
+        var components = URLComponents(url: base.appending(path: "api/surfaces"), resolvingAgainstBaseURL: false)!
+        var query: [URLQueryItem] = []
+        if let page { query.append(URLQueryItem(name: "page", value: page.uuidString)) }
+        if fresh { query.append(URLQueryItem(name: "new", value: "1")) }
+        components.queryItems = query.isEmpty ? nil : query
+        var request = URLRequest(url: components.url!)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        Session.authorize(&request)
         request.httpBody = try shared.json
         guard request.httpBody?.count ?? 0 <= SharedSurface.maxSize else { throw ShareError.tooBig }
         let (data, response) = try await session.data(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard status == 201 else { throw ServerError(status: status) }
-        struct Created: Decodable { let id: String }
-        guard let id = try? JSONDecoder().decode(Created.self, from: data).id, let link = SharedLink(base: base, id: id) else {
+        guard status == 201 || status == 200 else { throw ServerError(status: status, data: data) }
+        struct Created: Decodable {
+            let id: String
+            let reused: Bool?
+        }
+        guard let created = try? JSONDecoder().decode(Created.self, from: data), let link = SharedLink(base: base, id: created.id) else {
             throw ServerError(status: status)
         }
-        return link
+        return Upload(link: link, reused: created.reused ?? false)
     }
 
-    /// A shared surface's JSON, unchecked: `SharedSurface.received` checks it.
+    /// A shared surface's JSON, unchecked: `SharedSurface.received` checks it. The session goes
+    /// too, so pages from someone the user blocked don't open.
     static func fetch(_ link: SharedLink) async throws -> Data {
         var request = URLRequest(url: link.base.appending(path: "api/surfaces/\(link.id)"))
         request.setValue("application/json", forHTTPHeaderField: "Accept")
+        if [base, builtIn].contains(link.base) { Session.authorize(&request) }
         let (bytes, response) = try await session.bytes(for: request)
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
-        guard status == 200 else { throw ServerError(status: status) }
+        guard status == 200 else {
+            var data = Data()
+            for try await byte in bytes.prefix(4_000) { data.append(byte) }
+            throw ServerError(status: status, data: data)
+        }
         guard response.expectedContentLength <= Int64(SharedSurface.maxSize) else { throw ShareError.tooBig }
         var data = Data()
         for try await byte in bytes {
@@ -98,16 +120,38 @@ struct SharedLink: Hashable {
 }
 
 /// A failed request, in words. The server's own messages are left out: what's shown on the
-/// phone is written here.
+/// phone is written here, from the status and the reason the server gives for a refusal.
 struct ServerError: LocalizedError {
     let status: Int
+    /// Why, when the server says: `slur`, `minors` or `private` for a page the publish check
+    /// refused, `blocked`, `banned` or `daily`.
+    var reason: String?
+
+    init(status: Int, reason: String? = nil) {
+        self.status = status
+        self.reason = reason
+    }
+
+    init(status: Int, data: Data) {
+        struct Refusal: Decodable { let reason: String? }
+        self.init(status: status, reason: (try? JSONDecoder().decode(Refusal.self, from: data))?.reason)
+    }
 
     var errorDescription: String? {
-        switch status {
-        case 404: "This shared screen isn't there anymore, or the link is incomplete."
-        case 413: "This screen is too big to share."
-        case 429: "Too many shares at once. Try again in a minute."
-        case 0: "Couldn't reach the sharing server."
+        switch (status, reason) {
+        case (422, "slur"): "This page uses a slur, so it can't be shared. It's still yours on this iPhone."
+        case (422, "minors"): "This page puts children together with sexual content, so it can't be shared."
+        case (422, "private"): "This page seems to include someone's private details, like an ID or card number, or a home address and phone number, so it can't be shared."
+        case (403, "blocked"): "You chose not to see pages from this person."
+        case (403, "banned"): "This account can't share pages anymore."
+        case (403, _): "Only the person who shared this page can change it."
+        case (429, "daily"): "That's a lot of links for one day. Try again tomorrow."
+        case (401, _): "Sign in to share links."
+        case (404, _): "This shared page isn't there, or the link is incomplete."
+        case (410, _): "This page is no longer shared."
+        case (413, _): "This page is too big to share."
+        case (429, _): "Too many at once. Try again in a minute."
+        case (0, _): "Couldn't reach the sharing server."
         default: "The sharing server had a problem (\(status)). Try again in a moment."
         }
     }
