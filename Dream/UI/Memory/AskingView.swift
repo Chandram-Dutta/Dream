@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// The model's questions, where the page is forming. Each answer folds up into a tag, and once
-/// every question has one, the model carries on.
+/// The questions, where the page is forming. Answers Dream remembered show as tags already;
+/// each one the user picks folds up beside them, and once every question has one, building starts.
 struct AskingView: View {
     let asking: Asking
     let palette: Palette
-    /// Answers picked so far, by question, before they all go to the model together.
+    /// Answers picked so far, by open question, before they all go to the model together.
     @State private var picks: [Int: String] = [:]
     @Namespace private var fold
 
@@ -15,8 +15,8 @@ struct AskingView: View {
                 FlowLayout(spacing: 8) {
                     ForEach(tags) { tag in
                         AnswerTag(answer: tag.answer, palette: palette)
-                            .matchedGeometryEffect(id: "\(tag.index)-\(tag.answer.choice)", in: fold)
-                            .onTapGesture { reopen(tag.index) }
+                            .matchedGeometryEffect(id: tag.question.map { "\($0)-\(tag.answer.choice)" } ?? "tag-\(tag.id)", in: fold)
+                            .onTapGesture { if let question = tag.question { reopen(question) } }
                     }
                 }
             }
@@ -34,17 +34,20 @@ struct AskingView: View {
     }
 
     private struct Tag: Identifiable {
-        let index: Int
+        /// Its place among all the answers, which it keeps once they're sent.
+        let id: Int
         let answer: Answer
-        var id: Int { index }
+        /// The open question it was picked for, while it can still be reopened.
+        var question: Int?
     }
 
-    /// While waiting, the picks so far; after, what the model was told.
+    /// The answers so far (remembered ones), then while waiting, the user's picks.
     private var tags: [Tag] {
-        guard let questions = asking.questions else {
-            return asking.answers.enumerated().map { Tag(index: $0.offset, answer: $0.element) }
+        let known = asking.answers.enumerated().map { Tag(id: $0.offset, answer: $0.element) }
+        guard let questions = asking.questions else { return known }
+        return known + picks.keys.sorted().map { index in
+            Tag(id: known.count + index, answer: Answer(question: questions[index], choice: picks[index] ?? ""), question: index)
         }
-        return picks.keys.sorted().map { Tag(index: $0, answer: Answer(question: questions[$0], choice: picks[$0] ?? "")) }
     }
 
     private func pick(_ index: Int, _ choice: String) {
@@ -161,6 +164,10 @@ struct AnswerTag: View {
                     .foregroundStyle(palette.gradient)
                 Text(answer.question.topic)
             } else {
+                if answer.isRemembered {
+                    Image(systemName: "person.crop.circle")
+                        .foregroundStyle(palette.gradient)
+                }
                 Text(answer.choice)
             }
             if isChangeable {
@@ -176,7 +183,7 @@ struct AnswerTag: View {
         .background(palette.wash, in: .capsule)
         .overlay(Capsule().strokeBorder(palette.edge, lineWidth: 0.5))
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(answer.question.topic): \(answer.isLeftToDream ? "Dream chose" : answer.choice)")
+        .accessibilityLabel("\(answer.question.topic): \(answer.isLeftToDream ? "Dream chose" : answer.choice)\(answer.isRemembered ? ", remembered" : "")")
     }
 }
 

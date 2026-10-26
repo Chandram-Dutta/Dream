@@ -21,8 +21,20 @@ struct Answer: Codable, Hashable {
     var question: Question
     /// What they tapped or typed. Empty when they left it to Dream.
     var choice: String
+    /// Dream answered it from what it remembers about the user, without asking.
+    var isRemembered = false
 
     var isLeftToDream: Bool { choice.isEmpty }
+}
+
+// Answers saved before remembered ones existed decode with the default.
+extension Answer {
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        question = try container.decode(Question.self, forKey: .question)
+        choice = try container.decode(String.self, forKey: .choice)
+        isRemembered = try container.decodeIfPresent(Bool.self, forKey: .isRemembered) ?? false
+    }
 }
 
 extension Question {
