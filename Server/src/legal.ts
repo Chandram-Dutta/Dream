@@ -13,11 +13,12 @@ export type LegalPath = "/privacy" | "/terms" | "/support";
 const UPDATED = "26 October 2026";
 
 /** Something still to be filled in or decided, marked so it can't be missed. */
-const todo = (what: string) => `<mark>[${what}]</mark>`;
 
-const PRIVACY_CONTACT = todo("privacy contact address");
-const SUPPORT_CONTACT = todo("support contact address");
-const COMPANY = todo("legal name and address of the company behind Dream");
+const mail = (address: string) => `<a href="mailto:${address}">${address}</a>`;
+const PRIVACY_CONTACT = mail("privacy@onlychan.xyz");
+const SUPPORT_CONTACT = mail("support@onlychan.xyz");
+/** Dream is made by one person, not a company. */
+const OWNER = "Chandram Dutta";
 
 const STYLE = `<style>
 .draft{display:inline-flex;align-items:center;gap:8px;margin:0 0 16px;padding:7px 14px;border-radius:999px;font-size:13px;font-weight:600;
@@ -76,7 +77,7 @@ const PRIVACY = [
   ),
   section(
     "Who we are",
-    p(`Dream is made by ${COMPANY}, which decides how your data is used (the “controller”). Write to ${PRIVACY_CONTACT} about anything in this policy.`),
+    p(`Dream is made by ${OWNER}, an independent developer, who decides how your data is used (the “controller”). Write to ${PRIVACY_CONTACT} about anything in this policy.`),
   ),
   section(
     "What Dream keeps, and for how long",
@@ -133,13 +134,13 @@ const PRIVACY = [
         what: "Usage and limits",
         detail: "How many pages, model tokens and web searches your account has used, to apply the free allowance and your subscription.",
         where: SERVER,
-        how: todo("retention for usage records, for example 13 months"),
+        how: "until you delete your account",
       },
       {
         what: "Subscription",
         detail: "Whether you subscribe, and Apple's signed record of each purchase and renewal. Apple handles payment; Dream never sees card details.",
         where: SERVER,
-        how: todo("as long as tax and accounting law requires"),
+        how: "until you delete your account; Apple keeps its own record of your purchases",
       },
       {
         what: "Web search answers",
@@ -160,7 +161,7 @@ const PRIVACY = [
         detail:
           "Events like “page built”, with how long it took, how many parts it had and of which kinds, and whether it used the web; and for each request to an AI model, how much it used, what it cost and how long it took. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
         where: "PostHog, in the United States",
-        how: todo("retention set in PostHog, for example 12 months"),
+        how: "kept by PostHog; once you delete your account, nothing links them to you",
       },
     ]),
     p(
@@ -182,7 +183,7 @@ const PRIVACY = [
     list([
       "<strong>Cloudflare</strong> runs Dream's server, database and file storage, so it holds everything Dream keeps.",
       "<strong>AI providers</strong> run the models that make pages. Today that's <strong>xAI</strong> (Grok). Dream may add or change providers, and this list will say so before it does. For each request a provider receives what you asked, the context needed to answer it (like facts from your memory you've confirmed, your answers, the page you're changing, or list entries you're talking to), any photo you attached, and what lookups returned. It doesn't receive your name, email or Apple ID. " +
-        todo("each provider's retention and training terms for API data, starting with xAI's"),
+        "xAI doesn't train its models on what it receives through its API, and deletes it after 30 days, keeping it until then only to look into abuse.",
       "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account.",
       "<strong>Apple</strong> handles Sign in with Apple, App Store purchases, Weather and Maps.",
       "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds. It receives what's looked up.",
@@ -194,10 +195,10 @@ const PRIVACY = [
   ),
   section(
     "Why Dream uses it",
-    p(todo("legal bases, for a lawyer to confirm")),
+    p("Dream uses your data on these grounds:"),
     list([
       "To provide Dream: your account, pages, lists, memory and subscription, and sending what you ask to AI providers to make your pages (performing the contract with you, which you agree to when you sign in).",
-      `To improve Dream: crash reports and usage counts, which you can turn off at any time in Account (${todo("consent given at sign-in, or legitimate interests, for a lawyer to confirm")}).`,
+      "To improve Dream: crash reports and usage counts, which you can turn off at any time in Account (legitimate interests in keeping Dream working and making it better; in India, the consent you give when you sign in, which turning them off withdraws).",
       "To keep Dream safe and working: rate limits, preventing abuse, and fixing problems (legitimate interests).",
       "Because the law requires it: purchase records.",
     ]),
@@ -215,7 +216,7 @@ const PRIVACY = [
       "<strong>In the EU, the UK and elsewhere under the GDPR</strong>, you also have the right to restrict or object to how your data is used, and to complain to your data protection authority. Dream answers requests within one month.",
     ),
     p(
-      `<strong>In India, under the Digital Personal Data Protection Act, 2023</strong>, you can ask for a summary of your data and who it's shared with, have it corrected, completed or erased, nominate someone to act for you if you die or can't, and have grievances answered by Dream's grievance officer, ${todo("name and contact of the grievance officer")}, within ${todo("response time")}. If you're not satisfied, you can complain to the Data Protection Board of India.`,
+      `<strong>In India, under the Digital Personal Data Protection Act, 2023</strong>, you can ask for a summary of your data and who it's shared with, have it corrected, completed or erased, nominate someone to act for you if you die or can't, and have grievances answered by Dream's grievance officer, ${OWNER}, at ${PRIVACY_CONTACT}, within 30 days. If you're not satisfied, you can complain to the Data Protection Board of India.`,
     ),
     p(`For anything the app can't do, write to ${PRIVACY_CONTACT}. Dream may ask you to confirm the request from your account before acting on it.`),
   ),
@@ -225,25 +226,25 @@ const PRIVACY = [
       "Deleting your account in the app erases it from Dream's server at once: your account, devices, pages and their history, lists, memory, photos, settings and shared pages, whose links stop working. Dream also tells Apple to revoke its Sign in with Apple link to you. Copies in the database's backups (Cloudflare D1 Time Travel) are gone within 30 days.",
     ),
     p(
-      `Crash reports aren't linked to you, so they stay until they expire after 90 days. Usage counts in PostHog are linked to Dream's id for you; ${todo("how they're deleted with the account, for example a deletion request to PostHog")}. Purchase records may be kept as long as the law requires.`,
+      `Crash reports aren't linked to you, so they stay until they expire after 90 days. Usage counts in PostHog carry only Dream's id for you, which goes with your account, so nothing links them to you afterwards. Apple keeps its own record of your purchases.`,
     ),
   ),
   section(
     "Children",
     p(
-      `Dream isn't meant for children under 13. ${todo("Decide the minimum age, and how to handle users under 18: the DPDP Act treats them as children, needing verifiable parental consent. For a lawyer to decide.")}`,
+      `Dream is for people 16 and older, and 18 and older in India. If you think a child has signed up, write to ${PRIVACY_CONTACT} and their account will be deleted.`,
     ),
   ),
   section(
     "Moving data between countries",
     p(
-      `Cloudflare runs Dream's server around the world; xAI, Parallel and PostHog are in the United States. When data leaves your country, ${todo("the safeguards used, such as the EU's standard contractual clauses")}.`,
+      `Cloudflare runs Dream's server around the world; xAI, Parallel and PostHog are in the United States. When data leaves your country, Dream relies on each provider's data protection terms, including the EU's standard contractual clauses where the provider offers them.`,
     ),
   ),
   section(
     "Security",
     p(
-      `Everything travels over HTTPS. Sessions are stored only as hashes, and sign-ins to connected services stay in your iPhone's Keychain. ${todo("who at the company can reach production data, and how")}.`,
+      `Everything travels over HTTPS. Sessions are stored only as hashes, and sign-ins to connected services stay in your iPhone's Keychain. Only ${OWNER}, who runs Dream, can reach its production data.`,
     ),
   ),
   section("Changes", p("If this policy changes in a way that matters, Dream will say so in the app before the change takes effect.")),
@@ -253,10 +254,10 @@ const TERMS = [
   section(
     "Agreeing to these terms",
     p(
-      `These terms are between you and ${COMPANY}. By signing in to Dream, or otherwise using it, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including what it says about AI providers and usage counts. If you don't agree, please don't use Dream.`,
+      `These terms are between you and ${OWNER}, who makes Dream. By signing in to Dream, or otherwise using it, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including what it says about AI providers and usage counts. If you don't agree, please don't use Dream.`,
     ),
   ),
-  section("Who can use Dream", p(`You need to be at least ${todo("minimum age")} and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
+  section("Who can use Dream", p(`You need to be at least 16, or 18 in India, and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
   section(
     "Your account",
     p("You're responsible for what happens in your account, so keep your Apple Account secure. You can delete your account at any time in Account."),
@@ -274,7 +275,7 @@ const TERMS = [
   section(
     "What's yours",
     p(
-      `What you ask for, your numbers, lists and memory are yours. You let Dream store and process them to run the service for you, as the privacy policy describes. ${todo("who owns page templates Dream makes, and the licence for shared pages")}`,
+      `What you ask for, your numbers, lists and memory are yours. You let Dream store and process them to run the service for you, as the privacy policy describes. Pages Dream makes for you are yours to use. Dream may reuse the layout of a page it made, never your words, numbers, answers, lists or memory, to make pages for other people. When you share a page, anyone with its link may view it and keep a copy.`,
     ),
   ),
   section(
@@ -302,24 +303,29 @@ const TERMS = [
   ),
   section(
     "Free use and subscription",
-    p(todo("final names, allowances and prices")),
     list([
-      `Dream is free to use up to ${todo("the free allowance, for example a number of pages a month")}.`,
-      `A subscription, ${todo("name and price")}, raises those limits. It's bought through Apple and renews automatically for the same period until you cancel at least 24 hours before it ends.`,
+      "Dream is free for up to 5 pages a day and 30 a month. Making a page, or asking for a change to one, counts once; opening and using the pages you have never counts.",
+      "Dream Plus, at $9.99 a month or $79.99 a year (or the App Store's price where you live), raises that to 25 a day and 150 a month. It's bought through Apple and renews automatically for the same period until you cancel at least 24 hours before it ends.",
       "Manage or cancel it in Settings › your name › Subscriptions. Payment, renewals and refunds are handled by Apple, under Apple's terms.",
       "If prices change, you'll be told before your next renewal, and can cancel first.",
-      `Apple's Licensed Application End User License Agreement applies to Dream ${todo("or a custom licence agreement, which must include Apple's minimum terms")}.`,
+      "Apple's standard Licensed Application End User License Agreement applies to Dream, alongside these terms.",
     ]),
   ),
   section(
     "Ending",
     p(
-      `You can stop using Dream and delete your account at any time. Dream may suspend or close an account that breaks these terms, ${todo("with notice and a way to appeal, except where the law or safety requires otherwise")}.`,
+      `You can stop using Dream and delete your account at any time. Dream may suspend or close an account that breaks these terms. Unless the law or someone's safety requires otherwise, you'll be told why, and can reply to support to ask for another look.`,
     ),
   ),
   section("Changes", p("Dream changes over time, and these terms may too. If they change in a way that matters, the app will tell you before it takes effect.")),
-  section("Disclaimers and liability", p(todo("disclaimer of warranties and limits on liability, for a lawyer to write for each country Dream is offered in"))),
-  section("Law", p(todo("governing law and where disputes are settled"))),
+  section(
+    "Disclaimers and liability",
+    p(
+      "Dream is provided as it is, without promises that it will be available, correct or fit for a particular purpose. As far as the law allows, Dream isn't liable for indirect or consequential losses, or for decisions made from what a page says, and its total liability to you is limited to what you paid for Dream in the 12 months before the claim.",
+    ),
+    p("Nothing here limits liability that the law doesn't allow to be limited, or takes away rights you have as a consumer where you live."),
+  ),
+  section("Law", p("These terms are governed by the laws of India, and disputes are settled by the courts of India. If you're a consumer elsewhere, you keep the protections of the law where you live.")),
   section("Contact", p(`Questions about these terms: ${SUPPORT_CONTACT}.`)),
 ];
 
