@@ -38,6 +38,10 @@ export class TokenRefused extends Error {
 /** Apple couldn't be reached, so nothing could be checked. */
 export class AppleUnavailable extends Error {}
 
+/** Named on every request to Apple: appleid.apple.com answers some agents, like curl's and the
+ * Workers default, with 501 Not Implemented. */
+const USER_AGENT = "Dream/1.0 (+https://dream.onlychan.xyz)";
+
 /** What a verified identity token says. */
 export interface AppleIdentity {
   /** Apple's stable id for the person, in Dream's team. */
@@ -134,10 +138,11 @@ export function appleKeys(base: string = APPLE): KeyLookup {
     if (current && now - current.fetchedAt < 60_000) return current.keys.get(kid) ?? null;
     let body: { keys?: PublishedKey[] };
     try {
-      const response = await fetch(url, { headers: { Accept: "application/json" }, signal: AbortSignal.timeout(8_000) });
+      const response = await fetch(url, { headers: { Accept: "application/json", "User-Agent": USER_AGENT }, signal: AbortSignal.timeout(8_000) });
       if (!response.ok) throw new AppleUnavailable(`Apple's keys: ${response.status}`);
       body = await response.json();
     } catch (error) {
+      console.error("Apple's keys couldn't be fetched:", error instanceof AppleUnavailable ? error.message : error instanceof Error ? error.name : typeof error);
       if (current) return current.keys.get(kid) ?? null;
       throw error instanceof AppleUnavailable ? error : new AppleUnavailable("Apple's keys couldn't be fetched");
     }
@@ -213,7 +218,7 @@ export async function revoke(env: AppleEnv, code: string | null, sub: string | n
 function form(url: string, fields: Record<string, string>): Promise<Response> {
   return fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json" },
+    headers: { "Content-Type": "application/x-www-form-urlencoded", Accept: "application/json", "User-Agent": USER_AGENT },
     body: new URLSearchParams(fields).toString(),
     signal: AbortSignal.timeout(10_000),
   });
