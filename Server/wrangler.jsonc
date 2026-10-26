@@ -44,6 +44,10 @@
   // once with `npx wrangler r2 bucket create dream-photos`.
   "r2_buckets": [{ "binding": "PHOTOS", "bucket_name": "dream-photos" }],
 
+  // Workers AI, only for its gateway(): the model goes to xAI through Dream's AI Gateway
+  // (src/model.ts), signed in as this account, so no gateway token is needed.
+  "ai": { "binding": "AI" },
+
   "vars": {
     // The apps that open /s/ links, as <Team ID>.<bundle ID>, separated by commas. Served in
     // /.well-known/apple-app-site-association; change it here when the app's ID changes.
@@ -57,6 +61,9 @@
     "APPLE_TEAM_ID": "DR99P625RR",
     // Dollars a day the model may cost for everyone together (src/usage.ts); past it, pages wait.
     "MODEL_DAILY_BUDGET": "100",
+    // The AI Gateway model requests go through: logs off, no cache, provider keys required. Made
+    // with `cf ai-gateway gateways create`; empty sends them straight to xAI.
+    "AI_GATEWAY": "dream",
     // PostHog, for the server's own analytics events (src/analytics.ts), sent only for people who
     // turned on "Help improve Dream". The project key is public, like the app's; empty turns
     // server events off. The host is the US or EU cloud.

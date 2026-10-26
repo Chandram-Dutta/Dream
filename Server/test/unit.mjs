@@ -10,6 +10,7 @@ import { checkURL, isPublicIP, parseIP } from "../src/address.ts";
 import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
 import { AppleUnavailable, appleKeys } from "../src/apple.ts";
+import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
 import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
 import { MAX_REPORTS, MAX_STACK, parseReports, ReportError, signatureOf } from "../src/metrickit.ts";
 import { robotsAllows } from "../src/robots.ts";
@@ -297,6 +298,44 @@ expect(built?.properties.$ai_total_cost_usd === 0.0042 && built.properties.$ai_l
 expect(!Object.keys(built?.properties ?? {}).some((key) => key === "$ai_input" || key === "$ai_output_choices"), "never the messages or the answer");
 expect(failed?.properties.$ai_is_error === true && failed.properties.$ai_http_status === 429 && failed.properties.$ai_span_name === "lists" && !("$ai_total_cost_usd" in failed.properties) && typeof failed.properties.$ai_trace_id === "string", "a failure, with no cost and a trace of its own");
 globalThis.fetch = realFetch;
+
+console.log("Chat completions as xAI's Responses API");
+const photo = "data:image/jpeg;base64,AAAA";
+const asked = toResponses(
+  {
+    model: "grok-4.7",
+    stream: true,
+    stream_options: { include_usage: true },
+    max_tokens: 900,
+    reasoning_effort: "low",
+    response_format: { type: "json_schema", json_schema: { name: "response", strict: true, schema: { type: "object" } } },
+    tools: [{ type: "function", function: { name: "lookup", description: "Looks up.", parameters: { type: "object", properties: {} } } }],
+    tool_choice: "auto",
+    messages: [
+      { role: "system", content: "Make a page." },
+      { role: "user", content: [{ type: "text", text: "What is this?" }, { type: "image_url", image_url: { url: photo } }] },
+      { role: "assistant", content: "", tool_calls: [{ id: "call-1", type: "function", function: { name: "lookup", arguments: '{"q":"x"}' } }] },
+      { role: "tool", tool_call_id: "call-1", content: "found" },
+    ],
+  },
+  "cache-key",
+);
+expect(asked.store === false && asked.prompt_cache_key === "cache-key" && asked.stream === true && asked.max_output_tokens === 900 && asked.reasoning?.effort === "low", "nothing stored, the cache key, streaming, the cap and the effort");
+expect(asked.text?.format?.type === "json_schema" && asked.text.format.name === "response" && asked.text.format.strict === true, "a JSON schema as text.format");
+expect(asked.tools?.[0]?.type === "function" && asked.tools[0].name === "lookup" && asked.tools[0].parameters?.type === "object" && asked.tool_choice === "auto", "tools as Responses functions");
+const [system, userTurn, call, result, extra] = asked.input;
+expect(system?.role === "system" && system.content === "Make a page." && userTurn?.content?.[1]?.type === "input_image" && userTurn.content[1].image_url === photo, "a photo as an input_image");
+expect(call?.type === "function_call" && call.call_id === "call-1" && call.arguments === '{"q":"x"}' && result?.type === "function_call_output" && result.call_id === "call-1" && result.output === "found" && extra === undefined, "a tool call and its result as items, without an empty assistant message");
+expect(!("messages" in asked) && !("stream_options" in asked), "nothing chat completions only");
+const mapped = chatUsage({ input_tokens: 100, input_tokens_details: { cached_tokens: 80 }, output_tokens: 30, output_tokens_details: { reasoning_tokens: 20 }, total_tokens: 130, cost_in_usd_ticks: 5 });
+expect(mapped?.prompt_tokens === 100 && mapped.prompt_tokens_details.cached_tokens === 80 && mapped.completion_tokens === 10 && mapped.completion_tokens_details.reasoning_tokens === 20 && mapped.cost_in_usd_ticks === 5, "usage with reasoning apart, as chat completions count it");
+const finished = chatCompletion({ id: "r1", status: "completed", output: [{ type: "reasoning" }, { type: "function_call", call_id: "c9", name: "lookup", arguments: "{}" }] }, "grok-4.7");
+expect(finished.choices[0].finish_reason === "tool_calls" && finished.choices[0].message.tool_calls[0].id === "c9" && finished.choices[0].message.content === null, "a finished answer with a tool call");
+const events = (list) => new Blob(list.map((event) => `event: ${event.type}\ndata: ${JSON.stringify(event)}\n\n`)).stream();
+const cut = await new Response(chatStream(events([{ type: "response.created", response: { id: "r2" } }, { type: "response.output_text.delta", delta: "Hal" }]), "grok-4.7")).text();
+expect(cut.includes('"content":"Hal"') && cut.trimEnd().endsWith("data: [DONE]") && cut.includes('"id":"r2"'), "a stream cut short still ends, with what came");
+const failedStream = await new Response(chatStream(events([{ type: "response.created", response: { id: "r3" } }, { type: "response.failed", response: { error: { message: "secret prompt words" } } }]), "grok-4.7")).text();
+expect(failedStream.trimEnd().endsWith("data: [DONE]") && !failedStream.includes("secret prompt words"), "a failed answer ends without passing on what xAI said");
 
 console.log("Apple's sign-in keys, kept for every server");
 const { publicKey } = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);

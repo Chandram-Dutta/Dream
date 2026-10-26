@@ -431,7 +431,7 @@ async function runPlan(base, xai) {
   expect(response.status === 400, "a provider's paid server-side tools are refused");
   response = await ask(hello({ messages: [{ role: "user", content: "x".repeat(2_100_000) }] }));
   expect(response.status === 413, "a body over 2 MB is refused");
-  expect(xai.calls.completions.length === 0 && xai.calls.unauthorized === 0, "nothing refused reached xAI");
+  expect(xai.calls.responses.length === 0 && xai.calls.unauthorized === 0, "nothing refused reached xAI");
 
   console.log("Model: streaming through");
   const started = Date.now();
@@ -450,10 +450,21 @@ async function runPlan(base, xai) {
   const total = Date.now() - started;
   expect(firstAt > 0 && total - firstAt >= 600, `chunks arrive as xAI sends them, not all at the end (first after ${firstAt} ms of ${total} ms)`);
   expect(streamed.includes('"reasoning_content":"Thinking"') && streamed.indexOf("Thinking") < streamed.indexOf("Blue"), "reasoning comes through first, so the app sees the model working");
-  expect(streamed.includes('"usage":{') && streamed.trimEnd().endsWith("data: [DONE]"), "then the answer, the usage and [DONE], byte for byte");
-  const sent = xai.calls.completions.at(-1);
-  expect(sent?.max_tokens === 4000 && sent?.stream_options?.include_usage === true && sent?.reasoning_effort === "low", "xAI got max_tokens capped, a request for usage, and the reasoning effort");
-  expect(sent && !("n" in sent) && !("search_parameters" in sent), "and nothing Dream doesn't use");
+  expect(streamed.includes('"content":"{\\"answer\\":\\"Blue"') && streamed.includes('"usage":{"prompt_tokens":1261') && streamed.trimEnd().endsWith("data: [DONE]"), "then the answer, the usage and [DONE], as chat completion chunks");
+  const sent = xai.calls.responses.at(-1);
+  expect(sent?.max_output_tokens === 4000 && sent?.stream === true && sent?.reasoning?.effort === "low", "xAI's Responses API got the output capped, streaming, and the reasoning effort");
+  expect(sent?.store === false && /^[0-9a-f]{32}$/.test(sent?.prompt_cache_key ?? "") && sent.prompt_cache_key === xai.calls.headers.at(-1)?.["x-grok-conv-id"], "with nothing stored at xAI, and the account's cache key in the body and the header");
+  expect(sent?.input?.[0]?.role === "system" && sent?.input?.[1]?.content === "What colour is the sky?", "the messages as input items");
+  expect(sent && !("n" in sent) && !("search_parameters" in sent) && !("messages" in sent), "and nothing Dream doesn't use");
+
+  console.log("Model: tool calls");
+  response = await ask(hello({ stream: true, messages: [{ role: "user", content: "Weather? use the tool" }], tools: [{ type: "function", function: { name: "lookup_weather", description: "Weather.", parameters: { type: "object", properties: { city: { type: "string" } } } } }] }), { page: "page-a-0001" });
+  const toolStream = await response.text();
+  const toolChunk = toolStream.split("\n").filter((line) => line.startsWith("data:") && line.includes("tool_calls")).map((line) => JSON.parse(line.slice(5)))[0];
+  const toolCall = toolChunk?.choices?.[0]?.delta?.tool_calls?.[0];
+  expect(toolCall?.id === "call-stub-0" && toolCall?.function?.name === "lookup_weather" && toolCall?.function?.arguments === '{"city":"Pune"}', "a tool call arrives whole, with its id, name and arguments");
+  expect(toolStream.includes('"finish_reason":"tool_calls"'), "and the answer ends as tool calls");
+  expect(xai.calls.responses.at(-1)?.tools?.[0]?.name === "lookup_weather" && xai.calls.responses.at(-1)?.tools?.[0]?.type === "function", "the tool went to xAI as a Responses function");
 
   console.log("Model: errors");
   response = await ask(hello({ messages: [{ role: "user", content: "please fail" }] }));
@@ -472,11 +483,11 @@ async function runPlan(base, xai) {
   expect(status.plan === "free" && status.pages.today === 1 && status.pages.perDay === LOCAL_ALLOWANCES.free.pagesPerDay, `two requests for the same page count as one page (${status.pages?.today})`);
   expect(status.accountToken === me.user && status.subscription === null && status.plans?.plus?.pagesPerDay > status.plans?.free?.pagesPerDay, "with the account's purchase token, and what Dream Plus adds");
   const [row] = query(`SELECT tokens_in, tokens_cached, tokens_out, cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
-  // Three requests reached xAI and were answered: two streamed for page a, and one plain. Errors cost nothing.
-  expect(row?.tokens_in === 3 * 1261 && row?.tokens_cached === 3 * 1152 && row?.tokens_out === 3 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
-  expect(row?.cost_micros === 3 * 1184, "and what they cost, from xAI's own figure");
-  expect(query(`SELECT cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today.slice(0, 7)}'`)[0]?.cost_micros === 3 * 1184, "by month too");
-  expect(query(`SELECT cost_micros FROM usage_pages WHERE user_id = '${me.user}' AND page = 'page-a-0001'`)[0]?.cost_micros === 2 * 1184, "and by page");
+  // Four requests reached xAI and were answered: three streamed for page a (one a tool call), and one plain. Errors cost nothing.
+  expect(row?.tokens_in === 4 * 1261 && row?.tokens_cached === 4 * 1152 && row?.tokens_out === 4 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
+  expect(row?.cost_micros === 4 * 1184, "and what they cost, from xAI's own figure");
+  expect(query(`SELECT cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today.slice(0, 7)}'`)[0]?.cost_micros === 4 * 1184, "by month too");
+  expect(query(`SELECT cost_micros FROM usage_pages WHERE user_id = '${me.user}' AND page = 'page-a-0001'`)[0]?.cost_micros === 3 * 1184, "and by page");
   response = await ask(hello(), { page: "page-b-0001" });
   expect(response.status === 200, "a second page is allowed");
   response = await ask(hello(), { page: "page-c-0001" });

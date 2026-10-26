@@ -528,10 +528,33 @@ npx wrangler deploy
 The app never holds a provider key. Its default model, "Dream"
 (`Dream/Generation/Providers/DreamModel.swift`), sends the chat completion it would send xAI to
 `POST /api/model` (`src/model.ts`), which passes it to xAI with the server's `XAI_API_KEY` and
-streams the answer back byte for byte, reasoning included, so the app's stall watchdog sees the
+streams the answer back as it comes, reasoning included, so the app's stall watchdog sees the
 model thinking. The app's xAI adapter and the Dream adapter share one translation
 (`ChatCompletions.swift`); Grok with your own key and Private Cloud Compute stay in Under the
 hood as developer options.
+
+### Through Cloudflare's AI Gateway
+
+Requests go to xAI's **Responses API** through the AI Gateway named in `AI_GATEWAY` (`dream`),
+reached with the Worker's `AI` binding, which signs in as the account, so no gateway token is
+needed. `src/responses.ts` translates both ways: the app's chat completion becomes a Responses
+request (tool calls and their results as items, a photo as `input_image`, the JSON schema as
+`text.format`, `store: false`), and the streamed events become chat completion chunks again (text
+and reasoning as deltas, each tool call whole when its arguments are done, then the usage and
+`[DONE]`). The app doesn't know.
+
+Why: xAI reads a repeated prompt from its cache, at about a third of the price, only when requests
+carry a cache key that sends them to the same server. Chat completions take it as the
+`x-grok-conv-id` header, which the gateway doesn't pass on reliably (hits were about half in
+testing); the Responses API takes it in the body as `prompt_cache_key`, which arrives intact (every
+repeat hit). Each account has its own key, a hash of its id.
+
+The `dream` gateway was made with the Cloudflare CLI: authentication on, logs off, no cache, and
+provider keys required (`byok_only`), so nothing falls back to Cloudflare's billing. Each request
+also says `cf-aig-collect-log: false`. To check it: `cf ai-gateway gateways get dream`. With
+`AI_GATEWAY` empty, or `XAI_BASE_URL` set (the tests' stand-in, `test/stub-xai.mjs`), requests go
+straight to xAI. Other providers can go through the same gateway later, keys stored with
+`cf ai-gateway gateways providers`.
 
 A request needs a session, proof that it's the app (as for web search), and room in the
 account's allowance. It's checked and rebuilt from the fields Dream uses: the model must be on
