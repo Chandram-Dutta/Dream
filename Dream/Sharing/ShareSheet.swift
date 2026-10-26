@@ -4,13 +4,15 @@ import SwiftUI
 struct ShareButton: View {
     let surface: Surface?
     let values: [String: Double]
+    /// The saved page it is, so sharing it again reuses its link.
+    var page: UUID? = nil
     @State private var isSharing = false
 
     var body: some View {
         Button("Share", systemImage: "square.and.arrow.up") { isSharing = true }
             .sheet(isPresented: $isSharing) {
                 if let surface {
-                    ShareSheet(surface: surface, values: values)
+                    ShareSheet(surface: surface, values: values, page: page)
                 }
             }
     }
@@ -19,10 +21,12 @@ struct ShareButton: View {
 /// Sharing a surface: a link that opens in Dream (or on the web without it), or a picture.
 /// What's shared is the template, so the person who opens it starts from the beginning. The
 /// user's numbers go too only if they switch them on; their answers, list entries and photo never
-/// do. The picture shows exactly what goes.
+/// do. The picture shows exactly what goes. Links belong to the user's account: sharing a page
+/// again updates the link it already has, unless they ask for a new one.
 struct ShareSheet: View {
     let surface: Surface
     let values: [String: Double]
+    var page: UUID? = nil
     @Environment(\.dismiss) private var dismiss
     @Environment(\.colorScheme) private var colorScheme
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
@@ -31,8 +35,13 @@ struct ShareSheet: View {
     @State private var picture: UIImage?
     /// Links made while the sheet is open, with and without the user's numbers.
     @State private var links: [Bool: URL] = [:]
+    /// Links this page already had, with and without the user's numbers, which sharing updates.
+    @State private var earlier: [Bool: OwnedLink] = [:]
+    /// Which of `links` are those, now showing this version.
+    @State private var updatedEarlier: Set<Bool> = []
     @State private var isUploading = false
     @State private var failure: String?
+    @State private var signedIn = Session.isSignedIn
     /// Whether the user chose to share what connected services gave the page. Until then a page
     /// that holds some can't go anywhere.
     @State private var sharesServices = false
@@ -81,6 +90,17 @@ struct ShareSheet: View {
             withAnimation(.smooth) { picture = nil }
             let image = await PictureMaker.picture(of: surface, values: includesNumbers ? values : [:], colorScheme: colorScheme, dynamicTypeSize: dynamicTypeSize)
             withAnimation(.smooth) { picture = image }
+        }
+        .task(id: signedIn) { await findEarlierLinks() }
+        .onReceive(NotificationCenter.default.publisher(for: Session.didChange)) { _ in signedIn = Session.isSignedIn }
+    }
+
+    /// The links this page already has, so the sheet can say sharing it updates one.
+    private func findEarlierLinks() async {
+        guard signedIn, let page, server != nil, let mine = try? await ShareServer.myLinks() else { return }
+        let own = mine.filter { $0.isShared && $0.page == page.uuidString }
+        withAnimation(.smooth) {
+            earlier = Dictionary(own.map { ($0.hasValues, $0) }, uniquingKeysWith: { newer, _ in newer })
         }
     }
 
@@ -132,6 +152,7 @@ struct ShareSheet: View {
 
     @ViewBuilder private var actions: some View {
         let title = surface.title
+        let before = earlier[includesNumbers]
         VStack(spacing: 12) {
             if let url = links[includesNumbers] {
                 ShareLink(item: url, subject: Text(title), preview: SharePreview(title, image: Image(uiImage: picture ?? UIImage()))) {
@@ -141,13 +162,35 @@ struct ShareSheet: View {
                     .font(.footnote.monospaced())
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
+                if updatedEarlier.contains(includesNumbers) {
+                    Text("Your link from before, now showing this version.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                    newLinkButton
+                }
             } else {
                 Button {
                     Task { await makeLink() }
                 } label: {
-                    action(isUploading ? "Making a link…" : "Make a link", symbol: "link", busy: isUploading)
+                    if before == nil {
+                        action(isUploading ? "Making a link…" : "Make a link", symbol: "link", busy: isUploading)
+                    } else {
+                        action(isUploading ? "Updating your link…" : "Update your link", symbol: "arrow.triangle.2.circlepath", busy: isUploading)
+                    }
                 }
-                .disabled(isUploading || server == nil || waitsForChoice)
+                .disabled(isUploading || server == nil || waitsForChoice || !signedIn)
+                if let before {
+                    Text("You shared this page on \(before.created.formatted(.dateTime.day().month(.abbreviated))), and \(opened(before.views)). Updating shows this version at the same link.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                    newLinkButton
+                }
+            }
+            if !signedIn, server != nil {
+                Text("Sign in to make links. Pictures don't need an account.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
             }
             if let picture, !waitsForChoice {
                 ShareLink(item: Image(uiImage: picture), preview: SharePreview(title, image: Image(uiImage: picture))) {
@@ -196,15 +239,34 @@ struct ShareSheet: View {
         .contentShape(.capsule)
     }
 
-    private func makeLink() async {
+    private var newLinkButton: some View {
+        Button("Make a new link instead") { Task { await makeLink(fresh: true) } }
+            .font(.footnote.weight(.semibold))
+            .foregroundStyle(palette.accent)
+            .disabled(isUploading || waitsForChoice)
+            .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func opened(_ views: Int) -> String {
+        switch views {
+        case 0: "nobody's opened it yet"
+        case 1: "it's been opened once"
+        default: "it's been opened \(views.formatted()) times"
+        }
+    }
+
+    /// Makes a link, or updates the one this page already has, unless `fresh` asks for a new one.
+    private func makeLink(fresh: Bool = false) async {
         guard let server else { return }
         let mode = includesNumbers
         isUploading = true
         failure = nil
         defer { isUploading = false }
         do {
-            let link = try await ShareServer.upload(shared, to: server)
-            links[mode] = link.url
+            let upload = try await ShareServer.upload(shared, to: server, page: page, fresh: fresh)
+            links[mode] = upload.link.url
+            if upload.reused { updatedEarlier.insert(mode) } else { updatedEarlier.remove(mode) }
+            earlier[mode] = nil
         } catch {
             failure = error.localizedDescription
         }

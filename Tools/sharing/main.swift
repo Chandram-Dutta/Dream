@@ -206,21 +206,71 @@ expect(SharedLink(URL(string: "dream://s/AbCdE12345")!)?.base == base, "dream://
 expect(SharedLink(URL(string: "https://elsewhere.example/s/AbCdE12345")!) == nil, "a link to another server doesn't")
 expect(SharedLink(URL(string: "dream://s/AbCdE12345/../../x")!) == nil && SharedLink(URL(string: "dream://s/short")!) == nil, "malformed ids don't")
 UserDefaults.standard.removeObject(forKey: "shareServer")
+expect(SharedLink(address: "https://dream.onlychan.xyz/s/AbCdE12345")?.id == "AbCdE12345" && SharedLink(address: "https://dream.onlychan.xyz/x/AbCdE12345") == nil, "a shelf page's link is read back from where it was opened")
+
+print("\nYour links, and refusals")
+let listing = Data("""
+{"shares":[{"id":"AbCdE12345","url":"https://dream.onlychan.xyz/s/AbCdE12345","page":"7D2A","title":"Split a bill","accent":"orange","symbol":"fork.knife",
+"created":1761400000,"updated":1761500000,"hasValues":true,"views":12,"expiresAt":null,"state":"shared"},
+{"id":"ZyXwV98765","url":"https://dream.onlychan.xyz/s/ZyXwV98765","page":null,"title":"Old","accent":"ultraviolet","symbol":null,
+"created":1761400000,"updated":1761400000,"hasValues":false,"views":0,"expiresAt":1761600000,"state":"somethingnew"}]}
+""".utf8)
+struct Listing: Decodable { let shares: [OwnedLink] }
+let owned = (try? JSONDecoder().decode(Listing.self, from: listing))?.shares ?? []
+expect(owned.count == 2 && owned[0].views == 12 && owned[0].hasValues && owned[0].accent == .orange && owned[0].isShared, "links decode, with views, numbers and colors")
+expect(owned.count == 2 && owned[1].accent == nil && owned[1].expiresAt != nil && !owned[1].isShared, "an unknown color or state doesn't stop a link decoding")
+let refusal = { (status: Int, json: String) in ServerError(status: status, data: Data(json.utf8)).localizedDescription }
+expect(refusal(422, #"{"error":"…","reason":"slur"}"#).contains("slur") && refusal(422, #"{"reason":"private"}"#).contains("private details"), "the publish check's refusals say why, in Dream's words")
+expect(refusal(403, #"{"reason":"blocked"}"#).contains("chose not to see") && refusal(410, "{}") == "This page is no longer shared.", "and so do blocked and stopped pages")
+expect(refusal(401, "not json") == "Sign in to share links.", "making a link signed out asks for signing in")
 
 if let server = ProcessInfo.processInfo.environment["DREAM_SHARE_URL"].flatMap(ShareServer.normalized) {
     print("\nThrough the Worker at \(server.absoluteString)")
+    UserDefaults.standard.set(server.absoluteString, forKey: "shareServer")
+    defer { UserDefaults.standard.removeObject(forKey: "shareServer") }
+    // A test user, from the Worker's dev sign-in (DEV_LOGIN=1 in Server/.dev.vars).
+    var signIn = URLRequest(url: server.appending(path: "api/dev/session").appending(queryItems: [URLQueryItem(name: "user", value: "sharing-tool")]))
+    signIn.httpMethod = "POST"
+    struct DevSession: Decodable { let token: String }
+    if let (data, _) = try? await URLSession.shared.data(for: signIn), let token = try? JSONDecoder().decode(DevSession.self, from: data).token {
+        setenv("DREAM_SESSION", token, 1)
+    } else {
+        print("  (no dev sign-in on this server: set DEV_LOGIN=1 in Server/.dev.vars, or DREAM_SESSION)")
+    }
     do {
-        let link = try await ShareServer.upload(mine, to: server)
-        expect(link.url.absoluteString.hasPrefix(server.absoluteString + "/s/"), "uploading gives a link (\(link.url.absoluteString))")
+        let page = UUID()
+        let upload = try await ShareServer.upload(mine, to: server, page: page)
+        let link = upload.link
+        expect(link.url.absoluteString.hasPrefix(server.absoluteString + "/s/") && !upload.reused, "uploading gives a link (\(link.url.absoluteString))")
+        let again = try await ShareServer.upload(mine, to: server, page: page)
+        expect(again.reused && again.link == link, "sharing the same page again reuses its link")
+        let listed = try await ShareServer.myLinks().first { $0.id == link.id }
+        expect(listed?.page == page.uuidString && listed?.hasValues == true && listed?.title == surface.title, "and it's in your links")
         let fetched = try await ShareServer.fetch(link)
         let opened = try SharedSurface.received(fetched)
         expect(opened.surface.inputs == surface.inputs && opened.surface.blocks.map(\.id) == surface.blocks.map(\.id), "it opens as it was shared")
         expect(opened.values == ["days": 7, "hotel": 4500], "with the sharer's numbers")
-        let (page, _) = try await URLSession.shared.data(from: link.url)
-        let html = String(decoding: page, as: UTF8.self)
+        let (viewer, _) = try await URLSession.shared.data(from: link.url)
+        let html = String(decoding: viewer, as: UTF8.self)
         expect(html.contains("Pune trip budget") && html.contains("class=\"katex\"") && !html.contains("Vegetarian"), "and the web viewer shows it, without the answers")
         expect(html.contains("href=\"https://www.lonelyplanet.com/india/pune\"") && html.contains("CC BY-SA 4.0"), "crediting every source, with Wikipedia's licence")
+        expect(html.contains("/s/\(link.id)/report"), "with a way to report it")
         print("  Web viewer: \(link.url.absoluteString)")
+
+        var renamed = surface
+        renamed.title = "Pune trip budget, revised"
+        let updated = try await ShareServer.update(listed!, to: SharedSurface(sharing: renamed, values: nil))
+        expect(updated.title == renamed.title && updated.id == link.id && !updated.hasValues, "updating puts the newest version at the same link")
+        try await ShareServer.report(link, reason: .spam, note: "  Checking reports.  ")
+        expect(true, "reporting it works")
+        let stopped = try await ShareServer.stop(updated)
+        expect(stopped.state == .stopped, "stopping it works")
+        do {
+            _ = try await ShareServer.fetch(link)
+            expect(false, "a stopped link doesn't open")
+        } catch {
+            expect(error.localizedDescription == "This page is no longer shared.", "a stopped link says it's no longer shared")
+        }
     } catch {
         expect(false, "the round trip through the Worker failed: \(error.localizedDescription)")
     }

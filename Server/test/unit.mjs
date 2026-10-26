@@ -4,6 +4,7 @@
 //   node test/unit.mjs
 
 import { checkURL, isPublicIP, parseIP } from "../src/address.ts";
+import { checkPublish, words } from "../src/moderation.ts";
 import { robotsAllows } from "../src/robots.ts";
 import { capText, clip, dayOf, decodeEntities, delink, flatten, siteOf, tidy } from "../src/webtext.ts";
 
@@ -104,6 +105,24 @@ const capped = capText(`${"First paragraph sentence. ".repeat(10)}\n\n${"Second 
 expect(capped.truncated && capped.text.length <= 302 && capped.text.endsWith("\n…"), "long text is cut, and says so");
 expect(siteOf("www.gsmarena.com") === "gsmarena.com" && siteOf("m.example.co.uk") === "example.co.uk", "site names from hosts");
 expect(dayOf("2026-10-20T08:00:00+05:30") === "2026-10-20" && dayOf("Tue, 20 Oct 2026 10:00:00 GMT") === "2026-10-20" && dayOf("soon") === undefined, "dates");
+
+console.log("The publish check (with each list's made-up test word)");
+const page = (text, extra = {}) => ({ format: 1, surface: { title: "A page", summary: "", blocks: [{ id: "p", kind: "paragraph", title: "", text }], inputs: [], outputs: [], accent: "blue", symbol: "x", ...extra } });
+const reason = (text, extra) => checkPublish(page(text, extra))?.reason ?? null;
+expect(words("Ünïcödé L33T sp3ll1ng, stretchhhhed, s p e l l e d").join(" ") === "unicode leet spelling stretchhed spelled", "words are folded: accents, l33t, stretched and spelled-out letters");
+expect(reason("Some dreamslurcheck here.") === "slur" && reason("DREAMSLURCHECKS!") === "slur", "a listed word, in any case, or plural");
+expect(reason("notdreamslurcheck") === null, "only as a whole word");
+expect(reason("Fine text", { related: ["dreamslurcheck"] }) === "slur", "anywhere a reader sees text");
+expect(reason("Fine text", { inputs: [{ name: "dreamslurcheck", formula: "dreamslurcheck * 2" }] }) === null, "but not in names and formulas");
+expect(reason("The toddlers dreamexplicitcheck.") === "minors" && reason("A 12 yrs old and dreamexplicitcheck") === "minors", "an explicit word in a sentence with a child, or a young age");
+expect(reason("Kids are here. Elsewhere, dreamexplicitcheck.") === null && reason("A 30-year-old and dreamexplicitcheck") === null, "not in another sentence, or with an adult's age");
+expect(reason("kiddie dreamporncheck") === "minors" && reason("dreamporncheck for kids") === null, "slang for pornography right after a word for a child");
+expect(reason("Talk to children about sexual abuse and how to stay safe.") === null, "clinical words about keeping children safe aren't refused");
+expect(reason("SSN 512-44-3321") === "private" && reason("SSN 666-44-3321") === null && reason("e.g. 123-45-6789") === null, "Social Security numbers, but not impossible or example ones");
+expect(reason("Aadhaar 4991 1866 5246") === "private" && reason("4991 1866 5247") === null, "Aadhaar numbers that pass their check digit");
+expect(reason("4539 1488 0343 6467") === "private" && reason("4539 1488 0343 6468") === null && reason("4242 4242 4242 4242") === null, "card numbers that pass Luhn, apart from test cards");
+expect(reason("Her home address is 14 Elm Road. Her phone number is +44 20 7946 0958.") === "private", "a person's home address with their phone number");
+expect(reason("The President lives at 1600 Pennsylvania Avenue. Call the office on 202-456-1111.") === null, "but not a famous address, or a public phone");
 
 console.log(failures ? `\n${failures} failed` : "\nAll passed");
 process.exit(failures ? 1 : 0);

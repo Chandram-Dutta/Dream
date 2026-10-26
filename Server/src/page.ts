@@ -22,6 +22,8 @@ const isWikipedia = (url: unknown) => typeof url === "string" && /^https:\/\/[a-
 const INFORMATION = new Set(["paragraph", "facts", "bullets", "steps", "timeline", "stat", "equation", "data", "diagram"]);
 
 export const CSP = "default-src 'none'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self' https://upload.wikimedia.org; media-src https://upload.wikimedia.org; base-uri 'none'; form-action 'none'; frame-ancestors 'none'";
+/** Pages with a form (reporting a page, and the admin's), which posts back to this server only. */
+export const FORM_CSP = CSP.replace("form-action 'none'", "form-action 'self'");
 
 /** The engine's working, as the app sent it; anything malformed is left out. */
 function pageOf(stored: Stored): Page {
@@ -91,9 +93,58 @@ ${stored.values ? `<p class="note">Shared with their numbers</p>` : ""}
 ${image ? `<img class="cover" src="${escape(image)}" alt="" loading="lazy" referrerpolicy="no-referrer">` : ""}
 ${renderBlocks(Array.isArray(surface.blocks) ? surface.blocks : [], page)}
 ${related.length ? `<div class="chips">${related.map((topic) => `<span class="chip">${escape(topic)}</span>`).join("")}</div>` : ""}
-${source ? `<footer class="source">${source}</footer>` : ""}`,
+${source ? `<footer class="source">${source}</footer>` : ""}
+<p class="report"><a href="/s/${escape(stored.id)}/report" rel="nofollow">Report this page</a></p>`,
     open: `dream://s/${stored.id}`,
   });
+}
+
+/** What a link that stopped says instead of its page. */
+export function gonePage(state: "stopped" | "expired" | "removed"): string {
+  switch (state) {
+    case "removed":
+      return messagePage("This page was removed", "It broke Dream's rules for shared pages.");
+    case "expired":
+      return messagePage("This page is no longer shared", "Its link was set to stop working after a while.");
+    case "stopped":
+      return messagePage("This page is no longer shared", "The person who shared it has stopped sharing it.");
+  }
+}
+
+/** Why someone might report a page, in the order the form lists them. */
+export const REPORT_REASONS: [string, string][] = [
+  ["hate", "Hate or harassment"],
+  ["sexual", "Sexual content"],
+  ["violence", "Violence or threats"],
+  ["private", "Someone's private information"],
+  ["spam", "Spam or a scam"],
+  ["other", "Something else"],
+];
+
+/** Reporting a page from the web viewer: a few reasons and a note, posted back without script. */
+export function reportPage(id: string, title: string, problem?: string): string {
+  const reasons = REPORT_REASONS.map(
+    ([value, label], index) => `<label><input type="radio" name="reason" value="${value}"${index === 0 ? " required" : ""}> ${escape(label)}</label>`,
+  ).join("\n");
+  return formPage(
+    "Report this page",
+    `<header><h1>Report this page</h1><p class="summary">${escape(title)}</p></header>
+<form class="form" method="post" action="/s/${escape(id)}/report">
+<fieldset class="reasons"><legend>What's wrong with it?</legend>
+${reasons}
+</fieldset>
+<label class="stack-tight"><span class="secondary">Anything else we should know (optional)</span>
+<textarea name="note" rows="4" maxlength="500"></textarea></label>
+${problem ? `<p class="problem">${escape(problem)}</p>` : ""}
+<button class="button" type="submit">Send report</button>
+<p class="footnote">Reports are anonymous. Nothing about you is kept.</p>
+</form>`,
+  );
+}
+
+/** A page around a form: the report form, and the admin's. `body` is HTML, already escaped. */
+export function formPage(title: string, body: string): string {
+  return document({ language: "en", rtl: false, title, accent: "indigo", head: `<meta name="robots" content="noindex">`, body });
 }
 
 interface Credit {
@@ -319,5 +370,22 @@ audio{width:100%;margin-top:4px}
 .open>span{display:flex;flex-direction:column;font-size:13px;line-height:1.3;min-width:0}
 .open strong{font-family:var(--display);font-stretch:125%;font-size:15px}
 .button{flex:none;padding:12px 18px;border-radius:999px;background:var(--gradient);color:#fff;font-weight:600;font-size:15px}
+.report{font-size:13px;margin:-8px 0 0}
+.report a{color:var(--secondary);text-decoration:underline;text-underline-offset:2px}
+.form{display:flex;flex-direction:column;gap:18px}
+fieldset{border:0;margin:0;padding:0;display:flex;flex-direction:column}
+legend{padding:0;margin-bottom:4px;font-weight:600}
+.reasons label{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:.5px solid var(--separator)}
+.reasons label:last-child{border-bottom:0}
+input[type=radio]{accent-color:var(--accent);width:20px;height:20px;margin:0}
+input[type=password],input[type=text],textarea{width:100%;font:inherit;color:var(--label);background:var(--wash);border:.5px solid var(--edge);border-radius:16px;padding:12px 14px}
+button.button{border:0;font-family:inherit;cursor:pointer;align-self:flex-start}
+button.quiet{background:var(--wash);color:var(--accent)}
+.problem{color:#c93400;font-size:15px}
+.case{padding:18px;border-radius:24px;background:var(--wash);border:.5px solid var(--edge);display:flex;flex-direction:column;gap:8px}
+.case h3 a{color:var(--label)}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.actions form{margin:0}
+.notes{margin:0;padding-inline-start:18px;color:var(--secondary);font-size:15px}
 @media (max-width:380px){.open>span .secondary{display:none}.hero-value{font-size:52px}}
 `;

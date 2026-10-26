@@ -2,9 +2,10 @@
 // the app as JSON, shows them on the web to people without Dream, and tells iOS which links the
 // app opens.
 //
-//   POST /api/surfaces        a shared surface (JSON)  → 201 { id, url }
-//   GET  /api/surfaces/:id    the shared surface, for the app
+//   POST /api/surfaces        a shared surface (JSON), from a signed-in user  → 201 { id, url }
+//   GET  /api/surfaces/:id    the shared surface, for the app; PUT and DELETE for its owner
 //   GET  /s/:id               the web viewer; also the universal link the app opens
+//   …                         owners' links, reports, blocks and the admin (sharing.ts)
 //   GET  /.well-known/apple-app-site-association
 //   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
 //   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
@@ -15,12 +16,11 @@
 
 import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
-import { CSP, messagePage, surfacePage } from "./page";
-import { parseShared, readBody, Rejection } from "./payload";
-import { ID_PATTERN, load, save } from "./store";
+import { CSP, messagePage } from "./page";
+import { routeSharing, type SharingEnv } from "./sharing";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv {
+export interface Env extends WebEnv, AuthEnv, SharingEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -71,20 +71,6 @@ function associatedDomains(env: Env): Response {
   );
 }
 
-async function create(request: Request, env: Env, origin: string): Promise<Response> {
-  if (!(await allowed(env.CREATE_LIMIT, request, "create"))) return problem(429, "Too many shares at once. Try again in a minute.", { "Retry-After": "60" });
-  const type = request.headers.get("Content-Type") ?? "";
-  if (!/^application\/json(\s*;|$)/i.test(type)) return problem(415, "Send the surface as application/json.");
-  try {
-    const shared = parseShared(await readBody(request));
-    const id = await save(env.DB, shared);
-    return json({ id, url: `${origin}/s/${id}` }, 201, { "Cache-Control": "no-store" });
-  } catch (error) {
-    if (error instanceof Rejection) return problem(error.status, error.message);
-    throw error;
-  }
-}
-
 export default {
   async fetch(request, env, ctx): Promise<Response> {
     const url = new URL(request.url);
@@ -100,26 +86,9 @@ export default {
       if (path === "/.well-known/apple-app-site-association" || path === "/apple-app-site-association") {
         return reading ? associatedDomains(env) : problem(405, "Only GET.", { Allow: "GET, HEAD" });
       }
-      if (path === "/api/surfaces") {
-        return request.method === "POST" ? await create(request, env, url.origin) : problem(405, "Only POST.", { Allow: "POST" });
-      }
-      const api = path.match(/^\/api\/surfaces\/([^/]+)$/);
-      const viewer = path.match(/^\/s\/([^/]+)\/?$/);
-      if (api || viewer) {
-        if (!reading) return problem(405, "Only GET.", { Allow: "GET, HEAD" });
-        if (!(await allowed(env.READ_LIMIT, request, "read"))) {
-          return api ? problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" }) : html(messagePage("Slow down", "Too many requests at once. Try again in a minute."), 429);
-        }
-        const id = (api ?? viewer)![1];
-        const stored = ID_PATTERN.test(id) ? await load(env.DB, id) : null;
-        if (api) {
-          if (!stored) return problem(404, "There's no shared screen here.");
-          const { preview: _, ...forApp } = stored;
-          return json(forApp, 200, { "Cache-Control": "public, max-age=3600" });
-        }
-        if (!stored) return html(messagePage("This screen isn't here", "The link may be incomplete, or the screen was taken down."), 404);
-        return html(surfacePage(stored, url.origin), 200, "public, max-age=300");
-      }
+      // Shared links, their owners, reports, blocks and the admin (sharing.ts).
+      const sharing = await routeSharing(request, env, ctx, url);
+      if (sharing) return sharing;
       if (path.startsWith("/api/mcp/")) {
         if (!reading) return problem(405, "Only GET.", { Allow: "GET, HEAD" });
         if (!(await allowed(env.READ_LIMIT, request, "directory"))) return problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" });

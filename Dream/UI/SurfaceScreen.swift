@@ -156,8 +156,10 @@ struct SurfaceScreen: View {
                     .disabled(busy || surface == nil)
                 Button("Change", systemImage: "wand.and.stars") { beginChange(ChangeTarget()) }
                     .disabled(busy || surface == nil)
-                ShareButton(surface: surface, values: state.values)
+                ShareButton(surface: surface, values: state.values, page: saved?.id)
                     .disabled(busy || surface == nil)
+                // Someone else's page: report it, or stop seeing pages from them (SharedPageMenu.swift).
+                if let saved, saved.sharedFrom != nil { SharedPageMenu(saved: saved) }
                 Button("Under the hood", systemImage: "ladybug") { showingDebug = true }
             }
         }
