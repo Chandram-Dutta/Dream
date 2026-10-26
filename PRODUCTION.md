@@ -148,7 +148,7 @@ public App Store release, the decisions taken, and the work in progress.
   - set the App Store Server Notifications URL to the backend.
 - **xAI:** a production API key for the server, set as a Worker secret.
 - **Legal:** the pages are written in Chandram Dutta's name (an individual, not a company), for
-  16+ (18+ in India). A lawyer's review is optional, worth it with revenue or an EU push.
+  16+ everywhere. A lawyer's review is optional, worth it with revenue or an EU push.
 - **Parallel:** sign its Data Processing Addendum, and ask whether shared pages may carry text made
   from its results.
 - **Optional:** a GitHub repository for CI.

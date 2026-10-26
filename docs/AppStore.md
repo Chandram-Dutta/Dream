@@ -236,9 +236,9 @@ what we hope people ask for.
 suit 13+ when sexual and graphic content is refused reliably and shared pages can be reported and
 taken down. If the model's output isn't filtered on the server by launch (workstream C's check
 before publishing, and D's proxy), answer the mature-content questions "Frequent" and take 16+, or
-18+ if explicit content can get through. In India, the DPDP Act treats everyone under 18 as a
-child, whose data needs verifiable parental consent; a 13+ rating doesn't settle that (privacy
-policy draft, legal review).
+18+ if explicit content can get through. Dream's terms say 16+ everywhere, so the rating should
+be 16+ at least. Chandram chose 16+ in India too, knowing the DPDP Act treats under-18s as
+children needing a parent's consent; revisit if Dream grows there.
 
 ## Export compliance
 

@@ -233,7 +233,7 @@ const PRIVACY = [
   section(
     "Children",
     p(
-      `Dream is for people 16 and older, and 18 and older in India. If you think a child has signed up, write to ${PRIVACY_CONTACT} and their account will be deleted.`,
+      `Dream is for people 16 and older. If you think a child has signed up, write to ${PRIVACY_CONTACT} and their account will be deleted.`,
     ),
   ),
   section(
@@ -258,7 +258,7 @@ const TERMS = [
       `These terms are between you and ${OWNER}, who makes Dream. By signing in to Dream, or otherwise using it, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including what it says about AI providers and usage counts. If you don't agree, please don't use Dream.`,
     ),
   ),
-  section("Who can use Dream", p(`You need to be at least 16, or 18 in India, and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
+  section("Who can use Dream", p(`You need to be at least 16 and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
   section(
     "Your account",
     p("You're responsible for what happens in your account, so keep your Apple Account secure. You can delete your account at any time in Account."),
