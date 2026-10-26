@@ -9,11 +9,13 @@ struct DreamApp: App {
     init() {
         Memory.start(container)
         ConnectionStore.shared.start(container)
+        Plan.shared.start()
     }
 
     var body: some Scene {
         WindowGroup {
             HomeView()
+                .offeringPlans()
         }
         .modelContainer(container)
     }

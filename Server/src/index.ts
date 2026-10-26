@@ -9,6 +9,7 @@
 //   GET  /api/mcp/featured, /api/mcp/servers   the directory of MCP servers (directory.ts)
 //   POST /api/search, POST /api/read, GET /reader   web search and pages, for the app (web.ts)
 //   POST /api/dev/session     a test user's session, in local development only (auth.ts)
+//   POST /api/model, GET /api/usage, /api/appstore/*, /api/attest/*   the model, limits and Dream Plus (plan.ts)
 //
 // Nothing personal is logged: no addresses, no surface content. Addresses are only used as
 // rate-limit keys, which Cloudflare counts and the Worker never stores.
@@ -17,10 +18,11 @@ import { devSession, type AuthEnv } from "./auth";
 import { directory } from "./directory";
 import { CSP, messagePage, surfacePage } from "./page";
 import { parseShared, readBody, Rejection } from "./payload";
+import { routePlan, type PlanEnv } from "./plan";
 import { ID_PATTERN, load, save } from "./store";
 import { routeWeb, type WebEnv } from "./web";
 
-export interface Env extends WebEnv, AuthEnv {
+export interface Env extends WebEnv, AuthEnv, PlanEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -93,6 +95,8 @@ export default {
     try {
       const web = await routeWeb(request, env, ctx, url);
       if (web) return web;
+      const plan = await routePlan(request, env, ctx, url);
+      if (plan) return plan;
       if (path === "/api/dev/session") {
         const session = await devSession(request, env);
         if (session) return session;

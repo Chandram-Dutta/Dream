@@ -4,9 +4,10 @@
 //   POST /api/read     { url, focus?, maxChars?, language? }               → { title, site, canonical, date?, text, … }
 //   GET  /reader       what DreamReader is, for site owners who see it in their logs
 //
-// Both cost money (providers.ts), so neither is an open proxy: only the app may call them (a
-// shared key for now, App Attest later; README.md), each address has a rate limit, everyone
-// together has a daily budget, answers are cached for a while, and sizes and times are capped.
+// Both cost money (providers.ts), so neither is an open proxy: only signed-in people, using the
+// app, may call them (a session, and App Attest or the shared key in X-Dream-Key: attest.ts),
+// each account has a daily allowance (usage.ts), each address a rate limit, everyone together a
+// daily budget, answers are cached for a while, and sizes and times are capped.
 // The reader fetches only public http(s) pages, checks where names resolve before fetching,
 // follows robots.txt, and says who it is.
 //
@@ -14,14 +15,17 @@
 // answers are keyed by a hash of what was asked, and expire.
 
 import { checkURL, hostOf, isPublicIP, parseIP, type Refusal } from "./address";
+import { proveApp, type ProofEnv } from "./attest";
+import { signInNeeded, userFrom, type AuthEnv, type User } from "./auth";
 import { readHTML, type PageText } from "./html";
 import { messagePage } from "./page";
 import { readBody, Rejection } from "./payload";
 import { Parallel, ProviderError, type Freshness, type PageProvider, type ProvidedPage, type SearchProvider } from "./providers";
 import { READER_TOKEN, robotsAllows } from "./robots";
+import { admitWeb, refusalResponse, type UsageEnv } from "./usage";
 import { capText, delink, siteOf, tidy } from "./webtext";
 
-export interface WebEnv {
+export interface WebEnv extends ProofEnv, UsageEnv, AuthEnv {
   DB: D1Database;
   SEARCH_LIMIT?: RateLimit;
   PAGE_LIMIT?: RateLimit;
@@ -30,8 +34,6 @@ export interface WebEnv {
   /** Where Parallel's API is. Only tests change it, to a stand-in on this Mac. */
   PARALLEL_BASE_URL?: string;
   PARALLEL_SEARCH_MODE?: string;
-  /** Secret. The keys the app proves itself with, separated by commas so one can be rotated out. */
-  DREAM_APP_KEYS?: string;
   /** Provider calls a day, for everyone together, of each kind (searches, page reads). */
   WEB_DAILY_LIMIT?: string;
 }
@@ -75,21 +77,6 @@ async function allowed(limiter: RateLimit | undefined, request: Request, bucket:
   return (await limiter.limit({ key: `${bucket}:${address}` })).success;
 }
 
-/** Whether the caller holds an app key. Without any set, nothing is let through. */
-async function authorized(request: Request, env: WebEnv): Promise<"yes" | "no" | "unset"> {
-  const keys = (env.DREAM_APP_KEYS ?? "").split(",").map((key) => key.trim()).filter((key) => key.length >= 16);
-  if (!keys.length) return "unset";
-  const given = /^Bearer\s+(\S{16,200})$/.exec(request.headers.get("Authorization") ?? "")?.[1];
-  if (!given) return "no";
-  // Compared as hashes, in constant time, so neither length nor content leaks through timing.
-  const hash = await digestBytes(given);
-  let match = false;
-  for (const key of keys) {
-    if (crypto.subtle.timingSafeEqual(hash, await digestBytes(key))) match = true;
-  }
-  return match ? "yes" : "no";
-}
-
 /** Counts one provider call against today's budget, and says whether it's still within it. */
 async function spend(env: WebEnv, kind: "search" | "read"): Promise<boolean> {
   const limit = Number(env.WEB_DAILY_LIMIT ?? "");
@@ -101,24 +88,32 @@ async function spend(env: WebEnv, kind: "search" | "read"): Promise<boolean> {
   return (row?.count ?? Infinity) <= daily;
 }
 
-/** What the app sent, as a JSON object: small, and only as application/json. */
-async function input(request: Request): Promise<Record<string, unknown> | Response> {
+/** What the app sent: small, and only as application/json. */
+async function input(request: Request): Promise<string | Response> {
   if (!/^application\/json(\s*;|$)/i.test(request.headers.get("Content-Type") ?? "")) return problem(415, "Send application/json.");
   try {
-    const body: unknown = JSON.parse(await readBody(request, 4_000));
-    return body && typeof body === "object" && !Array.isArray(body) ? (body as Record<string, unknown>) : problem(400, "Expected a JSON object.");
+    return await readBody(request, 4_000);
   } catch (error) {
     return error instanceof Rejection ? problem(error.status === 413 ? 413 : 400, error.status === 413 ? "That's too much to ask at once." : "Expected a JSON object.") : problem(400, "That isn't JSON.");
   }
 }
 
-/** Checks the caller before anything costs anything: the rate limit, then the app key, then the body. */
-async function gate(request: Request, env: WebEnv, limiter: RateLimit | undefined, bucket: string): Promise<Record<string, unknown> | Response> {
+/** Checks the caller before anything costs anything: the rate limit, who's signed in, the body's
+ * size, and that it's the app asking (the body is part of what App Attest signs). */
+async function gate(request: Request, env: WebEnv, limiter: RateLimit | undefined, bucket: string): Promise<{ body: Record<string, unknown>; user: User } | Response> {
   if (!(await allowed(limiter, request, bucket))) return problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" });
-  const auth = await authorized(request, env);
-  if (auth === "unset") return problem(503, "Web search isn't set up on this server yet.");
-  if (auth === "no") return problem(401, "This is for the Dream app.", { "WWW-Authenticate": "Bearer" });
-  return input(request);
+  const user = await userFrom(request, env);
+  if (!user) return signInNeeded();
+  const text = await input(request);
+  if (text instanceof Response) return text;
+  const refused = await proveApp(request, env, new TextEncoder().encode(text), "Web search");
+  if (refused) return refused;
+  try {
+    const body: unknown = JSON.parse(text);
+    return body && typeof body === "object" && !Array.isArray(body) ? { body: body as Record<string, unknown>, user } : problem(400, "Expected a JSON object.");
+  } catch {
+    return problem(400, "That isn't JSON.");
+  }
 }
 
 // MARK: - Cache
@@ -162,8 +157,9 @@ const pageProvider = (env: WebEnv): PageProvider | null => parallel(env);
 const words = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max + 1) : "");
 
 async function search(request: Request, env: WebEnv, ctx: ExecutionContext): Promise<Response> {
-  const body = await gate(request, env, env.SEARCH_LIMIT, "search");
-  if (body instanceof Response) return body;
+  const gated = await gate(request, env, env.SEARCH_LIMIT, "search");
+  if (gated instanceof Response) return gated;
+  const { body, user } = gated;
 
   const query = words(body.query, 300);
   if (query.length < 2 || query.length > 300) return problem(400, "Send a query of 2 to 300 characters.");
@@ -177,6 +173,8 @@ async function search(request: Request, env: WebEnv, ctx: ExecutionContext): Pro
 
   const provider = searchProvider(env);
   if (!provider) return problem(503, "Web search isn't set up on this server yet.");
+  const refusal = await admitWeb(env, user.id, "search");
+  if (refusal) return refusalResponse(refusal);
   const key = await digest(`search:1:${provider.name}:${JSON.stringify([query.toLowerCase(), objective, count, freshness ?? "", region ?? ""])}`);
   const hit = await cached<object>(env, key);
   if (hit) return json({ ...hit, cached: true });
@@ -234,8 +232,9 @@ interface ReadAnswer {
 }
 
 async function read(request: Request, env: WebEnv, ctx: ExecutionContext, origin: string): Promise<Response> {
-  const body = await gate(request, env, env.PAGE_LIMIT, "page");
-  if (body instanceof Response) return body;
+  const gated = await gate(request, env, env.PAGE_LIMIT, "page");
+  if (gated instanceof Response) return gated;
+  const { body, user } = gated;
 
   const checked = checkURL(body.url);
   if ("refused" in checked) return problem(400, REFUSED[checked.refused]);
@@ -244,6 +243,8 @@ async function read(request: Request, env: WebEnv, ctx: ExecutionContext, origin
   if (body.maxChars !== undefined && !(Number.isInteger(body.maxChars) && (body.maxChars as number) > 0)) return problem(400, "maxChars is a whole number.");
   const maxChars = Math.max(500, Math.min((body.maxChars as number | undefined) ?? 6_000, 12_000));
   const language = typeof body.language === "string" && /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8}){0,2}$/.test(body.language) ? body.language : undefined;
+  const refusal = await admitWeb(env, user.id, "read");
+  if (refusal) return refusalResponse(refusal);
 
   const provider = pageProvider(env);
   const key = await digest(`read:1:${provider?.name ?? "fetch"}:${JSON.stringify([url.href, focus, maxChars])}`);

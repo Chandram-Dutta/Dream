@@ -21,14 +21,16 @@ enum WebService {
         return (Bundle.main.object(forInfoDictionaryKey: "DreamShareHost") as? String).flatMap(ServerAddress.normalized)
     }
 
-    /// What shows the server it's Dream asking (Server/README.md). On the Mac bench it comes from
-    /// the environment; on the phone, from the Keychain, where Under the hood saves it.
-    static var key: String? {
-        if let key = ProcessInfo.processInfo.environment["DREAM_WEB_KEY"], !key.isEmpty { return key }
-        return Keychain.read("web")
-    }
+    /// Searches are counted against the signed-in user's allowance, and the server checks it's
+    /// the app asking (AppProof.swift): App Attest, or the shared key on the bench.
+    static var isAvailable: Bool { base != nil && Session.isSignedIn && AppProof.isAvailable }
 
-    static var isAvailable: Bool { base != nil && key != nil }
+    /// Why it isn't available, for the log.
+    static var unavailableReason: String {
+        if base == nil { return "no server is set" }
+        if !Session.isSignedIn { return "no one is signed in" }
+        return "there's no key for it"
+    }
 
     struct Result: Decodable, Hashable {
         var title: String
@@ -74,12 +76,16 @@ enum WebService {
     }()
 
     private static func post<T: Decodable>(_ path: String, _ body: [String: Any], timeout: TimeInterval, as type: T.Type) async throws -> T {
-        guard let base, let key else { throw WebError(status: -1) }
+        guard let base, Session.isSignedIn else { throw WebError(status: -1) }
         var request = URLRequest(url: base.appending(path: path), timeoutInterval: timeout)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(key)", forHTTPHeaderField: "Authorization")
-        request.httpBody = try JSONSerialization.data(withJSONObject: body)
+        Session.authorize(&request)
+        let sent = try JSONSerialization.data(withJSONObject: body)
+        for (name, value) in await AppProof.headers(method: "POST", path: "/" + path, body: sent) {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
+        request.httpBody = sent
         let data: Data
         let response: URLResponse
         do {
@@ -88,6 +94,7 @@ enum WebService {
             throw WebError(status: 0)
         }
         let status = (response as? HTTPURLResponse)?.statusCode ?? 0
+        if status == 401, let http = response as? HTTPURLResponse { AppProof.serverAsks(http) }
         // A page is capped at 12,000 characters on the server; anything far bigger isn't it.
         guard status == 200, data.count <= 200_000 else { throw WebError(status: status) }
         guard let decoded = try? JSONDecoder().decode(T.self, from: data) else { throw WebError(status: 502) }
@@ -105,7 +112,8 @@ struct WebError: LocalizedError {
         case -1: "Web search isn't set up on this phone."
         case 0: "The web couldn't be reached just now."
         case 400: "That address can't be read: Dream reads public web pages only."
-        case 401: "Web search refused Dream's key."
+        case 401: "Web search didn't accept this phone: it needs someone signed in, using the app."
+        case 402: "Today's web searches and reads are used up."
         case 403: "That site asks tools like Dream not to read it."
         case 404: "There's no page at that address."
         case 415: "That's a file, not a web page."
@@ -185,7 +193,7 @@ enum WebTools {
     static func offered(log: WebLog, language: String, onNote: @escaping @Sendable (String) -> Void, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
         log.beginSession()
         guard WebService.isAvailable else {
-            onNote("Web: search and read are off, since \(WebService.base == nil ? "no server is set" : "there's no key for it") (Under the hood › Web search).")
+            onNote("Web: search and read are off, since \(WebService.unavailableReason) (Under the hood › Web search).")
             return []
         }
         return [SearchTool(log: log, onUse: onUse), ReadTool(log: log, language: language, onUse: onUse)]

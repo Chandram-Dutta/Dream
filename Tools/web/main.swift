@@ -3,8 +3,9 @@ import Foundation
 // Checks web search and citations without the app or a model: which addresses count as the same
 // page, the checker holding citations to what was read, how untrusted text is fenced for the
 // model, and the per-screen limits. With DREAM_WEB_URL (say http://127.0.0.1:8787, from
-// `npx wrangler dev` in Server/) and DREAM_WEB_KEY, it also searches and reads once through the
-// Worker, which is a paid search and read unless they're cached. Build and run with Tools/web.sh.
+// `npx wrangler dev` in Server/), DREAM_WEB_KEY and DREAM_SESSION, it also searches and reads once
+// through the Worker, which is a paid search and read unless they're cached. Build and run with
+// Tools/web.sh.
 
 var failures = 0
 
@@ -80,7 +81,7 @@ expect(log.maySearch() && !log.hasRead("https://a.example/"), "a new session sta
 log.start(keeping: [Citation(title: "K", site: "k.example", url: "https://k.example/")])
 expect(log.reading(with: []).page(at: "https://k.example") != nil, "a change starts from the pages the screen credits")
 
-if let server = ProcessInfo.processInfo.environment["DREAM_WEB_URL"], ProcessInfo.processInfo.environment["DREAM_WEB_KEY"] != nil {
+if let server = ProcessInfo.processInfo.environment["DREAM_WEB_URL"], ProcessInfo.processInfo.environment["DREAM_WEB_KEY"] != nil, ProcessInfo.processInfo.environment["DREAM_SESSION"] != nil {
     print("\nThrough the Worker at \(server)")
     UserDefaults.standard.set(server, forKey: "webServer")
     let log = WebLog()

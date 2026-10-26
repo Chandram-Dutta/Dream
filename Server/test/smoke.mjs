@@ -1,21 +1,28 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
-// domains file, web search and reading, and the protections. With no address given, it applies
-// the migrations to a local database and starts `wrangler dev` itself, with web search pointed at
-// a stand-in for Parallel on this Mac (test/stub-parallel.mjs), so no search is paid for. Reading
+// domains file, web search and reading, the model proxy, allowances, Dream Plus, App Attest, and
+// the protections. With no address given, it applies the migrations to a local database and
+// starts `wrangler dev` itself, with web search pointed at a stand-in for Parallel and the model
+// at a stand-in for xAI on this Mac (test/stub-parallel.mjs, test/stub-xai.mjs), so nothing is
+// paid for, and with test roots for the App Store and App Attest (test/vectors.mjs). Reading
 // fetches example.com and example.org, and asks Cloudflare's resolver about names, so it needs
 // the network.
 //
 //   npm test                                  local, on a free port
 //   DREAM_SHARE_URL=http://127.0.0.1:8787 npm test   against a server that's already running
 //
-// Against a server that's already running, the web checks need its app key in DREAM_WEB_KEY, and
-// only the ones refused before anything is paid for run.
+// Against a server that's already running, the web and model checks need its app key in
+// DREAM_WEB_KEY and a session in DREAM_SESSION, and only the ones refused before anything is
+// paid for run.
 
 import { spawn, execFileSync } from "node:child_process";
-import { readFileSync } from "node:fs";
+import { randomUUID } from "node:crypto";
+import { readdirSync, readFileSync } from "node:fs";
 import { dirname, join } from "node:path";
+import { DatabaseSync } from "node:sqlite";
 import { fileURLToPath } from "node:url";
 import { STUB_KEY, startStub } from "./stub-parallel.mjs";
+import { STUB_XAI_KEY, startXAIStub } from "./stub-xai.mjs";
+import { appStoreChain, assertion, attest, attestRoot, jws, requestData, transaction } from "./vectors.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const fixture = readFileSync(join(root, "test/fixtures/split-bill.json"), "utf8");
@@ -30,15 +37,34 @@ function expect(condition, message) {
 const LOCAL_APP_KEY = "test-app-key-0123456789abcdef";
 /** Provider calls a day, low enough to reach in a test. */
 const LOCAL_DAILY_LIMIT = 4;
+/** Allowances low enough to reach in a test. */
+const LOCAL_ALLOWANCES = { free: { pagesPerDay: 2, searchesPerDay: 10 } };
+/** The roots the local server trusts besides Apple's, made for this run. */
+const appStore = appStoreChain();
+const attestCA = attestRoot();
+/** Everything the test writes, cleared before and after so runs don't affect each other. */
+const CLEAR = ["web_cache", "web_usage", "usage", "usage_pages", "spend", "subscriptions", "appstore_notifications", "attest_keys", "attest_challenges"].map((table) => `DELETE FROM ${table};`).join(" ");
 
-async function startLocal(stub) {
+async function startLocal(stub, xai) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
   execFileSync("npx", ["wrangler", "d1", "migrations", "apply", "dream-share", "--local"], { cwd: root, env, stdio: "ignore" });
   // Each run starts with nothing cached and nothing spent today.
-  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", CLEAR], { cwd: root, env, stdio: "ignore" });
   const port = 18_000 + Math.floor(Math.random() * 2_000);
-  // These take the place of anything in .dev.vars, so the real Parallel key is never used here.
-  const vars = [`PARALLEL_BASE_URL:${stub.base}`, `PARALLEL_API_KEY:${STUB_KEY}`, `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`, `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`].flatMap((pair) => ["--var", pair]);
+  // These take the place of anything in .dev.vars, so the real Parallel and xAI keys are never used here.
+  const vars = [
+    `PARALLEL_BASE_URL:${stub.base}`,
+    `PARALLEL_API_KEY:${STUB_KEY}`,
+    `DREAM_APP_KEYS:an-older-key-being-rotated-out,${LOCAL_APP_KEY}`,
+    `WEB_DAILY_LIMIT:${LOCAL_DAILY_LIMIT}`,
+    "DEV_LOGIN:1",
+    `XAI_BASE_URL:${xai.base}`,
+    `XAI_API_KEY:${STUB_XAI_KEY}`,
+    "MAX_OUTPUT_TOKENS:4000",
+    `ALLOWANCES:${JSON.stringify(LOCAL_ALLOWANCES)}`,
+    `APPSTORE_TEST_ROOT:${appStore.rootBase64}`,
+    `ATTEST_TEST_ROOT:${attestCA.rootBase64}`,
+  ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
@@ -57,9 +83,29 @@ async function startLocal(stub) {
     stop() {
       child.kill("SIGTERM");
       // What the test spent and cached would otherwise hold back a `wrangler dev` run afterwards.
-      execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", "DELETE FROM web_cache; DELETE FROM web_usage;"], { cwd: root, env, stdio: "ignore" });
+      execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", CLEAR], { cwd: root, env, stdio: "ignore" });
     },
   };
+}
+
+/** One read of the local database while `wrangler dev` runs, straight from its SQLite file:
+ * `wrangler d1 execute` at the same time can upset the running server. */
+function query(sql) {
+  const folder = join(root, ".wrangler/state/v3/d1/miniflare-D1DatabaseObject");
+  const file = readdirSync(folder).find((name) => name.endsWith(".sqlite") && name !== "metadata.sqlite");
+  const db = new DatabaseSync(join(folder, file), { readOnly: true });
+  try {
+    return db.prepare(sql).all();
+  } finally {
+    db.close();
+  }
+}
+
+/** A test user's session, from the local-only dev route. */
+async function signIn(base, name) {
+  const response = await fetch(`${base}/api/dev/session?user=${name}`, { method: "POST" });
+  const body = await response.json();
+  return { token: body.token, user: body.user };
 }
 
 const create = (base, body, type = "application/json") => fetch(`${base}/api/surfaces`, { method: "POST", headers: { "Content-Type": type }, body });
@@ -186,17 +232,21 @@ async function run(base) {
 
 /** Web search and reading. With the stand-in (`stub`), everything; against a running server,
  * only what's refused before anything is paid for. */
-async function runWeb(base, key, stub) {
+async function runWeb(base, key, session, stub) {
   const local = stub !== null;
-  const post = (path, body, { auth = key, type = "application/json" } = {}) =>
+  const post = (path, body, { auth = key, signedIn = session, type = "application/json" } = {}) =>
     fetch(`${base}${path}`, {
       method: "POST",
-      headers: { "Content-Type": type, ...(auth ? { Authorization: `Bearer ${auth}` } : {}) },
+      headers: { "Content-Type": type, ...(auth ? { "X-Dream-Key": auth } : {}), ...(signedIn ? { Authorization: `Bearer ${signedIn}` } : {}) },
       body: typeof body === "string" ? body : JSON.stringify(body),
     });
 
   console.log("Web search: who may ask, and what");
-  let response = await post("/api/search", { query: "budget phones" }, { auth: null });
+  let response = await post("/api/search", { query: "budget phones" }, { signedIn: null });
+  expect(response.status === 401 && response.headers.get("www-authenticate") === "Bearer", "no session is refused");
+  response = await fetch(`${base}/api/search`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` }, body: "{}" });
+  expect(response.status === 401, "the app key in Authorization, where it used to go, isn't a session");
+  response = await post("/api/search", { query: "budget phones" }, { auth: null });
   expect(response.status === 401, "no app key is refused");
   response = await post("/api/search", { query: "budget phones" }, { auth: "a-wrong-key-of-a-good-length" });
   expect(response.status === 401, "a wrong key is refused");
@@ -290,6 +340,17 @@ async function runWeb(base, key, stub) {
   expect(stopped === LOCAL_DAILY_LIMIT - 1, `searches stop for the day at the limit (after ${stopped} more)`);
   expect(stub.calls.search.length === LOCAL_DAILY_LIMIT, "and the provider isn't asked past it");
 
+  console.log("Web allowance per account");
+  const other = await signIn(base, "web-allowance");
+  let refusal = null;
+  for (let i = 0; i < LOCAL_ALLOWANCES.free.searchesPerDay + 2 && !refusal; i++) {
+    const answer = await post("/api/search", { query: `allowance check ${i}` }, { signedIn: other.token });
+    if (answer.status === 402) refusal = { at: i, body: await answer.json() };
+  }
+  expect(refusal?.at === LOCAL_ALLOWANCES.free.searchesPerDay, `a free account's searches stop at its daily allowance (after ${refusal?.at})`);
+  expect(refusal?.body.upgrade === true && /free web searches/.test(refusal?.body.error ?? ""), "saying so plainly, with Dream Plus as the way to more");
+  expect(query(`SELECT searches FROM usage WHERE user_id = '${other.user}' AND period = '${new Date().toISOString().slice(0, 10)}'`)[0]?.searches === LOCAL_ALLOWANCES.free.searchesPerDay, "searches are counted per account, by day");
+
   console.log("Rate limiting");
   let limited = false;
   for (let i = 0; i < 40 && !limited; i++) limited = (await post("/api/search", { query: "budget phones" })).status === 429;
@@ -299,20 +360,206 @@ async function runWeb(base, key, stub) {
   expect(limited, "and too many reads");
 }
 
+/** The model proxy, allowances, Dream Plus and App Attest, against the local server and the
+ * stand-in for xAI. */
+async function runPlan(base, xai) {
+  const me = await signIn(base, "plan");
+  const today = new Date().toISOString().slice(0, 10);
+  const ask = (body, { session = me.token, key = LOCAL_APP_KEY, page, headers = {} } = {}) =>
+    fetch(`${base}/api/model`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(session ? { Authorization: `Bearer ${session}` } : {}),
+        ...(key ? { "X-Dream-Key": key } : {}),
+        ...(page ? { "X-Dream-Page": page } : {}),
+        ...headers,
+      },
+      body: typeof body === "string" ? body : JSON.stringify(body),
+    });
+  const hello = (extra = {}) => ({ model: "grok-4.7", messages: [{ role: "system", content: "Answer briefly." }, { role: "user", content: "What colour is the sky?" }], ...extra });
+  const usage = async (token = me.token) => (await fetch(`${base}/api/usage`, { headers: { Authorization: `Bearer ${token}` } })).json();
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+
+  console.log("Model: who may ask, and what");
+  let response = await ask(hello(), { session: null });
+  expect(response.status === 401, "no session is refused");
+  response = await ask(hello(), { key: null });
+  expect(response.status === 401 && (await response.json()).error === "This is for the Dream app.", "a session without the app's proof is refused");
+  response = await fetch(`${base}/api/model`, { headers: { Authorization: `Bearer ${me.token}` } });
+  expect(response.status === 405, "only POST");
+  response = await ask(JSON.stringify(hello()), { headers: { "Content-Type": "text/plain" } });
+  expect(response.status === 415, "only application/json");
+  response = await ask(hello({ model: "grok-5-heavy" }));
+  expect(response.status === 400 && /doesn't offer that model/.test((await response.json()).error), "a model that isn't on the list is refused");
+  response = await ask(hello({ tools: [{ type: "web_search" }] }));
+  expect(response.status === 400, "a provider's paid server-side tools are refused");
+  response = await ask(hello({ messages: [{ role: "user", content: "x".repeat(2_100_000) }] }));
+  expect(response.status === 413, "a body over 2 MB is refused");
+  expect(xai.calls.completions.length === 0 && xai.calls.unauthorized === 0, "nothing refused reached xAI");
+
+  console.log("Model: streaming through");
+  const started = Date.now();
+  response = await ask(hello({ stream: true, max_tokens: 90_000, n: 3, search_parameters: { mode: "on" }, reasoning_effort: "low" }), { page: "page-a-0001" });
+  expect(response.status === 200 && response.headers.get("content-type")?.startsWith("text/event-stream"), "200, as server-sent events");
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let streamed = "";
+  let firstAt = 0;
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    if (!firstAt) firstAt = Date.now() - started;
+    streamed += decoder.decode(value, { stream: true });
+  }
+  const total = Date.now() - started;
+  expect(firstAt > 0 && total - firstAt >= 600, `chunks arrive as xAI sends them, not all at the end (first after ${firstAt} ms of ${total} ms)`);
+  expect(streamed.includes('"reasoning_content":"Thinking"') && streamed.indexOf("Thinking") < streamed.indexOf("Blue"), "reasoning comes through first, so the app sees the model working");
+  expect(streamed.includes('"usage":{') && streamed.trimEnd().endsWith("data: [DONE]"), "then the answer, the usage and [DONE], byte for byte");
+  const sent = xai.calls.completions.at(-1);
+  expect(sent?.max_tokens === 4000 && sent?.stream_options?.include_usage === true && sent?.reasoning_effort === "low", "xAI got max_tokens capped, a request for usage, and the reasoning effort");
+  expect(sent && !("n" in sent) && !("search_parameters" in sent), "and nothing Dream doesn't use");
+
+  console.log("Model: errors");
+  response = await ask(hello({ messages: [{ role: "user", content: "please fail" }] }));
+  expect(response.status === 503 && response.headers.get("retry-after") === "20", "xAI's rate limit is a 503 to try again shortly");
+  response = await ask(hello({ messages: [{ role: "user", content: "bad schema" }] }));
+  expect(response.status === 400 && /Invalid response_format schema/.test((await response.json()).error), "a request xAI calls malformed says why");
+
+  console.log("Allowance: pages");
+  response = await ask(hello({ stream: true }), { page: "page-a-0001" });
+  await response.text();
+  response = await ask(hello());
+  const plain = await response.json();
+  expect(response.status === 200 && plain.choices?.[0]?.message?.content === "Blue." && plain.usage?.prompt_tokens === 1261, "a small job that isn't a page goes through, not streamed");
+  await settle();
+  let status = await usage();
+  expect(status.plan === "free" && status.pages.today === 1 && status.pages.perDay === LOCAL_ALLOWANCES.free.pagesPerDay, `two requests for the same page count as one page (${status.pages?.today})`);
+  expect(status.accountToken === me.user && status.subscription === null && status.plans?.plus?.pagesPerDay > status.plans?.free?.pagesPerDay, "with the account's purchase token, and what Dream Plus adds");
+  const [row] = query(`SELECT tokens_in, tokens_cached, tokens_out, cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
+  // Three requests reached xAI and were answered: two streamed for page a, and one plain. Errors cost nothing.
+  expect(row?.tokens_in === 3 * 1261 && row?.tokens_cached === 3 * 1152 && row?.tokens_out === 3 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
+  expect(row?.cost_micros === 3 * 1184, "and what they cost, from xAI's own figure");
+  expect(query(`SELECT cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today.slice(0, 7)}'`)[0]?.cost_micros === 3 * 1184, "by month too");
+  expect(query(`SELECT cost_micros FROM usage_pages WHERE user_id = '${me.user}' AND page = 'page-a-0001'`)[0]?.cost_micros === 2 * 1184, "and by page");
+  response = await ask(hello(), { page: "page-b-0001" });
+  expect(response.status === 200, "a second page is allowed");
+  response = await ask(hello(), { page: "page-c-0001" });
+  const refused = await response.json();
+  expect(response.status === 402 && refused.upgrade === true && refused.reason === "allowance", "a third, past the free allowance, is 402 with a way to Dream Plus");
+  expect(refused.error === `You've made today's ${LOCAL_ALLOWANCES.free.pagesPerDay} free pages. You can make more tomorrow, or now with Dream Plus.`, "saying so plainly");
+  expect(Number(response.headers.get("retry-after")) > 0 && refused.resetsAt > Date.now() / 1000, "and when more come");
+  response = await ask(hello(), { page: "page-b-0001" });
+  expect(response.status === 200, "a page already started can finish");
+  response = await ask(hello());
+  expect(response.status === 200, "small jobs that aren't pages still go");
+
+  console.log("Dream Plus: purchases from the app");
+  const bought = transaction({ appAccountToken: me.user.toUpperCase(), originalTransactionId: "7000000000000001", transactionId: "7000000000000001" });
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${me.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStore, bought)] }) });
+  status = await response.json();
+  expect(response.status === 200 && status.plan === "plus" && status.subscription?.product === "xyz.onlychan.dream.plus.monthly", "a signed purchase makes the account Dream Plus");
+  response = await ask(hello(), { page: "page-c-0001" });
+  expect(response.status === 200, "and the next page goes through");
+  const theirs = await signIn(base, "plan-other");
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${theirs.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStore, bought)] }) });
+  expect(response.status === 409, "someone else can't claim it");
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${theirs.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStore, transaction({ originalTransactionId: "7000000000000001" }))] }) });
+  expect(response.status === 409, "even without an account token");
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${theirs.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStoreChain(), transaction({ appAccountToken: theirs.user }))] }) });
+  expect(response.status === 400, "a purchase not signed by the App Store is refused");
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${theirs.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStore, transaction({ appAccountToken: theirs.user, bundleId: "com.example.other", originalTransactionId: "7000000000000009" }))] }) });
+  expect(response.status === 400, "so is one for another app");
+  response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" });
+  expect(response.status === 401, "purchases need a session");
+
+  console.log("Dream Plus: App Store Server Notifications");
+  const notify = (payload) => fetch(`${base}/api/appstore/notifications`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ signedPayload: jws(appStore, payload) }) });
+  const notification = (type, signedTransaction, extra = {}) => ({
+    notificationType: type,
+    notificationUUID: randomUUID(),
+    data: { bundleId: "xyz.onlychan.Dream", bundleVersion: "1", environment: "Sandbox", signedTransactionInfo: signedTransaction, status: 1 },
+    version: "2.0",
+    signedDate: Date.now(),
+    ...extra,
+  });
+  const refund = notification("REFUND", jws(appStore, { ...bought, revocationDate: Date.now(), revocationReason: 0, signedDate: Date.now() + 1_000 }));
+  response = await notify(refund);
+  expect(response.status === 200 && (await usage()).plan === "free", "a refund ends Dream Plus");
+  response = await notify(refund);
+  expect(response.status === 200, "the same notification again is fine");
+  response = await notify(notification("DID_RENEW", jws(appStore, { ...bought, signedDate: Date.now() - 60_000 })));
+  expect(response.status === 200 && (await usage()).plan === "free", "an older state arriving late doesn't undo the refund");
+  response = await notify({ ...notification("SUBSCRIBED", jws(appStore, transaction({ appAccountToken: theirs.user, originalTransactionId: "7000000000000002", transactionId: "7000000000000002", productId: "xyz.onlychan.dream.plus.yearly" }))), subtype: "INITIAL_BUY" });
+  const subscribed = await usage(theirs.token);
+  expect(response.status === 200 && subscribed.plan === "plus" && subscribed.subscription?.product === "xyz.onlychan.dream.plus.yearly", "a purchase the server hears of first is tied to the account the app named");
+  const lapsed = transaction({ appAccountToken: theirs.user, originalTransactionId: "7000000000000002", transactionId: "7000000000000003", expiresDate: Date.now() - 1_000, signedDate: Date.now() + 2_000 });
+  const graceful = notification("DID_FAIL_TO_RENEW", jws(appStore, lapsed), { subtype: "GRACE_PERIOD" });
+  graceful.data.signedRenewalInfo = jws(appStore, { originalTransactionId: "7000000000000002", autoRenewStatus: 1, isInBillingRetryPeriod: true, gracePeriodExpiresDate: Date.now() + 6 * 86_400_000, environment: "Sandbox", signedDate: Date.now() + 2_000 });
+  response = await notify(graceful);
+  expect(response.status === 200 && (await usage(theirs.token)).plan === "plus", "a billing grace period keeps Dream Plus going");
+  response = await notify(notification("EXPIRED", jws(appStore, { ...lapsed, signedDate: Date.now() + 3_000 }), { subtype: "BILLING_RETRY" }));
+  expect(response.status === 200 && (await usage(theirs.token)).plan === "free", "and when it expires, it ends");
+  response = await notify(notification("SUBSCRIBED", jws(appStore, transaction({ appAccountToken: randomUUID(), originalTransactionId: "7000000000000004" }))));
+  expect(response.status === 200, "a purchase for no one Dream knows is acknowledged and left alone");
+  response = await notify({ notificationType: "TEST", notificationUUID: randomUUID(), data: { bundleId: "xyz.onlychan.Dream", environment: "Sandbox" }, version: "2.0", signedDate: Date.now() });
+  expect(response.status === 200, "a test notification is acknowledged");
+  response = await fetch(`${base}/api/appstore/notifications`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ signedPayload: jws(appStoreChain(), notification("REFUND", jws(appStore, bought))) }) });
+  expect(response.status === 400, "a notification not signed by the App Store is refused");
+  response = await notify({ ...notification("DID_RENEW", jws(appStore, bought)), data: { bundleId: "com.example.other", environment: "Sandbox", signedTransactionInfo: jws(appStore, bought) } });
+  expect(response.status === 400, "as is one for another app");
+
+  console.log("App Attest");
+  const attestFor = (token) => fetch(`${base}/api/attest/challenge`, { method: "POST", headers: { Authorization: `Bearer ${token}` } });
+  response = await fetch(`${base}/api/attest/challenge`, { method: "POST" });
+  expect(response.status === 401, "attesting needs a session");
+  const { challenge } = await (await attestFor(me.token)).json();
+  const device = attest(attestCA, { challenge: Buffer.from(challenge, "base64"), category: 3 });
+  const register = (body) => fetch(`${base}/api/attest/key`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${me.token}` }, body: JSON.stringify(body) });
+  response = await register({ keyId: device.keyID, attestation: device.attestation.toString("base64"), challenge });
+  expect(response.status === 201 && (await response.json()).environment === "development", "a key attested for a fresh challenge is kept");
+  response = await register({ keyId: device.keyID, attestation: device.attestation.toString("base64"), challenge });
+  expect(response.status === 400, "a challenge works once");
+  const asserted = (body, counter, { time = String(Math.floor(Date.now() / 1000)), keyID = device.keyID, signer = device.device } = {}) => ({
+    "X-Dream-Attest-Key": keyID,
+    "X-Dream-Attest-Time": time,
+    "X-Dream-Assertion": assertion(signer, requestData("POST", "/api/model", time, Buffer.from(body)), counter).toString("base64"),
+  });
+  const body = JSON.stringify(hello());
+  const headers = asserted(body, 1);
+  response = await ask(body, { key: null, headers });
+  expect(response.status === 200, "a request with an assertion, and no app key, goes through");
+  response = await ask(body, { key: null, headers });
+  expect(response.status === 401, "the same assertion again is refused");
+  response = await ask(JSON.stringify(hello({ temperature: 1 })), { key: null, headers: asserted(body, 2) });
+  expect(response.status === 401, "an assertion for another body is refused");
+  const [late, later] = [asserted(body, 4), asserted(body, 3)];
+  expect((await ask(body, { key: null, headers: late })).status === 200 && (await ask(body, { key: null, headers: later })).status === 200, "counters arriving a little out of order are fine");
+  response = await ask(body, { key: null, headers: asserted(body, 5, { time: String(Math.floor(Date.now() / 1000) - 600) }) });
+  expect(response.status === 401, "an assertion from ten minutes ago is refused");
+  const stranger = attest(attestCA, { challenge: Buffer.from("never asked for") });
+  response = await ask(body, { key: null, headers: asserted(body, 1, { keyID: stranger.keyID, signer: stranger.device }) });
+  expect(response.status === 401 && response.headers.get("x-dream-attest") === "again", "a key the server doesn't know asks the app to attest again");
+}
+
 const remote = process.env.DREAM_SHARE_URL;
 const stub = remote ? null : await startStub();
-const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub);
+const xai = remote ? null : await startXAIStub();
+const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub, xai);
 try {
   await run(server.base);
   const key = remote ? process.env.DREAM_WEB_KEY : LOCAL_APP_KEY;
-  if (key) await runWeb(server.base, key, stub);
-  else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY isn't set for this server.");
+  const session = remote ? process.env.DREAM_SESSION : (await signIn(server.base, "smoke")).token;
+  if (key && session) await runWeb(server.base, key, session, stub);
+  else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY or DREAM_SESSION isn't set for this server.");
+  if (!remote) await runPlan(server.base, xai);
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;
 } finally {
   server.stop();
   stub?.stop();
+  xai?.stop();
 }
 console.log(failures ? `\n${failures} failed` : "\nAll passed");
 process.exit(failures ? 1 : 0);

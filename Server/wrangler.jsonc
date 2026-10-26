@@ -28,7 +28,10 @@
     { "name": "READ_LIMIT", "namespace_id": "4802", "simple": { "limit": 120, "period": 60 } },
     // Web search and page reads (src/web.ts), which cost money. A screen uses a few of each.
     { "name": "SEARCH_LIMIT", "namespace_id": "4803", "simple": { "limit": 30, "period": 60 } },
-    { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } }
+    { "name": "PAGE_LIMIT", "namespace_id": "4804", "simple": { "limit": 30, "period": 60 } },
+    // Per account (src/model.ts, src/attest.ts): a page takes a handful of model requests.
+    { "name": "MODEL_LIMIT", "namespace_id": "4805", "simple": { "limit": 60, "period": 60 } },
+    { "name": "ATTEST_LIMIT", "namespace_id": "4806", "simple": { "limit": 10, "period": 60 } }
   ],
 
   "vars": {
@@ -37,8 +40,11 @@
     "APP_IDS": "DR99P625RR.xyz.onlychan.Dream",
     // Paid provider calls a day for everyone together, of each kind: searches, and page reads.
     // At Parallel's prices (fast search $1, extract $1 per 1,000) that's at most $4 a day.
-    "WEB_DAILY_LIMIT": "2000"
-    // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS.
+    "WEB_DAILY_LIMIT": "2000",
+    // Dollars a day the model may cost for everyone together (src/usage.ts); past it, pages wait.
+    "MODEL_DAILY_BUDGET": "100"
+    // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY,
+    // DREAM_APP_KEYS, XAI_API_KEY.
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.
