@@ -144,9 +144,9 @@ final class Composer {
         request = "\(intent). \(instruction)"
         do {
             let context = await Prompts.context(for: intent)
-            let prompt = Prompt(Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context))
+            let asked = Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context)
             try await withModel {
-                try await self.write(prompt: prompt, fallback: current.reference, streaming: false)
+                try await self.write(prompt: Prompt(asked), asked: asked, fallback: current.reference, streaming: false)
             }
             recordLocale(likely: current.locale?.language, editing: current.locale)
             phase = .done
@@ -212,15 +212,18 @@ final class Composer {
     /// writing carries on untouched. If it has questions, the writing stops, what Dream remembers
     /// or the user answers them, and it starts again with the answers.
     private func write(request intent: String, image: CGImage?, context: [String]) async throws {
+        func asked(_ answers: [Answer]) -> String {
+            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.answersContext(answers))
+        }
         func prompt(_ answers: [Answer]) -> Prompt {
             Prompt {
-                Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.answersContext(answers))
+                asked(answers)
                 if let image { Attachment(image) }
             }
         }
         // A photo usually settles what it's about; and on a second model, the answers are in.
         guard image == nil, asking.answers.isEmpty else {
-            return try await write(prompt: prompt(asking.answers), fallback: nil, streaming: true)
+            return try await write(prompt: prompt(asking.answers), asked: asked(asking.answers), fallback: nil, streaming: true)
         }
         let started = Date()
         let first = prompt([])
@@ -229,7 +232,7 @@ final class Composer {
         holdUntil = started.addingTimeInterval(GapCheck.hold)
         defer { isChecking = false; held = nil }
         let checking = Task { await self.gaps(in: intent) }
-        let writing = Task { try await self.write(prompt: first, fallback: nil, streaming: true) }
+        let writing = Task { try await self.write(prompt: first, asked: asked([]), fallback: nil, streaming: true) }
         try await withTaskCancellationHandler {
             let gaps = await checking.value
             guard !gaps.questions.isEmpty else {
@@ -249,7 +252,7 @@ final class Composer {
             _ = await writing.result
             surface = nil
             isChecking = false
-            try await write(prompt: prompt(answers), fallback: nil, streaming: true)
+            try await write(prompt: prompt(answers), asked: asked(answers), fallback: nil, streaming: true)
         } onCancel: {
             checking.cancel()
             writing.cancel()
@@ -275,20 +278,36 @@ final class Composer {
     // MARK: - Writing
 
     /// Writes a whole surface, then has the checker fix what it can and sends real mistakes
-    /// back in the same session, so the model sees what it wrote.
-    private func write(prompt: Prompt, fallback: Reference?, streaming: Bool) async throws {
+    /// back in the same session, so the model sees what it wrote. `asked` is the prompt's text,
+    /// for a repair to repeat when the session no longer holds it.
+    private func write(prompt: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
         phase = .composing
         let found = ReferenceLog()
-        let session = session(Prompts.surface, tools: tools(found: found))
-        var surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming).fetched(live).connected(connected)
+        var session = session(Prompts.surface, tools: tools(found: found))
+        var surface: Surface
+        do {
+            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+            if surface.title.isEmpty, surface.summary.isEmpty { throw EmptyScreen() }
+        } catch where Self.isWorthAnotherTry(error) {
+            // Nothing usable came out: a loop or padding with nothing finished, a broken answer, or
+            // an empty one. Another go in a new session usually works, and costs less than a page
+            // that fails.
+            note("Writing again in a new session, after: \(describe(error))")
+            session = self.session(Prompts.surface, tools: tools(found: found))
+            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+        }
+        surface = surface.fetched(live).connected(connected)
         for round in 0...2 {
             let issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
             if problems.isEmpty || round == 2 { break }
             phase = .fixing(problems.count)
-            let wire = try await generate(WireSurface.self, in: session, step: "Repair \(round + 1)", prompt: Prompt(Prompts.repair(problems)))
-            surface = Surface(wire, reference: found.first ?? fallback).fetched(live).connected(connected)
+            // A screen that stopped early left the session without the request or the screen, so
+            // the repair repeats both.
+            let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
+            surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false)
+                .fetched(live).connected(connected)
         }
         await surface.findRecordings()
         await surface.findMolecules()
@@ -300,10 +319,11 @@ final class Composer {
     }
 
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
-    private func generateSurface(in session: LanguageModelSession, prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
+    /// A repair is one too, and keeps what it finished the same way.
+    private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
         let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.show(Surface(partial: $0, reference: found.first ?? fallback).answered(self.asking.answers)) } : nil
         do {
-            let wire = try await generate(WireSurface.self, in: session, step: "Surface", options: GenerationOptions(temperature: 0.4), prompt: prompt,
+            let wire = try await generate(WireSurface.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
                                           onPartial: onPartial, isRunaway: { Surface(partial: $0, reference: nil).isRepeatingItself })
             return Surface(wire, reference: found.first ?? fallback)
         } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
@@ -334,6 +354,19 @@ final class Composer {
     }
 
     // MARK: - Generation
+
+    // A screen has no budget of its own below the server's cap. Providers count thinking against
+    // it, and Grok thinking at low can spend 20,000 tokens on a quadratic: a budget of 20,000 cut
+    // its answer off after 400 characters. Runaways are caught as they start instead: loops by
+    // `isRepeatingItself`, padding by ChatCompletions.Padding.
+
+    /// Whether writing the screen again might work where this failed: the model looped, padded or
+    /// broke its answer with nothing worth keeping, or left it empty. Not when it was stopped, the
+    /// safety filter stepped in, or the server refused (sign-in, allowance, a busy model it
+    /// already retried).
+    private static func isWorthAnotherTry(_ error: Error) -> Bool {
+        error is Unfinished<WireSurface.PartiallyGenerated> || error is EmptyScreen || error is GeneratedContent.ParsingError
+    }
 
     private func generate<Content: Generable>(
         _ type: Content.Type,
@@ -395,6 +428,9 @@ final class Composer {
             if let partial = watch.partial, !(error is CancellationError) { throw Unfinished(partial: partial, reason: .cutOff) }
             throw error
         }
+        // Stopped from outside, like writing that gives way to the gap check's questions. The
+        // stream then just ends, which would otherwise read as an answer cut short.
+        try Task.checkCancellation()
 
         switch watch.stop {
         case .repeating:
@@ -419,8 +455,9 @@ final class Composer {
         do {
             return try Content(last)
         } catch {
-            // The answer filled its room in the context before it was done.
-            note("\(step) ran out of room before finishing.")
+            // The answer filled its room before it was done, or turned to padding and was cut
+            // off (ChatCompletions.swift).
+            note("\(step) ended before it was finished.")
             if let partial = watch.partial { throw Unfinished(partial: partial, reason: .cutOff) }
             throw error
         }
@@ -522,4 +559,19 @@ struct ComposeError: LocalizedError {
     let message: String
     init(_ message: String) { self.message = message }
     var errorDescription: String? { message }
+}
+
+/// The model answered with a screen that has nothing in it, not even a title.
+struct EmptyScreen: LocalizedError {
+    var errorDescription: String? { "The model wrote an empty screen." }
+}
+
+extension LanguageModelSession {
+    /// Whether the session ends with the model's answer, which a follow-up like a repair can
+    /// point back to. A generation that failed or was stopped early is taken back out of the
+    /// transcript, request and all.
+    var endsWithAnswer: Bool {
+        if case .response = transcript.last { return true }
+        return false
+    }
 }

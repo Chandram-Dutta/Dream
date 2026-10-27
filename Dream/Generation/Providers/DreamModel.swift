@@ -45,9 +45,30 @@ struct DreamExecutor: LanguageModelExecutor {
 
     func prewarm(model: DreamLanguageModel, transcript: Transcript) {}
 
+    /// How long to wait before asking again when the model was busy or didn't answer. Some
+    /// providers count requests per minute, so the waits grow.
+    static let retryDelays: [Duration] = [.seconds(2), .seconds(6), .seconds(15)]
+
     func respond(to request: LanguageModelExecutorGenerationRequest, model: DreamLanguageModel, streamingInto channel: LanguageModelExecutorGenerationChannel) async throws {
         guard let base = ServerAddress.dream, Session.isSignedIn else { throw DreamServiceError(message: "Sign in to make pages.") }
         let (body, summary) = try ChatCompletions.body(for: request, modelID: configuration.modelID)
+        // A busy or unreachable model often answers a moment later, and nothing has streamed yet,
+        // so asking again is safe. Without it, a provider that takes one request at a time turned
+        // away most pages, whose check and writing start together.
+        for delay in Self.retryDelays + [nil] {
+            do {
+                try await send(body, summary: summary, to: base, into: channel)
+                return
+            } catch let error as DreamServiceError where error.isTransient {
+                guard let delay else { throw error }
+                Build.trace("[Dream/Dream] \(error.message) Asking again in \(delay).")
+                try await Task.sleep(for: delay)
+            }
+        }
+    }
+
+    /// One request. Each carries its own proof that it's the app, which can't be used twice.
+    private func send(_ body: Data, summary: String, to base: URL, into channel: LanguageModelExecutorGenerationChannel) async throws {
         let path = "/api/model"
         var urlRequest = URLRequest(url: base.appending(path: "api/model"), timeoutInterval: 120)
         urlRequest.httpMethod = "POST"
@@ -71,6 +92,9 @@ struct DreamExecutor: LanguageModelExecutor {
 /// has run out, the app hears about it (`Allowance.ranOut`) and can offer Dream Plus.
 struct DreamServiceError: LocalizedError {
     let message: String
+    /// Worth asking again in a moment: the model didn't answer (502), or was busy (503, with a
+    /// Retry-After). Not a used-up allowance, nor a server that isn't set up.
+    private(set) var isTransient = false
 
     init(message: String) {
         self.message = message
@@ -79,6 +103,8 @@ struct DreamServiceError: LocalizedError {
     init(response: HTTPURLResponse, body: Data) {
         let object = (try? JSONSerialization.jsonObject(with: body)) as? [String: Any]
         let said = ChatCompletions.errorMessage(in: body)
+        isTransient = response.statusCode == 502
+            || (response.statusCode == 503 && object?["reason"] as? String != "allowance" && response.value(forHTTPHeaderField: "Retry-After") != nil)
         if response.statusCode == 402 || (response.statusCode == 429 && object?["reason"] as? String == "allowance") {
             message = said ?? "You've used today's allowance."
             Allowance.ranOut(message: message, upgrade: object?["upgrade"] as? Bool ?? false)

@@ -33,7 +33,9 @@ enum ChatCompletions {
         let options = request.generationOptions
         if let temperature = options.temperature { body["temperature"] = temperature }
         if options.samplingMode == .greedy { body["temperature"] = 0 }
-        if let maximum = options.maximumResponseTokens { body["max_tokens"] = maximum }
+        // Providers count thinking against max_tokens, so the answer's budget gets room for it on
+        // top: the gap check, given 600 tokens, used to spend them all thinking and answer nothing.
+        if let maximum = options.maximumResponseTokens { body["max_tokens"] = maximum + thinkingRoom(ThinkingChoice.level) }
 
         let messages = body["messages"] as? [[String: Any]] ?? []
         let summary = "\(messages.count) messages (last: \(messages.last?["role"] as? String ?? "?")), schema: \(request.schema != nil), tools: \(request.enabledToolDefinitions.map(\.name))"
@@ -64,18 +66,39 @@ enum ChatCompletions {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         var firstText = true
         var reasoningCharacters = 0
+        var padding = Padding()
+        var usage: Chunk.Usage?
+        // Why it ended: stop, tool_calls, or length when it ran out of room.
+        var finish: String?
+        // A short answer is shown whole, since one that short is usually a broken or empty one.
+        var answer = ""
+        defer {
+            let tokens = usage.map { String(format: " (%d tokens in, %d of them cached; %d out, %d of them thinking)", $0.promptTokens ?? 0, $0.promptTokensDetails?.cachedTokens ?? 0, ($0.completionTokens ?? 0) + ($0.completionTokensDetails?.reasoningTokens ?? 0), $0.completionTokensDetails?.reasoningTokens ?? 0) } ?? ""
+            trace(label, String(format: "done after %.1fs%@%@", Date().timeIntervalSince(started), finish.map { ", finished: \($0)" } ?? "", tokens))
+            if !answer.isEmpty, answer.count < 400 { trace(label, "the whole answer: \(answer)") }
+        }
         for try await line in bytes.lines {
             ModelActivity.touch()
             guard line.hasPrefix("data:") else { continue }
             let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
             if payload == "[DONE]" { break }
-            guard let chunk = try? decoder.decode(Chunk.self, from: Data(payload.utf8)), let delta = chunk.choices.first?.delta else { continue }
+            guard let chunk = try? decoder.decode(Chunk.self, from: Data(payload.utf8)) else { continue }
+            // What the request used comes last, in a chunk of its own, for the log.
+            if let used = chunk.usage { usage = used }
+            if let reason = chunk.choices.first?.finishReason { finish = reason }
+            guard let delta = chunk.choices.first?.delta else { continue }
             if let reasoning = delta.reasoningContent { reasoningCharacters += reasoning.count }
             if let text = delta.content, !text.isEmpty {
                 if firstText {
                     firstText = false
                     trace(label, String(format: "first text after %.1fs (%d characters of reasoning before it)", Date().timeIntervalSince(started), reasoningCharacters))
                 }
+                // Padding goes no further: the answer ends here, and the composer keeps what's finished.
+                if let kind = padding.read(text) {
+                    trace(label, String(format: "stopped after %.1fs: the answer turned to %@", Date().timeIntervalSince(started), kind))
+                    return
+                }
+                if answer.count < 400 { answer += text }
                 await channel.send(.response(action: .appendText(text, tokenCount: tokens(in: text))))
             }
             // Streamed tool calls arrive whole, in a single chunk.
@@ -88,7 +111,17 @@ enum ChatCompletions {
                     action: .appendArguments(arguments, tokenCount: tokens(in: arguments)))))
             }
         }
-        trace(label, String(format: "done after %.1fs", Date().timeIntervalSince(started)))
+    }
+
+    /// Tokens of thinking to allow beside an answer's own budget, by level. Never none: the server
+    /// may raise a level the app asks for (Server/src/model.ts).
+    static func thinkingRoom(_ level: String) -> Int {
+        switch level {
+        case "medium": 8_000
+        case "high": 16_000
+        case "max": 32_000
+        default: 4_000
+        }
     }
 
     /// The `error` an answer's JSON carries, as a string or an object with a message.
@@ -190,9 +223,49 @@ enum ChatCompletions {
         max(1, text.count / 4)
     }
 
+    /// Spots an answer that has turned to padding. JSON never needs hundreds of blank characters
+    /// in a row, or a number dozens of digits long, but a model held to a schema token by token
+    /// can fall into either and go on until it runs out of room: a packing list once ran for 155
+    /// seconds that way, and a quadratic for 90, both ending in nothing. Neither changes what's
+    /// been parsed, so the composer can't see it, and tokens keep coming, so it isn't a stall.
+    struct Padding {
+        static let blankLimit = 400
+        static let digitLimit = 40
+        private var inString = false
+        private var escaped = false
+        private var blanks = 0
+        private var digits = 0
+
+        /// Reads the next piece of the answer; what it has turned into, once it's padding.
+        mutating func read(_ text: String) -> String? {
+            for scalar in text.unicodeScalars {
+                if scalar == " " || scalar == "\n" || scalar == "\r" || scalar == "\t" {
+                    blanks += 1
+                    if blanks >= Self.blankLimit { return "\(blanks) blank characters in a row" }
+                } else {
+                    blanks = 0
+                }
+                // Digits only count in numbers: a string may quote as many as it likes, like π's.
+                if inString {
+                    if escaped { escaped = false } else if scalar == "\\" { escaped = true } else if scalar == "\"" { inString = false }
+                } else if scalar == "\"" {
+                    inString = true
+                    digits = 0
+                } else if ("0"..."9").contains(scalar) {
+                    digits += 1
+                    if digits >= Self.digitLimit { return "a number \(digits) digits long" }
+                } else if !".-+eE".unicodeScalars.contains(scalar) {
+                    digits = 0
+                }
+            }
+            return nil
+        }
+    }
+
     private struct Chunk: Decodable {
         struct Choice: Decodable {
             let delta: Delta?
+            let finishReason: String?
         }
 
         struct Delta: Decodable {
@@ -211,7 +284,17 @@ enum ChatCompletions {
             let arguments: String?
         }
 
+        struct Usage: Decodable {
+            struct Prompt: Decodable { let cachedTokens: Int? }
+            struct Completion: Decodable { let reasoningTokens: Int? }
+            let promptTokens: Int?
+            let completionTokens: Int?
+            let promptTokensDetails: Prompt?
+            let completionTokensDetails: Completion?
+        }
+
         let choices: [Choice]
+        let usage: Usage?
     }
 }
 
