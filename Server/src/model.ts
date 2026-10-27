@@ -25,6 +25,7 @@ import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
 import { choose, CATALOG, offered, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
+import { withHeartbeat } from "./stream";
 import { workersCompletion, workersStream } from "./workersai";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
 
@@ -316,6 +317,9 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
   body.model = chosen.upstream;
+  // How long it thinks first: Dream Plus picks in Account (low, medium or high); everyone else, low.
+  // To bench longer thinking, list the bench's account in PLUS_ACCOUNTS.
+  if (account.plan !== "plus" && body.reasoning_effort !== undefined) body.reasoning_effort = "low";
   if (chosen.effort === null) delete body.reasoning_effort;
   else if (chosen.effort !== undefined) body.reasoning_effort = chosen.effort;
   const refusal = await admitModel(env, user.id, pageID, account);
@@ -365,7 +369,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
 
   if (body.stream && upstream.body) {
     const chat = chosen.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;
-    return new Response(metered(chat, modelID, raw.length, record), {
+    return new Response(metered(withHeartbeat(chat), modelID, raw.length, record), {
       status: 200,
       headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
     });

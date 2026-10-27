@@ -27,8 +27,9 @@ enum ChatCompletions {
                 ["type": "function", "function": ["name": tool.name, "description": tool.description, "parameters": try json(tool.parameters)]]
             }
         }
-        // Screens should arrive in seconds; at default effort, Grok can think for half a minute first.
-        body["reasoning_effort"] = "low"
+        // Screens should arrive in seconds; at default effort, Grok can think for half a minute
+        // first. Low unless Dream Plus picked longer in Account (ThinkingChoice).
+        body["reasoning_effort"] = ThinkingChoice.level
         let options = request.generationOptions
         if let temperature = options.temperature { body["temperature"] = temperature }
         if options.samplingMode == .greedy { body["temperature"] = 0 }

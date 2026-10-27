@@ -453,6 +453,9 @@ async function runPlan(base, xai) {
   expect(streamed.includes('"content":"{\\"answer\\":\\"Blue"') && streamed.includes('"usage":{"prompt_tokens":1261') && streamed.trimEnd().endsWith("data: [DONE]"), "then the answer, the usage and [DONE], as chat completion chunks");
   const sent = xai.calls.responses.at(-1);
   expect(sent?.max_output_tokens === 4000 && sent?.stream === true && sent?.reasoning?.effort === "low", "xAI's Responses API got the output capped, streaming, and the reasoning effort");
+  response = await ask(hello({ reasoning_effort: "high" }));
+  await response.text();
+  expect(xai.calls.responses.at(-1)?.reasoning?.effort === "low", "on the free plan, thinking stays low whatever the app asks");
   expect(sent?.store === false && /^[0-9a-f]{32}$/.test(sent?.prompt_cache_key ?? "") && sent.prompt_cache_key === xai.calls.headers.at(-1)?.["x-grok-conv-id"], "with nothing stored at xAI, and the account's cache key in the body and the header");
   expect(sent?.input?.[0]?.role === "system" && sent?.input?.[1]?.content === "What colour is the sky?", "the messages as input items");
   expect(sent && !("n" in sent) && !("search_parameters" in sent) && !("messages" in sent), "and nothing Dream doesn't use");
@@ -484,10 +487,10 @@ async function runPlan(base, xai) {
   expect(status.accountToken === me.user && status.subscription === null && status.plans?.plus?.pagesPerDay > status.plans?.free?.pagesPerDay, "with the account's purchase token, and what Dream Plus adds");
   expect(status.models?.[0]?.id === "grok-4.7" && typeof status.models[0].name === "string" && "plus" in status.models[0], "and the models Account can offer");
   const [row] = query(`SELECT tokens_in, tokens_cached, tokens_out, cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
-  // Four requests reached xAI and were answered: three streamed for page a (one a tool call), and one plain. Errors cost nothing.
-  expect(row?.tokens_in === 4 * 1261 && row?.tokens_cached === 4 * 1152 && row?.tokens_out === 4 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
-  expect(row?.cost_micros === 4 * 1184, "and what they cost, from xAI's own figure");
-  expect(query(`SELECT cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today.slice(0, 7)}'`)[0]?.cost_micros === 4 * 1184, "by month too");
+  // Five requests reached xAI and were answered: three streamed for page a (one a tool call), and two plain. Errors cost nothing.
+  expect(row?.tokens_in === 5 * 1261 && row?.tokens_cached === 5 * 1152 && row?.tokens_out === 5 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
+  expect(row?.cost_micros === 5 * 1184, "and what they cost, from xAI's own figure");
+  expect(query(`SELECT cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today.slice(0, 7)}'`)[0]?.cost_micros === 5 * 1184, "by month too");
   expect(query(`SELECT cost_micros FROM usage_pages WHERE user_id = '${me.user}' AND page = 'page-a-0001'`)[0]?.cost_micros === 3 * 1184, "and by page");
   response = await ask(hello(), { page: "page-b-0001" });
   expect(response.status === 200, "a second page is allowed");
@@ -508,6 +511,10 @@ async function runPlan(base, xai) {
   expect(response.status === 200 && status.plan === "plus" && status.subscription?.product === "xyz.onlychan.dream.plus.monthly", "a signed purchase makes the account Dream Plus");
   response = await ask(hello(), { page: "page-c-0001" });
   expect(response.status === 200, "and the next page goes through");
+  await response.text();
+  response = await ask(hello({ reasoning_effort: "high" }), { page: "page-c-0001" });
+  await response.text();
+  expect(xai.calls.responses.at(-1)?.reasoning?.effort === "high", "and Dream Plus can ask Grok to think longer");
   const theirs = await signIn(base, "plan-other");
   response = await fetch(`${base}/api/appstore/transactions`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${theirs.token}` }, body: JSON.stringify({ signedTransactions: [jws(appStore, bought)] }) });
   expect(response.status === 409, "someone else can't claim it");

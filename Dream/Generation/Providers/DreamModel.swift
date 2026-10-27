@@ -117,3 +117,17 @@ enum ModelChoice {
         UserDefaults.standard.string(forKey: key).flatMap { $0.isEmpty ? nil : $0 }
     }
 }
+
+/// How long the model thinks before it answers, picked in Account. Only Dream Plus can pick; the
+/// server gives everyone else "low", whatever's asked.
+enum ThinkingChoice {
+    /// The UserDefaults key, which views can watch with `@AppStorage`.
+    static let key = "thinking"
+    static let levels = ["low", "medium", "high"]
+
+    /// Testing builds can name one at launch, like `-thinking high`.
+    static var level: String {
+        let picked = Build.setting(key) ?? UserDefaults.standard.string(forKey: key)
+        return picked.flatMap { levels.contains($0) ? $0 : nil } ?? "low"
+    }
+}

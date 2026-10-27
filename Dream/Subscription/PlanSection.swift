@@ -1,9 +1,9 @@
 import StoreKit
 import SwiftUI
 
-/// The account's plan, for the account screen: pages used today, the model that makes them (Dream
-/// Plus picks), Dream Plus, restoring purchases, and managing the subscription in the system's own
-/// sheet.
+/// The account's plan, for the account screen: pages used today, the model that makes them, how
+/// long it thinks (Dream Plus picks), Dream Plus, restoring purchases, and managing the
+/// subscription in the system's own sheet.
 struct PlanSection: View {
     @State private var showingPlans = false
     @State private var managing = false
@@ -16,7 +16,10 @@ struct PlanSection: View {
                 PagesMeter(status: status, palette: palette)
                     .padding(.vertical, 4)
                 if let models = status.models, !models.isEmpty {
-                    ModelRow(models: models, canPick: status.isPlus)
+                    ModelRow(models: models, canPick: status.isPlus && models.count > 1)
+                }
+                if status.isPlus {
+                    ThinkingRow()
                 }
                 if status.isPlus {
                     Button("Manage subscription") { managing = true }
@@ -74,5 +77,30 @@ private struct ModelRow: View {
         } else {
             LabeledContent("Model", value: models[0].name)
         }
+    }
+}
+
+/// How long the model thinks before it answers, for Dream Plus. Longer takes more time and
+/// suits harder questions.
+private struct ThinkingRow: View {
+    @AppStorage(ThinkingChoice.key) private var level = "low"
+
+    var body: some View {
+        Picker("Thinking", selection: $level) {
+            option("Low", "Quickest pages", tag: "low")
+            option("Medium", "A little more care", tag: "medium")
+            option("High", "Thinks longest, for hard questions", tag: "high")
+        }
+        .pickerStyle(.navigationLink)
+    }
+
+    private func option(_ name: String, _ note: String, tag: String) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(name)
+            Text(note)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+        }
+        .tag(tag)
     }
 }

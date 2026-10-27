@@ -12,6 +12,7 @@ import { adminAccess } from "../src/adminkey.ts";
 import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
 import { CATALOG, choose, offered } from "../src/models.ts";
+import { withHeartbeat } from "../src/stream.ts";
 import { workersCompletion, workersStream, workersUsage } from "../src/workersai.ts";
 import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
 import { MAX_REPORTS, MAX_STACK, parseReports, ReportError, signatureOf } from "../src/metrickit.ts";
@@ -340,13 +341,24 @@ const failedStream = await new Response(chatStream(events([{ type: "response.cre
 expect(failedStream.trimEnd().endsWith("data: [DONE]") && !failedStream.includes("secret prompt words"), "a failed answer ends without passing on what xAI said");
 
 console.log("Which model answers");
-const all = offered("deepseek-v4.1-flash,nonsense,grok-4.7");
-expect(all.map((model) => model.id).join() === "deepseek-v4.1-flash,grok-4.7" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
-expect(choose(undefined, "free", all)?.id === "deepseek-v4.1-flash" && choose("default", "plus", all)?.id === "deepseek-v4.1-flash", "nothing asked for is the default, on either plan");
-expect(choose("grok-4.7", "plus", all)?.id === "grok-4.7" && choose("grok-4.7", "free", all)?.id === "deepseek-v4.1-flash", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
-expect(choose("grok-4.7", "free", all, true)?.id === "grok-4.7", "test accounts on the bench may use any");
-expect(choose("grok-5-heavy", "plus", all).id === "deepseek-v4.1-flash" && choose(42, "plus", all).id === "deepseek-v4.1-flash", "a model nobody offers, or one since retired, gets the default instead");
-expect(choose(undefined, "free", offered("grok-4.7"))?.id === "grok-4.7", "with only Plus models offered, the first is everyone's");
+const all = offered("grok-4.7,nonsense,grok-4.20-fast");
+expect(all.map((model) => model.id).join() === "grok-4.7,grok-4.20-fast" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
+expect(choose(undefined, "free", all).id === "grok-4.7" && choose("default", "plus", all).id === "grok-4.7", "nothing asked for is the default, on either plan");
+expect(choose("grok-4.20-fast", "plus", all).id === "grok-4.20-fast" && choose("grok-4.20-fast", "free", all).id === "grok-4.7", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
+expect(choose("grok-4.20-fast", "free", all, true).id === "grok-4.20-fast", "test accounts on the bench may use any");
+expect(choose("grok-5-heavy", "plus", all).id === "grok-4.7" && choose(42, "plus", all).id === "grok-4.7", "a model nobody offers, or one since retired, gets the default instead");
+expect(choose(undefined, "free", offered("grok-4.20-fast")).id === "grok-4.20-fast", "with only Plus models offered, the first is everyone's");
+
+console.log("A quiet stream kept alive");
+const slow = new ReadableStream({
+  async start(controller) {
+    await new Promise((resolve) => setTimeout(resolve, 130));
+    controller.enqueue(new TextEncoder().encode("data: late\n\n"));
+    controller.close();
+  },
+});
+const beating = await new Response(withHeartbeat(slow, 50)).text();
+expect(beating.startsWith(": thinking\n\n") && (beating.match(/: thinking/g) ?? []).length >= 2 && beating.endsWith("data: late\n\n"), "comments while the model is quiet, then what it says, none of it lost");
 
 console.log("Workers AI, as the app reads it");
 const piecesOf = (list) => new Blob(list.map((event) => `data: ${typeof event === "string" ? event : JSON.stringify(event)}\n\n`)).stream();

@@ -33,7 +33,8 @@ export interface Allowance {
 // and 4 reads (WebSearch.swift), so the web allowances cover every page of the day.
 export const ALLOWANCES: Record<Plan, Allowance> = {
   free: { pagesPerDay: 5, pagesPerMonth: 30, pageCost: 300_000, dailyCost: 600_000, searchesPerDay: 15, readsPerDay: 20 },
-  plus: { pagesPerDay: 25, pagesPerMonth: 150, pageCost: 400_000, dailyCost: 3_000_000, searchesPerDay: 75, readsPerDay: 100 },
+  // Dream Plus can ask Grok to think longer (model.ts), which can cost several times a page at low.
+  plus: { pagesPerDay: 25, pagesPerMonth: 150, pageCost: 1_000_000, dailyCost: 5_000_000, searchesPerDay: 75, readsPerDay: 100 },
 };
 
 export interface UsageEnv extends StoreEnv {
