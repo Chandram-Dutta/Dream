@@ -93,15 +93,47 @@ export const CATALOG: Model[] = [
     price: { input: 0.95, cached: 0.16, output: 4 },
     efforts: ["none", "high"],
   },
+  // Sarvam's open models (POST /v2/chat/completions), not yet tried on pages. Sarvam prices in
+  // rupees and hasn't been measured here: guesses on the high side, so limits err toward caution.
   {
     id: "sarvam-105b",
     name: "Sarvam 105B",
-    note: "Made in India; not yet tried on pages",
+    note: "Sarvam's own model, made in India; thinks ~10 s first",
     provider: "sarvam",
     upstream: "sarvam-105b",
     plus: true,
-    // Sarvam prices in rupees and hasn't been measured here: a guess on the high side, so limits err toward caution.
     price: { input: 1, cached: 1, output: 4 },
+    efforts: [],
+  },
+  {
+    id: "sarvam-glm-5.3",
+    name: "GLM 5.3 on Sarvam",
+    note: "GLM 5.3, hosted by Sarvam",
+    provider: "sarvam",
+    upstream: "glm5.3",
+    plus: true,
+    price: { input: 1.4, cached: 1.4, output: 4.4 },
+    // Sarvam thinks at max when no level is sent; one always is.
+    efforts: ["low", "high", "max"],
+  },
+  {
+    id: "sarvam-deepseek-v4.1-flash",
+    name: "DeepSeek V4.1 Flash on Sarvam",
+    note: "DeepSeek V4.1 Flash, hosted by Sarvam",
+    provider: "sarvam",
+    upstream: "deepseekv4.1-flash",
+    plus: true,
+    price: { input: 0.5, cached: 0.5, output: 2 },
+    efforts: ["low", "high", "max"],
+  },
+  {
+    id: "sarvam-gemma-4",
+    name: "Gemma 4 on Sarvam",
+    note: "Gemma 4, hosted by Sarvam; reads photos",
+    provider: "sarvam",
+    upstream: "gemma4",
+    plus: true,
+    price: { input: 0.5, cached: 0.5, output: 1.5 },
     efforts: [],
   },
   {

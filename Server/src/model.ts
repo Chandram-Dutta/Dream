@@ -285,16 +285,23 @@ async function askWorkersAI(env: ModelEnv, model: Model, chat: Record<string, un
   return Response.json(workersCompletion(answer, model.id));
 }
 
-/** Asks Sarvam, an OpenAI-compatible API, through the gateway's custom provider (or straight there
- * without a gateway). Its stream is OpenAI's chunks, smoothed as Workers AI's are (workersai.ts). */
-async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unknown>): Promise<Response> {
-  const headers = { Authorization: `Bearer ${env.SARVAM_API_KEY?.trim()}`, "Content-Type": "application/json", Accept: chat.stream ? "text/event-stream" : "application/json" };
+/** Asks one of Sarvam's models (its OpenAI-compatible `/v2/chat/completions`), through the
+ * gateway's custom provider, or straight there without a gateway. Its stream is OpenAI's chunks,
+ * smoothed as Workers AI's are (workersai.ts). */
+async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unknown>, conversation: string): Promise<Response> {
+  const headers = {
+    "api-subscription-key": env.SARVAM_API_KEY?.trim() ?? "",
+    "Content-Type": "application/json",
+    Accept: chat.stream ? "text/event-stream" : "application/json",
+    // Lets Gemma 4 read a conversation's earlier prompts from cache; the others ignore it.
+    "x-session-affinity": conversation,
+  };
   const request = { ...chat, model: model.upstream };
   const gateway = env.AI_GATEWAY?.trim();
   const upstream =
     gateway && env.AI
-      ? await env.AI.gateway(gateway).run({ provider: "custom-sarvam", endpoint: "v1/chat/completions", headers: { ...headers, "cf-aig-collect-log": "false", "cf-aig-skip-cache": "true" }, query: request })
-      : await fetch("https://api.sarvam.ai/v1/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
+      ? await env.AI.gateway(gateway).run({ provider: "custom-sarvam", endpoint: "v2/chat/completions", headers: { ...headers, "cf-aig-collect-log": "false", "cf-aig-skip-cache": "true" }, query: request })
+      : await fetch("https://api.sarvam.ai/v2/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
   if (!upstream.ok) return upstream;
   if (chat.stream === true && upstream.body) {
     return new Response(workersStream(upstream.body, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
@@ -382,7 +389,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
       chosen.provider === "xai"
         ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation)
         : chosen.provider === "sarvam"
-          ? await askSarvam(env, chosen, body)
+          ? await askSarvam(env, chosen, body, conversation)
           : await askWorkersAI(env, chosen, body, conversation);
   } catch {
     console.error("Model provider unreachable");
