@@ -18,8 +18,8 @@ struct PlanSection: View {
                 if let models = status.models, !models.isEmpty {
                     ModelRow(models: models, canPick: status.isPlus && models.count > 1)
                 }
-                if status.isPlus {
-                    ThinkingRow()
+                if let levels = status.thinking, !levels.isEmpty {
+                    ThinkingRow(levels: levels)
                 }
                 if status.isPlus {
                     Button("Manage subscription") { managing = true }
@@ -80,27 +80,36 @@ private struct ModelRow: View {
     }
 }
 
-/// How long the model thinks before it answers, for Dream Plus. Longer takes more time and
-/// suits harder questions.
+/// How long the model thinks before it answers, for Dream Plus, from the levels the server
+/// offers this account. Longer takes more time and suits harder questions.
 private struct ThinkingRow: View {
+    let levels: [String]
     @AppStorage(ThinkingChoice.key) private var level = "low"
 
     var body: some View {
-        Picker("Thinking", selection: $level) {
-            option("Low", "Quickest pages", tag: "low")
-            option("Medium", "A little more care", tag: "medium")
-            option("High", "Thinks longest, for hard questions", tag: "high")
+        Picker("Thinking", selection: Binding(get: { levels.contains(level) ? level : "low" }, set: { level = $0 })) {
+            ForEach(levels, id: \.self) { each in
+                let (name, note) = Self.describe(each)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(name)
+                    Text(note)
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                }
+                .tag(each)
+            }
         }
         .pickerStyle(.navigationLink)
     }
 
-    private func option(_ name: String, _ note: String, tag: String) -> some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text(name)
-            Text(note)
-                .font(.caption)
-                .foregroundStyle(.secondary)
+    private static func describe(_ level: String) -> (String, String) {
+        switch level {
+        case "none": ("Off", "Answers at once, without thinking first")
+        case "low": ("Low", "Quickest pages")
+        case "medium": ("Medium", "A little more care")
+        case "high": ("High", "Thinks longer, for hard questions")
+        case "max": ("Max", "As long as it needs")
+        default: (level.capitalized, "")
         }
-        .tag(tag)
     }
 }

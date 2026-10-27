@@ -118,12 +118,13 @@ enum ModelChoice {
     }
 }
 
-/// How long the model thinks before it answers, picked in Account. Only Dream Plus can pick; the
-/// server gives everyone else "low", whatever's asked.
+/// How long the model thinks before it answers, picked in Account. Only Dream Plus can pick, and
+/// testers from every level; the server gives everyone else "low", and moves a level a model
+/// doesn't take to the nearest one it does.
 enum ThinkingChoice {
     /// The UserDefaults key, which views can watch with `@AppStorage`.
     static let key = "thinking"
-    static let levels = ["low", "medium", "high"]
+    static let levels = ["none", "low", "medium", "high", "max"]
 
     /// Testing builds can name one at launch, like `-thinking high`.
     static var level: String {

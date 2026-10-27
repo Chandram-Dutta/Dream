@@ -23,16 +23,23 @@ export interface Model {
   plus: boolean;
   /** Dollars per million tokens, for when the provider doesn't say what a request cost. */
   price: { input: number; cached: number; output: number };
-  /** How much it thinks first, in place of what the app asks: "none" to answer at once, or null
-   * for a model that doesn't think and takes no setting. Left out, the app's choice stands. */
-  effort?: string | null;
+  /** The thinking levels it takes, from least to most; empty for a model that doesn't think. A
+   * level it doesn't take is moved to the nearest one it does (`fitEffort`). */
+  efforts: Effort[];
 }
 
-// Benched with Dream's page bench (Tools/bench-many.sh) through the server, 2026-10-27. Grok 4.7
-// made the most careful pages (it looks facts up and explains more) at about $0.05 a page, and is
-// everyone's model; Dream Plus picks how long it thinks instead (model.ts). DeepSeek V4.1 Flash
-// made every page at about $0.004, a little thinner, and stays ready but isn't offered. GLM 5.3
-// Flash wrote a rupee page in Spanish pesos, and Kimi K2.6 took up to six minutes a page.
+/** How long a model thinks before it answers, from not at all to as long as it needs. */
+export const EFFORTS = ["none", "low", "medium", "high", "max"] as const;
+export type Effort = (typeof EFFORTS)[number];
+
+// Benched with Dream's page bench (Tools/bench-many.sh) through the server, 2026-10-27, four
+// everyday pages each. Grok 4.7 made the most careful pages (it looks facts up and explains more)
+// at about $0.05 a page, and is everyone's model; Dream Plus picks how long it thinks. The rest are
+// for testers (PLUS_ACCOUNTS) to try in Account: DeepSeek V4.1 Flash made every page at about
+// $0.004, a little thinner, and twice as fast thinking "none", though one long list ran away;
+// GLM 5.3 Flash wrote a rupee page in Spanish pesos; Kimi K2.6 took up to six minutes a page;
+// Grok 4.20 Fast was no faster than 4.7 and cost more; Mistral Small 3.1 and Llama 4 Scout failed
+// most pages. Thinking levels are from Workers AI's catalogue and xAI's API.
 export const CATALOG: Model[] = [
   {
     id: "grok-4.7",
@@ -42,56 +49,67 @@ export const CATALOG: Model[] = [
     upstream: "grok-4.7",
     plus: false,
     price: { input: 2, cached: 0.5, output: 6 },
-  },
-  {
-    id: "deepseek-v4.1-flash",
-    name: "DeepSeek V4.1 Flash",
-    note: "Fast, for everyday pages",
-    provider: "workers-ai",
-    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
-    plus: false,
-    price: { input: 0.3, cached: 0.006, output: 1.2 },
-  },
-  // Faster candidates, thinking little or not at all, to bench before offering (MODELS decides).
-  {
-    id: "deepseek-v4.1-flash-instant",
-    name: "DeepSeek V4.1 Flash, instant",
-    note: "Answers without thinking first",
-    provider: "workers-ai",
-    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
-    plus: false,
-    price: { input: 0.3, cached: 0.006, output: 1.2 },
-    effort: "none",
+    efforts: ["low", "medium", "high"],
   },
   {
     id: "grok-4.20-fast",
     name: "Grok 4.20 Fast",
-    note: "Grok without the thinking",
+    note: "Grok without thinking",
     provider: "xai",
     upstream: "grok-4.20-0309-non-reasoning",
     plus: true,
     price: { input: 2, cached: 0.5, output: 6 },
-    effort: null,
+    efforts: [],
+  },
+  {
+    id: "deepseek-v4.1-flash",
+    name: "DeepSeek V4.1 Flash",
+    note: "Cheap and quick; thinking off is quicker still",
+    provider: "workers-ai",
+    upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
+    plus: true,
+    price: { input: 0.3, cached: 0.006, output: 1.2 },
+    efforts: ["none", "low", "high", "max"],
+  },
+  {
+    id: "glm-5.3-flash",
+    name: "GLM 5.3 Flash",
+    note: "Cheapest; wrote a rupee page in Spanish once",
+    provider: "workers-ai",
+    upstream: "@cf/zai-org/glm-5.3-flash",
+    plus: true,
+    price: { input: 0.15, cached: 0.03, output: 0.5 },
+    efforts: ["low", "high", "max"],
+  },
+  {
+    id: "kimi-k2.6",
+    name: "Kimi K2.6",
+    note: "Slow; thinks for minutes at high",
+    provider: "workers-ai",
+    upstream: "@cf/moonshotai/kimi-k2.6",
+    plus: true,
+    price: { input: 0.95, cached: 0.16, output: 4 },
+    efforts: ["none", "high"],
   },
   {
     id: "mistral-small-3.1",
     name: "Mistral Small 3.1",
-    note: "Quick, no thinking",
+    note: "No thinking; failed most pages",
     provider: "workers-ai",
     upstream: "@cf/mistralai/mistral-small-3.1-24b-instruct",
-    plus: false,
+    plus: true,
     price: { input: 0.351, cached: 0.351, output: 0.555 },
-    effort: null,
+    efforts: [],
   },
   {
     id: "llama-4-scout",
     name: "Llama 4 Scout",
-    note: "Quick, no thinking",
+    note: "No thinking; failed half its pages",
     provider: "workers-ai",
     upstream: "@cf/meta/llama-4-scout-17b-16e-instruct",
-    plus: false,
+    plus: true,
     price: { input: 0.27, cached: 0.27, output: 0.85 },
-    effort: null,
+    efforts: [],
   },
 ];
 
@@ -104,6 +122,21 @@ export function offered(list: string | undefined): Model[] {
   const ids = (list ?? "").split(",").map((id) => id.trim()).filter(Boolean);
   const chosen = ids.map((id) => CATALOG.find((model) => model.id === id)).filter((model): model is Model => model !== undefined);
   return chosen.length ? chosen : CATALOG;
+}
+
+/** The thinking level a model gets: the one asked for if it takes it, else the nearest it does,
+ * leaning longer; null for a model that doesn't think, so none is sent. */
+export function fitEffort(asked: string | undefined, model: Model): Effort | null {
+  if (!model.efforts.length) return null;
+  const wanted = EFFORTS.indexOf((asked ?? "low") as Effort);
+  if (wanted < 0) return model.efforts[0];
+  let best = model.efforts[0];
+  for (const level of model.efforts) {
+    const distance = Math.abs(EFFORTS.indexOf(level) - wanted);
+    const bestDistance = Math.abs(EFFORTS.indexOf(best) - wanted);
+    if (distance < bestDistance || (distance === bestDistance && EFFORTS.indexOf(level) > EFFORTS.indexOf(best))) best = level;
+  }
+  return best;
 }
 
 /** The model a request runs on: the one asked for, if this server offers it and the account may

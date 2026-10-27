@@ -10,7 +10,7 @@
 //
 //   GET /api/usage   (signed in) → the plan, today's and this month's pages, and the subscription
 
-import { offered } from "./models";
+import { CATALOG, EFFORTS, offered } from "./models";
 import { activeSubscription, type StoreEnv, type Subscription } from "./appstore";
 
 export type Plan = "free" | "plus";
@@ -75,12 +75,14 @@ function resets(at = Date.now()): { day: number; month: number } {
 export interface Account {
   plan: Plan;
   subscription: Subscription | null;
+  /** On PLUS_ACCOUNTS: the developer or a tester, who can try every model and thinking level. */
+  tester: boolean;
 }
 
 export async function accountOf(env: UsageEnv, userID: string): Promise<Account> {
   const subscription = await activeSubscription(env, userID);
-  const complimentary = (env.PLUS_ACCOUNTS ?? "").split(",").some((id) => id.trim() === userID);
-  return { plan: subscription || complimentary ? "plus" : "free", subscription };
+  const tester = (env.PLUS_ACCOUNTS ?? "").split(",").some((id) => id.trim() === userID);
+  return { plan: subscription || tester ? "plus" : "free", subscription, tester };
 }
 
 interface Row {
@@ -229,8 +231,10 @@ export async function status(env: UsageEnv, userID: string, at = Date.now()): Pr
     subscription: account.subscription,
     // Both plans, so the app can say what Dream Plus adds without a second request.
     plans: Object.fromEntries(Object.entries(allowances(env)).map(([plan, { pagesPerDay, pagesPerMonth }]) => [plan, { pagesPerDay, pagesPerMonth }])),
-    // The models Account can offer, the default first; `plus` ones only for Dream Plus.
-    models: offered(env.MODELS).map(({ id, name, note, plus }) => ({ id, name, note, plus })),
+    // The models Account can offer, the default first: every one in the catalogue for testers.
+    models: (account.tester ? CATALOG : offered(env.MODELS)).map(({ id, name, note, plus }) => ({ id, name, note, plus })),
+    // The thinking levels Account can offer: every one for testers, low to high for Dream Plus.
+    thinking: account.tester ? [...EFFORTS] : account.plan === "plus" ? ["low", "medium", "high"] : [],
   };
 }
 

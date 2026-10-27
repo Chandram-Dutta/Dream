@@ -23,7 +23,7 @@ import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
 import { proveApp, type ProofEnv } from "./attest";
 import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
-import { choose, CATALOG, offered, type Model } from "./models";
+import { CATALOG, choose, fitEffort, offered, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
 import { withHeartbeat } from "./stream";
 import { workersCompletion, workersStream } from "./workersai";
@@ -50,7 +50,7 @@ export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
 /** A page's prompt is 60–120 KB, with a photo up to about 400 KB more. */
 const MAX_BODY = 2_000_000;
 const DEFAULT_MAX_OUTPUT = 32_000;
-const EFFORTS = new Set(["low", "medium", "high"]);
+const EFFORTS = new Set(["none", "low", "medium", "high", "max"]);
 const ROLES = new Set(["system", "developer", "user", "assistant", "tool"]);
 
 /** For a model nobody priced: on the high side, so limits err toward caution. */
@@ -121,7 +121,7 @@ export function upstreamBody(body: Record<string, unknown>, env: ModelEnv): Reco
     out.response_format = format;
   }
   if (body.reasoning_effort !== undefined) {
-    if (!EFFORTS.has(body.reasoning_effort as string)) throw new Invalid("reasoning_effort is low, medium or high.");
+    if (!EFFORTS.has(body.reasoning_effort as string)) throw new Invalid("reasoning_effort is none, low, medium, high or max.");
     out.reasoning_effort = body.reasoning_effort;
   }
   for (const [name, low, high] of [["temperature", 0, 2], ["top_p", 0, 1], ["frequency_penalty", -2, 2], ["presence_penalty", -2, 2]] as const) {
@@ -312,16 +312,21 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const page = request.headers.get("X-Dream-Page");
   const pageID = page && /^[A-Za-z0-9-]{8,64}$/.test(page) ? page : null;
   const account = await accountOf(env, user.id);
-  const chosen = choose(body.model, account.plan, offered(env.MODELS), env.DEV_LOGIN === "1");
+  // Testers (PLUS_ACCOUNTS) and the bench can use any model in the catalogue; everyone else, those offered.
+  const anyModel = account.tester || env.DEV_LOGIN === "1";
+  const chosen = choose(body.model, account.plan, anyModel ? CATALOG : offered(env.MODELS), anyModel);
   const key = env.XAI_API_KEY?.trim();
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
   body.model = chosen.upstream;
-  // How long it thinks first: Dream Plus picks in Account (low, medium or high); everyone else, low.
-  // To bench longer thinking, list the bench's account in PLUS_ACCOUNTS.
-  if (account.plan !== "plus" && body.reasoning_effort !== undefined) body.reasoning_effort = "low";
-  if (chosen.effort === null) delete body.reasoning_effort;
-  else if (chosen.effort !== undefined) body.reasoning_effort = chosen.effort;
+  // How long it thinks first: testers any level, Dream Plus low to high, everyone else low; then
+  // the nearest level the model takes (models.ts). To bench longer thinking, list the bench's
+  // account in PLUS_ACCOUNTS.
+  const asked = typeof body.reasoning_effort === "string" ? body.reasoning_effort : undefined;
+  const permitted = account.tester ? asked : account.plan === "plus" ? (asked === "none" ? "low" : asked === "max" ? "high" : asked) : "low";
+  const effort = fitEffort(permitted, chosen);
+  if (effort === null) delete body.reasoning_effort;
+  else body.reasoning_effort = effort;
   const refusal = await admitModel(env, user.id, pageID, account);
   if (refusal) return refusalResponse(refusal);
 

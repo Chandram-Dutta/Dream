@@ -40,6 +40,9 @@ final class Plan {
         let plans: [String: Allowance]
         /// What Account can offer, the default first. Older servers don't send it.
         let models: [ModelOption]?
+        /// The thinking levels Account can offer: none on the free plan, low to high on Dream Plus,
+        /// every one for testers.
+        let thinking: [String]?
 
         struct ModelOption: Decodable, Equatable, Identifiable {
             let id: String

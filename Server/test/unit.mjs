@@ -11,7 +11,7 @@ import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
 import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
-import { CATALOG, choose, offered } from "../src/models.ts";
+import { CATALOG, choose, fitEffort, offered } from "../src/models.ts";
 import { withHeartbeat } from "../src/stream.ts";
 import { workersCompletion, workersStream, workersUsage } from "../src/workersai.ts";
 import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
@@ -348,6 +348,12 @@ expect(choose("grok-4.20-fast", "plus", all).id === "grok-4.20-fast" && choose("
 expect(choose("grok-4.20-fast", "free", all, true).id === "grok-4.20-fast", "test accounts on the bench may use any");
 expect(choose("grok-5-heavy", "plus", all).id === "grok-4.7" && choose(42, "plus", all).id === "grok-4.7", "a model nobody offers, or one since retired, gets the default instead");
 expect(choose(undefined, "free", offered("grok-4.20-fast")).id === "grok-4.20-fast", "with only Plus models offered, the first is everyone's");
+const byID = (id) => CATALOG.find((model) => model.id === id);
+expect(fitEffort("high", byID("grok-4.7")) === "high" && fitEffort(undefined, byID("grok-4.7")) === "low", "a level the model takes stands; none asked is low");
+expect(fitEffort("none", byID("grok-4.7")) === "low" && fitEffort("max", byID("grok-4.7")) === "high", "Grok can't think less than low or more than high");
+expect(fitEffort("medium", byID("deepseek-v4.1-flash")) === "high" && fitEffort("none", byID("deepseek-v4.1-flash")) === "none", "a level the model doesn't take moves to the nearest, leaning longer");
+expect(fitEffort("high", byID("mistral-small-3.1")) === null && fitEffort("low", byID("kimi-k2.6")) === "none", "a model that doesn't think gets no level at all");
+expect(CATALOG.every((model) => model.efforts.every((level) => ["none", "low", "medium", "high", "max"].includes(level))), "every model's levels are known ones");
 
 console.log("A quiet stream kept alive");
 const slow = new ReadableStream({
