@@ -144,8 +144,16 @@ struct HomeView: View {
     // MARK: - Asking
 
     private var composer: some View {
-        VStack(spacing: 10) {
+        let options = ModelOptions.offered
+        return VStack(spacing: 10) {
             SavedSuggestion(text: intent, surfaces: surfaces)
+            // What will make the page, for accounts that can choose (ModelPicker.swift).
+            if let options {
+                ModelChip(options: options, palette: palette, focus: $focused)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .transition(.opacity)
+            }
             VStack(alignment: .leading, spacing: 10) {
                 if let photo {
                     Image(uiImage: photo)
@@ -202,6 +210,7 @@ struct HomeView: View {
         .animation(.smooth, value: photo)
         .animation(.smooth, value: focused)
         .animation(.smooth, value: listener.isActive)
+        .animation(.smooth, value: options)
     }
 
     private var canMake: Bool {

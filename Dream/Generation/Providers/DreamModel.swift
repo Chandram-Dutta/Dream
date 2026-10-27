@@ -107,28 +107,70 @@ enum Allowance {
     }
 }
 
-/// The model picked in Account. Only Dream Plus can pick; the server checks the plan on every
-/// request, and anyone else gets the default.
+/// The model picked in Account, or from the chip by the composer and the change bar
+/// (ModelPicker.swift). Only models the plan offers can be picked; the server checks the plan on
+/// every request, and anyone else gets the default.
 enum ModelChoice {
     /// The UserDefaults key, which views can watch with `@AppStorage`. Empty is the default.
     static let key = "model"
+    /// Not one model: Dream's server picks the model and how long it thinks for each page, so
+    /// there's no thinking level to pick alongside it.
+    static let auto = "auto"
 
     static var picked: String? {
         UserDefaults.standard.string(forKey: key).flatMap { $0.isEmpty ? nil : $0 }
     }
 }
 
-/// How long the model thinks before it answers, picked in Account. Only Dream Plus can pick, and
-/// testers from every level; the server gives everyone else "low", and moves a level a model
-/// doesn't take to the nearest one it does.
+/// How long the model thinks before it answers, picked in Account or from the chip by the
+/// composer. Only Dream Plus can pick, and testers from every level; the server gives everyone
+/// else "low", and moves a level a model doesn't take to the nearest one it does.
 enum ThinkingChoice {
     /// The UserDefaults key, which views can watch with `@AppStorage`.
     static let key = "thinking"
     static let levels = ["none", "low", "medium", "high", "max"]
+    /// What the server gives when nothing's picked.
+    static let standard = "low"
 
     /// Testing builds can name one at launch, like `-thinking high`.
     static var level: String {
         let picked = Build.setting(key) ?? UserDefaults.standard.string(forKey: key)
-        return picked.flatMap { levels.contains($0) ? $0 : nil } ?? "low"
+        return picked.flatMap { levels.contains($0) ? $0 : nil } ?? standard
+    }
+
+    /// The level to show as picked among the ones an account is offered. A pick made on another
+    /// plan shows as the nearest offered, leaning longer, as the server moves it (Server/src/model.ts):
+    /// "max" on Dream Plus is "high". With no pick it's low, or the first offered.
+    static func shown(_ picked: String, among offered: [String]) -> String? {
+        if offered.contains(picked) { return picked }
+        guard let wanted = levels.firstIndex(of: picked) else { return offered.contains(standard) ? standard : offered.first }
+        func distance(_ level: String) -> Int { abs((levels.firstIndex(of: level) ?? 0) - wanted) }
+        return offered.min { a, b in
+            distance(a) != distance(b) ? distance(a) < distance(b) : (levels.firstIndex(of: a) ?? 0) > (levels.firstIndex(of: b) ?? 0)
+        }
+    }
+
+    /// What a level is called in the pickers.
+    static func name(_ level: String) -> String {
+        switch level {
+        case "none": "Off"
+        case "low": "Low"
+        case "medium": "Medium"
+        case "high": "High"
+        case "max": "Max"
+        default: level.capitalized
+        }
+    }
+
+    /// What a level is like, in a few words, under its name.
+    static func note(_ level: String) -> String {
+        switch level {
+        case "none": "Answers at once, without thinking first"
+        case "low": "Quickest pages"
+        case "medium": "A little more care"
+        case "high": "Thinks longer, for hard questions"
+        case "max": "As long as it needs"
+        default: ""
+        }
     }
 }

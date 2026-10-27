@@ -1,9 +1,9 @@
 import StoreKit
 import SwiftUI
 
-/// The account's plan, for the account screen: pages used today, the model that makes them, how
-/// long it thinks (Dream Plus picks), Dream Plus, restoring purchases, and managing the
-/// subscription in the system's own sheet.
+/// The account's plan, for the account screen: pages used today, the model that makes them and
+/// how long it thinks (the same picks as the chip by the composer, ModelPicker.swift), Dream Plus,
+/// restoring purchases, and managing the subscription in the system's own sheet.
 struct PlanSection: View {
     @State private var showingPlans = false
     @State private var managing = false
@@ -15,12 +15,11 @@ struct PlanSection: View {
             if let status = plan.status {
                 PagesMeter(status: status, palette: palette)
                     .padding(.vertical, 4)
-                if let models = status.models, !models.isEmpty {
-                    ModelRow(models: models, canPick: status.isPlus && models.count > 1)
+                let options = ModelOptions(status)
+                if !options.models.isEmpty {
+                    ModelRow(options: options)
                 }
-                if let levels = status.thinking, !levels.isEmpty {
-                    ThinkingRow(levels: levels)
-                }
+                ThinkingRow(options: options)
                 if status.isPlus {
                     Button("Manage subscription") { managing = true }
                 } else {
@@ -51,65 +50,57 @@ struct PlanSection: View {
     }
 }
 
-/// The model that makes pages. Dream Plus picks from the server's list, each with a line on what
-/// it's good for; everyone else sees the one theirs are made with.
+/// The model that makes pages, picked from the ones the plan offers, each with a line on what it's
+/// good for (Auto among them, when the server offers it); with only one, the one theirs are made with.
 private struct ModelRow: View {
-    let models: [Plan.Status.ModelOption]
-    let canPick: Bool
+    let options: ModelOptions
     @AppStorage(ModelChoice.key) private var picked = ""
 
     var body: some View {
-        // The default is the first; a pick the server no longer offers falls back to it.
-        let current = models.first { $0.id == picked } ?? models[0]
-        if canPick {
-            Picker("Model", selection: Binding(get: { current.id }, set: { picked = $0 == models[0].id ? "" : $0 })) {
-                ForEach(models) { model in
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(model.name)
-                        Text(model.note)
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
+        if let current = options.model(picked: picked) {
+            if options.canChooseModel {
+                Picker("Model", selection: Binding(get: { current.id }, set: { id in
+                    if let model = options.models.first(where: { $0.id == id }) { picked = options.stored(model) }
+                })) {
+                    ForEach(options.models) { model in
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(model.name)
+                            Text(model.note)
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .tag(model.id)
                     }
-                    .tag(model.id)
                 }
+                .pickerStyle(.navigationLink)
+            } else {
+                LabeledContent("Model", value: current.name)
             }
-            .pickerStyle(.navigationLink)
-        } else {
-            LabeledContent("Model", value: models[0].name)
         }
     }
 }
 
-/// How long the model thinks before it answers, for Dream Plus, from the levels the server
-/// offers this account. Longer takes more time and suits harder questions.
+/// How long the model thinks before it answers, from the levels the server offers this account.
+/// Longer takes more time and suits harder questions. Not beside Auto, which picks its own.
 private struct ThinkingRow: View {
-    let levels: [String]
-    @AppStorage(ThinkingChoice.key) private var level = "low"
+    let options: ModelOptions
+    @AppStorage(ModelChoice.key) private var picked = ""
+    @AppStorage(ThinkingChoice.key) private var level = ThinkingChoice.standard
 
     var body: some View {
-        Picker("Thinking", selection: Binding(get: { levels.contains(level) ? level : "low" }, set: { level = $0 })) {
-            ForEach(levels, id: \.self) { each in
-                let (name, note) = Self.describe(each)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(name)
-                    Text(note)
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+        if options.hasThinking(with: options.model(picked: picked)), let shown = ThinkingChoice.shown(level, among: options.levels) {
+            Picker("Thinking", selection: Binding(get: { shown }, set: { level = $0 })) {
+                ForEach(options.levels, id: \.self) { each in
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(ThinkingChoice.name(each))
+                        Text(ThinkingChoice.note(each))
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    .tag(each)
                 }
-                .tag(each)
             }
-        }
-        .pickerStyle(.navigationLink)
-    }
-
-    private static func describe(_ level: String) -> (String, String) {
-        switch level {
-        case "none": ("Off", "Answers at once, without thinking first")
-        case "low": ("Low", "Quickest pages")
-        case "medium": ("Medium", "A little more care")
-        case "high": ("High", "Thinks longer, for hard questions")
-        case "max": ("Max", "As long as it needs")
-        default: (level.capitalized, "")
+            .pickerStyle(.navigationLink)
         }
     }
 }

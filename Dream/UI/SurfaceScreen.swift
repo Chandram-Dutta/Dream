@@ -214,39 +214,49 @@ struct SurfaceScreen: View {
 
     @ViewBuilder private var changeBar: some View {
         if let target = changing {
-            HStack(spacing: 8) {
-                TextField(placeholderText(for: target), text: $instruction)
-                    .focused($instructionFocused)
-                    .submitLabel(.go)
-                    .onSubmit(submitChange)
-                    .onAppear { instructionFocused = true }
-                    .onChange(of: instructionFocused) { if instructionFocused, voice.listener.isActive { voice.listener.cancel() } }
-                if instruction.isEmpty || voice.listener.isActive {
-                    MicButton(listener: voice.listener, text: $instruction, palette: palette, onStart: { instructionFocused = false }) { _ in submitChange() }
-                } else {
-                    Button("Send", systemImage: "arrow.up", action: submitChange)
-                        .labelStyle(.iconOnly)
-                        .font(.headline.weight(.bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 38, height: 38)
-                        .background(palette.gradient, in: .circle)
-                        .disabled(instruction.trimmingCharacters(in: .whitespaces).isEmpty)
+            VStack(alignment: .leading, spacing: 8) {
+                // What will make the change, for accounts that can choose (ModelPicker.swift).
+                if let options = ModelOptions.offered {
+                    ModelChip(options: options, palette: palette, focus: $instructionFocused)
                 }
-                Button("Cancel", systemImage: "xmark") { changing = nil }
-                    .labelStyle(.iconOnly)
-                    .font(.headline)
-                    .foregroundStyle(.secondary)
-                    .frame(width: 38, height: 38)
+                instructionField(for: target)
             }
-            .padding(.leading, 20)
-            .padding(.trailing, 6)
-            .padding(.vertical, 6)
-            .glassEffect(.regular.interactive(), in: .capsule)
-            .listeningGlow(voice.listener, palette: palette, in: .capsule)
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
             .transition(.move(edge: .bottom).combined(with: .opacity))
         }
+    }
+
+    private func instructionField(for target: ChangeTarget) -> some View {
+        HStack(spacing: 8) {
+            TextField(placeholderText(for: target), text: $instruction)
+                .focused($instructionFocused)
+                .submitLabel(.go)
+                .onSubmit(submitChange)
+                .onAppear { instructionFocused = true }
+                .onChange(of: instructionFocused) { if instructionFocused, voice.listener.isActive { voice.listener.cancel() } }
+            if instruction.isEmpty || voice.listener.isActive {
+                MicButton(listener: voice.listener, text: $instruction, palette: palette, onStart: { instructionFocused = false }) { _ in submitChange() }
+            } else {
+                Button("Send", systemImage: "arrow.up", action: submitChange)
+                    .labelStyle(.iconOnly)
+                    .font(.headline.weight(.bold))
+                    .foregroundStyle(.white)
+                    .frame(width: 38, height: 38)
+                    .background(palette.gradient, in: .circle)
+                    .disabled(instruction.trimmingCharacters(in: .whitespaces).isEmpty)
+            }
+            Button("Cancel", systemImage: "xmark") { changing = nil }
+                .labelStyle(.iconOnly)
+                .font(.headline)
+                .foregroundStyle(.secondary)
+                .frame(width: 38, height: 38)
+        }
+        .padding(.leading, 20)
+        .padding(.trailing, 6)
+        .padding(.vertical, 6)
+        .glassEffect(.regular.interactive(), in: .capsule)
+        .listeningGlow(voice.listener, palette: palette, in: .capsule)
     }
 
     private func placeholderText(for target: ChangeTarget) -> String {
