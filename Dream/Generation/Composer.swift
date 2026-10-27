@@ -328,9 +328,10 @@ final class Composer {
             return Surface(wire, reference: found.first ?? fallback)
         } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
             let kept = await salvaged(Surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: unfinished.partial.related != nil)
-            // Finished blocks are worth keeping, and so is a calculation with none: the checker
-            // gives it its controls and results (Checker.checkBlocks), and a repair what's missing.
-            guard !kept.blocks.isEmpty || (kept.hasLogic && !kept.title.isEmpty) else { throw unfinished }
+            // Finished blocks are worth keeping, and so is a calculation with none, if it has
+            // results: the checker gives it its controls and results (Checker.checkBlocks). Inputs
+            // alone were kept once, and every repair stopped early too: a page of one slider.
+            guard !kept.blocks.isEmpty || (!kept.inputs.isEmpty && !kept.outputs.isEmpty && !kept.title.isEmpty) else { throw unfinished }
             note(kept.blocks.isEmpty ? "Kept the calculation; no block was finished." : "Kept the \(kept.blocks.count) finished blocks.")
             return kept
         }
