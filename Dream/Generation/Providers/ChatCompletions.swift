@@ -39,7 +39,44 @@ enum ChatCompletions {
 
         let messages = body["messages"] as? [[String: Any]] ?? []
         let summary = "\(messages.count) messages (last: \(messages.last?["role"] as? String ?? "?")), schema: \(request.schema != nil), tools: \(request.enabledToolDefinitions.map(\.name))"
-        return (try JSONSerialization.data(withJSONObject: body), summary)
+        return (try ordered(body), summary)
+    }
+
+    /// JSON whose keys always come in the same order, so the same request is the same bytes and
+    /// a provider can serve what it has seen from its prompt cache. A schema's properties come in
+    /// the order they were declared (its "x-order", which then goes): models write them in that
+    /// order, so names come before the formulas that use them and a screen's related topics come
+    /// last (Wire.swift). Swift's dictionaries used to set both orders at random, differently in
+    /// every process, so a screen could start with its citations.
+    static func ordered(_ value: Any) throws -> Data {
+        var out = Data()
+        try write(value, into: &out)
+        return out
+    }
+
+    private static func write(_ value: Any, order: [String]? = nil, into out: inout Data) throws {
+        switch value {
+        case let object as [String: Any]:
+            let keys = object.keys.filter { $0 != "x-order" }
+            let declared = (order ?? []).filter(keys.contains)
+            out.append(UInt8(ascii: "{"))
+            for (index, key) in (declared + keys.filter { !declared.contains($0) }.sorted()).enumerated() {
+                if index > 0 { out.append(UInt8(ascii: ",")) }
+                try write(key, into: &out)
+                out.append(UInt8(ascii: ":"))
+                try write(object[key] ?? NSNull(), order: key == "properties" ? object["x-order"] as? [String] : nil, into: &out)
+            }
+            out.append(UInt8(ascii: "}"))
+        case let array as [Any]:
+            out.append(UInt8(ascii: "["))
+            for (index, item) in array.enumerated() {
+                if index > 0 { out.append(UInt8(ascii: ",")) }
+                try write(item, into: &out)
+            }
+            out.append(UInt8(ascii: "]"))
+        default:
+            out.append(try JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed, .withoutEscapingSlashes]))
+        }
     }
 
     /// Sends a request that's ready to go and streams the answer into `channel`. Every line that
@@ -194,17 +231,10 @@ enum ChatCompletions {
         }
     }
 
-    /// Apple's schemas are JSON Schema already; only the ordering extension needs to go.
+    /// Apple's schemas are JSON Schema already, with an "x-order" extension that `ordered` puts
+    /// the properties in, and drops.
     private static func json(_ schema: GenerationSchema) throws -> Any {
-        let object = try JSONSerialization.jsonObject(with: JSONEncoder().encode(schema))
-        func clean(_ value: Any) -> Any {
-            if let dictionary = value as? [String: Any] {
-                return dictionary.filter { $0.key != "x-order" }.mapValues(clean)
-            }
-            if let array = value as? [Any] { return array.map(clean) }
-            return value
-        }
-        return clean(object)
+        try JSONSerialization.jsonObject(with: JSONEncoder().encode(schema))
     }
 
     private static func jpeg(_ image: CGImage) -> Data? {

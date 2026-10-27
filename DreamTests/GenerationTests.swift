@@ -1,4 +1,5 @@
 import Foundation
+import FoundationModels
 import NaturalLanguage
 import Testing
 @testable import Dream
@@ -7,6 +8,15 @@ import Testing
 // room thinking gets beside an answer's budget, a repair that restates what the session lost,
 // which server answers are worth asking again, and the language a finished page is labelled
 // with. Whole pages on real models are Tools/bench-many.sh's job.
+
+/// Properties named against the alphabet, to see the declared order survive.
+@Generable
+private struct Declared {
+    var zebra: String
+    var apple: [String]
+    var mango: Int
+    var kiwi: String
+}
 
 @Suite("Generation")
 struct GenerationTests {
@@ -28,6 +38,20 @@ struct GenerationTests {
         var digits = ChatCompletions.Padding()
         #expect(digits.read(#"{"inputs": [{"name": "a", "max": 2.0000000000"#) == nil)
         #expect(digits.read(String(repeating: "0", count: 40))?.contains("digits") == true, "a number that keeps growing digits")
+    }
+
+    @Test("A schema goes out in the order it was declared, the same bytes every time")
+    func schemaOrder() throws {
+        let schema = try JSONSerialization.jsonObject(with: JSONEncoder().encode(Declared.generationSchema))
+        let body: [String: Any] = ["stream": true, "temperature": 0.4, "response_format": ["json_schema": ["schema": schema, "strict": true]]]
+        let sent = try ChatCompletions.ordered(body)
+        let text = String(decoding: sent, as: UTF8.self)
+        let places = ["zebra", "apple", "mango", "kiwi"].compactMap { text.range(of: "\"\($0)\":")?.lowerBound }
+        #expect(places.count == 4 && places == places.sorted(), "properties in the order they were declared, not the alphabet's or a dictionary's")
+        #expect(!text.contains("x-order"), "the ordering extension goes")
+        #expect(try ChatCompletions.ordered(body) == sent, "the same request is the same bytes")
+        let back = try JSONSerialization.jsonObject(with: sent) as? [String: Any]
+        #expect(back?["temperature"] as? Double == 0.4 && back?["stream"] as? Bool == true, "and still JSON that reads back the same")
     }
 
     @Test("Thinking gets room beside an answer's budget")
