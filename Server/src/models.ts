@@ -3,11 +3,13 @@
 // for none; the server decides, so models can change without an app update.
 //
 // Each model is reached through Dream's AI Gateway (model.ts): xAI's through its Responses API
-// with Dream's xAI key, Workers AI's through the Worker's AI binding, billed to the account.
+// with Dream's xAI key, Workers AI's through the Worker's AI binding, billed to the account, and
+// Sarvam's through the gateway's custom provider `sarvam` (made with `cf ai-gateway
+// custom-providers create`) with Dream's Sarvam key.
 //
 // No imports, so test/unit.mjs runs it in Node.
 
-export type Provider = "xai" | "workers-ai";
+export type Provider = "xai" | "workers-ai" | "sarvam";
 
 export interface Model {
   /** What the app sends, and what usage is recorded under. */
@@ -90,6 +92,17 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.95, cached: 0.16, output: 4 },
     efforts: ["none", "high"],
+  },
+  {
+    id: "sarvam-105b",
+    name: "Sarvam 105B",
+    note: "Made in India; not yet tried on pages",
+    provider: "sarvam",
+    upstream: "sarvam-105b",
+    plus: true,
+    // Sarvam prices in rupees and hasn't been measured here: a guess on the high side, so limits err toward caution.
+    price: { input: 1, cached: 1, output: 4 },
+    efforts: [],
   },
   {
     id: "mistral-small-3.1",

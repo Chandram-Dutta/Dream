@@ -36,6 +36,8 @@ export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
   XAI_BASE_URL?: string;
   /** Workers AI, whose gateway() reaches AI Gateway signed in as Dream's account. */
   AI?: Ai;
+  /** Secret. Dream's Sarvam key, for the testers' Sarvam models. */
+  SARVAM_API_KEY?: string;
   /** The AI Gateway that model requests go through ("dream"). Without it, they go to xAI directly. */
   AI_GATEWAY?: string;
   /** The models offered, ids from models.ts separated by commas; the first free one is the default. */
@@ -283,6 +285,23 @@ async function askWorkersAI(env: ModelEnv, model: Model, chat: Record<string, un
   return Response.json(workersCompletion(answer, model.id));
 }
 
+/** Asks Sarvam, an OpenAI-compatible API, through the gateway's custom provider (or straight there
+ * without a gateway). Its stream is OpenAI's chunks, smoothed as Workers AI's are (workersai.ts). */
+async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unknown>): Promise<Response> {
+  const headers = { Authorization: `Bearer ${env.SARVAM_API_KEY?.trim()}`, "Content-Type": "application/json", Accept: chat.stream ? "text/event-stream" : "application/json" };
+  const request = { ...chat, model: model.upstream };
+  const gateway = env.AI_GATEWAY?.trim();
+  const upstream =
+    gateway && env.AI
+      ? await env.AI.gateway(gateway).run({ provider: "custom-sarvam", endpoint: "v1/chat/completions", headers: { ...headers, "cf-aig-collect-log": "false", "cf-aig-skip-cache": "true" }, query: request })
+      : await fetch("https://api.sarvam.ai/v1/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
+  if (!upstream.ok) return upstream;
+  if (chat.stream === true && upstream.body) {
+    return new Response(workersStream(upstream.body, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
+  }
+  return Response.json(workersCompletion(await upstream.json(), model.id));
+}
+
 async function conversationID(userID: string): Promise<string> {
   const digest = new Uint8Array(await crypto.subtle.digest("SHA-256", new TextEncoder().encode(`dream-conversation:${userID}`)));
   return [...digest.subarray(0, 16)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
@@ -318,6 +337,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const key = env.XAI_API_KEY?.trim();
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
+  if (chosen.provider === "sarvam" && !env.SARVAM_API_KEY?.trim()) return problem(503, "Sarvam isn't set up on this server yet.");
   body.model = chosen.upstream;
   // How long it thinks first: testers any level, Dream Plus low to high, everyone else low; then
   // the nearest level the model takes (models.ts). To bench longer thinking, list the bench's
@@ -338,7 +358,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     if (!counted) return;
     aiGeneration(env, ctx, user.id, {
       model: modelID,
-      provider: chosen.provider === "xai" ? "xai" : "cloudflare-workers-ai",
+      provider: chosen.provider === "workers-ai" ? "cloudflare-workers-ai" : chosen.provider,
       page: pageID,
       plan: account.plan,
       tokensIn: use?.tokensIn ?? 0,
@@ -358,7 +378,12 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const conversation = await conversationID(user.id);
   let upstream: Response;
   try {
-    upstream = chosen.provider === "xai" ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation) : await askWorkersAI(env, chosen, body, conversation);
+    upstream =
+      chosen.provider === "xai"
+        ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation)
+        : chosen.provider === "sarvam"
+          ? await askSarvam(env, chosen, body)
+          : await askWorkersAI(env, chosen, body, conversation);
   } catch {
     console.error("Model provider unreachable");
     return problem(502, "The model didn't answer. Try again in a moment.");
