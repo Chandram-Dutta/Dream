@@ -553,6 +553,16 @@ neurons (10,000 a day free, then $0.011 per 1,000), with each account's `x-sessi
 prompt caching. `src/workersai.ts` joins a tool call's streamed pieces into one call, keeps one
 usage total, and turns neurons into dollars, so usage and limits work the same as for Grok.
 
+Workers AI and Sarvam hold every token a model writes to the request's JSON schema, so with one
+the model can never start a tool call, and writes facts from memory instead (benched: asked who
+won the 2026 World Cup, DeepSeek wrote "I'll look this up." as the page, and Gemma 4 that the final
+hadn't been played). Their models are marked `toolsFirst` in `src/models.ts`, and
+`src/toolsfirst.ts` sends each round that has tools first without the schema, thinking as little
+as the model allows. A tool call there is the answer; once the model starts writing an answer
+instead, it's dropped unread (its cost estimated and counted) and the round is asked again with
+the schema at the level asked for. Grok takes tools and a schema together, so its requests go
+as they are.
+
 ### Through Cloudflare's AI Gateway
 
 Requests go to xAI's **Responses API** through the AI Gateway named in `AI_GATEWAY` (`dream`),
@@ -580,7 +590,8 @@ A request needs a session, proof that it's the app (as for web search), and room
 account's allowance. It's checked and rebuilt from the fields Dream uses: the model must be on
 the list (`MODELS`, default `grok-4.7`), tools must be the app's own functions (never a
 provider's paid server-side tools), pictures go only as `data:` URLs, `reasoning_effort` is low,
-medium or high, `max_tokens` is capped (`MAX_OUTPUT_TOKENS`, default 32,000), the body is at
+medium or high, `max_tokens` is capped (`MAX_OUTPUT_TOKENS`, default 32,000, thinking included,
+which is why a page asks for no less), the body is at
 most 2 MB, and anything else (`n`, `search_parameters`, `user`, …) is dropped. Streams ask xAI
 for usage (`stream_options.include_usage`); the Worker reads only that last chunk, and counts
 its tokens and cost (`cost_in_usd_ticks`, in 10⁻¹⁰ dollars) against the account. A stream cut
@@ -593,7 +604,11 @@ aren't a page (turning "add milk" into a list entry) send none and count only th
 
 Nothing asked or answered is logged or kept; only counts and costs (`migrations/0007_usage.sql`).
 xAI's errors become plain answers: its rate limit is a 503 to retry, a malformed request a 400
-with xAI's reason, anything else a 502.
+with xAI's reason, anything else a 502. The app asks again, up to three times, after 2, 6 and 15
+seconds, when a model didn't answer (502) or was busy (503 with `Retry-After`), since nothing has
+streamed yet: Sarvam turns away a second request at once, a page's check and writing start
+together, and Workers AI limits requests per minute (its error code, like 3021, is the one thing
+logged).
 
 ## Plans and limits
 

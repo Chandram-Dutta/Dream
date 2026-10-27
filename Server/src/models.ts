@@ -28,6 +28,10 @@ export interface Model {
   /** The thinking levels it takes, from least to most; empty for a model that doesn't think. A
    * level it doesn't take is moved to the nearest one it does (`fitEffort`). */
   efforts: Effort[];
+  /** It holds every token to a request's JSON schema, so with one it can never start a tool
+   * call: a round with tools goes first without the schema (toolsfirst.ts). True of what Workers
+   * AI and Sarvam serve; Grok takes tools and a schema together. */
+  toolsFirst: boolean;
 }
 
 /** How long a model thinks before it answers, from not at all to as long as it needs. */
@@ -52,6 +56,7 @@ export const CATALOG: Model[] = [
     plus: false,
     price: { input: 2, cached: 0.5, output: 6 },
     efforts: ["low", "medium", "high"],
+    toolsFirst: false,
   },
   {
     id: "grok-4.20-fast",
@@ -62,6 +67,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 2, cached: 0.5, output: 6 },
     efforts: [],
+    toolsFirst: false,
   },
   {
     id: "deepseek-v4.1-flash",
@@ -72,6 +78,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.3, cached: 0.006, output: 1.2 },
     efforts: ["none", "low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "glm-5.3-flash",
@@ -82,6 +89,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.15, cached: 0.03, output: 0.5 },
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "kimi-k2.6",
@@ -92,6 +100,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.95, cached: 0.16, output: 4 },
     efforts: ["none", "high"],
+    toolsFirst: true,
   },
   // Sarvam's open models (POST /v2/chat/completions), not yet tried on pages. Sarvam prices in
   // rupees and hasn't been measured here: guesses on the high side, so limits err toward caution.
@@ -104,6 +113,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 1, cached: 1, output: 4 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "sarvam-glm-5.3",
@@ -115,6 +125,7 @@ export const CATALOG: Model[] = [
     price: { input: 1.4, cached: 1.4, output: 4.4 },
     // Sarvam thinks at max when no level is sent; one always is.
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "sarvam-deepseek-v4.1-flash",
@@ -125,6 +136,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.5, cached: 0.5, output: 2 },
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "sarvam-gemma-4",
@@ -135,6 +147,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.5, cached: 0.5, output: 1.5 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "mistral-small-3.1",
@@ -145,6 +158,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.351, cached: 0.351, output: 0.555 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "llama-4-scout",
@@ -155,6 +169,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.27, cached: 0.27, output: 0.85 },
     efforts: [],
+    toolsFirst: true,
   },
 ];
 
