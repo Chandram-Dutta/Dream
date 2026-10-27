@@ -35,6 +35,12 @@ struct GenerationTests {
         for _ in 0..<100 where stopped == nil { stopped = blanks.read("\n\n\n\n\n") }
         #expect(stopped?.contains("blank") == true, "hundreds of blank characters in a row, even a few at a time")
 
+        var long = ChatCompletions.Padding()
+        let entry = #"{"values": ["Sunscreen", "Beach", "false"]}, "#
+        var ended: String?
+        for _ in 0..<2_000 where ended == nil { ended = long.read(entry) }
+        #expect(ended?.contains("longer than any screen") == true, "an answer longer than any screen, however it's made")
+
         var digits = ChatCompletions.Padding()
         #expect(digits.read(#"{"inputs": [{"name": "a", "max": 2.0000000000"#) == nil)
         #expect(digits.read(String(repeating: "0", count: 40))?.contains("digits") == true, "a number that keeps growing digits")

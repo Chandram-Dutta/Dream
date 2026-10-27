@@ -258,16 +258,23 @@ enum ChatCompletions {
     /// can fall into either and go on until it runs out of room: a packing list once ran for 155
     /// seconds that way, and a quadratic for 90, both ending in nothing. Neither changes what's
     /// been parsed, so the composer can't see it, and tokens keep coming, so it isn't a stall.
+    /// Nor is any screen longer than `lengthLimit`, ten times the longest on the bench (about
+    /// 1,500 tokens): a loop the other checks miss, like DeepSeek's on a packing list, would
+    /// otherwise run on to the 32,000-token cap.
     struct Padding {
         static let blankLimit = 400
         static let digitLimit = 40
+        static let lengthLimit = 60_000
         private var inString = false
         private var escaped = false
         private var blanks = 0
         private var digits = 0
+        private var length = 0
 
         /// Reads the next piece of the answer; what it has turned into, once it's padding.
         mutating func read(_ text: String) -> String? {
+            length += text.count
+            if length > Self.lengthLimit { return "more than \(Self.lengthLimit) characters, longer than any screen" }
             for scalar in text.unicodeScalars {
                 if scalar == " " || scalar == "\n" || scalar == "\r" || scalar == "\t" {
                     blanks += 1
