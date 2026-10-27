@@ -26,11 +26,14 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
-                    Text("Dream")
-                        .font(.display(.largeTitle, weight: .bold))
-                        .padding(.top, 24)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { SyncNote(); YourLinksButton(); ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
+                    // One button for everything that isn't making a page, so the name stands alone.
+                    HStack(spacing: 12) {
+                        Text("Dream")
+                            .font(.display(.largeTitle, weight: .bold))
+                        Spacer(minLength: 0)
+                        AccountButton(palette: palette)
+                    }
+                    .padding(.top, 24)
                     // The key goes in Under the hood, which only testing builds have.
                     if !canCompose, Build.hasTestingHooks {
                         Button { showingSettings = true } label: {
@@ -141,8 +144,16 @@ struct HomeView: View {
     // MARK: - Asking
 
     private var composer: some View {
-        VStack(spacing: 10) {
+        let options = ModelOptions.offered
+        return VStack(spacing: 10) {
             SavedSuggestion(text: intent, surfaces: surfaces)
+            // What will make the page, for accounts that can choose (ModelPicker.swift).
+            if let options {
+                ModelChip(options: options, palette: palette, focus: $focused)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .transition(.opacity)
+            }
             VStack(alignment: .leading, spacing: 10) {
                 if let photo {
                     Image(uiImage: photo)
@@ -199,6 +210,7 @@ struct HomeView: View {
         .animation(.smooth, value: photo)
         .animation(.smooth, value: focused)
         .animation(.smooth, value: listener.isActive)
+        .animation(.smooth, value: options)
     }
 
     private var canMake: Bool {

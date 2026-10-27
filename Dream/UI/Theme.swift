@@ -97,6 +97,23 @@ extension View {
     }
 }
 
+/// A row in Dream's small glass cards (the account card, the model picker): the whole row is the
+/// target, and it answers a finger with a wash of the palette instead of a grey highlight.
+struct CardRowStyle: ButtonStyle {
+    let palette: Palette
+
+    func makeBody(configuration: Configuration) -> some View {
+        configuration.label
+            .foregroundStyle(.primary)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .background(palette.accent.opacity(configuration.isPressed ? 0.14 : 0), in: .rect(cornerRadius: 16, style: .continuous))
+            .contentShape(.rect(cornerRadius: 16, style: .continuous))
+            .animation(.smooth(duration: 0.2), value: configuration.isPressed)
+    }
+}
+
 /// A light sweep across placeholders, while there's nothing to show yet.
 struct Shimmer: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion

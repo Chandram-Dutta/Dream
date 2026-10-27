@@ -177,35 +177,6 @@ private struct FactEditor: View {
     }
 }
 
-/// Opens What Dream knows. A dot shows when Dream has noticed something to confirm.
-struct MemoryButton: View {
-    let palette: Palette
-    @Query(filter: #Predicate<MemoryFact> { $0.isConfirmed == false }) private var noticed: [MemoryFact]
-    @State private var showing = false
-
-    var body: some View {
-        Button { showing = true } label: {
-            Image(systemName: "person.crop.circle")
-                .font(.title2)
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44)
-                .overlay(alignment: .topTrailing) {
-                    if !noticed.isEmpty {
-                        Circle()
-                            .fill(palette.gradient)
-                            .frame(width: 10, height: 10)
-                            .offset(x: -6, y: 8)
-                            .transition(.scale)
-                    }
-                }
-        }
-        .accessibilityLabel("What Dream knows")
-        .accessibilityValue(noticed.isEmpty ? "" : "\(noticed.count) to confirm")
-        .animation(.smooth, value: noticed.isEmpty)
-        .sheet(isPresented: $showing) { MemoryView() }
-    }
-}
-
 /// After a request, something Dream noticed the user say about themselves in it, offered once
 /// to remember. Until they say yes, it isn't used.
 struct NoticedFacts: View {
