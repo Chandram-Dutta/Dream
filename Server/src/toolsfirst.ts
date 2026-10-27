@@ -71,10 +71,19 @@ function kind(event: string): "tool" | "answer" | "blank" | "end" | "other" {
   return "other";
 }
 
+/** How long to wait before asking again for the answer with the schema, when the model is busy or
+ * didn't answer (`shaped` failing outright counts too). By then the round's answer has begun, so
+ * the app can't ask again itself, as it does when a round is turned away at the start
+ * (DreamModel.swift): it would only see an empty answer. Sarvam turns away a second request in
+ * quick succession. */
+export const SHAPED_WAITS = [2_000, 6_000];
+
+const AGAIN = new Set([429, 500, 502, 503]);
+
 /** A round's answer: `free` as it is if the model calls a tool there, otherwise the answer
  * `shaped` asks for with the schema. `dropped` hears how many events of a dropped answer came
  * before it was dropped, to count what it cost. */
-export function toolsFirst(free: ReadableStream<Uint8Array>, shaped: () => Promise<Response>, dropped: (events: number) => void): ReadableStream<Uint8Array> {
+export function toolsFirst(free: ReadableStream<Uint8Array>, shaped: () => Promise<Response>, dropped: (events: number) => void, waits = SHAPED_WAITS): ReadableStream<Uint8Array> {
   const decoder = new TextDecoder();
   const encoder = new TextEncoder();
   let reader = free.getReader();
@@ -89,7 +98,12 @@ export function toolsFirst(free: ReadableStream<Uint8Array>, shaped: () => Promi
     pending = "";
     dropped(events);
     await reader.cancel().catch(() => {});
-    const response = await shaped().catch(() => null);
+    let response = await shaped().catch(() => null);
+    for (const wait of waits) {
+      if (response && (response.ok || !AGAIN.has(response.status))) break;
+      await new Promise((resolve) => setTimeout(resolve, wait));
+      response = await shaped().catch(() => null);
+    }
     // With nothing to pass on, the answer just ends, and the app says the model didn't answer.
     reader = (response?.ok && response.body ? response.body : new Blob(["data: [DONE]\n\n"]).stream()).getReader();
   };

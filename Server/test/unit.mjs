@@ -460,8 +460,14 @@ expect(shapedAsked === 1 && droppedEvents === 3 && answered.includes("Easy") && 
 const toolRound = { role: "assistant", content: "", tool_calls: [{ id: "c", type: "function", function: { name: "lookup", arguments: "{}" } }] };
 const rounds = (count) => ({ stream: true, tools: [{}], response_format: { type: "json_schema", json_schema: {} }, messages: [{ role: "system" }, { role: "user" }, ...Array.from({ length: count }, () => [toolRound, { role: "tool" }]).flat()] });
 expect(asksToolsFirst(rounds(TOOL_ROUNDS - 1)) && !asksToolsFirst(rounds(TOOL_ROUNDS)), "after a few rounds of tools, the schema holds the model to answering");
-const turnedAway = await new Response(toolsFirst(freeRound([delta({ content: "Hi" }), "[DONE]"]), async () => new Response("busy", { status: 503 }), () => {})).text();
-expect(turnedAway.trim() === "data: [DONE]", "if asking again fails, the answer just ends");
+let busyTimes = 0;
+const busyOnce = async () => (busyTimes++ ? shapedReply() : new Response("busy", { status: 429 }));
+const askedAgain = await new Response(toolsFirst(freeRound([delta({ content: "Hi" }), "[DONE]"]), busyOnce, () => {}, [1, 1])).text();
+expect(busyTimes === 2 && askedAgain.includes('{\\"title\\":\\"Spain\\"}'), "a busy model is asked again for the answer");
+let refusedTimes = 0;
+const refusing = async () => (refusedTimes++, new Response("bad", { status: 400 }));
+const turnedAway = await new Response(toolsFirst(freeRound([delta({ content: "Hi" }), "[DONE]"]), refusing, () => {}, [1, 1])).text();
+expect(turnedAway.trim() === "data: [DONE]" && refusedTimes === 1, "a request it refuses isn't asked again, and the answer just ends");
 
 console.log("Apple's sign-in keys, kept for every server");
 const { publicKey } = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);
