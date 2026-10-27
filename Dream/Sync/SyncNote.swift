@@ -1,57 +1,49 @@
 import SwiftUI
 
-/// Sync on the home screen, only when it matters: changes waiting without a connection, a
-/// session that needs signing in again, a full account, or a server that keeps failing. The rest
-/// of the time there's nothing to see.
+/// Sync, at the foot of the account card on home, only when it matters: changes waiting without a
+/// connection, a session that needs signing in again, a full account, or a server that keeps
+/// failing. The rest of the time there's nothing to see. The account button's ring says the same
+/// without words (AccountButton.swift); this says what, and what to do.
 struct SyncNote: View {
-    @State private var showing = false
+    /// The card's icon column, so this lines up with the rows above.
+    let column: CGFloat
     private let sync = Sync.shared
 
     var body: some View {
-        ZStack {
-            if let trouble = sync.trouble {
-                Button { showing = true } label: {
-                    Image(systemName: trouble.symbol)
-                        .font(.title2)
-                        .foregroundStyle(trouble == .offline ? AnyShapeStyle(.secondary) : AnyShapeStyle(.orange))
-                        .frame(width: 44, height: 44)
+        if let trouble = sync.trouble {
+            HStack(alignment: .firstTextBaseline, spacing: 12) {
+                Image(systemName: trouble.symbol)
+                    .foregroundStyle(trouble.isWaiting ? AnyShapeStyle(.secondary) : AnyShapeStyle(.orange))
+                    .frame(width: column)
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(trouble.title)
+                        .font(.subheadline.weight(.semibold))
+                    Text(trouble.detail(unsent: sync.unsent))
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                    if trouble == .offline || trouble == .failing {
+                        Button("Try now") { Task { await Sync.flush() } }
+                            .font(.footnote.weight(.semibold))
+                            .buttonStyle(.borderless)
+                            .padding(.top, 2)
+                    }
                 }
-                .accessibilityLabel(trouble.title)
-                .popover(isPresented: $showing) {
-                    SyncTroubleDetail(trouble: trouble, unsent: sync.unsent)
-                        .presentationCompactAdaptation(.popover)
-                }
-                .transition(.scale.combined(with: .opacity))
             }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+            .frame(maxWidth: .infinity, alignment: .leading)
         }
-        .animation(.smooth, value: sync.trouble)
     }
 }
 
-private struct SyncTroubleDetail: View {
-    let trouble: Sync.Trouble
-    let unsent: Int
+extension Sync.Trouble {
+    /// Changes waiting for a connection go on their own, so they're shown quietly; the rest need
+    /// the person, or won't fix themselves soon, and are shown in orange.
+    var isWaiting: Bool { self == .offline }
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Text(trouble.title)
-                .font(.headline)
-            Text(detail)
-                .font(.subheadline)
-                .foregroundStyle(.secondary)
-                .fixedSize(horizontal: false, vertical: true)
-            if trouble == .offline || trouble == .failing {
-                Button("Try now") { Task { await Sync.flush() } }
-                    .font(.subheadline.weight(.semibold))
-                    .padding(.top, 6)
-            }
-        }
-        .padding(20)
-        .frame(width: 290, alignment: .leading)
-    }
-
-    private var detail: String {
-        switch trouble {
+    func detail(unsent: Int) -> String {
+        switch self {
         case .offline:
             unsent == 1 ? "1 change is on this iPhone, and syncs when you're back online." : "\(unsent) changes are on this iPhone, and sync when you're back online."
         case .signedOut: "Your changes stay on this iPhone until you sign in again."
@@ -59,9 +51,7 @@ private struct SyncTroubleDetail: View {
         case .failing: "Your changes are safe on this iPhone. Dream keeps trying."
         }
     }
-}
 
-extension Sync.Trouble {
     var title: String {
         switch self {
         case .offline: "Not synced yet"

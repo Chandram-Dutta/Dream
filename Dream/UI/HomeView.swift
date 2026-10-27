@@ -26,11 +26,14 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
-                    Text("Dream")
-                        .font(.display(.largeTitle, weight: .bold))
-                        .padding(.top, 24)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                        .overlay(alignment: .bottomTrailing) { HStack(spacing: 0) { SyncNote(); YourLinksButton(); ConnectionsButton(); MemoryButton(palette: palette); AccountButton(palette: palette) } }
+                    // One button for everything that isn't making a page, so the name stands alone.
+                    HStack(spacing: 12) {
+                        Text("Dream")
+                            .font(.display(.largeTitle, weight: .bold))
+                        Spacer(minLength: 0)
+                        AccountButton(palette: palette)
+                    }
+                    .padding(.top, 24)
                     // The key goes in Under the hood, which only testing builds have.
                     if !canCompose, Build.hasTestingHooks {
                         Button { showingSettings = true } label: {

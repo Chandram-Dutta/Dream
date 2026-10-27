@@ -385,25 +385,3 @@ private struct WebPage: UIViewControllerRepresentable, Identifiable {
 
     func updateUIViewController(_ controller: SFSafariViewController, context: Context) {}
 }
-
-/// Opens Your shared links from home, once the user is signed in and so can share links.
-struct YourLinksButton: View {
-    @State private var showing = false
-    @State private var signedIn = Session.isSignedIn
-
-    var body: some View {
-        Group {
-            if signedIn {
-                Button { showing = true } label: {
-                    Image(systemName: "link")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                        .frame(width: 44, height: 44)
-                }
-                .accessibilityLabel("Your shared links")
-                .sheet(isPresented: $showing) { YourLinksView() }
-            }
-        }
-        .onReceive(NotificationCenter.default.publisher(for: Session.didChange)) { _ in signedIn = Session.isSignedIn }
-    }
-}

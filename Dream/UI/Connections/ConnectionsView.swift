@@ -50,27 +50,18 @@ struct ConnectionsView: View {
     }
 }
 
-/// Opens Connections from home.
-struct ConnectionsButton: View {
-    @State private var showing = false
+/// Connections in a sheet of its own, opened from the account card on home.
+struct ConnectionsSheet: View {
+    @Environment(\.dismiss) private var dismiss
 
     var body: some View {
-        Button { showing = true } label: {
-            Image(systemName: "point.3.connected.trianglepath.dotted")
-                .font(.title2)
-                .foregroundStyle(.secondary)
-                .frame(width: 44, height: 44)
-        }
-        .accessibilityLabel("Connections")
-        .sheet(isPresented: $showing) {
-            NavigationStack {
-                ConnectionsView()
-                    .toolbar {
-                        ToolbarItem(placement: .confirmationAction) {
-                            Button("Done") { showing = false }
-                        }
+        NavigationStack {
+            ConnectionsView()
+                .toolbar {
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Done") { dismiss() }
                     }
-            }
+                }
         }
     }
 }

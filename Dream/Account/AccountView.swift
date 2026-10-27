@@ -2,47 +2,6 @@ import AuthenticationServices
 import SwiftData
 import SwiftUI
 
-/// On home: the account when signed in (its initial, in the colors of the moment), or a way to
-/// sign in when not.
-struct AccountButton: View {
-    let palette: Palette
-    private let account = Account.shared
-    @State private var showing = false
-
-    var body: some View {
-        Group {
-            if account.isSignedIn {
-                Button { showing = true } label: {
-                    Text(account.profile?.initial ?? "")
-                        .font(.display(.subheadline, weight: .bold))
-                        .foregroundStyle(.white)
-                        .frame(width: 30, height: 30)
-                        .background(palette.gradient, in: .circle)
-                        .overlay {
-                            if account.profile?.initial == nil {
-                                Image(systemName: "person.fill").font(.footnote).foregroundStyle(.white)
-                            }
-                        }
-                        .frame(width: 44, height: 44)
-                }
-                .accessibilityLabel("Account")
-            } else {
-                Button("Sign in") { account.askToSignIn("Sign in to Dream") }
-                    .font(.subheadline.weight(.semibold))
-                    .buttonStyle(.glass)
-            }
-        }
-        .sheet(isPresented: $showing) { AccountView() }
-    }
-}
-
-extension Account.Profile {
-    /// The first letter of their name, if Apple shared it.
-    var initial: String? {
-        name?.trimmingCharacters(in: .whitespaces).first.map { String($0).uppercased() }
-    }
-}
-
 /// The account: who's signed in, where, their data, signing out, and deleting it all.
 struct AccountView: View {
     private let account = Account.shared
@@ -144,16 +103,7 @@ struct AccountView: View {
 
     private var header: some View {
         VStack(spacing: 12) {
-            Text(account.profile?.initial ?? "")
-                .font(.display(size: 34, weight: .bold))
-                .foregroundStyle(.white)
-                .frame(width: 76, height: 76)
-                .background(palette.gradient, in: .circle)
-                .overlay {
-                    if account.profile?.initial == nil {
-                        Image(systemName: "person.fill").font(.title).foregroundStyle(.white)
-                    }
-                }
+            AccountMark(palette: palette, size: 76)
                 .shadow(color: palette.accent.opacity(0.35), radius: 16, y: 6)
             Text(account.profile?.name ?? "Signed in with Apple")
                 .font(.display(.title2, weight: .bold))
