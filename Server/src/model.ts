@@ -377,7 +377,10 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const refusal = await admitModel(env, user.id, pageID, account);
   if (refusal) return refusalResponse(refusal);
 
-  const modelID = chosen.id;
+  // The model that answers: the chosen one, or Grok when a cheaper one is too busy (below). Usage
+  // and analytics are counted under it.
+  let answeredBy = chosen;
+  let modelID = chosen.id;
   // For PostHog's LLM analytics, only when the person lets Dream count what's used (analytics.ts).
   const counted = countsAllowed(request);
   const started = Date.now();
@@ -385,7 +388,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     if (!counted) return;
     aiGeneration(env, ctx, user.id, {
       model: modelID,
-      provider: chosen.provider === "workers-ai" ? "cloudflare-workers-ai" : chosen.provider,
+      provider: answeredBy.provider === "workers-ai" ? "cloudflare-workers-ai" : answeredBy.provider,
       page: pageID,
       plan: account.plan,
       tokensIn: use?.tokensIn ?? 0,
@@ -413,6 +416,21 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     const tokensIn = Math.ceil(raw.length / 4);
     record({ tokensIn, tokensCached: 0, tokensOut: events, cost: priced(modelID, tokensIn, 0, events) });
   };
+  // When Workers AI or Sarvam turns a request away for being busy (Workers AI's per-minute limit
+  // 3021 or capacity 3040; Sarvam's 429), Grok answers it instead: a limit like that lasts longer
+  // than the app's retries wait, and a page that costs a little more beats one that fails.
+  const byGrok = async (): Promise<Response | null> => {
+    const grok = CATALOG.find((each) => each.id === "grok-4.7");
+    if (!grok || !key) return null;
+    console.warn("Model busy; Grok answers", chosen.id);
+    answeredBy = grok;
+    modelID = grok.id;
+    const shifted: Record<string, unknown> = { ...body, model: grok.upstream };
+    const level = fitEffort(allowedEffort(asked, account.plan, account.tester), grok);
+    if (level === null) delete shifted.reasoning_effort;
+    else shifted.reasoning_effort = level;
+    return askXAI(env, key, toResponses(shifted, conversation), conversation);
+  };
   let upstream: Response;
   try {
     upstream =
@@ -421,11 +439,17 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
         : chosen.toolsFirst && asksToolsFirst(body)
           ? await askToolsFirst(ask, body, droppedRound)
           : await ask(body);
+    if (chosen.provider === "sarvam" && upstream.status === 429) upstream = (await byGrok()) ?? upstream;
   } catch (error) {
     // Only the provider's error code, like Workers AI's 3021 for its per-minute limit: its message
     // could repeat what was asked.
-    console.error("Model provider unreachable", (error instanceof Error ? error.message : "").match(/^\d{3,5}\b/)?.[0] ?? "");
-    return problem(502, "The model didn't answer. Try again in a moment.");
+    const code = (error instanceof Error ? error.message : "").match(/^\d{3,5}\b/)?.[0] ?? "";
+    const instead = code === "3021" || code === "3040" ? await byGrok().catch(() => null) : null;
+    if (!instead) {
+      console.error("Model provider unreachable", code);
+      return problem(502, "The model didn't answer. Try again in a moment.");
+    }
+    upstream = instead;
   }
   if (!upstream.ok) {
     generation(null, upstream.status);
@@ -433,7 +457,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   }
 
   if (body.stream && upstream.body) {
-    const chat = chosen.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;
+    const chat = answeredBy.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;
     return new Response(metered(withHeartbeat(chat), modelID, raw.length, record), {
       status: 200,
       headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
@@ -442,7 +466,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   let text = "";
   let use: ModelUse | null = null;
   try {
-    const answer = chosen.provider === "xai" ? chatCompletion(await upstream.json(), modelID) : ((await upstream.json()) as Record<string, unknown>);
+    const answer = answeredBy.provider === "xai" ? chatCompletion(await upstream.json(), modelID) : ((await upstream.json()) as Record<string, unknown>);
     text = JSON.stringify(answer);
     use = useFrom(answer.usage, modelID);
   } catch {
