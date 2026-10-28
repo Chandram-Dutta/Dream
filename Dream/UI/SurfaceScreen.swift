@@ -77,18 +77,21 @@ struct SurfaceScreen: View {
     }
 
     /// The light means one thing: moving is Dream's turn, still is yours. It churns while Dream
-    /// works on a page that isn't here yet, flows at the top while one writes itself or changes,
-    /// and holds nearly still while questions wait.
+    /// works, from the first frame until the page is finished, writing itself or changing, and
+    /// holds nearly still while questions wait. It settles only when the page is done: that's
+    /// how the reader knows.
     private var energy: Double {
         guard isWorking else { return 0 }
         if yourTurn { return 0.04 }
-        return isForming ? 1 : 0.55
+        return isForming ? 1 : 0.85
     }
 
-    /// The light fills the screen while there's no page, from the first frame, and pulls up to
-    /// the top when one comes.
+    /// The light fills the screen while there's no page, from the first frame; behind a page
+    /// still being written it stays over most of the screen, and it pulls up to the top when the
+    /// page is done.
     private var flood: Double {
-        isWorking && isForming ? 1 : 0
+        guard isWorking else { return 0 }
+        return isForming ? 1 : 0.6
     }
 
     /// Blocks shown, so each one landing surges the light.

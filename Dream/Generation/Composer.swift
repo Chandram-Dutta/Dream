@@ -323,7 +323,9 @@ final class Composer {
         var surface: Surface
         do {
             surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
-            if surface.title.isEmpty, surface.summary.isEmpty { throw EmptyScreen() }
+            // A title and a sentence with nothing under them is as empty as nothing at all: a
+            // cheap model once answered a whole EV comparison with just that.
+            if surface.blocks.isEmpty, !surface.hasLogic { throw EmptyScreen() }
         } catch where Self.isWorthAnotherTry(error) {
             // Nothing usable came out: a loop or padding with nothing finished, a broken answer, or
             // an empty one. Another go in a new session usually works, and costs less than a page

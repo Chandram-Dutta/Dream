@@ -72,8 +72,10 @@ extension Accent {
 
     var palette: Palette {
         let deep = color.mix(with: .black, by: 0.5)
-        let bright = color.mix(with: .white, by: 0.35)
-        return Palette(accent: color, companion: companion, lights: [deep, color, companion, bright, color, deep])
+        // Only a little lighter: text sits on this light while a page is written.
+        let bright = color.mix(with: .white, by: 0.15)
+        // One deep shade among them, so the light stays bright while a page is being written.
+        return Palette(accent: color, companion: companion, lights: [deep, color, bright, companion, color, bright])
     }
 }
 
