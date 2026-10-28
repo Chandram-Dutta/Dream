@@ -1,0 +1,131 @@
+{
+  "about": "Charts: of something that isn't a result (removed), of five results (the first four kept), along a given (moved to the variable), along nothing the reader changes (removed); a variable no chart runs along gets a control; a chart on its own moves into the one section holding its controls, and within a section a chart comes before the controls; the main result made a hero when only a metric shows it.",
+  "fill": true,
+  "wire": {
+    "title": "Growth",
+    "inputs": [
+      {
+        "name": "rate",
+        "label": "Rate",
+        "format": "percent",
+        "initial": 7,
+        "max": 20,
+        "step": 0.5
+      },
+      {
+        "name": "start",
+        "label": "Start",
+        "format": "currency",
+        "initial": 1000,
+        "max": 10000,
+        "step": 100
+      },
+      {
+        "name": "year",
+        "label": "Year",
+        "format": "integer",
+        "role": "variable",
+        "initial": 0,
+        "min": 0,
+        "max": 30
+      },
+      {
+        "name": "month",
+        "label": "Month",
+        "role": "variable",
+        "initial": 0,
+        "min": 0,
+        "max": 12,
+        "step": 1
+      },
+      {
+        "name": "inflation",
+        "label": "Inflation",
+        "format": "percent",
+        "role": "given",
+        "initial": 4
+      }
+    ],
+    "outputs": [
+      {
+        "name": "value",
+        "label": "Value",
+        "formula": "start * (1 + rate / 100) ^ year",
+        "format": "currency"
+      },
+      {
+        "name": "real",
+        "label": "Real value",
+        "formula": "value / (1 + inflation / 100) ^ year",
+        "format": "currency"
+      },
+      {
+        "name": "gain",
+        "label": "Gain",
+        "formula": "value - start",
+        "format": "currency"
+      },
+      {
+        "name": "doubling",
+        "label": "Doubling time",
+        "formula": "72 / rate"
+      },
+      {
+        "name": "monthly",
+        "label": "Monthly",
+        "formula": "rate / 12 + month * 0"
+      },
+      {
+        "name": "fixedOnly",
+        "label": "Fixed",
+        "formula": "inflation * 2"
+      }
+    ],
+    "blocks": [
+      {
+        "kind": "metric",
+        "ref": "value"
+      },
+      {
+        "kind": "chart",
+        "ref": "nothing",
+        "over": "year"
+      },
+      {
+        "kind": "chart",
+        "ref": "value, real, gain, doubling, monthly",
+        "over": "inflation",
+        "title": "Over the years"
+      },
+      {
+        "kind": "section",
+        "title": "Change it",
+        "children": [
+          {
+            "kind": "slider",
+            "ref": "rate"
+          },
+          {
+            "kind": "chart",
+            "ref": "doubling",
+            "over": "rate"
+          },
+          {
+            "kind": "slider",
+            "ref": "start"
+          }
+        ]
+      },
+      {
+        "kind": "chart",
+        "ref": "gain",
+        "over": "start"
+      },
+      {
+        "kind": "chart",
+        "ref": "fixedOnly",
+        "over": "inflation"
+      }
+    ]
+  }
+}

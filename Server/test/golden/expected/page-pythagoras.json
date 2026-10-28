@@ -1,0 +1,2307 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a second point named 'A'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped the point 'Bad', whose position can't be read: (zebra, 0)."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a segment 'broken', which uses 'Z', not a point."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a circle, whose radius can't be read."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a text '  ', with nothing to say."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped an angle, which needs 3 points."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped 'Far', 'Loop', which can't be placed at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a shape (circle) that can't be drawn at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a shape (arc) that can't be drawn at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'triangle', dropped a shape (arrow) that can't be drawn at the starting values."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "triangle",
+          "text" : "",
+          "title" : "The squares on the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "c",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "a",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "b",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "c",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The long side is {c} when the others are {a} and {b}.",
+          "title" : ""
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "triangle",
+          "points" : [
+            {
+              "label" : "C",
+              "name" : "C",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "B",
+              "name" : "B",
+              "x" : "a",
+              "y" : "0"
+            },
+            {
+              "label" : "A",
+              "name" : "A",
+              "x" : "0",
+              "y" : "b"
+            },
+            {
+              "label" : "",
+              "name" : "P",
+              "x" : "B.x",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "Q",
+              "x" : "0",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "R",
+              "x" : "-b",
+              "y" : "A.y"
+            },
+            {
+              "label" : "",
+              "name" : "S",
+              "x" : "-b",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "T",
+              "x" : "B.x + A.y",
+              "y" : "B.x"
+            },
+            {
+              "label" : "",
+              "name" : "U",
+              "x" : "A.y",
+              "y" : "A.y + B.x"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$a^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "B",
+                "P",
+                "Q"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$b^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "A",
+                "R",
+                "S"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "square",
+              "label" : "$c^2$",
+              "over" : "",
+              "points" : [
+                "B",
+                "A",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "rightAngle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "B",
+                "C",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "c = {c}",
+              "over" : "",
+              "points" : [
+                "B",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "arc",
+              "label" : "θ",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "1",
+              "to" : "atan2(b, a) * 180 / pi",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "angle",
+              "label" : "β",
+              "over" : "",
+              "points" : [
+                "A",
+                "B",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Side a",
+          "max" : 8,
+          "min" : 1,
+          "name" : "a",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "a",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 4,
+          "label" : "Side b",
+          "max" : 8,
+          "min" : 1,
+          "name" : "b",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "b",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "sqrt(a^2 + b^2)",
+          "label" : "Hypotenuse",
+          "name" : "c",
+          "symbol" : "c",
+          "unit" : ""
+        }
+      ],
+      "question" : "How does the long side change with the other two?",
+      "reference" : {
+        "extract" : "In mathematics, the Pythagorean theorem is a fundamental relation in Euclidean geometry between the three sides of a right triangle.",
+        "imageURL" : "https://upload.wikimedia.org/pythagoras.png",
+        "title" : "Pythagorean theorem",
+        "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+      },
+      "related" : [
+        "Euclid",
+        "Right triangle",
+        "Pythagorean triple"
+      ],
+      "summary" : "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+      "symbol" : "triangle",
+      "title" : "Pythagoras' theorem"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that wasn't read: en.wikipedia.org."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "triangel",
+          "text" : "",
+          "title" : "The squares on the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "c",
+          "text" : "c = \\sqrt{a^2 + b^2}",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "a",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "b",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "c",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The long side is {c} when the others are {a} and {b}.",
+          "title" : ""
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "triangle",
+          "points" : [
+            {
+              "label" : "C",
+              "name" : "C",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "B",
+              "name" : "B",
+              "x" : "a",
+              "y" : "0"
+            },
+            {
+              "label" : "A",
+              "name" : "A",
+              "x" : "0",
+              "y" : "b"
+            },
+            {
+              "label" : "again",
+              "name" : "A",
+              "x" : "1",
+              "y" : "1"
+            },
+            {
+              "label" : "",
+              "name" : "P",
+              "x" : "Bx",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "Q",
+              "x" : "0",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "R",
+              "x" : "-b",
+              "y" : "A.y"
+            },
+            {
+              "label" : "",
+              "name" : "S",
+              "x" : "-b",
+              "y" : ""
+            },
+            {
+              "label" : "",
+              "name" : "T",
+              "x" : "B_x + A.Y",
+              "y" : "B.x"
+            },
+            {
+              "label" : "",
+              "name" : "U",
+              "x" : "A.y",
+              "y" : "A.y + B.x"
+            },
+            {
+              "label" : "nowhere",
+              "name" : "Far",
+              "x" : "sqrt(-a)",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "Loop",
+              "x" : "Loop.x + 1",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "Bad",
+              "x" : "zebra",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "ABC"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$a^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "B",
+                "P",
+                "Q"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$b^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "A",
+                "R",
+                "S"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "square",
+              "label" : "$c^2$",
+              "over" : "",
+              "points" : [
+                "B",
+                "A",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "rightAngle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "B",
+                "C",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "c = {c} {nothing}",
+              "over" : "",
+              "points" : [
+                "B",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "broken",
+              "over" : "",
+              "points" : [
+                "B",
+                "Z"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "radius of it",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "c - 10",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "arc",
+              "label" : "θ",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "1",
+              "to" : "atan2(b, a) * 180 / pi",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "45",
+              "kind" : "arc",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "1",
+              "to" : "45",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "angle",
+              "label" : "β",
+              "over" : "",
+              "points" : [
+                "A",
+                "B",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "text",
+              "label" : "  ",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "arrow",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C",
+                "Far"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "angle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Side a",
+          "max" : 8,
+          "min" : 1,
+          "name" : "a",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "a",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 4,
+          "label" : "Side b",
+          "max" : 8,
+          "min" : 1,
+          "name" : "b",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "b",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "sqrt(a^2 + b^2)",
+          "label" : "Hypotenuse",
+          "name" : "c",
+          "symbol" : "c",
+          "unit" : ""
+        }
+      ],
+      "question" : "How does the long side change with the other two?",
+      "reference" : {
+        "extract" : "In mathematics, the Pythagorean theorem is a fundamental relation in Euclidean geometry between the three sides of a right triangle.",
+        "imageURL" : "https://upload.wikimedia.org/pythagoras.png",
+        "title" : "Pythagorean theorem",
+        "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+      },
+      "related" : [
+        "Euclid",
+        "Right triangle",
+        "Pythagorean triple"
+      ],
+      "summary" : "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+      "symbol" : "triangle",
+      "title" : "Pythagoras' theorem"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "figure",
+        "over" : "",
+        "ref" : "triangel",
+        "text" : "",
+        "title" : "The squares on the sides"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "c",
+        "text" : "c = \\sqrt{a^2 + b^2}",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "a",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "b",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Change the sides"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "c",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The long side is {c} when the others are {a} and {b}.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+      {
+        "name" : "triangle",
+        "points" : [
+          {
+            "label" : "C",
+            "name" : "C",
+            "x" : "0",
+            "y" : "0"
+          },
+          {
+            "label" : "B",
+            "name" : "B",
+            "x" : "a",
+            "y" : "0"
+          },
+          {
+            "label" : "A",
+            "name" : "A",
+            "x" : "0",
+            "y" : "b"
+          },
+          {
+            "label" : "again",
+            "name" : "A",
+            "x" : "1",
+            "y" : "1"
+          },
+          {
+            "label" : "",
+            "name" : "P",
+            "x" : "Bx",
+            "y" : "-a"
+          },
+          {
+            "label" : "",
+            "name" : "Q",
+            "x" : "0",
+            "y" : "-a"
+          },
+          {
+            "label" : "",
+            "name" : "R",
+            "x" : "-b",
+            "y" : "A.y"
+          },
+          {
+            "label" : "",
+            "name" : "S",
+            "x" : "-b",
+            "y" : ""
+          },
+          {
+            "label" : "",
+            "name" : "T",
+            "x" : "B_x + A.Y",
+            "y" : "B.x"
+          },
+          {
+            "label" : "",
+            "name" : "U",
+            "x" : "A.y",
+            "y" : "A.y + B.x"
+          },
+          {
+            "label" : "nowhere",
+            "name" : "Far",
+            "x" : "sqrt(-a)",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "Loop",
+            "x" : "Loop.x + 1",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "Bad",
+            "x" : "zebra",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "",
+            "over" : "",
+            "points" : "ABC",
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "$a^2$",
+            "over" : "",
+            "points" : "C, B, P, Q",
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "$b^2$",
+            "over" : "",
+            "points" : "C A R S",
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "square",
+            "label" : "$c^2$",
+            "over" : "",
+            "points" : "B, A, C",
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "rightAngle",
+            "label" : "",
+            "over" : "",
+            "points" : "B, C, A",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "c = {c} {nothing}",
+            "over" : "",
+            "points" : "B, A",
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "broken",
+            "over" : "",
+            "points" : "B, Z",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : "C",
+            "radius" : "radius of it",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : "C",
+            "radius" : "c - 10",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "0",
+            "kind" : "arc",
+            "label" : "θ",
+            "over" : "",
+            "points" : "C",
+            "radius" : "1",
+            "to" : "atan2(b, a) * 180 / pi",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "45",
+            "kind" : "arc",
+            "label" : "",
+            "over" : "",
+            "points" : "C",
+            "radius" : "1",
+            "to" : "45",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "angle",
+            "label" : "β",
+            "over" : "",
+            "points" : "A, B, C",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "text",
+            "label" : "  ",
+            "over" : "",
+            "points" : "C",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "arrow",
+            "label" : "",
+            "over" : "",
+            "points" : "C, Far",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "angle",
+            "label" : "",
+            "over" : "",
+            "points" : "A, B",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Side a",
+        "max" : 8,
+        "min" : 1,
+        "name" : "a",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "a",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 4,
+        "label" : "Side b",
+        "max" : 8,
+        "min" : 1,
+        "name" : "b",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "b",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "sqrt(a^2 + b^2)",
+        "label" : "Hypotenuse",
+        "name" : "c",
+        "symbol" : "c",
+        "unit" : ""
+      }
+    ],
+    "question" : "How does the long side change with the other two?",
+    "related" : [
+      "Euclid",
+      "Right triangle",
+      "Pythagorean triple"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+    "symbol" : "triangle",
+    "title" : "Pythagoras' theorem"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "figure",
+        "over" : "",
+        "ref" : "triangel",
+        "text" : "",
+        "title" : "The squares on the sides"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "c",
+        "text" : "c = \\sqrt{a^2 + b^2}",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-0",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "a",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "b",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Change the sides"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "c",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The long side is {c} when the others are {a} and {b}.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+      }
+    ],
+    "figures" : [
+      {
+        "name" : "triangle",
+        "points" : [
+          {
+            "label" : "C",
+            "name" : "C",
+            "x" : "0",
+            "y" : "0"
+          },
+          {
+            "label" : "B",
+            "name" : "B",
+            "x" : "a",
+            "y" : "0"
+          },
+          {
+            "label" : "A",
+            "name" : "A",
+            "x" : "0",
+            "y" : "b"
+          },
+          {
+            "label" : "again",
+            "name" : "A",
+            "x" : "1",
+            "y" : "1"
+          },
+          {
+            "label" : "",
+            "name" : "P",
+            "x" : "Bx",
+            "y" : "-a"
+          },
+          {
+            "label" : "",
+            "name" : "Q",
+            "x" : "0",
+            "y" : "-a"
+          },
+          {
+            "label" : "",
+            "name" : "R",
+            "x" : "-b",
+            "y" : "A.y"
+          },
+          {
+            "label" : "",
+            "name" : "S",
+            "x" : "-b",
+            "y" : ""
+          },
+          {
+            "label" : "",
+            "name" : "T",
+            "x" : "B_x + A.Y",
+            "y" : "B.x"
+          },
+          {
+            "label" : "",
+            "name" : "U",
+            "x" : "A.y",
+            "y" : "A.y + B.x"
+          },
+          {
+            "label" : "nowhere",
+            "name" : "Far",
+            "x" : "sqrt(-a)",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "Loop",
+            "x" : "Loop.x + 1",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "Bad",
+            "x" : "zebra",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "ABC"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "$a^2$",
+            "over" : "",
+            "points" : [
+              "C",
+              "B",
+              "P",
+              "Q"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "polygon",
+            "label" : "$b^2$",
+            "over" : "",
+            "points" : [
+              "C",
+              "A",
+              "R",
+              "S"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "square",
+            "label" : "$c^2$",
+            "over" : "",
+            "points" : [
+              "B",
+              "A",
+              "C"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "rightAngle",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "B",
+              "C",
+              "A"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "c = {c} {nothing}",
+            "over" : "",
+            "points" : [
+              "B",
+              "A"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "main",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "broken",
+            "over" : "",
+            "points" : [
+              "B",
+              "Z"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "C"
+            ],
+            "radius" : "radius of it",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "C"
+            ],
+            "radius" : "c - 10",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "0",
+            "kind" : "arc",
+            "label" : "θ",
+            "over" : "",
+            "points" : [
+              "C"
+            ],
+            "radius" : "1",
+            "to" : "atan2(b, a) * 180 / pi",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "45",
+            "kind" : "arc",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "C"
+            ],
+            "radius" : "1",
+            "to" : "45",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "angle",
+            "label" : "β",
+            "over" : "",
+            "points" : [
+              "A",
+              "B",
+              "C"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "text",
+            "label" : "  ",
+            "over" : "",
+            "points" : [
+              "C"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "arrow",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "C",
+              "Far"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "angle",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "A",
+              "B"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Side a",
+        "max" : 8,
+        "min" : 1,
+        "name" : "a",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "a",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 4,
+        "label" : "Side b",
+        "max" : 8,
+        "min" : 1,
+        "name" : "b",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "b",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "sqrt(a^2 + b^2)",
+        "label" : "Hypotenuse",
+        "name" : "c",
+        "symbol" : "c",
+        "unit" : ""
+      }
+    ],
+    "question" : "How does the long side change with the other two?",
+    "reference" : {
+      "extract" : "In mathematics, the Pythagorean theorem is a fundamental relation in Euclidean geometry between the three sides of a right triangle.",
+      "imageURL" : "https://upload.wikimedia.org/pythagoras.png",
+      "title" : "Pythagorean theorem",
+      "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+    },
+    "related" : [
+      "Euclid",
+      "Right triangle",
+      "Pythagorean triple"
+    ],
+    "summary" : "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+    "symbol" : "triangle",
+    "title" : "Pythagoras' theorem"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- a: \"Side a\", number, starts at 3, 1 to 8, step 0.1, written a\n- b: \"Side b\", number, starts at 4, 1 to 8, step 0.1, written b\nOutputs:\n- c: \"Hypotenuse\", number, written c = sqrt(a^2 + b^2)",
+    "outline" : "Pythagoras' theorem: The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.\n- figure #block-0 ref triangel \"The squares on the sides\"\n- equation #block-1 ref c\n  c = \\sqrt{a^2 + b^2}\n- section #block-2 \"Change the sides\"\n  - slider #block-2-0 ref a\n  - slider #block-2-1 ref b\n- hero #block-3 ref c\n- paragraph #block-4\n  The long side is {c} when the others are {a} and {b}.\nfigure triangle:\n  point C = (0, 0) \"C\"\n  point B = (a, 0) \"B\"\n  point A = (0, b) \"A\"\n  point A = (1, 1) \"again\"\n  point P = (Bx, -a)\n  point Q = (0, -a)\n  point R = (-b, A.y)\n  point S = (-b, )\n  point T = (B_x + A.Y, B.x)\n  point U = (A.y, A.y + B.x)\n  point Far = (sqrt(-a), 0) \"nowhere\"\n  point Loop = (Loop.x + 1, 0)\n  point Bad = (zebra, 0)\n  polygon ABC main\n  polygon C, B, P, Q \"$a^2$\" contrast\n  polygon C, A, R, S \"$b^2$\" contrast\n  square B, A, C \"$c^2$\" main\n  rightAngle B, C, A plain\n  segment B, A \"c = {c} {nothing}\" main\n  segment B, Z \"broken\" plain\n  circle C radius radius of it plain\n  circle C radius c - 10 plain\n  arc C radius 1 from 0° to atan2(b, a) * 180 / pi° \"θ\" plain\n  arc C radius 1 from 45° to 45° plain\n  angle A, B, C \"β\" plain\n  text C \"  \" plain\n  arrow C, Far plain\n  angle A, B plain\nrelated: Euclid, Right triangle, Pythagorean triple\ncitations (pages already read; list again the ones the screen still uses): https://en.wikipedia.org/wiki/Pythagorean_theorem"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- a: \"Side a\", number, starts at 3, 1 to 8, step 0.1, written a\n- b: \"Side b\", number, starts at 4, 1 to 8, step 0.1, written b\nOutputs:\n- c: \"Hypotenuse\", number, written c = sqrt(a^2 + b^2)",
+    "outline" : "Pythagoras' theorem: The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.\n- figure #block-0 ref triangle \"The squares on the sides\"\n- equation #block-1 ref c\n- section #block-2 \"Change the sides\"\n  - slider #block-2-0 ref a\n  - slider #block-2-1 ref b\n- hero #block-3 ref c\n- paragraph #block-4\n  The long side is {c} when the others are {a} and {b}.\nfigure triangle:\n  point C = (0, 0) \"C\"\n  point B = (a, 0) \"B\"\n  point A = (0, b) \"A\"\n  point P = (B.x, -a)\n  point Q = (0, -a)\n  point R = (-b, A.y)\n  point S = (-b, 0)\n  point T = (B.x + A.y, B.x)\n  point U = (A.y, A.y + B.x)\n  polygon A, B, C main\n  polygon C, B, P, Q \"$a^2$\" contrast\n  polygon C, A, R, S \"$b^2$\" contrast\n  square B, A, C \"$c^2$\" main\n  rightAngle B, C, A plain\n  segment B, A \"c = {c}\" main\n  arc C radius 1 from 0° to atan2(b, a) * 180 / pi° \"θ\" plain\n  angle A, B, C \"β\" plain\nrelated: Euclid, Right triangle, Pythagorean triple"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "triangel",
+          "text" : "",
+          "title" : "The squares on the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "c",
+          "text" : "c = \\sqrt{a^2 + b^2}",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "a",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "b",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change the sides"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "c",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The long side is {c} when the others are {a} and {b}.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "triangle",
+          "points" : [
+            {
+              "label" : "C",
+              "name" : "C",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "B",
+              "name" : "B",
+              "x" : "a",
+              "y" : "0"
+            },
+            {
+              "label" : "A",
+              "name" : "A",
+              "x" : "0",
+              "y" : "b"
+            },
+            {
+              "label" : "again",
+              "name" : "A",
+              "x" : "1",
+              "y" : "1"
+            },
+            {
+              "label" : "",
+              "name" : "P",
+              "x" : "Bx",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "Q",
+              "x" : "0",
+              "y" : "-a"
+            },
+            {
+              "label" : "",
+              "name" : "R",
+              "x" : "-b",
+              "y" : "A.y"
+            },
+            {
+              "label" : "",
+              "name" : "S",
+              "x" : "-b",
+              "y" : ""
+            },
+            {
+              "label" : "",
+              "name" : "T",
+              "x" : "B_x + A.Y",
+              "y" : "B.x"
+            },
+            {
+              "label" : "",
+              "name" : "U",
+              "x" : "A.y",
+              "y" : "A.y + B.x"
+            },
+            {
+              "label" : "nowhere",
+              "name" : "Far",
+              "x" : "sqrt(-a)",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "Loop",
+              "x" : "Loop.x + 1",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "Bad",
+              "x" : "zebra",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "ABC"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$a^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "B",
+                "P",
+                "Q"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "polygon",
+              "label" : "$b^2$",
+              "over" : "",
+              "points" : [
+                "C",
+                "A",
+                "R",
+                "S"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "square",
+              "label" : "$c^2$",
+              "over" : "",
+              "points" : [
+                "B",
+                "A",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "rightAngle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "B",
+                "C",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "c = {c} {nothing}",
+              "over" : "",
+              "points" : [
+                "B",
+                "A"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "main",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "broken",
+              "over" : "",
+              "points" : [
+                "B",
+                "Z"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "radius of it",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "c - 10",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "arc",
+              "label" : "θ",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "1",
+              "to" : "atan2(b, a) * 180 / pi",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "45",
+              "kind" : "arc",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "1",
+              "to" : "45",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "angle",
+              "label" : "β",
+              "over" : "",
+              "points" : [
+                "A",
+                "B",
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "text",
+              "label" : "  ",
+              "over" : "",
+              "points" : [
+                "C"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "arrow",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "C",
+                "Far"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "angle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Side a",
+          "max" : 8,
+          "min" : 1,
+          "name" : "a",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "a",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 4,
+          "label" : "Side b",
+          "max" : 8,
+          "min" : 1,
+          "name" : "b",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "b",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "sqrt(a^2 + b^2)",
+          "label" : "Hypotenuse",
+          "name" : "c",
+          "symbol" : "c",
+          "unit" : ""
+        }
+      ],
+      "question" : "How does the long side change with the other two?",
+      "reference" : {
+        "extract" : "In mathematics, the Pythagorean theorem is a fundamental relation in Euclidean geometry between the three sides of a right triangle.",
+        "imageURL" : "https://upload.wikimedia.org/pythagoras.png",
+        "title" : "Pythagorean theorem",
+        "url" : "https://en.wikipedia.org/wiki/Pythagorean_theorem"
+      },
+      "related" : [
+        "Euclid",
+        "Right triangle",
+        "Pythagorean triple"
+      ],
+      "summary" : "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+      "symbol" : "triangle",
+      "title" : "Pythagoras' theorem"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

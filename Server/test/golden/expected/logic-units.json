@@ -1,0 +1,1601 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'distance', 'speed', 'speedTwo', 'tip', 'bill', 'price', 'time', 'accel', 'mass', 'temperature', 'angle', 'weird', 'share'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "energy",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "distance-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "distance",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "speed-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "speedTwo-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speedTwo",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "tip-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tip",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "bill-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "price-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "price",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "time-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "time",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "accel-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "accel",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "mass-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "mass",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "temperature-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "temperature",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "angle-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "angle",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "weird-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "weird",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "share-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "share",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 10,
+          "label" : "Distance",
+          "max" : 100,
+          "min" : 0,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed [m/s]",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "meters per second"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speedTwo",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 5,
+          "label" : "Price",
+          "max" : 50,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "time",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8000000000000007,
+          "label" : "Acceleration",
+          "max" : 20,
+          "min" : 0,
+          "name" : "accel",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 0,
+          "name" : "mass",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "kg"
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Temperature",
+          "max" : 40,
+          "min" : 0,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 90,
+          "min" : 0,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°"
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count (widgets)",
+          "max" : 10,
+          "min" : 0,
+          "name" : "weird",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : "EUR"
+        },
+        {
+          "format" : "number",
+          "formula" : "mass * accel",
+          "label" : "Energy",
+          "name" : "energy",
+          "symbol" : "",
+          "unit" : "kWh"
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Units"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "energy",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 10,
+          "label" : "Distance",
+          "max" : 100,
+          "min" : 0,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed [m/s]",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "meters per second"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speedTwo",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 5,
+          "label" : "Price",
+          "max" : 50,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "time",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8000000000000007,
+          "label" : "Acceleration",
+          "max" : 20,
+          "min" : 0,
+          "name" : "accel",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 0,
+          "name" : "mass",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "kg"
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Temperature",
+          "max" : 40,
+          "min" : 0,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 90,
+          "min" : 0,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°"
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count (widgets)",
+          "max" : 10,
+          "min" : 0,
+          "name" : "weird",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : "EUR"
+        },
+        {
+          "format" : "number",
+          "formula" : "mass * accel",
+          "label" : "Energy",
+          "name" : "energy",
+          "symbol" : "",
+          "unit" : "kWh"
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Units"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "energy",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 10,
+        "label" : "Distance (km)",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Speed [m/s]",
+        "max" : 10,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "meters per second"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Speed (m/s)",
+        "max" : 10,
+        "min" : 0,
+        "name" : "speedTwo",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip (%)",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      },
+      {
+        "format" : "currency",
+        "initial" : 50,
+        "label" : "Bill ($)",
+        "max" : 500,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 5,
+        "label" : "Price (USD)",
+        "max" : 50,
+        "min" : 0,
+        "name" : "price",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Time",
+        "max" : 10,
+        "min" : 0,
+        "name" : "time",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "seconds"
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8000000000000007,
+        "label" : "Acceleration",
+        "max" : 20,
+        "min" : 0,
+        "name" : "accel",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s^2"
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Mass",
+        "max" : 10,
+        "min" : 0,
+        "name" : "mass",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "\\mathrm{kg}"
+      },
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Temperature (°C)",
+        "max" : 40,
+        "min" : 0,
+        "name" : "temperature",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 45,
+        "label" : "Angle",
+        "max" : 90,
+        "min" : 0,
+        "name" : "angle",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "^\\circ"
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "Count (widgets)",
+        "max" : 10,
+        "min" : 0,
+        "name" : "weird",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 50,
+        "label" : "Share",
+        "max" : 100,
+        "min" : 0,
+        "name" : "share",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "percent"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share",
+        "label" : "Total (EUR)",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : "eur"
+      },
+      {
+        "format" : "number",
+        "formula" : "mass * accel",
+        "label" : "Energy (kWh)",
+        "name" : "energy",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Units"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "energy",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 10,
+        "label" : "Distance (km)",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Speed [m/s]",
+        "max" : 10,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "meters per second"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Speed (m/s)",
+        "max" : 10,
+        "min" : 0,
+        "name" : "speedTwo",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip (%)",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      },
+      {
+        "format" : "currency",
+        "initial" : 50,
+        "label" : "Bill ($)",
+        "max" : 500,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 5,
+        "label" : "Price (USD)",
+        "max" : 50,
+        "min" : 0,
+        "name" : "price",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Time",
+        "max" : 10,
+        "min" : 0,
+        "name" : "time",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "seconds"
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8000000000000007,
+        "label" : "Acceleration",
+        "max" : 20,
+        "min" : 0,
+        "name" : "accel",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s^2"
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Mass",
+        "max" : 10,
+        "min" : 0,
+        "name" : "mass",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "\\mathrm{kg}"
+      },
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Temperature (°C)",
+        "max" : 40,
+        "min" : 0,
+        "name" : "temperature",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 45,
+        "label" : "Angle",
+        "max" : 90,
+        "min" : 0,
+        "name" : "angle",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "^\\circ"
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "Count (widgets)",
+        "max" : 10,
+        "min" : 0,
+        "name" : "weird",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 50,
+        "label" : "Share",
+        "max" : 100,
+        "min" : 0,
+        "name" : "share",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "percent"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share",
+        "label" : "Total (EUR)",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : "eur"
+      },
+      {
+        "format" : "number",
+        "formula" : "mass * accel",
+        "label" : "Energy (kWh)",
+        "name" : "energy",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Units"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- distance: \"Distance (km)\", number, starts at 10, 0 to 100, step 1\n- speed: \"Speed [m/s]\", number, starts at 3, 0 to 10, step 1, in meters per second\n- speedTwo: \"Speed (m/s)\", number, starts at 3, 0 to 10, step 1, in m/s\n- tip: \"Tip (%)\", percent, starts at 10, 0 to 30, step 1, in %\n- bill: \"Bill ($)\", currency, starts at 50, 0 to 500, step 1\n- price: \"Price (USD)\", currency, starts at 5, 0 to 50, step 1\n- time: \"Time\", number, starts at 2, 0 to 10, step 1, in seconds\n- accel: \"Acceleration\", number, starts at 9.8, 0 to 20, step 1, in m/s^2\n- mass: \"Mass\", number, starts at 2, 0 to 10, step 1, in \\mathrm{kg}\n- temperature: \"Temperature (°C)\", number, starts at 20, 0 to 40, step 1\n- angle: \"Angle\", number, starts at 45, 0 to 90, step 1, in ^\\circ\n- weird: \"Count (widgets)\", integer, starts at 3, 0 to 10, step 1\n- share: \"Share\", percent, starts at 50, 0 to 100, step 1, in percent\nOutputs:\n- total: \"Total (EUR)\", currency, in eur = distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share\n- energy: \"Energy (kWh)\", number = mass * accel",
+    "outline" : "Units: \n- hero #block-0 ref total\n- metric #block-1 ref energy\n- section #auto-inputs\n  - slider #auto-input-0 ref distance\n  - slider #auto-input-1 ref speed\n  - slider #auto-input-2 ref speedTwo\n  - slider #auto-input-3 ref tip\n  - slider #auto-input-4 ref bill\n  - slider #auto-input-5 ref price\n  - slider #auto-input-6 ref time\n  - slider #auto-input-7 ref accel\n  - slider #auto-input-8 ref mass\n  - slider #auto-input-9 ref temperature\n  - slider #auto-input-10 ref angle\n  - stepper #auto-input-11 ref weird\n  - slider #auto-input-12 ref share"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- distance: \"Distance\", number, starts at 10, 0 to 100, step 1, in km\n- speed: \"Speed [m/s]\", number, starts at 3, 0 to 10, step 1, in meters per second\n- speedTwo: \"Speed\", number, starts at 3, 0 to 10, step 1, in m/s\n- tip: \"Tip\", percent, starts at 10, 0 to 30, step 1\n- bill: \"Bill\", currency, starts at 50, 0 to 500, step 1\n- price: \"Price\", currency, starts at 5, 0 to 50, step 1, in USD\n- time: \"Time\", number, starts at 2, 0 to 10, step 1, in s\n- accel: \"Acceleration\", number, starts at 9.8, 0 to 20, step 1, in m/s²\n- mass: \"Mass\", number, starts at 2, 0 to 10, step 1, in kg\n- temperature: \"Temperature\", number, starts at 20, 0 to 40, step 1, in °C\n- angle: \"Angle\", number, starts at 45, 0 to 90, step 1, in °\n- weird: \"Count (widgets)\", integer, starts at 3, 0 to 10, step 1\n- share: \"Share\", percent, starts at 50, 0 to 100, step 1\nOutputs:\n- total: \"Total\", currency, in EUR = distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share\n- energy: \"Energy\", number, in kWh = mass * accel",
+    "outline" : "Units: \n- hero #block-0 ref total\n- metric #block-1 ref energy\n- section #more-inputs\n  - slider #distance-control ref distance\n  - slider #speed-control ref speed\n  - slider #speedTwo-control ref speedTwo\n  - slider #tip-control ref tip\n  - slider #bill-control ref bill\n  - slider #price-control ref price\n  - slider #time-control ref time\n  - slider #accel-control ref accel\n  - slider #mass-control ref mass\n  - slider #temperature-control ref temperature\n  - slider #angle-control ref angle\n  - stepper #weird-control ref weird\n  - slider #share-control ref share"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'distance', 'speedTwo', 'tip', 'bill', 'price', 'time', 'accel', 'mass', 'temperature', 'angle', 'share', 'total', 'energy'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "energy",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 10,
+          "label" : "Distance",
+          "max" : 100,
+          "min" : 0,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed [m/s]",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "meters per second"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Speed",
+          "max" : 10,
+          "min" : 0,
+          "name" : "speedTwo",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 5,
+          "label" : "Price",
+          "max" : 50,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "time",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8000000000000007,
+          "label" : "Acceleration",
+          "max" : 20,
+          "min" : 0,
+          "name" : "accel",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 0,
+          "name" : "mass",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "kg"
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Temperature",
+          "max" : 40,
+          "min" : 0,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 90,
+          "min" : 0,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°"
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count (widgets)",
+          "max" : 10,
+          "min" : 0,
+          "name" : "weird",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : "EUR"
+        },
+        {
+          "format" : "number",
+          "formula" : "mass * accel",
+          "label" : "Energy",
+          "name" : "energy",
+          "symbol" : "",
+          "unit" : "kWh"
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Units"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

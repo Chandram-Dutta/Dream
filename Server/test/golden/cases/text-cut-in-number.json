@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off in an input's maximum: the number is read as far as it goes, the rest of the input isn't there, and the calculation is checked as it stands.",
+  "text": "{\"subject\": \"money\", \"mode\": \"use\", \"title\": \"Tip\", \"summary\": \"A 15% tip\", \"symbol\": \"percent\", \"collections\": [], \"question\": \"How much tip?\", \"inputs\": [{\"name\": \"bill\", \"label\": \"Bill\", \"role\": \"adjustable\", \"source\": \"\", \"symbol\": \"\", \"unit\": \"\", \"format\": \"currency\", \"initial\": 64.5, \"min\": 0, \"max\": 1000, \"step\": 1, \"options\": []}, {\"name\": \"tip\", \"label\": \"Tip\", \"role\": \"adjustable\", \"format\": \"percent\", \"initial\": 15, \"min\": 0, \"max\": 3"
+}

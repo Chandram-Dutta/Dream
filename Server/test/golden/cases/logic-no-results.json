@@ -1,0 +1,9 @@
+{
+  "about": "A calculation with inputs and no results goes back to the model.",
+  "fill": true,
+  "wire": {
+    "title": "Inputs only",
+    "inputs": [{"name": "age", "label": "Age", "format": "integer", "initial": 30, "max": 100}],
+    "blocks": [{"kind": "slider", "ref": "age"}]
+  }
+}

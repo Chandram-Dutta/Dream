@@ -54,6 +54,48 @@ func facts(_ surface: Surface) -> [String: Any] {
      "outline": surface.outline, "logicSummary": surface.logicSummary]
 }
 
+// MARK: - Filling in
+
+/// What every property of an answer is when a case leaves it out (`"fill": true`), so a case only
+/// writes what it's about and is still read as a whole answer. The filled answer is written out as
+/// `content`, which is what the server's test reads.
+let defaults: [String: [String: Any]] = [
+    "surface": ["subject": "home", "mode": "use", "title": "", "summary": "", "symbol": "", "collections": [], "question": "", "inputs": [], "outputs": [],
+                "sounds": [], "figures": [], "diagrams": [], "actions": [], "scenes": [], "blocks": [], "related": [], "citations": []],
+    "inputs": ["name": "", "label": "", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "number", "initial": 0, "min": 0, "max": 100, "step": 1, "options": []],
+    "outputs": ["name": "", "label": "", "symbol": "", "unit": "", "formula": "", "format": "number"],
+    "blocks": ["kind": "paragraph", "title": "", "text": "", "ref": "", "over": "", "items": [], "children": []],
+    "items": ["label": "", "value": ""],
+    "collections": ["name": "", "label": "", "entry": "", "fields": [], "starters": [], "source": ""],
+    "fields": ["name": "", "label": "", "type": "text", "options": []],
+    "starters": ["values": []],
+    "sounds": ["name": "", "label": "", "kind": "tones", "tones": [], "search": ""],
+    "tones": ["frequency": "", "amplitude": "", "waveform": "sine"],
+    "figures": ["name": "", "points": [], "shapes": []],
+    "points": ["name": "", "x": "", "y": "", "label": ""],
+    "shapes": ["kind": "segment", "points": "", "radius": "", "from": "", "to": "", "over": "", "x": "", "y": "", "label": "", "tone": "plain"],
+    "diagrams": ["name": "", "shape": "flow", "nodes": [], "edges": []],
+    "nodes": ["id": "", "label": "", "detail": ""],
+    "edges": ["from": "", "to": "", "label": ""],
+    "actions": ["name": "", "kind": "calendarEvent", "title": "", "day": "", "time": "", "duration": "", "place": "", "from": "", "travel": "driving", "notes": ""],
+    "scenes": ["name": "", "molecule": "", "objects": [], "plots": [], "time": ""],
+    "objects": ["name": "", "kind": "sphere", "position": "", "to": "", "size": "", "turn": "", "tilt": "", "label": "", "tone": "plain"],
+    "plots": ["z": "", "xFrom": "", "xTo": "", "yFrom": "", "yTo": "", "label": ""],
+]
+
+/// An answer with every property it leaves out filled in; lists of things are filled by what they hold.
+func filled(_ value: Any, as kind: String) -> Any {
+    guard var object = value as? [String: Any] else { return value }
+    for (key, fallback) in defaults[kind] ?? [:] where object[key] == nil { object[key] = fallback }
+    for (key, inner) in object {
+        guard let list = inner as? [Any], defaults[key] != nil else { continue }
+        object[key] = list.map { filled($0, as: key == "children" ? "blocks" : key) }
+    }
+    // A block's children are blocks, and figures' and scenes' lists are named for what they hold.
+    if let children = object["children"] as? [Any] { object["children"] = children.map { filled($0, as: "blocks") } }
+    return object
+}
+
 /// One page the model read, with every address it can be cited by.
 struct ReadPage: Decodable {
     var title: String
@@ -76,7 +118,8 @@ func run(_ input: [String: Any]) throws -> [String: Any] {
         }
         content = parsed
     } else {
-        let data = try JSONSerialization.data(withJSONObject: input["wire"] ?? [:], options: [.fragmentsAllowed])
+        let wire = input["fill"] as? Bool == true ? filled(input["wire"] ?? [:], as: "surface") : input["wire"] ?? [:]
+        let data = try JSONSerialization.data(withJSONObject: wire, options: [.fragmentsAllowed])
         content = try GeneratedContent(json: String(decoding: data, as: UTF8.self))
     }
     let whole = try? WireSurface(content)

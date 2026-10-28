@@ -1,0 +1,8 @@
+{
+  "about": "An answer missing its related topics and citations, the last things a model writes: not whole, so it's read as cut short; its mode and subject are still read.",
+  "wire": {
+    "subject": "health", "mode": "learn", "title": "Sleep", "summary": "Adults need 7 to 9 hours.", "symbol": "bed.double",
+    "collections": [], "question": "", "inputs": [], "outputs": [], "sounds": [], "figures": [], "diagrams": [], "actions": [], "scenes": [],
+    "blocks": [{"kind": "paragraph", "title": "", "text": "Sleep clears the brain.", "ref": "", "over": "", "items": [], "children": []}]
+  }
+}

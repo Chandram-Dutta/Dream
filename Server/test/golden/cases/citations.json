@@ -1,0 +1,40 @@
+{
+  "about": "Sources checked against what was read: a page cited by another of its addresses (where it ended up, or written with www., a fragment, a trailing slash or capitals), one named twice, the reference article (not credited twice), one never read (dropped, by its host), one that isn't a web address, one with a user in it, ftp, a page whose site and title are blank (its host and site stand in), a date that isn't a day (dropped), and more than eight (the first eight kept).",
+  "fill": true,
+  "reference": {"title": "Hampi", "extract": "Hampi is a UNESCO World Heritage Site in Karnataka.", "url": "https://en.wikipedia.org/wiki/Hampi"},
+  "read": [
+    {"title": "  Hampi travel guide  ", "site": "Lonely Planet", "url": "https://www.lonelyplanet.com/india/karnataka/hampi", "date": "2025-03-14", "addresses": ["https://lonelyplanet.com/hampi-guide", "http://LonelyPlanet.com/india/karnataka/hampi/#top"]},
+    {"title": "", "site": "  ", "url": "https://www.karnatakatourism.org/hampi/", "date": "March 2025"},
+    {"title": "Getting there", "site": "Indian Railways", "url": "https://indianrail.gov.in/hampi?from=bangalore&to=hospet", "date": "2024-1-5"},
+    {"title": "A", "site": "a", "url": "https://a.example.com/1"},
+    {"title": "B", "site": "b", "url": "https://b.example.com/2"},
+    {"title": "C", "site": "c", "url": "https://c.example.com/3"},
+    {"title": "D", "site": "d", "url": "https://d.example.com/4"},
+    {"title": "E", "site": "e", "url": "https://e.example.com/5"},
+    {"title": "F", "site": "f", "url": "https://f.example.com/6"},
+    {"title": "Hampi", "site": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Hampi"}
+  ],
+  "wire": {
+    "title": "Hampi",
+    "subject": "places",
+    "mode": "read",
+    "blocks": [{"kind": "paragraph", "text": "Ruins of the Vijayanagara empire."}],
+    "citations": [
+      "https://lonelyplanet.com/hampi-guide",
+      "  https://www.lonelyplanet.com/india/karnataka/hampi#history  ",
+      "https://en.wikipedia.org/wiki/Hampi",
+      "https://www.hampi-tours.example/never-read",
+      "lonelyplanet.com/hampi",
+      "https://user:pass@karnatakatourism.org/hampi",
+      "ftp://karnatakatourism.org/hampi",
+      "HTTPS://WWW.KARNATAKATOURISM.ORG/hampi",
+      "https://indianrail.gov.in/hampi?from=bangalore&to=hospet",
+      "https://a.example.com/1",
+      "https://b.example.com/2/",
+      "https://c.example.com/3",
+      "https://d.example.com/4",
+      "https://e.example.com/5",
+      "https://f.example.com/6"
+    ]
+  }
+}

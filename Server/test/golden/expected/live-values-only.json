@@ -1,0 +1,788 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the source 'unused', which nothing shows."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "'high' is live, so it's shown instead of edited."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed units written after the live values of 'high', which show their own."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "rain",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "high",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It'll be {high} at most, with a {rain} chance of rain.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "Rain",
+              "value" : "{rain}"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 40,
+          "label" : "Rain",
+          "max" : 40,
+          "min" : 40,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 87.799999999995549,
+          "label" : "High",
+          "max" : 87.799999999995549,
+          "min" : 87.799999999995549,
+          "name" : "high",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        }
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "the high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 31
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "tomorrow",
+            "place" : "here"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tomorrow"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "rain",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "high",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It'll be {high} °F at most, with a {rain} chance of rain.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "Rain",
+              "value" : "{rain}"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 40,
+          "label" : "Rain",
+          "max" : 40,
+          "min" : 40,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 87.799999999995549,
+          "label" : "High",
+          "max" : 87.799999999995549,
+          "min" : 87.799999999995549,
+          "name" : "high",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        }
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "the high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 31
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "tomorrow",
+            "place" : "here"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "",
+              "name" : "rate",
+              "unit" : "",
+              "value" : 90
+            }
+          ],
+          "kind" : "exchangeRate",
+          "name" : "unused",
+          "parameters" : {
+            "from" : "EUR",
+            "to" : "INR"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tomorrow"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "rain",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "high",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It'll be {high} °F at most, with a {rain} chance of rain.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "Rain",
+            "value" : "{rain}"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "High (°F)",
+        "max" : 100,
+        "min" : 0,
+        "name" : "high",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.high",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "°F"
+      }
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "places",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Tomorrow"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-0",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "rain",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "high",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It'll be {high} °F at most, with a {rain} chance of rain.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+          {
+            "label" : "Rain",
+            "value" : "{rain}"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "High (°F)",
+        "max" : 100,
+        "min" : 0,
+        "name" : "high",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.high",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "°F"
+      }
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Tomorrow"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Rain\", live number from weather.rainChance, now 0\n- high: \"High (°F)\", live number from weather.high, now 0, in °F\nOutputs:",
+    "outline" : "Tomorrow: \n- row #block-0\n  - metric #block-0-0 ref rain\n  - slider #block-0-1 ref high\n- paragraph #block-1\n  It'll be {high} °F at most, with a {rain} chance of rain.\n- facts #block-2\n  • Rain: {rain}"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Rain\", live percent from weather.rainChance, now 40\n- high: \"High\", live number from weather.high, now 87.79999999999555, in °F\nOutputs:",
+    "outline" : "Tomorrow: \n- row #block-0\n  - metric #block-0-0 ref rain\n  - metric #block-0-1 ref high\n- paragraph #block-1\n  It'll be {high} at most, with a {rain} chance of rain.\n- facts #block-2\n  • Rain: {rain}\nsources (fetched with the live tool; fetch again to change one):\n- weather: weather, day tomorrow, place here; fields weather.rainChance, weather.high"
+  },
+  "locale" : "en_IN",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'high'."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "rain",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "high",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It'll be {high} °F at most, with a {rain} chance of rain.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "Rain",
+              "value" : "{rain}"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 40,
+          "label" : "Rain",
+          "max" : 40,
+          "min" : 40,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 87.799999999995549,
+          "label" : "High",
+          "max" : 87.799999999995549,
+          "min" : 87.799999999995549,
+          "name" : "high",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        }
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "the high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 31
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "tomorrow",
+            "place" : "here"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "",
+              "name" : "rate",
+              "unit" : "",
+              "value" : 90
+            }
+          ],
+          "kind" : "exchangeRate",
+          "name" : "unused",
+          "parameters" : {
+            "from" : "EUR",
+            "to" : "INR"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tomorrow"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

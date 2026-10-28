@@ -1,0 +1,1262 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the figure 'bar', which had nothing that could be drawn."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the diagram 'flow', dropped an edge from 'a' to 'b', which aren't both parts."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the diagram 'flow', which needs at least two parts."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'coins', dropped the molecule 'gold': PubChem has no 3D structure for it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave a tone of 'ding' a moderate loudness."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the sound 'rec': no recording was found for \"bell\"."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'coins'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'payments'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a button for 'remind'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'rate', 'years'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'ding'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "title" : "Pay EMI"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "payments-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "payments",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "payments-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "payments",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "scene-coins",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "coins",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "principal",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "remind-action",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "remind",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "rate-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "years-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "years",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "ding-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "ding",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "payment",
+          "fields" : [
+            {
+              "label" : "Amount",
+              "name" : "amount",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Payments",
+          "name" : "payments",
+          "starters" : [
+            {
+              "amount" : 500
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 500000,
+          "label" : "Loan",
+          "max" : 1000000,
+          "min" : 0,
+          "name" : "principal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -2,
+          "label" : "Rate",
+          "max" : -1,
+          "min" : -2,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Years",
+          "max" : 40,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "",
+          "label" : "Emi",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "Home loans"
+      ],
+      "scenes" : [
+        {
+          "name" : "coins",
+          "objects" : [
+            {
+              "kind" : "cylinder",
+              "label" : "",
+              "name" : "coin",
+              "position" : "stack(ground, 5)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        }
+      ],
+      "sounds" : [
+        {
+          "label" : "Ding",
+          "name" : "ding",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "880",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "Your EMI",
+      "symbol" : "sparkles",
+      "title" : "EMI"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "title" : "Pay EMI"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "principal",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "payment",
+          "fields" : [
+            {
+              "label" : "Amount",
+              "name" : "amount",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Payments",
+          "name" : "payments",
+          "starters" : [
+            {
+              "amount" : 500
+            }
+          ]
+        }
+      ],
+      "diagrams" : [
+        {
+          "edges" : [
+            {
+              "from" : "a",
+              "label" : "",
+              "to" : "b"
+            }
+          ],
+          "name" : "flow",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "a",
+              "label" : "A"
+            }
+          ],
+          "shape" : "flow"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "bar",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "A",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 500000,
+          "label" : "Loan",
+          "max" : 1000000,
+          "min" : 0,
+          "name" : "principal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -2,
+          "label" : "Rate",
+          "max" : -1,
+          "min" : -2,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Years",
+          "max" : 40,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "",
+          "label" : "Emi",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "Home loans"
+      ],
+      "scenes" : [
+        {
+          "molecule" : {
+            "name" : " gold "
+          },
+          "name" : "coins",
+          "objects" : [
+            {
+              "kind" : "cylinder",
+              "label" : "",
+              "name" : "coin",
+              "position" : "stack(ground, 5)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        }
+      ],
+      "sounds" : [
+        {
+          "label" : "",
+          "name" : "ding",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "",
+              "frequency" : "880",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "",
+          "name" : "rec",
+          "search" : "bell",
+          "tones" : [
+
+          ]
+        }
+      ],
+      "summary" : "Your EMI",
+      "symbol" : "sparkles",
+      "title" : "EMI"
+    }
+  },
+  "content" : {
+    "actions" : [
+      {
+        "day" : "monday",
+        "kind" : "reminder",
+        "name" : "remind",
+        "title" : "Pay EMI"
+      },
+      {
+        "name" : "nokind"
+      }
+    ],
+    "blocks" : [
+      {
+        "kind" : "hero",
+        "ref" : "emi"
+      },
+      {
+        "kind" : "slider",
+        "ref" : "principal"
+      }
+    ],
+    "citations" : [
+      "https://example.com/emi"
+    ],
+    "collections" : [
+      {
+        "fields" : [
+          {
+            "name" : "amount",
+            "type" : "currency"
+          },
+          {
+            "label" : "no name yet"
+          }
+        ],
+        "name" : "payments",
+        "starters" : [
+          {
+            "values" : [
+              "₹500"
+            ]
+          },
+          {
+
+          }
+        ]
+      },
+      {
+        "label" : "no name"
+      }
+    ],
+    "diagrams" : [
+      {
+        "edges" : [
+          {
+            "from" : "a",
+            "to" : "b"
+          },
+          {
+            "from" : "a"
+          }
+        ],
+        "name" : "flow",
+        "nodes" : [
+          {
+            "id" : "a",
+            "label" : "A"
+          },
+          {
+            "id" : "b"
+          }
+        ]
+      }
+    ],
+    "figures" : [
+      {
+        "name" : "bar",
+        "points" : [
+          {
+            "name" : "A",
+            "x" : "0",
+            "y" : "0"
+          },
+          {
+            "name" : "B",
+            "x" : "1"
+          }
+        ],
+        "shapes" : [
+          {
+            "kind" : "segment",
+            "points" : "A,B"
+          },
+          {
+            "points" : "A"
+          }
+        ]
+      },
+      {
+        "points" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 500000,
+        "label" : "Loan",
+        "name" : "principal"
+      },
+      {
+        "initial" : -2,
+        "name" : "rate"
+      },
+      {
+        "label" : "Nameless"
+      },
+      {
+        "initial" : 3,
+        "name" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "Years",
+        "min" : 1,
+        "name" : "years"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "name" : "emi"
+      },
+      {
+        "label" : "no name"
+      }
+    ],
+    "question" : "",
+    "related" : [
+      "Home loans"
+    ],
+    "scenes" : [
+      {
+        "molecule" : " gold ",
+        "name" : "coins",
+        "objects" : [
+          {
+            "kind" : "cylinder",
+            "name" : "coin",
+            "position" : "stack(ground, 5)"
+          },
+          {
+            "kind" : "box",
+            "name" : "half"
+          }
+        ],
+        "plots" : [
+          {
+            "xFrom" : "-1",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "z" : "x * y"
+          }
+        ]
+      }
+    ],
+    "sounds" : [
+      {
+        "kind" : "tones",
+        "name" : "ding",
+        "tones" : [
+          {
+            "frequency" : "880"
+          },
+          {
+            "amplitude" : "0.2"
+          }
+        ]
+      },
+      {
+        "kind" : "recording",
+        "name" : "rec",
+        "search" : "bell"
+      },
+      {
+        "label" : "nameless"
+      }
+    ],
+    "subject" : "money",
+    "summary" : "Your EMI",
+    "title" : "EMI"
+  },
+  "converted" : {
+    "accent" : "green",
+    "actions" : [
+      {
+        "fields" : {
+          "day" : "monday",
+          "title" : "Pay EMI"
+        },
+        "kind" : "reminder",
+        "name" : "remind"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "slider",
+        "over" : "",
+        "ref" : "principal",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "",
+            "name" : "amount",
+            "options" : [
+
+            ],
+            "type" : "currency"
+          }
+        ],
+        "label" : "",
+        "name" : "payments",
+        "starters" : [
+          {
+            "amount" : 500
+          },
+          {
+
+          }
+        ]
+      }
+    ],
+    "diagrams" : [
+      {
+        "edges" : [
+          {
+            "from" : "a",
+            "label" : "",
+            "to" : "b"
+          }
+        ],
+        "name" : "flow",
+        "nodes" : [
+          {
+            "detail" : "",
+            "id" : "a",
+            "label" : "A"
+          }
+        ],
+        "shape" : "flow"
+      }
+    ],
+    "figures" : [
+      {
+        "name" : "bar",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "A",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "A",
+              "B"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 500000,
+        "label" : "Loan",
+        "max" : 1000000,
+        "min" : 0,
+        "name" : "principal",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : -2,
+        "label" : "",
+        "max" : -1,
+        "min" : -2,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "Years",
+        "max" : 40,
+        "min" : 1,
+        "name" : "years",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "",
+        "label" : "",
+        "name" : "emi",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+      "Home loans"
+    ],
+    "scenes" : [
+      {
+        "molecule" : {
+          "name" : " gold "
+        },
+        "name" : "coins",
+        "objects" : [
+          {
+            "kind" : "cylinder",
+            "label" : "",
+            "name" : "coin",
+            "position" : "stack(ground, 5)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      }
+    ],
+    "sounds" : [
+      {
+        "label" : "",
+        "name" : "ding",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "",
+            "frequency" : "880",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "",
+        "name" : "rec",
+        "search" : "bell",
+        "tones" : [
+
+        ]
+      }
+    ],
+    "summary" : "Your EMI",
+    "symbol" : "sparkles",
+    "title" : "EMI"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- principal: \"Loan\", currency, starts at 500000, 0 to 1000000, step 0\n- rate: \"\", number, starts at -2, -2 to -1, step 0\n- years: \"Years\", integer, starts at 20, 1 to 40, step 0\nOutputs:\n- emi: \"\", number = ",
+    "outline" : "EMI: Your EMI\nLists:\n- payments: \"\", each an entry: amount (currency)\n  starters: 500\n- hero #block-0 ref emi\n- slider #block-1 ref principal\n- section #auto-inputs\n  - slider #auto-input-1 ref rate\n  - slider #auto-input-2 ref years\nsounds:\n- ding \"\": tones sine at 880 Hz, amplitude \n- rec \"\": recording, search \"bell\"\nfigure bar:\n  point A = (0, 0)\n  segment A, B plain\ndiagram flow, flow:\n  a \"A\"\n  a → b\nactions:\n- remind: reminder, day \"monday\", title \"Pay EMI\"\nscene coins:\n  molecule  gold \n  coin cylinder stack(ground, 5) plain\nrelated: Home loans"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- principal: \"Loan\", currency, starts at 500000, 0 to 1000000, step 10000\n- rate: \"Rate\", number, starts at -2, -2 to -1, step 0.01\n- years: \"Years\", integer, starts at 20, 1 to 40, step 1\nOutputs:\n- emi: \"Emi\", currency = ",
+    "outline" : "EMI: Your EMI\nLists:\n- payments: \"Payments\", each a payment: amount (currency)\n  starters: 500\n- hero #block-0 ref emi\n- add #payments-add ref payments\n- list #payments-list ref payments\n- scene #scene-coins ref coins\n- slider #block-1 ref principal\n- action #remind-action ref remind\n- section #more-inputs\n  - slider #rate-control ref rate\n  - slider #years-control ref years\n- sound #ding-sound ref ding\nsounds:\n- ding \"Ding\": tones sine at 880 Hz, amplitude 0.4\nactions:\n- remind: reminder, day \"monday\", title \"Pay EMI\"\nscene coins:\n  coin cylinder stack(ground, 5) plain\nrelated: Home loans"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'emi' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'principal'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'rate'."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'emi' can't be read (the formula is empty): "
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "title" : "Pay EMI"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "principal",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "payment",
+          "fields" : [
+            {
+              "label" : "Amount",
+              "name" : "amount",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Payments",
+          "name" : "payments",
+          "starters" : [
+            {
+              "amount" : 500
+            }
+          ]
+        }
+      ],
+      "diagrams" : [
+        {
+          "edges" : [
+            {
+              "from" : "a",
+              "label" : "",
+              "to" : "b"
+            }
+          ],
+          "name" : "flow",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "a",
+              "label" : "A"
+            }
+          ],
+          "shape" : "flow"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "bar",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "A",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 500000,
+          "label" : "Loan",
+          "max" : 1000000,
+          "min" : 0,
+          "name" : "principal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -2,
+          "label" : "Rate",
+          "max" : -1,
+          "min" : -2,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Years",
+          "max" : 40,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "",
+          "label" : "Emi",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "Home loans"
+      ],
+      "scenes" : [
+        {
+          "molecule" : {
+            "name" : " gold "
+          },
+          "name" : "coins",
+          "objects" : [
+            {
+              "kind" : "cylinder",
+              "label" : "",
+              "name" : "coin",
+              "position" : "stack(ground, 5)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        }
+      ],
+      "sounds" : [
+        {
+          "label" : "",
+          "name" : "ding",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "",
+              "frequency" : "880",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "",
+          "name" : "rec",
+          "search" : "bell",
+          "tones" : [
+
+          ]
+        }
+      ],
+      "summary" : "Your EMI",
+      "symbol" : "sparkles",
+      "title" : "EMI"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

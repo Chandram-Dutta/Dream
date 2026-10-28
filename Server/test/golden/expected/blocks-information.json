@@ -1,0 +1,2297 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped an empty equation."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed an equation written as sentences as a paragraph."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed a data block with fewer than two numbers as facts."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped an empty facts block."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'rate'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "factor",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "A",
+              "value" : "the amount"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "A = P (1 + r)^n",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "e^{i\\pi} + 1 = 0",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "x",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "racwith a form feed",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-7",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The growth is $A = P(1+r)^n$ over $n$ years.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-8",
+          "items" : [
+            {
+              "label" : "2020",
+              "value" : "1.2 million"
+            },
+            {
+              "label" : "2021",
+              "value" : "about"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "One point"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-10",
+          "items" : [
+            {
+              "label" : "1950",
+              "value" : "1,210.9 million"
+            },
+            {
+              "label" : "2000",
+              "value" : "-3.5"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Population"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-11",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "First. Second {rate}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-12",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Line one.\\nLine two at {rate} and  with spaces.\\nalpha",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-14",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "No items here.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-16",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "One"
+            },
+            {
+              "label" : "",
+              "value" : "Two"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-17",
+          "items" : [
+            {
+              "label" : "1626",
+              "value" : "Interest is old."
+            }
+          ],
+          "kind" : "timeline",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-18",
+          "items" : [
+            {
+              "label" : "8%",
+              "value" : "a typical rate"
+            }
+          ],
+          "kind" : "stat",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-20-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-20",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Spaced"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "block-21-0-0",
+                  "items" : [
+
+                  ],
+                  "kind" : "paragraph",
+                  "over" : "",
+                  "ref" : "",
+                  "text" : "Nested.",
+                  "title" : ""
+                }
+              ],
+              "id" : "block-21-0",
+              "items" : [
+
+              ],
+              "kind" : "section",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-21",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "rate-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(1 + rate / 100) ^ 10",
+          "label" : "Factor",
+          "name" : "factor",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "Simple interest",
+        "APR",
+        "Rule of 72",
+        "Annuity",
+        "Inflation",
+        "Bonds"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Compound interest"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "F",
+              "value" : "factor"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "factor",
+          "text" : "F = (1 + r)^{10}",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "$A$",
+              "value" : "the amount"
+            },
+            {
+              "label" : "P",
+              "value" : ""
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "ghost",
+          "text" : "\\[ A = P (1 + r)^n \\]",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$$ e^{i\\pi} + 1 = 0 $$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$x$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\fracwith a form feed",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "   ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-7",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "The growth is $A = P(1+r)^n$ over $n$ years.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-8",
+          "items" : [
+            {
+              "label" : "2020",
+              "value" : "1.2 million"
+            },
+            {
+              "label" : "2021",
+              "value" : "about"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "One point"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-9",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "None"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-10",
+          "items" : [
+            {
+              "label" : "1950",
+              "value" : "1,210.9 million"
+            },
+            {
+              "label" : "2000",
+              "value" : "-3.5"
+            },
+            {
+              "label" : "",
+              "value" : "7"
+            },
+            {
+              "label" : "2020",
+              "value" : "१२"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Population"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-11",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "First."
+            },
+            {
+              "label" : "",
+              "value" : "Second {rate}."
+            }
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-12",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-13",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "  {nothing}  ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-14",
+          "items" : [
+
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "No items here.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-15",
+          "items" : [
+
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-16",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "One"
+            },
+            {
+              "label" : "  ",
+              "value" : "  "
+            },
+            {
+              "label" : "",
+              "value" : "Two"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "These repeat the items.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-17",
+          "items" : [
+            {
+              "label" : "1626",
+              "value" : "Interest is old."
+            }
+          ],
+          "kind" : "timeline",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-18",
+          "items" : [
+            {
+              "label" : "8%",
+              "value" : "a typical rate"
+            }
+          ],
+          "kind" : "stat",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-19-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-19",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Nothing in it"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-20-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-20",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "  Spaced  "
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "block-21-0-0",
+                  "items" : [
+
+                  ],
+                  "kind" : "paragraph",
+                  "over" : "",
+                  "ref" : "",
+                  "text" : "Nested.",
+                  "title" : ""
+                }
+              ],
+              "id" : "block-21-0",
+              "items" : [
+
+              ],
+              "kind" : "section",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-21",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(1 + rate / 100) ^ 10",
+          "label" : "Factor",
+          "name" : "factor",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "  Simple interest  ",
+        "Compound Interest",
+        "simple interest",
+        "",
+        "APR",
+        "Rule of 72",
+        "Annuity",
+        "Inflation",
+        "Bonds",
+        "Stocks"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Compound interest"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "F",
+            "value" : "factor"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "factor",
+        "text" : "F = (1 + r)^{10}",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "$A$",
+            "value" : "the amount"
+          },
+          {
+            "label" : "P",
+            "value" : ""
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "ghost",
+        "text" : "\\[ A = P (1 + r)^n \\]",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$$ e^{i\\pi} + 1 = 0 $$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$x$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\fracwith a form feed",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "   ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "The growth is $A = P(1+r)^n$ over $n$ years.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "2020",
+            "value" : "1.2 million"
+          },
+          {
+            "label" : "2021",
+            "value" : "about"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "One point"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "None"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "1950",
+            "value" : "1,210.9 million"
+          },
+          {
+            "label" : "2000",
+            "value" : "-3.5"
+          },
+          {
+            "label" : "",
+            "value" : "7"
+          },
+          {
+            "label" : "2020",
+            "value" : "१२"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Population"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "",
+            "value" : "First."
+          },
+          {
+            "label" : "",
+            "value" : "Second {rate}."
+          }
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "  {nothing}  ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "No items here.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "",
+            "value" : "One"
+          },
+          {
+            "label" : "  ",
+            "value" : "  "
+          },
+          {
+            "label" : "",
+            "value" : "Two"
+          }
+        ],
+        "kind" : "bullets",
+        "over" : "",
+        "ref" : "",
+        "text" : "These repeat the items.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "1626",
+            "value" : "Interest is old."
+          }
+        ],
+        "kind" : "timeline",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "8%",
+            "value" : "a typical rate"
+          }
+        ],
+        "kind" : "stat",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Nothing in it"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Inside.",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "  Spaced  "
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+              {
+                "children" : [
+
+                ],
+                "items" : [
+
+                ],
+                "kind" : "paragraph",
+                "over" : "",
+                "ref" : "",
+                "text" : "Nested.",
+                "title" : ""
+              }
+            ],
+            "items" : [
+
+            ],
+            "kind" : "section",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 5,
+        "label" : "Rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "(1 + rate / 100) ^ 10",
+        "label" : "Factor",
+        "name" : "factor",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+      "  Simple interest  ",
+      "Compound Interest",
+      "simple interest",
+      "",
+      "APR",
+      "Rule of 72",
+      "Annuity",
+      "Inflation",
+      "Bonds",
+      "Stocks"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Compound interest"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+          {
+            "label" : "F",
+            "value" : "factor"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "factor",
+        "text" : "F = (1 + r)^{10}",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+          {
+            "label" : "$A$",
+            "value" : "the amount"
+          },
+          {
+            "label" : "P",
+            "value" : ""
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "ghost",
+        "text" : "\\[ A = P (1 + r)^n \\]",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$$ e^{i\\pi} + 1 = 0 $$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$x$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-5",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\fracwith a form feed",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-6",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "   ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-7",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "The growth is $A = P(1+r)^n$ over $n$ years.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-8",
+        "items" : [
+          {
+            "label" : "2020",
+            "value" : "1.2 million"
+          },
+          {
+            "label" : "2021",
+            "value" : "about"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "One point"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-9",
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "None"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-10",
+        "items" : [
+          {
+            "label" : "1950",
+            "value" : "1,210.9 million"
+          },
+          {
+            "label" : "2000",
+            "value" : "-3.5"
+          },
+          {
+            "label" : "",
+            "value" : "7"
+          },
+          {
+            "label" : "2020",
+            "value" : "१२"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Population"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-11",
+        "items" : [
+          {
+            "label" : "",
+            "value" : "First."
+          },
+          {
+            "label" : "",
+            "value" : "Second {rate}."
+          }
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-12",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-13",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "  {nothing}  ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-14",
+        "items" : [
+
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "No items here.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-15",
+        "items" : [
+
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-16",
+        "items" : [
+          {
+            "label" : "",
+            "value" : "One"
+          },
+          {
+            "label" : "  ",
+            "value" : "  "
+          },
+          {
+            "label" : "",
+            "value" : "Two"
+          }
+        ],
+        "kind" : "bullets",
+        "over" : "",
+        "ref" : "",
+        "text" : "These repeat the items.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-17",
+        "items" : [
+          {
+            "label" : "1626",
+            "value" : "Interest is old."
+          }
+        ],
+        "kind" : "timeline",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-18",
+        "items" : [
+          {
+            "label" : "8%",
+            "value" : "a typical rate"
+          }
+        ],
+        "kind" : "stat",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-19-0",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-19",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Nothing in it"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-20-0",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Inside.",
+            "title" : ""
+          }
+        ],
+        "id" : "block-20",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "  Spaced  "
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+              {
+                "children" : [
+
+                ],
+                "id" : "block-21-0-0",
+                "items" : [
+
+                ],
+                "kind" : "paragraph",
+                "over" : "",
+                "ref" : "",
+                "text" : "Nested.",
+                "title" : ""
+              }
+            ],
+            "id" : "block-21-0",
+            "items" : [
+
+            ],
+            "kind" : "section",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-21",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 5,
+        "label" : "Rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "(1 + rate / 100) ^ 10",
+        "label" : "Factor",
+        "name" : "factor",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+      "  Simple interest  ",
+      "Compound Interest",
+      "simple interest",
+      "",
+      "APR",
+      "Rule of 72",
+      "Annuity",
+      "Inflation",
+      "Bonds",
+      "Stocks"
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Compound interest"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Rate\", percent, starts at 5, 0 to 20, step 1\nOutputs:\n- factor: \"Factor\", number = (1 + rate / 100) ^ 10",
+    "outline" : "Compound interest: \n- equation #block-0 ref factor\n  F = (1 + r)^{10}\n  • F: factor\n- equation #block-1 ref ghost\n  \\[ A = P (1 + r)^n \\]\n  • $A$: the amount\n  • P: \n- equation #block-2\n  $$ e^{i\\pi} + 1 = 0 $$\n- equation #block-3\n  $x$\n- equation #block-4\n  $\n- equation #block-5\n  \fracwith a form feed\n- equation #block-6\n     \n- equation #block-7\n  The growth is $A = P(1+r)^n$ over $n$ years.\n- data #block-8 \"One point\"\n  • 2020: 1.2 million\n  • 2021: about\n- data #block-9 \"None\"\n- data #block-10 \"Population\"\n  • 1950: 1,210.9 million\n  • 2000: -3.5\n  • 7\n  • 2020: १२\n- paragraph #block-11\n  • First.\n  • Second {rate}.\n- paragraph #block-12\n  Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha\n- paragraph #block-13\n    {nothing}  \n- facts #block-14\n  No items here.\n- facts #block-15\n- bullets #block-16\n  These repeat the items.\n  • One\n  •   :   \n  • Two\n- timeline #block-17\n  • 1626: Interest is old.\n- stat #block-18\n  • 8%: a typical rate\n- section #block-19 \"Nothing in it\"\n  - paragraph #block-19-0\n- section #block-20 \"  Spaced  \"\n  - paragraph #block-20-0\n    Inside.\n- row #block-21\n  - section #block-21-0\n    - paragraph #block-21-0-0\n      Nested.\n- section #auto-inputs\n  - slider #auto-input-0 ref rate\nrelated:   Simple interest  , Compound Interest, simple interest, , APR, Rule of 72, Annuity, Inflation, Bonds, Stocks"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Rate\", percent, starts at 5, 0 to 20, step 1\nOutputs:\n- factor: \"Factor\", number = (1 + rate / 100) ^ 10",
+    "outline" : "Compound interest: \n- equation #block-0 ref factor\n- equation #block-1\n  A = P (1 + r)^n\n  • A: the amount\n- equation #block-2\n  e^{i\\pi} + 1 = 0\n- equation #block-3\n  x\n- equation #block-4\n  $\n- equation #block-5\n  racwith a form feed\n- paragraph #block-7\n  The growth is $A = P(1+r)^n$ over $n$ years.\n- facts #block-8 \"One point\"\n  • 2020: 1.2 million\n  • 2021: about\n- data #block-10 \"Population\"\n  • 1950: 1,210.9 million\n  • 2000: -3.5\n- paragraph #block-11\n  First. Second {rate}.\n- paragraph #block-12\n  Line one.\\nLine two at {rate} and  with spaces.\\nalpha\n- paragraph #block-14\n  No items here.\n- bullets #block-16\n  • One\n  • Two\n- timeline #block-17\n  • 1626: Interest is old.\n- stat #block-18\n  • 8%: a typical rate\n- section #block-20 \"Spaced\"\n  - paragraph #block-20-0\n    Inside.\n- section #block-21\n  - section #block-21-0\n    - paragraph #block-21-0-0\n      Nested.\n- section #more-inputs\n  - slider #rate-control ref rate\nrelated: Simple interest, APR, Rule of 72, Annuity, Inflation, Bonds"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "F",
+              "value" : "factor"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "factor",
+          "text" : "F = (1 + r)^{10}",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "$A$",
+              "value" : "the amount"
+            },
+            {
+              "label" : "P",
+              "value" : ""
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "ghost",
+          "text" : "\\[ A = P (1 + r)^n \\]",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$$ e^{i\\pi} + 1 = 0 $$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$x$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\fracwith a form feed",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "   ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-7",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "The growth is $A = P(1+r)^n$ over $n$ years.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-8",
+          "items" : [
+            {
+              "label" : "2020",
+              "value" : "1.2 million"
+            },
+            {
+              "label" : "2021",
+              "value" : "about"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "One point"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-9",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "None"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-10",
+          "items" : [
+            {
+              "label" : "1950",
+              "value" : "1,210.9 million"
+            },
+            {
+              "label" : "2000",
+              "value" : "-3.5"
+            },
+            {
+              "label" : "",
+              "value" : "7"
+            },
+            {
+              "label" : "2020",
+              "value" : "१२"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Population"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-11",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "First."
+            },
+            {
+              "label" : "",
+              "value" : "Second {rate}."
+            }
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-12",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-13",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "  {nothing}  ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-14",
+          "items" : [
+
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "No items here.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-15",
+          "items" : [
+
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-16",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "One"
+            },
+            {
+              "label" : "  ",
+              "value" : "  "
+            },
+            {
+              "label" : "",
+              "value" : "Two"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "These repeat the items.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-17",
+          "items" : [
+            {
+              "label" : "1626",
+              "value" : "Interest is old."
+            }
+          ],
+          "kind" : "timeline",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-18",
+          "items" : [
+            {
+              "label" : "8%",
+              "value" : "a typical rate"
+            }
+          ],
+          "kind" : "stat",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-19-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-19",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Nothing in it"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-20-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-20",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "  Spaced  "
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "block-21-0-0",
+                  "items" : [
+
+                  ],
+                  "kind" : "paragraph",
+                  "over" : "",
+                  "ref" : "",
+                  "text" : "Nested.",
+                  "title" : ""
+                }
+              ],
+              "id" : "block-21-0",
+              "items" : [
+
+              ],
+              "kind" : "section",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-21",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(1 + rate / 100) ^ 10",
+          "label" : "Factor",
+          "name" : "factor",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "  Simple interest  ",
+        "Compound Interest",
+        "simple interest",
+        "",
+        "APR",
+        "Rule of 72",
+        "Annuity",
+        "Inflation",
+        "Bonds",
+        "Stocks"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Compound interest"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

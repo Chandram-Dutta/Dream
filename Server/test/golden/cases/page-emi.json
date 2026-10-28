@@ -1,0 +1,50 @@
+{
+  "about": "A whole page: a home loan EMI, as Grok writes one, with a monthly rate as a step on the way, a chart of the EMI over the tenure, a breakdown in a row, an equation of the EMI's own formula, and a reminder to pay.",
+  "locale": "en_IN",
+  "read": [{"title": "Home Loan EMI Calculator", "site": "SBI", "url": "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator", "date": "2026-01-10"}],
+  "wire": {
+    "subject": "money",
+    "mode": "use",
+    "title": "Home Loan EMI",
+    "summary": "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+    "symbol": "house.fill",
+    "collections": [],
+    "question": "How much will I pay each month?",
+    "inputs": [
+      {"name": "loanAmount", "label": "Loan amount", "role": "adjustable", "source": "", "symbol": "P", "unit": "", "format": "currency", "initial": 5000000, "min": 100000, "max": 50000000, "step": 100000, "options": []},
+      {"name": "annualRate", "label": "Interest rate", "role": "adjustable", "source": "", "symbol": "r", "unit": "%", "format": "percent", "initial": 8.5, "min": 5, "max": 15, "step": 0.05, "options": []},
+      {"name": "tenure", "label": "Tenure", "role": "adjustable", "source": "", "symbol": "n", "unit": "years", "format": "integer", "initial": 20, "min": 1, "max": 30, "step": 1, "options": []}
+    ],
+    "outputs": [
+      {"name": "emi", "label": "Monthly EMI", "symbol": "E", "unit": "", "formula": "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)", "format": "currency"},
+      {"name": "monthlyRate", "label": "Monthly rate", "symbol": "i", "unit": "", "formula": "annualRate / 12 / 100", "format": "number"},
+      {"name": "totalPayment", "label": "Total payment", "symbol": "", "unit": "", "formula": "emi * tenure * 12", "format": "currency"},
+      {"name": "totalInterest", "label": "Total interest", "symbol": "", "unit": "", "formula": "totalPayment - loanAmount", "format": "currency"}
+    ],
+    "sounds": [],
+    "figures": [],
+    "diagrams": [],
+    "actions": [
+      {"name": "payReminder", "kind": "reminder", "title": "Pay the EMI", "day": "2026-11-05", "time": "09:00", "duration": "", "place": "", "from": "", "travel": "driving", "notes": "{emi} is due"}
+    ],
+    "scenes": [],
+    "blocks": [
+      {"kind": "hero", "title": "", "text": "", "ref": "emi", "over": "", "items": [], "children": []},
+      {"kind": "section", "title": "Your loan", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "field", "title": "", "text": "", "ref": "loanAmount", "over": "", "items": [], "children": []},
+        {"kind": "slider", "title": "", "text": "", "ref": "annualRate", "over": "", "items": [], "children": []},
+        {"kind": "stepper", "title": "", "text": "", "ref": "tenure", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "chart", "title": "EMI by tenure", "text": "", "ref": "emi", "over": "tenure", "items": [], "children": []},
+      {"kind": "row", "title": "", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "metric", "title": "", "text": "", "ref": "totalInterest", "over": "", "items": [], "children": []},
+        {"kind": "metric", "title": "", "text": "", "ref": "totalPayment", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "equation", "title": "How it's worked out", "text": "", "ref": "emi", "over": "", "items": [], "children": []},
+      {"kind": "paragraph", "title": "", "text": "Over {tenure} years you pay {totalInterest} in interest on top of the loan.", "ref": "", "over": "", "items": [], "children": []},
+      {"kind": "action", "title": "", "text": "", "ref": "payReminder", "over": "", "items": [], "children": []}
+    ],
+    "related": ["Prepaying a home loan", "Floating vs fixed rates", "Home loan tax benefits"],
+    "citations": ["https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"]
+  }
+}

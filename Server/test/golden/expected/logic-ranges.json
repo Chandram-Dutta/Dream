@@ -1,0 +1,1455 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'swapped', 'outside', 'single', 'count', 'noStep', 'bigStep', 'rateFraction', 'night', 'size', 'flavour', 'colour'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'gravity'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "swapped-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "swapped",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "outside-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "outside",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "single-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "single",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "count-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "count",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "noStep-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "noStep",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "bigStep-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "bigStep",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "rateFraction-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rateFraction",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "night-control",
+              "items" : [
+
+              ],
+              "kind" : "toggle",
+              "over" : "",
+              "ref" : "night",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "size-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "size",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "flavour-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "flavour",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "colour-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "colour",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "gravity-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "gravity",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 150,
+          "label" : "Outside",
+          "max" : 150,
+          "min" : 0,
+          "name" : "outside",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Big step",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bigStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 0.17999999999999999,
+          "label" : "Rate",
+          "max" : 1,
+          "min" : 0,
+          "name" : "rateFraction",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Flavour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "flavour",
+          "options" : [
+            "Vanilla"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Colour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "colour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 150,
+          "label" : "Outside",
+          "max" : 150,
+          "min" : 0,
+          "name" : "outside",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Big step",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bigStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 0.17999999999999999,
+          "label" : "Rate",
+          "max" : 1,
+          "min" : 0,
+          "name" : "rateFraction",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Flavour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "flavour",
+          "options" : [
+            "Vanilla"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Colour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "colour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Swapped",
+        "max" : 0,
+        "min" : 10,
+        "name" : "swapped",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 150,
+        "label" : "Outside",
+        "max" : 100,
+        "min" : 0,
+        "name" : "outside",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : -4,
+        "label" : "Single",
+        "max" : -4,
+        "min" : -4,
+        "name" : "single",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2.6000000000000001,
+        "label" : "Count",
+        "max" : 9.1999999999999993,
+        "min" : 0.40000000000000002,
+        "name" : "count",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.29999999999999999,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0.5,
+        "label" : "No step",
+        "max" : 2.3999999999999999,
+        "min" : 0,
+        "name" : "noStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 500,
+        "label" : "Big step",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bigStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 5000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 0.17999999999999999,
+        "label" : "Rate",
+        "max" : 1,
+        "min" : 0,
+        "name" : "rateFraction",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 7,
+        "label" : "Night",
+        "max" : 9,
+        "min" : -3,
+        "name" : "night",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 2,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 7.5999999999999996,
+        "label" : "Size",
+        "max" : 100,
+        "min" : 0,
+        "name" : "size",
+        "options" : [
+          "  Small ",
+          "",
+          "Medium",
+          "Large  "
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Flavour",
+        "max" : 100,
+        "min" : 0,
+        "name" : "flavour",
+        "options" : [
+          "Vanilla"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 1,
+        "label" : "Colour",
+        "max" : 100,
+        "min" : 0,
+        "name" : "colour",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 20,
+        "min" : 0,
+        "name" : "gravity",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s²"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+        "label" : "Total",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Ranges"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Swapped",
+        "max" : 0,
+        "min" : 10,
+        "name" : "swapped",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 150,
+        "label" : "Outside",
+        "max" : 100,
+        "min" : 0,
+        "name" : "outside",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : -4,
+        "label" : "Single",
+        "max" : -4,
+        "min" : -4,
+        "name" : "single",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2.6000000000000001,
+        "label" : "Count",
+        "max" : 9.1999999999999993,
+        "min" : 0.40000000000000002,
+        "name" : "count",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.29999999999999999,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0.5,
+        "label" : "No step",
+        "max" : 2.3999999999999999,
+        "min" : 0,
+        "name" : "noStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 500,
+        "label" : "Big step",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bigStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 5000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 0.17999999999999999,
+        "label" : "Rate",
+        "max" : 1,
+        "min" : 0,
+        "name" : "rateFraction",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 7,
+        "label" : "Night",
+        "max" : 9,
+        "min" : -3,
+        "name" : "night",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 2,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 7.5999999999999996,
+        "label" : "Size",
+        "max" : 100,
+        "min" : 0,
+        "name" : "size",
+        "options" : [
+          "  Small ",
+          "",
+          "Medium",
+          "Large  "
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Flavour",
+        "max" : 100,
+        "min" : 0,
+        "name" : "flavour",
+        "options" : [
+          "Vanilla"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 1,
+        "label" : "Colour",
+        "max" : 100,
+        "min" : 0,
+        "name" : "colour",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 20,
+        "min" : 0,
+        "name" : "gravity",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s²"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+        "label" : "Total",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Ranges"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- swapped: \"Swapped\", number, starts at 5, 10 to 0, step 1\n- outside: \"Outside\", number, starts at 150, 0 to 100, step 1\n- single: \"Single\", number, starts at -4, -4 to -4, step 1\n- count: \"Count\", integer, starts at 2.6, 0.4 to 9.2, step 0.3\n- noStep: \"No step\", number, starts at 0.5, 0 to 2.4, step 0\n- bigStep: \"Big step\", number, starts at 500, 0 to 1000, step 5000\n- rateFraction: \"Rate\", percent, starts at 0.18, 0 to 1, step 0.01\n- night: \"Night\", toggle, starts on\n- size: \"Size\", choice of   Small  /  / Medium / Large  , starts at option 7.6\n- flavour: \"Flavour\", choice of Vanilla, starts at option 0\n- colour: \"Colour\", choice of , starts at option 1\n- gravity: \"Gravity\", given number, 9.81, in m/s²\nOutputs:\n- total: \"Total\", number = swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+    "outline" : "Ranges: \n- hero #block-0 ref total\n- section #auto-inputs\n  - slider #auto-input-0 ref swapped\n  - slider #auto-input-1 ref outside\n  - slider #auto-input-2 ref single\n  - slider #auto-input-3 ref count\n  - slider #auto-input-4 ref noStep\n  - slider #auto-input-5 ref bigStep\n  - slider #auto-input-6 ref rateFraction\n  - toggle #auto-input-7 ref night\n  - picker #auto-input-8 ref size\n  - picker #auto-input-9 ref flavour\n  - picker #auto-input-10 ref colour"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- swapped: \"Swapped\", number, starts at 5, 0 to 10, step 1\n- outside: \"Outside\", number, starts at 150, 0 to 150, step 1\n- single: \"Single\", number, starts at -4, -4 to 0, step 1\n- count: \"Count\", integer, starts at 3, 0 to 10, step 1\n- noStep: \"No step\", number, starts at 0.5, 0 to 2.4, step 0.02\n- bigStep: \"Big step\", number, starts at 500, 0 to 1000, step 10\n- rateFraction: \"Rate\", percent, starts at 0.18, 0 to 1, step 0.01\n- night: \"Night\", toggle, starts on\n- size: \"Size\", choice of Small / Medium / Large, starts at option 2\n- flavour: \"Flavour\", choice of Vanilla, starts at option 0\n- colour: \"Colour\", choice of , starts at option 0\n- gravity: \"Gravity\", given number, 9.81, in m/s²\nOutputs:\n- total: \"Total\", number = swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+    "outline" : "Ranges: \n- hero #block-0 ref total\n- section #more-inputs\n  - slider #swapped-control ref swapped\n  - slider #outside-control ref outside\n  - slider #single-control ref single\n  - stepper #count-control ref count\n  - slider #noStep-control ref noStep\n  - slider #bigStep-control ref bigStep\n  - slider #rateFraction-control ref rateFraction\n  - toggle #night-control ref night\n  - picker #size-control ref size\n  - picker #flavour-control ref flavour\n  - picker #colour-control ref colour\n  - row #givens\n    - metric #gravity-given ref gravity"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Swapped the minimum and maximum of 'swapped'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Widened the range of 'outside' to include its starting value."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave 'single' a range."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'noStep'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'bigStep'."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'rateFraction' is a percent written as a fraction. Use whole numbers (18 means 18%) and divide by 100 in formulas."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'flavour' is a choice with only one option. Give it at least two options, or use another format."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'colour' is a choice with no options. Give it at least two options, or use another format."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 150,
+          "label" : "Outside",
+          "max" : 150,
+          "min" : 0,
+          "name" : "outside",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Big step",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bigStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 0.17999999999999999,
+          "label" : "Rate",
+          "max" : 1,
+          "min" : 0,
+          "name" : "rateFraction",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Flavour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "flavour",
+          "options" : [
+            "Vanilla"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Colour",
+          "max" : 0,
+          "min" : 0,
+          "name" : "colour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

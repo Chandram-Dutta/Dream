@@ -1,0 +1,115 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : ""
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : ""
+    }
+  },
+  "content" : {
+
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "sparkles",
+    "title" : ""
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : true,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : ": "
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : true,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : ": "
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : ""
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

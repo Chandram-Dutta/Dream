@@ -1,0 +1,34 @@
+{
+  "about": "Actions tidied: an event on a weekday at a time with a length worked out, one with no day (today), one whose day can't be read (dropped), one whose time can't be read (all day), a reminder, directions to a place named only by its title, directions to nowhere (dropped), names that clash with an input or each other, {names} the calculation can't fill dropped; action blocks read by near miss, one with no name when there's one action, a second button removed, a row holding a button made a section, and a button for each action no block shows.",
+  "fill": true,
+  "wire": {
+    "title": "Saturday picnic",
+    "subject": "places",
+    "inputs": [
+      {"name": "startHour", "label": "Start", "initial": 16, "min": 6, "max": 20, "step": 0.5},
+      {"name": "picnic", "label": "People", "format": "integer", "initial": 4, "min": 1, "max": 20}
+    ],
+    "outputs": [
+      {"name": "hours", "label": "Hours", "formula": "20 - startHour"},
+      {"name": "food", "label": "Sandwiches", "formula": "picnic * 2", "format": "integer"}
+    ],
+    "actions": [
+      {"name": "picnic", "kind": "calendarEvent", "title": "Picnic in {place} Cubbon Park", "day": "this saturday", "time": "startHour", "duration": "hours * 60", "place": "Cubbon Park", "notes": "Bring {food} sandwiches for {nobody}."},
+      {"name": "", "kind": "calendarEvent", "title": "", "day": "", "time": "4:30 pm", "duration": "", "place": ""},
+      {"name": "someday", "kind": "calendarEvent", "title": "Someday", "day": "the 32nd of never", "time": "10:00"},
+      {"name": "fuzzy", "kind": "calendarEvent", "title": "Fuzzy", "day": "in 3 days", "time": "after lunch", "duration": "90"},
+      {"name": "remind", "kind": "reminder", "title": "Buy food", "day": "tomorrow", "time": "noon", "duration": "30", "notes": "  "},
+      {"name": "remind", "kind": "reminder", "title": "Second", "day": "2026-11-02"},
+      {"name": "go", "kind": "directions", "title": "Cubbon Park", "place": "", "from": "", "travel": "walking"},
+      {"name": "nowhere", "kind": "directions", "title": "", "place": "  ", "travel": "transit"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "hours"},
+      {"kind": "row", "children": [{"kind": "metric", "ref": "food"}, {"kind": "action", "ref": "picnicActon", "title": "Add it"}]},
+      {"kind": "action", "ref": "picnicAction"},
+      {"kind": "action", "ref": "missingOne"},
+      {"kind": "slider", "ref": "startHour"},
+      {"kind": "stepper", "ref": "picnic"}
+    ]
+  }
+}

@@ -1,0 +1,1024 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added a bar for adding to 'mine'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'other'."
+      }
+    ],
+    "surface" : {
+      "accent" : "cyan",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "open",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "work",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "mine-add",
+              "items" : [
+
+              ],
+              "kind" : "add",
+              "over" : "",
+              "ref" : "mine",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "mine",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Mine"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "other-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "other",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "other-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "other",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "issue",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "State",
+              "name" : "state",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Work",
+          "name" : "work",
+          "source" : "issues.items",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "other",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Other",
+          "name" : "other",
+          "source" : "notes.pages",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "mine",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Mine",
+          "name" : "mine",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Open",
+          "max" : 4,
+          "min" : 4,
+          "name" : "open",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "issues.open",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Linear"
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "integer",
+              "meaning" : "open issues",
+              "name" : "open",
+              "unit" : "",
+              "value" : 4
+            }
+          ],
+          "kind" : "connection",
+          "lists" : [
+            {
+              "count" : 4,
+              "keys" : [
+                "id",
+                "title",
+                "state"
+              ],
+              "name" : "items"
+            }
+          ],
+          "name" : "issues",
+          "parameters" : {
+            "service" : "Linear",
+            "tool" : "list_issues"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My issues"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "cyan",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "open",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "work",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "mine",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Mine"
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "issue",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "State",
+              "name" : "state",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Work",
+          "name" : "work",
+          "source" : "issues.items",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "other",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Other",
+          "name" : "other",
+          "source" : "notes.pages",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "mine",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Mine",
+          "name" : "mine",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Open",
+          "max" : 4,
+          "min" : 4,
+          "name" : "open",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "issues.open",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Linear"
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "integer",
+              "meaning" : "open issues",
+              "name" : "open",
+              "unit" : "",
+              "value" : 4
+            }
+          ],
+          "kind" : "connection",
+          "lists" : [
+            {
+              "count" : 4,
+              "keys" : [
+                "id",
+                "title",
+                "state"
+              ],
+              "name" : "items"
+            }
+          ],
+          "name" : "issues",
+          "parameters" : {
+            "service" : "Linear",
+            "tool" : "list_issues"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My issues"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "open",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "add",
+        "over" : "",
+        "ref" : "work",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "work",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "list",
+            "over" : "",
+            "ref" : "mine",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Mine"
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "issue",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "State",
+            "name" : "state",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Work",
+        "name" : "work",
+        "source" : "issues.itmes",
+        "starters" : [
+          {
+            "values" : [
+              "Fix login",
+              "open"
+            ]
+          }
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Other",
+        "name" : "other",
+        "source" : "notes.pages",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Mine",
+        "name" : "mine",
+        "source" : "  ",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "Open",
+        "max" : 100,
+        "min" : 0,
+        "name" : "open",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "issues.open",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "tech",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "My issues"
+  },
+  "converted" : {
+    "accent" : "cyan",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "open",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "add",
+        "over" : "",
+        "ref" : "work",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "work",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-0",
+            "items" : [
+
+            ],
+            "kind" : "list",
+            "over" : "",
+            "ref" : "mine",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Mine"
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "issue",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "State",
+            "name" : "state",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Work",
+        "name" : "work",
+        "source" : "issues.itmes",
+        "starters" : [
+          {
+            "state" : "open",
+            "title" : "Fix login"
+          }
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Other",
+        "name" : "other",
+        "source" : "notes.pages",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Title",
+            "name" : "title",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Mine",
+        "name" : "mine",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "Open",
+        "max" : 100,
+        "min" : 0,
+        "name" : "open",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "issues.open",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "My issues"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- open: \"Open\", live integer from issues.open, now 0\nOutputs:",
+    "outline" : "My issues: \nLists:\n- work: \"Work\", each an issue: title (text), state (text); filled from issues.itmes\n  starters: Fix login\n- other: \"Other\", each an entry: title (text); filled from notes.pages\n- mine: \"Mine\", each an entry: title (text)\n- metric #block-0 ref open\n- add #block-1 ref work\n- list #block-2 ref work\n- section #block-3 \"Mine\"\n  - list #block-3-0 ref mine"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- open: \"Open\", live integer from issues.open, now 4\nOutputs:",
+    "outline" : "My issues: \nLists:\n- work: \"Work\", each an issue: title (text), state (text); filled from issues.items\n- other: \"Other\", each an other: title (text); filled from notes.pages\n- mine: \"Mine\", each a mine: title (text)\n- metric #block-0 ref open\n- list #block-2 ref work\n- section #block-3 \"Mine\"\n  - add #mine-add ref mine\n  - list #block-3-0 ref mine\n- add #other-add ref other\n- list #other-list ref other\nsources (fetched with the live tool; fetch again to change one):\n- issues: connection, service Linear, tool list_issues; fields issues.open"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Filled 'work' from issues.items, for issues.itmes."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Took the starters out of 'work', which a service fills."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The list 'other' is filled from notes.pages, which no connected service returned. Lists a service returned: issues.items. Leave its source empty for a list the user keeps."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed the bar for adding to 'work', which a service fills."
+      }
+    ],
+    "surface" : {
+      "accent" : "cyan",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "open",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "work",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "mine",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Mine"
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "issue",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "State",
+              "name" : "state",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Work",
+          "name" : "work",
+          "source" : "issues.items",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "other",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Other",
+          "name" : "other",
+          "source" : "notes.pages",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "mine",
+          "fields" : [
+            {
+              "label" : "Title",
+              "name" : "title",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Mine",
+          "name" : "mine",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Open",
+          "max" : 4,
+          "min" : 4,
+          "name" : "open",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "issues.open",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Linear"
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "integer",
+              "meaning" : "open issues",
+              "name" : "open",
+              "unit" : "",
+              "value" : 4
+            }
+          ],
+          "kind" : "connection",
+          "lists" : [
+            {
+              "count" : 4,
+              "keys" : [
+                "id",
+                "title",
+                "state"
+              ],
+              "name" : "items"
+            }
+          ],
+          "name" : "issues",
+          "parameters" : {
+            "service" : "Linear",
+            "tool" : "list_issues"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My issues"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

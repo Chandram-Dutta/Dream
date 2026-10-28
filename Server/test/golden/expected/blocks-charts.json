@@ -1,0 +1,1489 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Gave 'month' a control, since no chart runs along it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a chart of 'nothing', which isn't a result."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a chart of 'fixedOnly', which nothing the reader changes moves."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'value' the main result."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'month'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'inflation'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'fixedOnly' to the screen."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'gain' with the controls that shape it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'value, real, gain, doubling' with the controls that shape it."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "value",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "year",
+              "ref" : "value, real, gain, doubling",
+              "text" : "",
+              "title" : "Over the years"
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-4",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "start",
+              "ref" : "gain",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "rate",
+              "ref" : "doubling",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "start",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "inflation-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "inflation",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change it"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "month-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "month",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "fixedOnly-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "fixedOnly",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 7,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Start",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "start",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 0,
+          "label" : "Year",
+          "max" : 30,
+          "min" : 0,
+          "name" : "year",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Month",
+          "max" : 12,
+          "min" : 0,
+          "name" : "month",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 4,
+          "label" : "Inflation",
+          "max" : 4,
+          "min" : 4,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "start * (1 + rate / 100) ^ year",
+          "label" : "Value",
+          "name" : "value",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value / (1 + inflation / 100) ^ year",
+          "label" : "Real value",
+          "name" : "real",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value - start",
+          "label" : "Gain",
+          "name" : "gain",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "72 / rate",
+          "label" : "Doubling time",
+          "name" : "doubling",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "rate / 12 + month * 0",
+          "label" : "Monthly",
+          "name" : "monthly",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "inflation * 2",
+          "label" : "Fixed",
+          "name" : "fixedOnly",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Growth"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "value",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "year",
+          "ref" : "nothing",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "inflation",
+          "ref" : "value, real, gain, doubling, monthly",
+          "text" : "",
+          "title" : "Over the years"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "rate",
+              "ref" : "doubling",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "start",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change it"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "start",
+          "ref" : "gain",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "inflation",
+          "ref" : "fixedOnly",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 7,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Start",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "start",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 0,
+          "label" : "Year",
+          "max" : 30,
+          "min" : 0,
+          "name" : "year",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Month",
+          "max" : 12,
+          "min" : 0,
+          "name" : "month",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 4,
+          "label" : "Inflation",
+          "max" : 4,
+          "min" : 4,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "start * (1 + rate / 100) ^ year",
+          "label" : "Value",
+          "name" : "value",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value / (1 + inflation / 100) ^ year",
+          "label" : "Real value",
+          "name" : "real",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value - start",
+          "label" : "Gain",
+          "name" : "gain",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "72 / rate",
+          "label" : "Doubling time",
+          "name" : "doubling",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "rate / 12 + month * 0",
+          "label" : "Monthly",
+          "name" : "monthly",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "inflation * 2",
+          "label" : "Fixed",
+          "name" : "fixedOnly",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Growth"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "value",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "year",
+        "ref" : "nothing",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "inflation",
+        "ref" : "value, real, gain, doubling, monthly",
+        "text" : "",
+        "title" : "Over the years"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "rate",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "chart",
+            "over" : "rate",
+            "ref" : "doubling",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "start",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Change it"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "start",
+        "ref" : "gain",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "inflation",
+        "ref" : "fixedOnly",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 7,
+        "label" : "Rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 1000,
+        "label" : "Start",
+        "max" : 10000,
+        "min" : 0,
+        "name" : "start",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "Year",
+        "max" : 30,
+        "min" : 0,
+        "name" : "year",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Month",
+        "max" : 12,
+        "min" : 0,
+        "name" : "month",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 4,
+        "label" : "Inflation",
+        "max" : 100,
+        "min" : 0,
+        "name" : "inflation",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "start * (1 + rate / 100) ^ year",
+        "label" : "Value",
+        "name" : "value",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "value / (1 + inflation / 100) ^ year",
+        "label" : "Real value",
+        "name" : "real",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "value - start",
+        "label" : "Gain",
+        "name" : "gain",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "72 / rate",
+        "label" : "Doubling time",
+        "name" : "doubling",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "rate / 12 + month * 0",
+        "label" : "Monthly",
+        "name" : "monthly",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "inflation * 2",
+        "label" : "Fixed",
+        "name" : "fixedOnly",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Growth"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "metric",
+        "over" : "",
+        "ref" : "value",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "year",
+        "ref" : "nothing",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "inflation",
+        "ref" : "value, real, gain, doubling, monthly",
+        "text" : "",
+        "title" : "Over the years"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-0",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "rate",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-1",
+            "items" : [
+
+            ],
+            "kind" : "chart",
+            "over" : "rate",
+            "ref" : "doubling",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-2",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "start",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Change it"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "start",
+        "ref" : "gain",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-5",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "inflation",
+        "ref" : "fixedOnly",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 7,
+        "label" : "Rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 1000,
+        "label" : "Start",
+        "max" : 10000,
+        "min" : 0,
+        "name" : "start",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "Year",
+        "max" : 30,
+        "min" : 0,
+        "name" : "year",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Month",
+        "max" : 12,
+        "min" : 0,
+        "name" : "month",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 4,
+        "label" : "Inflation",
+        "max" : 100,
+        "min" : 0,
+        "name" : "inflation",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "start * (1 + rate / 100) ^ year",
+        "label" : "Value",
+        "name" : "value",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "value / (1 + inflation / 100) ^ year",
+        "label" : "Real value",
+        "name" : "real",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "value - start",
+        "label" : "Gain",
+        "name" : "gain",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "72 / rate",
+        "label" : "Doubling time",
+        "name" : "doubling",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "rate / 12 + month * 0",
+        "label" : "Monthly",
+        "name" : "monthly",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "inflation * 2",
+        "label" : "Fixed",
+        "name" : "fixedOnly",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Growth"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Rate\", percent, starts at 7, 0 to 20, step 0.5\n- start: \"Start\", currency, starts at 1000, 0 to 10000, step 100\n- year: \"Year\", variable integer, 0 to 30\n- month: \"Month\", variable number, 0 to 12\n- inflation: \"Inflation\", given percent, 4\nOutputs:\n- value: \"Value\", currency = start * (1 + rate / 100) ^ year\n- real: \"Real value\", currency = value / (1 + inflation / 100) ^ year\n- gain: \"Gain\", currency = value - start\n- doubling: \"Doubling time\", number = 72 / rate\n- monthly: \"Monthly\", number = rate / 12 + month * 0\n- fixedOnly: \"Fixed\", number = inflation * 2",
+    "outline" : "Growth: \n- metric #block-0 ref value\n- chart #block-1 ref nothing over year\n- chart #block-2 ref value, real, gain, doubling, monthly over inflation \"Over the years\"\n- section #block-3 \"Change it\"\n  - slider #block-3-0 ref rate\n  - chart #block-3-1 ref doubling over rate\n  - slider #block-3-2 ref start\n- chart #block-4 ref gain over start\n- chart #block-5 ref fixedOnly over inflation"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Rate\", percent, starts at 7, 0 to 20, step 0.5\n- start: \"Start\", currency, starts at 1000, 0 to 10000, step 100\n- year: \"Year\", variable integer, 0 to 30\n- month: \"Month\", number, starts at 0, 0 to 12, step 1\n- inflation: \"Inflation\", given percent, 4\nOutputs:\n- value: \"Value\", currency = start * (1 + rate / 100) ^ year\n- real: \"Real value\", currency = value / (1 + inflation / 100) ^ year\n- gain: \"Gain\", currency = value - start\n- doubling: \"Doubling time\", number = 72 / rate\n- monthly: \"Monthly\", number = rate / 12 + month * 0\n- fixedOnly: \"Fixed\", number = inflation * 2",
+    "outline" : "Growth: \n- hero #block-0 ref value\n- section #block-3 \"Change it\"\n  - chart #block-2 ref value, real, gain, doubling over year \"Over the years\"\n  - chart #block-4 ref gain over start\n  - chart #block-3-1 ref doubling over rate\n  - slider #block-3-0 ref rate\n  - slider #block-3-2 ref start\n  - row #givens\n    - metric #inflation-given ref inflation\n- section #more-inputs\n  - slider #month-control ref month\n- section #more-results\n  - metric #fixedOnly-metric ref fixedOnly\n- section #auto-outputs\n  - metric #auto-output-4 ref monthly"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "The chart plots 'nothing', which isn't a result. Add what it plots as an output, calculated from the inputs, and chart that."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "metric",
+          "over" : "",
+          "ref" : "value",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "year",
+          "ref" : "nothing",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "inflation",
+          "ref" : "value, real, gain, doubling, monthly",
+          "text" : "",
+          "title" : "Over the years"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "rate",
+              "ref" : "doubling",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "start",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Change it"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "start",
+          "ref" : "gain",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "inflation",
+          "ref" : "fixedOnly",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 7,
+          "label" : "Rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Start",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "start",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 0,
+          "label" : "Year",
+          "max" : 30,
+          "min" : 0,
+          "name" : "year",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Month",
+          "max" : 12,
+          "min" : 0,
+          "name" : "month",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 4,
+          "label" : "Inflation",
+          "max" : 4,
+          "min" : 4,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "start * (1 + rate / 100) ^ year",
+          "label" : "Value",
+          "name" : "value",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value / (1 + inflation / 100) ^ year",
+          "label" : "Real value",
+          "name" : "real",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "value - start",
+          "label" : "Gain",
+          "name" : "gain",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "72 / rate",
+          "label" : "Doubling time",
+          "name" : "doubling",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "rate / 12 + month * 0",
+          "label" : "Monthly",
+          "name" : "monthly",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "inflation * 2",
+          "label" : "Fixed",
+          "name" : "fixedOnly",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Growth"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

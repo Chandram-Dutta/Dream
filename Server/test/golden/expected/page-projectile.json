@@ -1,0 +1,1971 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'flight', dropped a path 'no range', whose formulas can't be read."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the figure 'flight', dropped a path, whose formulas can't be read."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed an equation written as sentences as a paragraph."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped an empty equation."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the figure 'flight'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed units written after the live values of 'flightTime', 'height', 'range', 'speed', which show their own."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'g'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'flightTime' to the screen."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'height' with the controls that shape it."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "range",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It lands {range} away after {flightTime}, flying at {speed}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "R",
+              "value" : "the range"
+            },
+            {
+              "label" : "g",
+              "value" : "gravity"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "R = \\frac{v_0^2 \\sin 2\\theta}{g}",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The range is $R = \\val{range}$ for this throw.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "T = \\frac{2 v_0 \\sin\\theta}{g}",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Height is $y = \\val{height}$ at time {t}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-7",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "t",
+              "ref" : "height",
+              "text" : "",
+              "title" : "Height over time"
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "figure-flight",
+              "items" : [
+
+              ],
+              "kind" : "figure",
+              "over" : "",
+              "ref" : "flight",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "angle",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "g-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "g",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-8",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Throw"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "flightTime-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "flightTime",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "Wikipedia",
+          "title" : "Projectile motion",
+          "url" : "https://en.wikipedia.org/wiki/Projectile_motion"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "flight",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "tip",
+              "x" : "speed * cos(angle * pi / 180) * 0.5",
+              "y" : "speed * sin(angle * pi / 180) * 0.5"
+            },
+            {
+              "label" : "{range} m",
+              "name" : "land",
+              "x" : "range",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "end",
+              "x" : "100",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O",
+                "end"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "guide",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "path",
+              "label" : "",
+              "over" : "t",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "flightTime",
+              "tone" : "main",
+              "x" : "speed * cos(angle * pi / 180) * t",
+              "y" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2"
+            },
+            {
+              "from" : "",
+              "kind" : "arrow",
+              "label" : "v",
+              "over" : "",
+              "points" : [
+                "O",
+                "tip"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Speed",
+          "max" : 30,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "v_0",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 85,
+          "min" : 5,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta",
+          "unit" : "°"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "g",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "g",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 5,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "t",
+          "unit" : "s"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "2 * speed * sin(angle * pi / 180) / g",
+          "label" : "Time in the air",
+          "name" : "flightTime",
+          "symbol" : "T",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed^2 * sin(2 * angle * pi / 180) / g",
+          "label" : "Distance",
+          "name" : "range",
+          "symbol" : "R",
+          "unit" : "m"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+          "label" : "Height at t",
+          "name" : "height",
+          "symbol" : "y",
+          "unit" : "m"
+        }
+      ],
+      "question" : "How do speed and angle change the throw?",
+      "related" : [
+        "Projectile motion",
+        "Air resistance"
+      ],
+      "summary" : "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+      "symbol" : "",
+      "title" : "Throwing a ball"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "Named no sources, so every page read is credited."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "range",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It lands {range} m away after {flightTime} seconds, flying at {speed} m/s.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "$R$",
+              "value" : "the range"
+            },
+            {
+              "label" : "g",
+              "value" : "gravity"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "  ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "nothing",
+          "text" : "\\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-7",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "t",
+          "ref" : "height",
+          "text" : "",
+          "title" : "Height over time"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "angle",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-8",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Throw"
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "Wikipedia",
+          "title" : "Projectile motion",
+          "url" : "https://en.wikipedia.org/wiki/Projectile_motion"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "flight",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "tip",
+              "x" : "speed * cos(angle * pi / 180) * 0.5",
+              "y" : "speed * sin(angle * pi / 180) * 0.5"
+            },
+            {
+              "label" : "{range} m",
+              "name" : "land",
+              "x" : "range",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "end",
+              "x" : "100",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O",
+                "end"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "guide",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "path",
+              "label" : "",
+              "over" : "t",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "flightTime",
+              "tone" : "main",
+              "x" : "speed * cos(angle * pi / 180) * t",
+              "y" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2"
+            },
+            {
+              "from" : "",
+              "kind" : "path",
+              "label" : "no range",
+              "over" : "",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "s",
+              "y" : "s ^ 2"
+            },
+            {
+              "from" : "0",
+              "kind" : "path",
+              "label" : "",
+              "over" : "u",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "1",
+              "tone" : "plain",
+              "x" : "u * speed",
+              "y" : "missing * u"
+            },
+            {
+              "from" : "",
+              "kind" : "arrow",
+              "label" : "v",
+              "over" : "",
+              "points" : [
+                "O",
+                "tip"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Speed",
+          "max" : 30,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "v_0",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 85,
+          "min" : 5,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta",
+          "unit" : "°"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "g",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "g",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 5,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "t",
+          "unit" : "s"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "2 * speed * sin(angle * pi / 180) / g",
+          "label" : "Time in the air",
+          "name" : "flightTime",
+          "symbol" : "T",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed^2 * sin(2 * angle * pi / 180) / g",
+          "label" : "Distance",
+          "name" : "range",
+          "symbol" : "R",
+          "unit" : "m"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+          "label" : "Height at t",
+          "name" : "height",
+          "symbol" : "y",
+          "unit" : "m"
+        }
+      ],
+      "question" : "How do speed and angle change the throw?",
+      "related" : [
+        "Projectile motion",
+        "Air resistance"
+      ],
+      "summary" : "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+      "symbol" : "",
+      "title" : "Throwing a ball"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "range",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It lands {range} m away after {flightTime} seconds, flying at {speed} m/s.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "$R$",
+            "value" : "the range"
+          },
+          {
+            "label" : "g",
+            "value" : "gravity"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "  ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "nothing",
+        "text" : "\\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "t",
+        "ref" : "height",
+        "text" : "",
+        "title" : "Height over time"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "speed",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "angle",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Throw"
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+      {
+        "name" : "flight",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "tip",
+            "x" : "speed * cos(angle * pi / 180) * 0.5",
+            "y" : "speed * sin(angle * pi / 180) * 0.5"
+          },
+          {
+            "label" : "{range} m",
+            "name" : "land",
+            "x" : "range",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "end",
+            "x" : "100",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "",
+            "over" : "",
+            "points" : "O, end",
+            "radius" : "",
+            "to" : "",
+            "tone" : "guide",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "0",
+            "kind" : "path",
+            "label" : "",
+            "over" : "t",
+            "points" : "",
+            "radius" : "",
+            "to" : "flightTime",
+            "tone" : "main",
+            "x" : "speed * cos(angle * pi / 180) * t",
+            "y" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2"
+          },
+          {
+            "from" : "",
+            "kind" : "path",
+            "label" : "no range",
+            "over" : "",
+            "points" : "",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "s",
+            "y" : "s ^ 2"
+          },
+          {
+            "from" : "0",
+            "kind" : "path",
+            "label" : "",
+            "over" : "u",
+            "points" : "",
+            "radius" : "",
+            "to" : "1",
+            "tone" : "plain",
+            "x" : "u * speed",
+            "y" : "missing * u"
+          },
+          {
+            "from" : "",
+            "kind" : "arrow",
+            "label" : "v",
+            "over" : "",
+            "points" : "O, tip",
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Speed",
+        "max" : 30,
+        "min" : 5,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "v_0",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 45,
+        "label" : "Angle",
+        "max" : 85,
+        "min" : 5,
+        "name" : "angle",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "\\theta",
+        "unit" : "deg"
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 100,
+        "min" : 0,
+        "name" : "g",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "g",
+        "unit" : "m/s^2"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Time",
+        "max" : 5,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "t",
+        "unit" : "s"
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "2 * speed * sin(angle * pi / 180) / g",
+        "label" : "Time in the air",
+        "name" : "flightTime",
+        "symbol" : "T",
+        "unit" : "s"
+      },
+      {
+        "format" : "number",
+        "formula" : "speed^2 * sin(2 * angle * pi / 180) / g",
+        "label" : "Distance",
+        "name" : "range",
+        "symbol" : "R",
+        "unit" : "metres"
+      },
+      {
+        "format" : "number",
+        "formula" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+        "label" : "Height at t",
+        "name" : "height",
+        "symbol" : "y",
+        "unit" : "m"
+      }
+    ],
+    "question" : "How do speed and angle change the throw?",
+    "related" : [
+      "Projectile motion",
+      "Air resistance"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+    "symbol" : "",
+    "title" : "Throwing a ball"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "range",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It lands {range} m away after {flightTime} seconds, flying at {speed} m/s.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+          {
+            "label" : "$R$",
+            "value" : "the range"
+          },
+          {
+            "label" : "g",
+            "value" : "gravity"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "$$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "  ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-5",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "nothing",
+        "text" : "\\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-6",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-7",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "t",
+        "ref" : "height",
+        "text" : "",
+        "title" : "Height over time"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-8-0",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "speed",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-8-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "angle",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-8",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Throw"
+      }
+    ],
+    "figures" : [
+      {
+        "name" : "flight",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "tip",
+            "x" : "speed * cos(angle * pi / 180) * 0.5",
+            "y" : "speed * sin(angle * pi / 180) * 0.5"
+          },
+          {
+            "label" : "{range} m",
+            "name" : "land",
+            "x" : "range",
+            "y" : "0"
+          },
+          {
+            "label" : "",
+            "name" : "end",
+            "x" : "100",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "O",
+              "end"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "guide",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "0",
+            "kind" : "path",
+            "label" : "",
+            "over" : "t",
+            "points" : [
+
+            ],
+            "radius" : "",
+            "to" : "flightTime",
+            "tone" : "main",
+            "x" : "speed * cos(angle * pi / 180) * t",
+            "y" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2"
+          },
+          {
+            "from" : "",
+            "kind" : "path",
+            "label" : "no range",
+            "over" : "",
+            "points" : [
+
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "s",
+            "y" : "s ^ 2"
+          },
+          {
+            "from" : "0",
+            "kind" : "path",
+            "label" : "",
+            "over" : "u",
+            "points" : [
+
+            ],
+            "radius" : "",
+            "to" : "1",
+            "tone" : "plain",
+            "x" : "u * speed",
+            "y" : "missing * u"
+          },
+          {
+            "from" : "",
+            "kind" : "arrow",
+            "label" : "v",
+            "over" : "",
+            "points" : [
+              "O",
+              "tip"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "contrast",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Speed",
+        "max" : 30,
+        "min" : 5,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "v_0",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 45,
+        "label" : "Angle",
+        "max" : 85,
+        "min" : 5,
+        "name" : "angle",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "\\theta",
+        "unit" : "deg"
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 100,
+        "min" : 0,
+        "name" : "g",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "g",
+        "unit" : "m/s^2"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Time",
+        "max" : 5,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "t",
+        "unit" : "s"
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "2 * speed * sin(angle * pi / 180) / g",
+        "label" : "Time in the air",
+        "name" : "flightTime",
+        "symbol" : "T",
+        "unit" : "s"
+      },
+      {
+        "format" : "number",
+        "formula" : "speed^2 * sin(2 * angle * pi / 180) / g",
+        "label" : "Distance",
+        "name" : "range",
+        "symbol" : "R",
+        "unit" : "metres"
+      },
+      {
+        "format" : "number",
+        "formula" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+        "label" : "Height at t",
+        "name" : "height",
+        "symbol" : "y",
+        "unit" : "m"
+      }
+    ],
+    "question" : "How do speed and angle change the throw?",
+    "related" : [
+      "Projectile motion",
+      "Air resistance"
+    ],
+    "summary" : "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+    "symbol" : "",
+    "title" : "Throwing a ball"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- speed: \"Speed\", number, starts at 20, 5 to 30, step 1, written v_0, in m/s\n- angle: \"Angle\", number, starts at 45, 5 to 85, step 1, written \\theta, in deg\n- g: \"Gravity\", given number, 9.81, written g, in m/s^2\n- t: \"Time\", variable number, 0 to 5, written t, in s\nOutputs:\n- flightTime: \"Time in the air\", number, written T, in s = 2 * speed * sin(angle * pi / 180) / g\n- range: \"Distance\", number, written R, in metres = speed^2 * sin(2 * angle * pi / 180) / g\n- height: \"Height at t\", number, written y, in m = speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+    "outline" : "Throwing a ball: A ball thrown at {speed} m/s and 45° lands {range} m away.\n- hero #block-0 ref range\n- paragraph #block-1\n  It lands {range} m away after {flightTime} seconds, flying at {speed} m/s.\n- equation #block-2\n  $$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$\n  • $R$: the range\n  • g: gravity\n- equation #block-3\n  The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw.\n- equation #block-4\n    \n- equation #block-5 ref nothing\n  \\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]\n- paragraph #block-6\n  Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}.\n- chart #block-7 ref height over t \"Height over time\"\n- section #block-8 \"Throw\"\n  - slider #block-8-0 ref speed\n  - slider #block-8-1 ref angle\n- hero #auto-hero ref flightTime\nfigure flight:\n  point O = (0, 0)\n  point tip = (speed * cos(angle * pi / 180) * 0.5, speed * sin(angle * pi / 180) * 0.5)\n  point land = (range, 0) \"{range} m\"\n  point end = (100, 0)\n  segment O, end guide\n  path (speed * cos(angle * pi / 180) * t, speed * sin(angle * pi / 180) * t - g * t^2 / 2) over t from 0 to flightTime main\n  path (s, s ^ 2) over  \"no range\" plain\n  path (u * speed, missing * u) over u from 0 to 1 plain\n  arrow O, tip \"v\" contrast\nrelated: Projectile motion, Air resistance"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- speed: \"Speed\", number, starts at 20, 5 to 30, step 1, written v_0, in m/s\n- angle: \"Angle\", number, starts at 45, 5 to 85, step 1, written \\theta, in °\n- g: \"Gravity\", given number, 9.81, written g, in m/s²\n- t: \"Time\", variable number, 0 to 5, written t, in s\nOutputs:\n- flightTime: \"Time in the air\", number, written T, in s = 2 * speed * sin(angle * pi / 180) / g\n- range: \"Distance\", number, written R, in m = speed^2 * sin(2 * angle * pi / 180) / g\n- height: \"Height at t\", number, written y, in m = speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+    "outline" : "Throwing a ball: A ball thrown at {speed} m/s and 45° lands {range} m away.\n- hero #block-0 ref range\n- paragraph #block-1\n  It lands {range} away after {flightTime}, flying at {speed}.\n- equation #block-2\n  R = \\frac{v_0^2 \\sin 2\\theta}{g}\n  • R: the range\n  • g: gravity\n- paragraph #block-3\n  The range is $R = \\val{range}$ for this throw.\n- equation #block-5\n  T = \\frac{2 v_0 \\sin\\theta}{g}\n- paragraph #block-6\n  Height is $y = \\val{height}$ at time {t}.\n- section #block-8 \"Throw\"\n  - chart #block-7 ref height over t \"Height over time\"\n  - figure #figure-flight ref flight\n  - slider #block-8-0 ref speed\n  - slider #block-8-1 ref angle\n  - row #givens\n    - metric #g-given ref g\n- section #more-results\n  - metric #flightTime-metric ref flightTime\nfigure flight:\n  point O = (0, 0)\n  point tip = (speed * cos(angle * pi / 180) * 0.5, speed * sin(angle * pi / 180) * 0.5)\n  point land = (range, 0) \"{range} m\"\n  point end = (100, 0)\n  segment O, end guide\n  path (speed * cos(angle * pi / 180) * t, speed * sin(angle * pi / 180) * t - g * t^2 / 2) over t from 0 to flightTime main\n  arrow O, tip \"v\" contrast\nrelated: Projectile motion, Air resistance\ncitations (pages already read; list again the ones the screen still uses): https://en.wikipedia.org/wiki/Projectile_motion"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'angle', 'g', 'range'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "range",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It lands {range} m away after {flightTime} seconds, flying at {speed} m/s.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "$R$",
+              "value" : "the range"
+            },
+            {
+              "label" : "g",
+              "value" : "gravity"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "$$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "  ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "nothing",
+          "text" : "\\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-7",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "t",
+          "ref" : "height",
+          "text" : "",
+          "title" : "Height over time"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-8-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "angle",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-8",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Throw"
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "flight",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "tip",
+              "x" : "speed * cos(angle * pi / 180) * 0.5",
+              "y" : "speed * sin(angle * pi / 180) * 0.5"
+            },
+            {
+              "label" : "{range} m",
+              "name" : "land",
+              "x" : "range",
+              "y" : "0"
+            },
+            {
+              "label" : "",
+              "name" : "end",
+              "x" : "100",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O",
+                "end"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "guide",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "0",
+              "kind" : "path",
+              "label" : "",
+              "over" : "t",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "flightTime",
+              "tone" : "main",
+              "x" : "speed * cos(angle * pi / 180) * t",
+              "y" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2"
+            },
+            {
+              "from" : "",
+              "kind" : "path",
+              "label" : "no range",
+              "over" : "",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "s",
+              "y" : "s ^ 2"
+            },
+            {
+              "from" : "0",
+              "kind" : "path",
+              "label" : "",
+              "over" : "u",
+              "points" : [
+
+              ],
+              "radius" : "",
+              "to" : "1",
+              "tone" : "plain",
+              "x" : "u * speed",
+              "y" : "missing * u"
+            },
+            {
+              "from" : "",
+              "kind" : "arrow",
+              "label" : "v",
+              "over" : "",
+              "points" : [
+                "O",
+                "tip"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "contrast",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Speed",
+          "max" : 30,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "v_0",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 45,
+          "label" : "Angle",
+          "max" : 85,
+          "min" : 5,
+          "name" : "angle",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta",
+          "unit" : "°"
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "g",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "g",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 5,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "t",
+          "unit" : "s"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "2 * speed * sin(angle * pi / 180) / g",
+          "label" : "Time in the air",
+          "name" : "flightTime",
+          "symbol" : "T",
+          "unit" : "s"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed^2 * sin(2 * angle * pi / 180) / g",
+          "label" : "Distance",
+          "name" : "range",
+          "symbol" : "R",
+          "unit" : "m"
+        },
+        {
+          "format" : "number",
+          "formula" : "speed * sin(angle * pi / 180) * t - g * t^2 / 2",
+          "label" : "Height at t",
+          "name" : "height",
+          "symbol" : "y",
+          "unit" : "m"
+        }
+      ],
+      "question" : "How do speed and angle change the throw?",
+      "related" : [
+        "Projectile motion",
+        "Air resistance"
+      ],
+      "summary" : "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+      "symbol" : "",
+      "title" : "Throwing a ball"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

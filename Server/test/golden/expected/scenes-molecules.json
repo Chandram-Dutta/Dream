@@ -1,0 +1,1315 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'unknown', dropped the molecule 'unobtainium': PubChem has no 3D structure for it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the scene 'unknown', which had nothing that could be drawn."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'saddle', dropped a plot (1 / (x - x)) that can't be drawn at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'saddle', dropped a plot (x) that can't be drawn at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a scene of 'nowhere', which isn't defined."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'blank'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'orbit'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'saddle'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "methane",
+          "text" : "",
+          "title" : "Methane"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "scene-saddle",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "saddle",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "scene-orbit",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "orbit",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "scene-blank",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "blank",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each hydrogen sits at a corner of a tetrahedron.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "PubChem",
+          "title" : "Methane",
+          "url" : "https://pubchem.ncbi.nlm.nih.gov/compound/297"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "x",
+          "max" : 3,
+          "min" : -3,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "y",
+          "max" : 1,
+          "min" : -1,
+          "name" : "y",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "molecule" : {
+            "name" : "methane",
+            "structure" : {
+              "atoms" : [
+                {
+                  "element" : 6,
+                  "x" : 0,
+                  "y" : 0,
+                  "z" : 0
+                },
+                {
+                  "element" : 1,
+                  "x" : 0.55410000000000004,
+                  "y" : 0.79959999999999998,
+                  "z" : 0.4965
+                },
+                {
+                  "element" : 1,
+                  "x" : 0.68330000000000002,
+                  "y" : -0.81340000000000001,
+                  "z" : -0.25359999999999999
+                },
+                {
+                  "element" : 1,
+                  "x" : -0.7782,
+                  "y" : -0.3735,
+                  "z" : 0.66920000000000002
+                },
+                {
+                  "element" : 1,
+                  "x" : -0.45929999999999999,
+                  "y" : 0.38740000000000002,
+                  "z" : -0.91210000000000002
+                }
+              ],
+              "bonds" : [
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 1
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 2
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 3
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 4
+                }
+              ],
+              "cid" : 297,
+              "formula" : "CH4",
+              "title" : "Methane"
+            }
+          },
+          "name" : "methane",
+          "objects" : [
+
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "blank",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "dot",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "orbit",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "sun",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "earth",
+              "position" : "orbit(sun, 1, 360 * t / 365)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : "t"
+        },
+        {
+          "name" : "saddle",
+          "objects" : [
+
+          ],
+          "plots" : [
+            {
+              "label" : "$z = x^2 - y^2$",
+              "xFrom" : "-3",
+              "xTo" : "3",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x ^ 2 - y ^ 2"
+            }
+          ],
+          "time" : ""
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Molecules and orbits"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "Named no sources, so every page read is credited."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "methan",
+          "text" : "",
+          "title" : "Methane"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "nowhere",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each hydrogen sits at a corner of a tetrahedron.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "PubChem",
+          "title" : "Methane",
+          "url" : "https://pubchem.ncbi.nlm.nih.gov/compound/297"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "x",
+          "max" : 3,
+          "min" : -3,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "y",
+          "max" : 1,
+          "min" : -1,
+          "name" : "y",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "molecule" : {
+            "name" : "methane",
+            "structure" : {
+              "atoms" : [
+                {
+                  "element" : 6,
+                  "x" : 0,
+                  "y" : 0,
+                  "z" : 0
+                },
+                {
+                  "element" : 1,
+                  "x" : 0.55410000000000004,
+                  "y" : 0.79959999999999998,
+                  "z" : 0.4965
+                },
+                {
+                  "element" : 1,
+                  "x" : 0.68330000000000002,
+                  "y" : -0.81340000000000001,
+                  "z" : -0.25359999999999999
+                },
+                {
+                  "element" : 1,
+                  "x" : -0.7782,
+                  "y" : -0.3735,
+                  "z" : 0.66920000000000002
+                },
+                {
+                  "element" : 1,
+                  "x" : -0.45929999999999999,
+                  "y" : 0.38740000000000002,
+                  "z" : -0.91210000000000002
+                }
+              ],
+              "bonds" : [
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 1
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 2
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 3
+                },
+                {
+                  "from" : 0,
+                  "order" : 1,
+                  "to" : 4
+                }
+              ],
+              "cid" : 297,
+              "formula" : "CH4",
+              "title" : "Methane"
+            }
+          },
+          "name" : "methane",
+          "objects" : [
+
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "molecule" : {
+            "name" : "unobtainium"
+          },
+          "name" : "unknown",
+          "objects" : [
+
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "blank",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "dot",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "orbit",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "sun",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "earth",
+              "position" : "orbit(sun, 1, 360 * t / 365)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "saddle",
+          "objects" : [
+
+          ],
+          "plots" : [
+            {
+              "label" : "$z = x^2 - y^2$",
+              "xFrom" : "",
+              "xTo" : "",
+              "yFrom" : "",
+              "yTo" : "",
+              "z" : "x^2 - y^2"
+            },
+            {
+              "label" : "",
+              "xFrom" : "-1",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "1 / (x - x)"
+            },
+            {
+              "label" : "",
+              "xFrom" : "2",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x"
+            }
+          ],
+          "time" : ""
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Molecules and orbits"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "scene",
+        "over" : "",
+        "ref" : "methan",
+        "text" : "",
+        "title" : "Methane"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "scene",
+        "over" : "",
+        "ref" : "nowhere",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Each hydrogen sits at a corner of a tetrahedron.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Day",
+        "max" : 365,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "x",
+        "max" : 3,
+        "min" : -3,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "y",
+        "max" : 1,
+        "min" : -1,
+        "name" : "y",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "molecule" : "  methane ",
+        "name" : "methane",
+        "objects" : [
+
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "molecule" : "unobtainium",
+        "name" : "unknown",
+        "objects" : [
+
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "molecule" : "   ",
+        "name" : "blank",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "dot",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "molecule" : "",
+        "name" : "orbit",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "sun",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "earth",
+            "position" : "orbit(sun, 1, 360 * t / 365)",
+            "size" : "0.05",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "molecule" : "",
+        "name" : "saddle",
+        "objects" : [
+
+        ],
+        "plots" : [
+          {
+            "label" : "$z = x^2 - y^2$",
+            "xFrom" : "",
+            "xTo" : "",
+            "yFrom" : "",
+            "yTo" : "",
+            "z" : "x^2 - y^2"
+          },
+          {
+            "label" : "",
+            "xFrom" : "-1",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "1 / (x - x)"
+          },
+          {
+            "label" : "",
+            "xFrom" : "2",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "x"
+          }
+        ],
+        "time" : ""
+      }
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Molecules and orbits"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "scene",
+        "over" : "",
+        "ref" : "methan",
+        "text" : "",
+        "title" : "Methane"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "scene",
+        "over" : "",
+        "ref" : "nowhere",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Each hydrogen sits at a corner of a tetrahedron.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Day",
+        "max" : 365,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "x",
+        "max" : 3,
+        "min" : -3,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "y",
+        "max" : 1,
+        "min" : -1,
+        "name" : "y",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "molecule" : {
+          "name" : "methane"
+        },
+        "name" : "methane",
+        "objects" : [
+
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "molecule" : {
+          "name" : "unobtainium"
+        },
+        "name" : "unknown",
+        "objects" : [
+
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "name" : "blank",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "dot",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "name" : "orbit",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "sun",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "earth",
+            "position" : "orbit(sun, 1, 360 * t / 365)",
+            "size" : "0.05",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : ""
+      },
+      {
+        "name" : "saddle",
+        "objects" : [
+
+        ],
+        "plots" : [
+          {
+            "label" : "$z = x^2 - y^2$",
+            "xFrom" : "",
+            "xTo" : "",
+            "yFrom" : "",
+            "yTo" : "",
+            "z" : "x^2 - y^2"
+          },
+          {
+            "label" : "",
+            "xFrom" : "-1",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "1 / (x - x)"
+          },
+          {
+            "label" : "",
+            "xFrom" : "2",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "x"
+          }
+        ],
+        "time" : ""
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Molecules and orbits"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- t: \"Day\", variable number, 0 to 365\n- x: \"x\", variable number, -3 to 3\n- y: \"y\", variable number, -1 to 1\nOutputs:",
+    "outline" : "Molecules and orbits: \n- scene #block-0 ref methan \"Methane\"\n- scene #block-1 ref nowhere\n- paragraph #block-2\n  Each hydrogen sits at a corner of a tetrahedron.\nscene methane:\n  molecule methane\nscene unknown:\n  molecule unobtainium\nscene blank:\n  dot sphere at(0, 0, 0) size 0.1 plain\nscene orbit:\n  sun sphere at(0, 0, 0) size 0.2 plain\n  earth sphere orbit(sun, 1, 360 * t / 365) size 0.05 plain\nscene saddle:\n  plot z = x^2 - y^2 for x  to , y  to  \"$z = x^2 - y^2$\"\n  plot z = 1 / (x - x) for x -1 to 1, y -1 to 1\n  plot z = x for x 2 to 1, y -1 to 1"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- t: \"Day\", variable number, 0 to 365\n- x: \"x\", variable number, -3 to 3\n- y: \"y\", variable number, -1 to 1\nOutputs:",
+    "outline" : "Molecules and orbits: \n- scene #block-0 ref methane \"Methane\"\n- scene #scene-saddle ref saddle\n- scene #scene-orbit ref orbit\n- scene #scene-blank ref blank\n- paragraph #block-2\n  Each hydrogen sits at a corner of a tetrahedron.\nscene methane:\n  molecule methane (found \"Methane\", PubChem CID 297, 5 atoms)\nscene blank:\n  dot sphere at(0, 0, 0) size 0.1 plain\nscene orbit, time t:\n  sun sphere at(0, 0, 0) size 0.2 plain\n  earth sphere orbit(sun, 1, 360 * t / 365) size 0.05 plain\nscene saddle:\n  plot z = x ^ 2 - y ^ 2 for x -3 to 3, y -1 to 1 \"$z = x^2 - y^2$\"\ncitations (pages already read; list again the ones the screen still uses): https://pubchem.ncbi.nlm.nih.gov/compound/297"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "methan",
+          "text" : "",
+          "title" : "Methane"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "nowhere",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each hydrogen sits at a corner of a tetrahedron.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "x",
+          "max" : 3,
+          "min" : -3,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "y",
+          "max" : 1,
+          "min" : -1,
+          "name" : "y",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "molecule" : {
+            "name" : "methane"
+          },
+          "name" : "methane",
+          "objects" : [
+
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "molecule" : {
+            "name" : "unobtainium"
+          },
+          "name" : "unknown",
+          "objects" : [
+
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "blank",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "dot",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "orbit",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "sun",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "earth",
+              "position" : "orbit(sun, 1, 360 * t / 365)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : ""
+        },
+        {
+          "name" : "saddle",
+          "objects" : [
+
+          ],
+          "plots" : [
+            {
+              "label" : "$z = x^2 - y^2$",
+              "xFrom" : "",
+              "xTo" : "",
+              "yFrom" : "",
+              "yTo" : "",
+              "z" : "x^2 - y^2"
+            },
+            {
+              "label" : "",
+              "xFrom" : "-1",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "1 / (x - x)"
+            },
+            {
+              "label" : "",
+              "xFrom" : "2",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x"
+            }
+          ],
+          "time" : ""
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Molecules and orbits"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

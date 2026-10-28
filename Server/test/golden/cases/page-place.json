@@ -1,0 +1,32 @@
+{
+  "about": "A whole page to read about a place, Hampi, written from the Wikipedia article looked up and two pages read: a timeline, facts, bullets, a stat, a diagram of the sites, directions there, the article as the reference (credited once), and maths-free prose with prices.",
+  "reference": {"title": "Hampi", "extract": "Hampi or Hampe, also referred to as the Group of Monuments at Hampi, is a UNESCO World Heritage Site located in Hampi town, Vijayanagara district, east-central Karnataka, India.", "url": "https://en.wikipedia.org/wiki/Hampi", "imageURL": "https://upload.wikimedia.org/wikipedia/commons/hampi.jpg"},
+  "read": [
+    {"title": "Hampi", "site": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Hampi"},
+    {"title": "Hampi, the ruined capital", "site": "UNESCO", "url": "https://whc.unesco.org/en/list/241/", "date": "2024-08-01"},
+    {"title": "How to reach Hampi", "site": "Karnataka Tourism", "url": "https://karnatakatourism.org/tour-item/hampi/"}
+  ],
+  "wire": {
+    "subject": "places",
+    "mode": "read",
+    "title": "Hampi",
+    "summary": "Hampi is the ruined capital of the Vijayanagara Empire, a UNESCO site in Karnataka.",
+    "symbol": "building.columns",
+    "collections": [],
+    "question": "",
+    "inputs": [], "outputs": [], "sounds": [], "figures": [],
+    "diagrams": [{"name": "sites", "shape": "hub", "nodes": [{"id": "hampi", "label": "Hampi", "detail": "The capital."}, {"id": "virupaksha", "label": "Virupaksha Temple", "detail": "Still in worship since the 7th century."}, {"id": "vittala", "label": "Vittala Temple", "detail": "Its stone chariot is on the ₹50 note."}, {"id": "lotus", "label": "Lotus Mahal", "detail": ""}], "edges": []}],
+    "actions": [{"name": "goThere", "kind": "directions", "title": "Hampi", "day": "", "time": "", "duration": "", "place": "Hampi, Karnataka", "from": "Bengaluru", "travel": "transit", "notes": ""}],
+    "scenes": [],
+    "blocks": [
+      {"kind": "paragraph", "title": "", "text": "Hampi was one of the largest cities in the world around 1500. Entry to the Vittala Temple costs $5 to $10 for visitors from abroad.", "ref": "", "over": "", "items": [], "children": []},
+      {"kind": "timeline", "title": "History", "text": "", "ref": "", "over": "", "items": [{"label": "1336", "value": "The Vijayanagara Empire is founded."}, {"label": "1565", "value": "The city is sacked after the Battle of Talikota."}, {"label": "1986", "value": "Named a World Heritage Site."}], "children": []},
+      {"kind": "facts", "title": "At a glance", "text": "", "ref": "", "over": "", "items": [{"label": "State", "value": "Karnataka"}, {"label": "Area", "value": "4,187 hectares"}, {"label": "Nearest station", "value": "Hosapete, 13 km"}], "children": []},
+      {"kind": "stat", "title": "", "text": "", "ref": "", "over": "", "items": [{"label": "1,600+", "value": "surviving monuments"}], "children": []},
+      {"kind": "diagram", "title": "The main sites", "text": "", "ref": "sites", "over": "", "items": [], "children": []},
+      {"kind": "bullets", "title": "Don't miss", "text": "", "ref": "", "over": "", "items": [{"label": "", "value": "Sunrise from Matanga Hill"}, {"label": "", "value": "A coracle ride on the Tungabhadra"}], "children": []}
+    ],
+    "related": ["Vijayanagara Empire", "Badami", "Hampi"],
+    "citations": ["https://en.wikipedia.org/wiki/Hampi", "https://whc.unesco.org/en/list/241", "https://karnatakatourism.org/tour-item/hampi/"]
+  }
+}

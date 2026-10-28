@@ -1,0 +1,223 @@
+{
+  "about": "Lists checked: one with no name, one named like an input (renamed), a second of the same name, an entry named from the label, fields deduplicated and named, a money field, a choice with too few options made text, a list with no fields given a name, starters read into their fields with repeats and unnamed ones dropped; formulas totalling a list by a misspelt name; list and add blocks read by near miss, an add bar for each list, a row holding a list widened, and lists no block shows placed after the main result.",
+  "fill": true,
+  "wire": {
+    "title": "Spending",
+    "subject": "money",
+    "collections": [
+      {
+        "name": "",
+        "label": "",
+        "fields": [
+          {
+            "name": "x"
+          }
+        ]
+      },
+      {
+        "name": "expenses",
+        "label": " Expenses ",
+        "entry": "",
+        "fields": [
+          {
+            "name": "item",
+            "label": "Item",
+            "type": "text"
+          },
+          {
+            "name": "item",
+            "label": "Again",
+            "type": "text"
+          },
+          {
+            "name": "",
+            "label": "Cost",
+            "type": "number"
+          },
+          {
+            "name": "category",
+            "label": "Category",
+            "type": "choice",
+            "options": [
+              "Food",
+              " food ",
+              "Travel",
+              ""
+            ]
+          },
+          {
+            "name": "kind",
+            "label": "Kind",
+            "type": "choice",
+            "options": [
+              "Only"
+            ]
+          },
+          {
+            "name": "paid",
+            "label": "Paid",
+            "type": "done",
+            "options": [
+              "x"
+            ]
+          }
+        ],
+        "starters": [
+          {
+            "values": [
+              "Rent",
+              "",
+              "₹12,000",
+              "travel",
+              "Only",
+              "yes"
+            ]
+          },
+          {
+            "values": [
+              "rent",
+              "",
+              "500"
+            ]
+          },
+          {
+            "values": [
+              "",
+              "",
+              "100"
+            ]
+          },
+          {
+            "values": [
+              "Groceries",
+              "",
+              "2,500.50",
+              "Fod",
+              "",
+              "no"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "groceries",
+        "label": "Groceries",
+        "entry": "a grocery item that is far too long to be an entry name",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name",
+            "type": "text"
+          },
+          {
+            "name": "done",
+            "label": "Bought",
+            "type": "done"
+          }
+        ],
+        "starters": [
+          {
+            "values": [
+              "Milk",
+              "1"
+            ]
+          },
+          {
+            "values": [
+              "Eggs",
+              "maybe"
+            ]
+          }
+        ]
+      },
+      {
+        "name": "groceries",
+        "label": "Second groceries",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name"
+          }
+        ]
+      },
+      {
+        "name": "budget",
+        "label": "Budget list",
+        "fields": []
+      },
+      {
+        "name": "ignored",
+        "label": "Fifth list",
+        "fields": [
+          {
+            "name": "name",
+            "label": "Name"
+          }
+        ]
+      }
+    ],
+    "inputs": [
+      {
+        "name": "budget",
+        "label": "Budget",
+        "format": "currency",
+        "initial": 20000,
+        "max": 100000,
+        "step": 1000
+      }
+    ],
+    "outputs": [
+      {
+        "name": "spent",
+        "label": "Spent",
+        "formula": "sum(expences.cost)",
+        "format": "currency"
+      },
+      {
+        "name": "left",
+        "label": "Left",
+        "formula": "budget - spent",
+        "format": "currency"
+      },
+      {
+        "name": "toBuy",
+        "label": "To buy",
+        "formula": "count(grocery) - count(groceries.bought)",
+        "format": "integer"
+      },
+      {
+        "name": "biggest",
+        "label": "Biggest",
+        "formula": "max(expenses.cost)",
+        "format": "currency"
+      }
+    ],
+    "blocks": [
+      {
+        "kind": "hero",
+        "ref": "left"
+      },
+      {
+        "kind": "row",
+        "children": [
+          {
+            "kind": "metric",
+            "ref": "spent"
+          },
+          {
+            "kind": "list",
+            "ref": "expence"
+          }
+        ]
+      },
+      {
+        "kind": "list",
+        "ref": "groceries.name"
+      },
+      {
+        "kind": "add",
+        "ref": "nothing"
+      }
+    ]
+  }
+}

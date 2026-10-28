@@ -1,0 +1,25 @@
+{
+  "about": "Ranges checked: a minimum above the maximum, a start outside the range, a range of one value, whole numbers rounded, a step picked, a percent written as a fraction, a toggle and choices put right, a choice with one option and one with none, and givens and live values with no range at all.",
+  "fill": true,
+  "wire": {
+    "title": "Ranges",
+    "inputs": [
+      {"name": "swapped", "label": "Swapped", "initial": 5, "min": 10, "max": 0, "step": 1},
+      {"name": "outside", "label": "Outside", "initial": 150, "min": 0, "max": 100, "step": 1},
+      {"name": "single", "label": "Single", "initial": -4, "min": -4, "max": -4, "step": 1},
+      {"name": "count", "label": "Count", "format": "integer", "initial": 2.6, "min": 0.4, "max": 9.2, "step": 0.3},
+      {"name": "noStep", "label": "No step", "initial": 0.5, "min": 0, "max": 2.4, "step": 0},
+      {"name": "bigStep", "label": "Big step", "initial": 500, "min": 0, "max": 1000, "step": 5000},
+      {"name": "rateFraction", "label": "Rate", "format": "percent", "initial": 0.18, "min": 0, "max": 1, "step": 0.01},
+      {"name": "night", "label": "Night", "format": "toggle", "initial": 7, "min": -3, "max": 9, "step": 2},
+      {"name": "size", "label": "Size", "format": "choice", "initial": 7.6, "options": ["  Small ", "", "Medium", "Large  "]},
+      {"name": "flavour", "label": "Flavour", "format": "choice", "initial": 0, "options": ["Vanilla"]},
+      {"name": "colour", "label": "Colour", "format": "choice", "initial": 1, "options": []},
+      {"name": "gravity", "label": "Gravity", "role": "given", "initial": 9.81, "min": 0, "max": 20, "unit": "m/s²"}
+    ],
+    "outputs": [
+      {"name": "total", "label": "Total", "formula": "swapped + outside + single + count + noStep + bigStep + rateFraction + night + size + flavour + colour + gravity"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "total"}]
+  }
+}

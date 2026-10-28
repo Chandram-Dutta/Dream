@@ -1,0 +1,1590 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Read the list of 'expence' as 'expenses'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed the bar for adding to 'nothing', which isn't a list."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a bar for adding to 'expenses'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a bar for adding to 'groceries'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'budget'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'toBuy', 'biggest' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "left",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "spent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "expenses-add",
+              "items" : [
+
+              ],
+              "kind" : "add",
+              "over" : "",
+              "ref" : "expenses",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "expenses",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "groceries-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "groceries",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "groceries",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "budget-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "budget",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "toBuy-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "toBuy",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "biggest-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "biggest",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "expense",
+          "fields" : [
+            {
+              "label" : "Item",
+              "name" : "item",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Cost",
+              "name" : "Cost",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            },
+            {
+              "label" : "Category",
+              "name" : "category",
+              "options" : [
+                "Food",
+                "Travel"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Kind",
+              "name" : "kind",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Paid",
+              "name" : "paid",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Expenses",
+          "name" : "expenses",
+          "starters" : [
+            {
+              "category" : "Travel",
+              "Cost" : 12000,
+              "item" : "Rent",
+              "kind" : "Only",
+              "paid" : 1
+            },
+            {
+              "Cost" : 2500.5,
+              "item" : "Groceries",
+              "paid" : 0
+            }
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Bought",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+            {
+              "done" : 1,
+              "name" : "Milk"
+            },
+            {
+              "name" : "Eggs"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Budget",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "sum(expenses.Cost)",
+          "label" : "Spent",
+          "name" : "spent",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "budget - spent",
+          "label" : "Left",
+          "name" : "left",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(groceries) - count(groceries.done)",
+          "label" : "To buy",
+          "name" : "toBuy",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "max(expenses.Cost)",
+          "label" : "Biggest",
+          "name" : "biggest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Spending"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "left",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "spent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "expence",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "groceries.name",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "nothing",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "expense",
+          "fields" : [
+            {
+              "label" : "Item",
+              "name" : "item",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Cost",
+              "name" : "Cost",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            },
+            {
+              "label" : "Category",
+              "name" : "category",
+              "options" : [
+                "Food",
+                "Travel"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Kind",
+              "name" : "kind",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Paid",
+              "name" : "paid",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Expenses",
+          "name" : "expenses",
+          "starters" : [
+            {
+              "category" : "Travel",
+              "Cost" : 12000,
+              "item" : "Rent",
+              "kind" : "Only",
+              "paid" : 1
+            },
+            {
+              "Cost" : 2500.5,
+              "item" : "Groceries",
+              "paid" : 0
+            }
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Bought",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+            {
+              "done" : 1,
+              "name" : "Milk"
+            },
+            {
+              "name" : "Eggs"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Budget",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "sum(expenses.Cost)",
+          "label" : "Spent",
+          "name" : "spent",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "budget - spent",
+          "label" : "Left",
+          "name" : "left",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(groceries) - count(groceries.done)",
+          "label" : "To buy",
+          "name" : "toBuy",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "max(expenses.Cost)",
+          "label" : "Biggest",
+          "name" : "biggest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Spending"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "left",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "spent",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "list",
+            "over" : "",
+            "ref" : "expence",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "groceries.name",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "add",
+        "over" : "",
+        "ref" : "nothing",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "",
+            "name" : "x",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "",
+        "name" : "",
+        "source" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Item",
+            "name" : "item",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Again",
+            "name" : "item",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Cost",
+            "name" : "",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Category",
+            "name" : "category",
+            "options" : [
+              "Food",
+              " food ",
+              "Travel",
+              ""
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Kind",
+            "name" : "kind",
+            "options" : [
+              "Only"
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Paid",
+            "name" : "paid",
+            "options" : [
+              "x"
+            ],
+            "type" : "done"
+          }
+        ],
+        "label" : " Expenses ",
+        "name" : "expenses",
+        "source" : "",
+        "starters" : [
+          {
+            "values" : [
+              "Rent",
+              "",
+              "₹12,000",
+              "travel",
+              "Only",
+              "yes"
+            ]
+          },
+          {
+            "values" : [
+              "rent",
+              "",
+              "500"
+            ]
+          },
+          {
+            "values" : [
+              "",
+              "",
+              "100"
+            ]
+          },
+          {
+            "values" : [
+              "Groceries",
+              "",
+              "2,500.50",
+              "Fod",
+              "",
+              "no"
+            ]
+          }
+        ]
+      },
+      {
+        "entry" : "a grocery item that is far too long to be an entry name",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Bought",
+            "name" : "done",
+            "options" : [
+
+            ],
+            "type" : "done"
+          }
+        ],
+        "label" : "Groceries",
+        "name" : "groceries",
+        "source" : "",
+        "starters" : [
+          {
+            "values" : [
+              "Milk",
+              "1"
+            ]
+          },
+          {
+            "values" : [
+              "Eggs",
+              "maybe"
+            ]
+          }
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Second groceries",
+        "name" : "groceries",
+        "source" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+
+        ],
+        "label" : "Budget list",
+        "name" : "budget",
+        "source" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Fifth list",
+        "name" : "ignored",
+        "source" : "",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 20000,
+        "label" : "Budget",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1000,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "sum(expences.cost)",
+        "label" : "Spent",
+        "name" : "spent",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "budget - spent",
+        "label" : "Left",
+        "name" : "left",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "count(grocery) - count(groceries.bought)",
+        "label" : "To buy",
+        "name" : "toBuy",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "max(expenses.cost)",
+        "label" : "Biggest",
+        "name" : "biggest",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Spending"
+  },
+  "converted" : {
+    "accent" : "green",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "left",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "spent",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "list",
+            "over" : "",
+            "ref" : "expence",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "groceries.name",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "add",
+        "over" : "",
+        "ref" : "nothing",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "",
+            "name" : "x",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "",
+        "name" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Item",
+            "name" : "item",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Again",
+            "name" : "item",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Cost",
+            "name" : "",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Category",
+            "name" : "category",
+            "options" : [
+              "Food",
+              " food ",
+              "Travel",
+              ""
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Kind",
+            "name" : "kind",
+            "options" : [
+              "Only"
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Paid",
+            "name" : "paid",
+            "options" : [
+              "x"
+            ],
+            "type" : "done"
+          }
+        ],
+        "label" : " Expenses ",
+        "name" : "expenses",
+        "starters" : [
+          {
+            "" : 12000,
+            "category" : "Travel",
+            "item" : "Rent",
+            "kind" : "Only",
+            "paid" : 1
+          },
+          {
+            "" : 500,
+            "item" : "rent"
+          },
+          {
+            "" : 100
+          },
+          {
+            "" : 2500.5,
+            "item" : "Groceries",
+            "paid" : 0
+          }
+        ]
+      },
+      {
+        "entry" : "a grocery item that is far too long to be an entry name",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Bought",
+            "name" : "done",
+            "options" : [
+
+            ],
+            "type" : "done"
+          }
+        ],
+        "label" : "Groceries",
+        "name" : "groceries",
+        "starters" : [
+          {
+            "done" : 1,
+            "name" : "Milk"
+          },
+          {
+            "name" : "Eggs"
+          }
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Second groceries",
+        "name" : "groceries",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+
+        ],
+        "label" : "Budget list",
+        "name" : "budget",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Fifth list",
+        "name" : "ignored",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 20000,
+        "label" : "Budget",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1000,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "sum(expences.cost)",
+        "label" : "Spent",
+        "name" : "spent",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "budget - spent",
+        "label" : "Left",
+        "name" : "left",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "count(grocery) - count(groceries.bought)",
+        "label" : "To buy",
+        "name" : "toBuy",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "max(expenses.cost)",
+        "label" : "Biggest",
+        "name" : "biggest",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Spending"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- budget: \"Budget\", currency, starts at 20000, 0 to 100000, step 1000\nOutputs:\n- spent: \"Spent\", currency = sum(expences.cost)\n- left: \"Left\", currency = budget - spent\n- toBuy: \"To buy\", integer = count(grocery) - count(groceries.bought)\n- biggest: \"Biggest\", currency = max(expenses.cost)",
+    "outline" : "Spending: \nLists:\n- : \"\", each an entry: x (text)\n- expenses: \" Expenses \", each an entry: item (text), item (text),  (number), category (choice of Food /  food  / Travel / ), kind (choice of Only), paid (done)\n  starters: Rent, rent, Groceries\n- groceries: \"Groceries\", each an a grocery item that is far too long to be an entry name: name (text), done (done)\n  starters: Milk, Eggs\n- groceries: \"Second groceries\", each an entry: name (text)\n- budget: \"Budget list\", each an entry: \n- ignored: \"Fifth list\", each an entry: name (text)\n- hero #block-0 ref left\n- row #block-1\n  - metric #block-1-0 ref spent\n  - list #block-1-1 ref expence\n- list #block-2 ref groceries.name\n- add #block-3 ref nothing\n- section #auto-inputs\n  - slider #auto-input-0 ref budget\n- section #auto-outputs\n  - metric #auto-output-2 ref toBuy\n  - metric #auto-output-3 ref biggest"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- budget: \"Budget\", currency, starts at 20000, 0 to 100000, step 1000\nOutputs:\n- spent: \"Spent\", currency = sum(expenses.Cost)\n- left: \"Left\", currency = budget - spent\n- toBuy: \"To buy\", integer = count(groceries) - count(groceries.done)\n- biggest: \"Biggest\", currency = max(expenses.Cost)",
+    "outline" : "Spending: \nLists:\n- expenses: \"Expenses\", each an expense: item (text), Cost (currency), category (choice of Food / Travel), kind (text), paid (done)\n  starters: Rent, Groceries\n- groceries: \"Groceries\", each a grocery: name (text), done (done)\n  starters: Milk, Eggs\n- hero #block-0 ref left\n- section #block-1\n  - metric #block-1-0 ref spent\n  - add #expenses-add ref expenses\n  - list #block-1-1 ref expenses\n- add #groceries-add ref groceries\n- list #block-2 ref groceries\n- section #more-inputs\n  - slider #budget-control ref budget\n- section #more-results\n  - metric #toBuy-metric ref toBuy\n  - metric #biggest-metric ref biggest"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a list with no name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'expenses.Cost' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'expenses.kind' text, since a choice needs at least two options."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a second list named 'groceries'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'spent', read 'expences.cost' as 'expenses.Cost'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'toBuy', read 'groceries.bought' as 'groceries.done', 'grocery' as 'groceries'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'biggest', read 'expenses.cost' as 'expenses.Cost'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "left",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "spent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "list",
+              "over" : "",
+              "ref" : "expence",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "groceries.name",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "nothing",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "expense",
+          "fields" : [
+            {
+              "label" : "Item",
+              "name" : "item",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Cost",
+              "name" : "Cost",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            },
+            {
+              "label" : "Category",
+              "name" : "category",
+              "options" : [
+                "Food",
+                "Travel"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Kind",
+              "name" : "kind",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Paid",
+              "name" : "paid",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Expenses",
+          "name" : "expenses",
+          "starters" : [
+            {
+              "category" : "Travel",
+              "Cost" : 12000,
+              "item" : "Rent",
+              "kind" : "Only",
+              "paid" : 1
+            },
+            {
+              "Cost" : 2500.5,
+              "item" : "Groceries",
+              "paid" : 0
+            }
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Bought",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+            {
+              "done" : 1,
+              "name" : "Milk"
+            },
+            {
+              "name" : "Eggs"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Budget",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "sum(expenses.Cost)",
+          "label" : "Spent",
+          "name" : "spent",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "budget - spent",
+          "label" : "Left",
+          "name" : "left",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(groceries) - count(groceries.done)",
+          "label" : "To buy",
+          "name" : "toBuy",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "max(expenses.Cost)",
+          "label" : "Biggest",
+          "name" : "biggest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Spending"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

@@ -16,11 +16,11 @@ import { logicSummary as summaryOf, outline as outlineOf } from "./outline.ts";
 import { hasLogic as logicIn, isEmpty as emptyIn } from "./surface.ts";
 import type { Citation, EngineLocale, Issue, MoleculeStructure, Recording, Reference, Surface } from "./types.ts";
 import { asReader } from "./units.ts";
-import { fromPartial, fromWire, wireIsWhole } from "./wire.ts";
+import { fromPartial, fromWire, wireIsReadable, wireIsWhole } from "./wire.ts";
 
 export type { Citation, EngineLocale, Issue, MoleculeStructure, ReadPage, Recording, Reference, Surface };
 export type * from "./types.ts";
-export { citationOf, wireIsWhole };
+export { citationOf, wireIsReadable, wireIsWhole };
 
 /** A finished answer (WireSurface JSON) as a page: Surface.init(_ wire:reference:). Use it when
  * `wireIsWhole(wire)`; an answer that isn't whole is read with surfaceFromPartial, as the app does. */

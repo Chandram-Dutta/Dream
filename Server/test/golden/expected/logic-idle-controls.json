@@ -1,0 +1,1037 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'price', 'rent', 'deposit', 'years'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'inflation', 'stampDuty'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'growth' with the controls that shape it."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You'd put down {deposit} up front.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "price",
+              "ref" : "growth",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "price-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "price",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "rent-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "deposit-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "deposit",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "years-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "years",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "inflation-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "inflation",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "stampDuty-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "stampDuty",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Price",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 25000,
+          "label" : "Rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100000,
+          "label" : "Deposit",
+          "max" : 500000,
+          "min" : 0,
+          "name" : "deposit",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "Years",
+          "max" : 30,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Inflation",
+          "max" : 5,
+          "min" : 5,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 6,
+          "label" : "Stamp duty",
+          "max" : 6,
+          "min" : 6,
+          "name" : "stampDuty",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "decide",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "price / 100",
+          "label" : "EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "price * (1 + inflation / 100)",
+          "label" : "Growth",
+          "name" : "growth",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Idle controls"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You'd put down {deposit} up front.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "years",
+          "ref" : "growth",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Price",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 25000,
+          "label" : "Rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100000,
+          "label" : "Deposit",
+          "max" : 500000,
+          "min" : 0,
+          "name" : "deposit",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "Years",
+          "max" : 30,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Inflation",
+          "max" : 5,
+          "min" : 5,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 6,
+          "label" : "Stamp duty",
+          "max" : 6,
+          "min" : 6,
+          "name" : "stampDuty",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "decide",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "price / 100",
+          "label" : "EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "price * (1 + inflation / 100)",
+          "label" : "Growth",
+          "name" : "growth",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Idle controls"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "You'd put down {deposit} up front.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "years",
+        "ref" : "growth",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "Price",
+        "max" : 20000000,
+        "min" : 0,
+        "name" : "price",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 25000,
+        "label" : "Rent",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "rent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100000,
+        "label" : "Deposit",
+        "max" : 500000,
+        "min" : 0,
+        "name" : "deposit",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 10,
+        "label" : "Years",
+        "max" : 30,
+        "min" : 1,
+        "name" : "years",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 5,
+        "label" : "Inflation",
+        "max" : 100,
+        "min" : 0,
+        "name" : "inflation",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 6,
+        "label" : "Stamp duty",
+        "max" : 100,
+        "min" : 0,
+        "name" : "stampDuty",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "decide",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "price / 100",
+        "label" : "EMI",
+        "name" : "emi",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "price * (1 + inflation / 100)",
+        "label" : "Growth",
+        "name" : "growth",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Idle controls"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "You'd put down {deposit} up front.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "years",
+        "ref" : "growth",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "Price",
+        "max" : 20000000,
+        "min" : 0,
+        "name" : "price",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 25000,
+        "label" : "Rent",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "rent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100000,
+        "label" : "Deposit",
+        "max" : 500000,
+        "min" : 0,
+        "name" : "deposit",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 10,
+        "label" : "Years",
+        "max" : 30,
+        "min" : 1,
+        "name" : "years",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 5,
+        "label" : "Inflation",
+        "max" : 100,
+        "min" : 0,
+        "name" : "inflation",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 6,
+        "label" : "Stamp duty",
+        "max" : 100,
+        "min" : 0,
+        "name" : "stampDuty",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "decide",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "price / 100",
+        "label" : "EMI",
+        "name" : "emi",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "price * (1 + inflation / 100)",
+        "label" : "Growth",
+        "name" : "growth",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Idle controls"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- price: \"Price\", currency, starts at 5000000, 0 to 20000000, step 100000\n- rent: \"Rent\", currency, starts at 25000, 0 to 100000, step 1000\n- deposit: \"Deposit\", currency, starts at 100000, 0 to 500000, step 10000\n- years: \"Years\", integer, starts at 10, 1 to 30, step 1\n- inflation: \"Inflation\", given percent, 5\n- stampDuty: \"Stamp duty\", given percent, 6\nOutputs:\n- emi: \"EMI\", currency = price / 100\n- growth: \"Growth\", currency = price * (1 + inflation / 100)",
+    "outline" : "Idle controls: \n- hero #block-0 ref emi\n- paragraph #block-1\n  You'd put down {deposit} up front.\n- chart #block-2 ref growth over years\n- section #auto-inputs\n  - slider #auto-input-0 ref price\n  - slider #auto-input-1 ref rent\n  - slider #auto-input-2 ref deposit"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- price: \"Price\", currency, starts at 5000000, 0 to 20000000, step 100000\n- rent: \"Rent\", currency, starts at 25000, 0 to 100000, step 1000\n- deposit: \"Deposit\", currency, starts at 100000, 0 to 500000, step 10000\n- years: \"Years\", integer, starts at 10, 1 to 30, step 1\n- inflation: \"Inflation\", given percent, 5\n- stampDuty: \"Stamp duty\", given percent, 6\nOutputs:\n- emi: \"EMI\", currency = price / 100\n- growth: \"Growth\", currency = price * (1 + inflation / 100)",
+    "outline" : "Idle controls: \n- hero #block-0 ref emi\n- paragraph #block-1\n  You'd put down {deposit} up front.\n- section #more-inputs\n  - chart #block-2 ref growth over price\n  - slider #price-control ref price\n  - slider #rent-control ref rent\n  - slider #deposit-control ref deposit\n  - slider #years-control ref years\n  - row #givens\n    - metric #inflation-given ref inflation\n    - metric #stampDuty-given ref stampDuty"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "'rent' is a control that changes no result. Use it in the results it should change (both sides of a comparison), or remove it."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'stampDuty' doesn't affect any result."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You'd put down {deposit} up front.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "years",
+          "ref" : "growth",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Price",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "price",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 25000,
+          "label" : "Rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100000,
+          "label" : "Deposit",
+          "max" : 500000,
+          "min" : 0,
+          "name" : "deposit",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "Years",
+          "max" : 30,
+          "min" : 1,
+          "name" : "years",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 5,
+          "label" : "Inflation",
+          "max" : 5,
+          "min" : 5,
+          "name" : "inflation",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 6,
+          "label" : "Stamp duty",
+          "max" : 6,
+          "min" : 6,
+          "name" : "stampDuty",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "decide",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "price / 100",
+          "label" : "EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "price * (1 + inflation / 100)",
+          "label" : "Growth",
+          "name" : "growth",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Idle controls"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

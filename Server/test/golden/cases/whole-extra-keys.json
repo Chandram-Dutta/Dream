@@ -1,0 +1,9 @@
+{
+  "about": "A whole answer with properties the schema doesn't have, at the top and in a block: still whole.",
+  "fill": true,
+  "wire": {
+    "title": "Extra",
+    "colour": "red",
+    "blocks": [{"kind": "paragraph", "text": "Hello.", "style": "bold"}]
+  }
+}

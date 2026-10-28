@@ -1,0 +1,241 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "She worked with Charles Babbage.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Ada Lovelace wrote the first published algorithm.",
+      "symbol" : "",
+      "title" : "Ada Lovelace"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that wasn't read: en.wikipedia.org."
+      }
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "She worked with Charles Babbage.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Ada Lovelace wrote the first published algorithm.",
+      "symbol" : "",
+      "title" : "Ada Lovelace"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "She worked with Charles Babbage.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      "https://en.wikipedia.org/wiki/Ada_Lovelace"
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "learning",
+    "summary" : "Ada Lovelace wrote the first published algorithm.",
+    "symbol" : "",
+    "title" : "Ada Lovelace"
+  },
+  "converted" : {
+    "accent" : "purple",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "She worked with Charles Babbage.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://en.wikipedia.org/wiki/Ada_Lovelace"
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "Ada Lovelace wrote the first published algorithm.",
+    "symbol" : "",
+    "title" : "Ada Lovelace"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Ada Lovelace: Ada Lovelace wrote the first published algorithm.\n- paragraph #block-0\n  She worked with Charles Babbage.\ncitations (pages already read; list again the ones the screen still uses): https://en.wikipedia.org/wiki/Ada_Lovelace"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Ada Lovelace: Ada Lovelace wrote the first published algorithm.\n- paragraph #block-0\n  She worked with Charles Babbage."
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "She worked with Charles Babbage.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://en.wikipedia.org/wiki/Ada_Lovelace"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Ada Lovelace wrote the first published algorithm.",
+      "symbol" : "",
+      "title" : "Ada Lovelace"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

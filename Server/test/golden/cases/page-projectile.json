@@ -1,0 +1,47 @@
+{
+  "about": "A physics explainer with a figure that moves: DreamTests' thrown ball, its path along its own t from 0 to the flight time, a launch arrow, the landing labelled with the range; a given gravity; units written after live values in prose and in maths, which the values already show; equations, one wrapped in $$, one written as sentences; and a chart over a variable that a path runs along.",
+  "fill": true,
+  "wire": {
+    "subject": "science",
+    "mode": "learn",
+    "title": "Throwing a ball",
+    "summary": "A ball thrown at {speed} m/s and 45° lands {range} m away.",
+    "question": "How do speed and angle change the throw?",
+    "inputs": [
+      {"name": "speed", "label": "Speed", "symbol": "v_0", "unit": "m/s", "initial": 20, "min": 5, "max": 30, "step": 1},
+      {"name": "angle", "label": "Angle", "symbol": "\\theta", "unit": "deg", "initial": 45, "min": 5, "max": 85, "step": 1},
+      {"name": "g", "label": "Gravity", "symbol": "g", "unit": "m/s^2", "role": "given", "initial": 9.81},
+      {"name": "t", "label": "Time", "symbol": "t", "unit": "s", "role": "variable", "initial": 0, "min": 0, "max": 5, "step": 0.1}
+    ],
+    "outputs": [
+      {"name": "flightTime", "label": "Time in the air", "symbol": "T", "unit": "s", "formula": "2 * speed * sin(angle * pi / 180) / g"},
+      {"name": "range", "label": "Distance", "symbol": "R", "unit": "metres", "formula": "speed^2 * sin(2 * angle * pi / 180) / g"},
+      {"name": "height", "label": "Height at t", "symbol": "y", "unit": "m", "formula": "speed * sin(angle * pi / 180) * t - g * t^2 / 2"}
+    ],
+    "figures": [{"name": "flight", "points": [
+      {"name": "O", "x": "0", "y": "0", "label": ""},
+      {"name": "tip", "x": "speed * cos(angle * pi / 180) * 0.5", "y": "speed * sin(angle * pi / 180) * 0.5", "label": ""},
+      {"name": "land", "x": "range", "y": "0", "label": "{range} m"},
+      {"name": "end", "x": "100", "y": "0", "label": ""}
+    ], "shapes": [
+      {"kind": "segment", "points": "O, end", "tone": "guide"},
+      {"kind": "path", "over": "t", "from": "0", "to": "flightTime", "x": "speed * cos(angle * pi / 180) * t", "y": "speed * sin(angle * pi / 180) * t - g * t^2 / 2", "tone": "main"},
+      {"kind": "path", "over": "", "from": "", "to": "", "x": "s", "y": "s ^ 2", "label": "no range"},
+      {"kind": "path", "over": "u", "from": "0", "to": "1", "x": "u * speed", "y": "missing * u"},
+      {"kind": "arrow", "points": "O, tip", "label": "v", "tone": "contrast"}
+    ]}],
+    "blocks": [
+      {"kind": "hero", "ref": "range"},
+      {"kind": "paragraph", "text": "It lands {range} m away after {flightTime} seconds, flying at {speed} m/s."},
+      {"kind": "equation", "text": "$$R = \\frac{v_0^2 \\sin 2\\theta}{g}$$", "items": [{"label": "$R$", "value": "the range"}, {"label": "g", "value": "gravity"}]},
+      {"kind": "equation", "text": "The range is $R = \\val{range}\\,\\mathrm{m}$ for this throw."},
+      {"kind": "equation", "text": "  "},
+      {"kind": "equation", "ref": "nothing", "text": "\\[ T = \\frac{2 v_0 \\sin\\theta}{g} \\]"},
+      {"kind": "paragraph", "text": "Height is $y = \\val{height}\\,\\mathrm{m}$ at time {t}."},
+      {"kind": "chart", "ref": "height", "over": "t", "title": "Height over time"},
+      {"kind": "section", "title": "Throw", "children": [{"kind": "slider", "ref": "speed"}, {"kind": "slider", "ref": "angle"}]}
+    ],
+    "related": ["Projectile motion", "Air resistance"]
+  },
+  "read": [{"title": "Projectile motion", "site": "Wikipedia", "url": "https://en.wikipedia.org/wiki/Projectile_motion"}]
+}

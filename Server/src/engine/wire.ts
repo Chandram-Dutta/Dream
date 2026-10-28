@@ -441,3 +441,23 @@ function matches(value: unknown, shape: Shape): boolean {
 export function wireIsWhole(raw: unknown): boolean {
   return has(raw, SURFACE);
 }
+
+/** What's there is what the schema asks for, though anything may be missing yet (or null). */
+function hasSoFar(value: unknown, properties: Record<string, Shape>): boolean {
+  const wire = object(value);
+  return wire !== undefined && Object.entries(properties).every(([key, shape]) => wire[key] === undefined || wire[key] === null || matchesSoFar(wire[key], shape));
+}
+
+function matchesSoFar(value: unknown, shape: Shape): boolean {
+  if (typeof shape === "object" && "each" in shape) return Array.isArray(value) && value.every((item) => hasSoFar(item, shape.each));
+  if (typeof shape === "object" && "properties" in shape) return hasSoFar(value, shape.properties);
+  return matches(value, shape);
+}
+
+/** Whether the app can read this answer at all as it streams (WireSurface.PartiallyGenerated
+ * decodes it). It can't while a choice is half written, like a block's kind ("bul"), or when a
+ * value is the wrong type; the app then keeps showing the last answer it could read, and so
+ * should the server. */
+export function wireIsReadable(raw: unknown): boolean {
+  return hasSoFar(raw, SURFACE);
+}

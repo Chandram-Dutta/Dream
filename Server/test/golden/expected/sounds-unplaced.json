@@ -1,0 +1,760 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Removed a sound block for '', which isn't a sound."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'note'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'drone'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'note' with the controls that change it."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "pitch",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "note-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "note",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "octave",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Each octave doubles it.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "drone-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "drone",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Octave",
+          "max" : 7,
+          "min" : 1,
+          "name" : "octave",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "440 * 2 ^ (octave - 4)",
+          "label" : "Pitch",
+          "name" : "pitch",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "The note",
+          "name" : "note",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pitch",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Drone",
+          "name" : "drone",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.2",
+              "frequency" : "110",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Pitch"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "pitch",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "octave",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Each octave doubles it.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Octave",
+          "max" : 7,
+          "min" : 1,
+          "name" : "octave",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "440 * 2 ^ (octave - 4)",
+          "label" : "Pitch",
+          "name" : "pitch",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "The note",
+          "name" : "note",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pitch",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Drone",
+          "name" : "drone",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.2",
+              "frequency" : "110",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Pitch"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "pitch",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "octave",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Each octave doubles it.",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "Octave",
+        "max" : 7,
+        "min" : 1,
+        "name" : "octave",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "440 * 2 ^ (octave - 4)",
+        "label" : "Pitch",
+        "name" : "pitch",
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+      {
+        "kind" : "tones",
+        "label" : "The note",
+        "name" : "note",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "pitch",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Drone",
+        "name" : "drone",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.2",
+            "frequency" : "110",
+            "waveform" : "sine"
+          }
+        ]
+      }
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Pitch"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "pitch",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "octave",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Each octave doubles it.",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "Octave",
+        "max" : 7,
+        "min" : 1,
+        "name" : "octave",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "440 * 2 ^ (octave - 4)",
+        "label" : "Pitch",
+        "name" : "pitch",
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "related" : [
+
+    ],
+    "sounds" : [
+      {
+        "label" : "The note",
+        "name" : "note",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "pitch",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Drone",
+        "name" : "drone",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.2",
+            "frequency" : "110",
+            "waveform" : "sine"
+          }
+        ]
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Pitch"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- octave: \"Octave\", integer, starts at 4, 1 to 7, step 1\nOutputs:\n- pitch: \"Pitch\", number, in Hz = 440 * 2 ^ (octave - 4)",
+    "outline" : "Pitch: \n- hero #block-0 ref pitch\n- section #block-1\n  - stepper #block-1-0 ref octave\n  - paragraph #block-1-1\n    Each octave doubles it.\n- sound #block-2\nsounds:\n- note \"The note\": tones sine at pitch Hz, amplitude 0.4\n- drone \"Drone\": tones sine at 110 Hz, amplitude 0.2"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- octave: \"Octave\", integer, starts at 4, 1 to 7, step 1\nOutputs:\n- pitch: \"Pitch\", number, in Hz = 440 * 2 ^ (octave - 4)",
+    "outline" : "Pitch: \n- hero #block-0 ref pitch\n- section #block-1\n  - sound #note-sound ref note\n  - stepper #block-1-0 ref octave\n  - paragraph #block-1-1\n    Each octave doubles it.\n- sound #drone-sound ref drone\nsounds:\n- note \"The note\": tones sine at pitch Hz, amplitude 0.4\n- drone \"Drone\": tones sine at 110 Hz, amplitude 0.2"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "pitch",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "octave",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Each octave doubles it.",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "Octave",
+          "max" : 7,
+          "min" : 1,
+          "name" : "octave",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "440 * 2 ^ (octave - 4)",
+          "label" : "Pitch",
+          "name" : "pitch",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "The note",
+          "name" : "note",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pitch",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Drone",
+          "name" : "drone",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.2",
+              "frequency" : "110",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Pitch"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

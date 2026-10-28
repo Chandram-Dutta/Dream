@@ -1,0 +1,25 @@
+{
+  "about": "A control that changes no result goes back to the model (the rent in rent or buy); a value the text shows, or a chart runs along, is used; an unused given is only a warning.",
+  "fill": true,
+  "wire": {
+    "title": "Idle controls",
+    "mode": "decide",
+    "inputs": [
+      {"name": "price", "label": "Price", "format": "currency", "initial": 5000000, "max": 20000000, "step": 100000},
+      {"name": "rent", "label": "Rent", "format": "currency", "initial": 25000, "max": 100000, "step": 1000},
+      {"name": "deposit", "label": "Deposit", "format": "currency", "initial": 100000, "max": 500000, "step": 10000},
+      {"name": "years", "label": "Years", "format": "integer", "initial": 10, "min": 1, "max": 30},
+      {"name": "inflation", "label": "Inflation", "format": "percent", "role": "given", "initial": 5},
+      {"name": "stampDuty", "label": "Stamp duty", "format": "percent", "role": "given", "initial": 6}
+    ],
+    "outputs": [
+      {"name": "emi", "label": "EMI", "formula": "price / 100", "format": "currency"},
+      {"name": "growth", "label": "Growth", "formula": "price * (1 + inflation / 100)", "format": "currency"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "emi"},
+      {"kind": "paragraph", "text": "You'd put down {deposit} up front."},
+      {"kind": "chart", "ref": "growth", "over": "years"}
+    ]
+  }
+}

@@ -1,0 +1,900 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added a bar for adding to 'budgetList'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'groceries', 'watches'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'budget'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'lines' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "watchSpend",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "budgetList-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "budgetList",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "budgetList",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "groceries-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "groceries",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "groceries-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "groceries",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "watches-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "watches",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "watches-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "watches",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "budget-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "budget",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "lines-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "lines",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "line",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Budget lines",
+          "name" : "budgetList",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "watch",
+          "fields" : [
+            {
+              "label" : "Brand",
+              "name" : "brand",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Price",
+              "name" : "price",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Watches",
+          "name" : "watches",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Budget",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(budgetList.name)",
+          "label" : "Lines",
+          "name" : "lines",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "sum(watches.price) + budget * 0",
+          "label" : "On watches",
+          "name" : "watchSpend",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Budget"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "watchSpend",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "budgetList",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "line",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Budget lines",
+          "name" : "budgetList",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "watch",
+          "fields" : [
+            {
+              "label" : "Brand",
+              "name" : "brand",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Price",
+              "name" : "price",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Watches",
+          "name" : "watches",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Budget",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(budgetList.name)",
+          "label" : "Lines",
+          "name" : "lines",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "sum(watches.price) + budget * 0",
+          "label" : "On watches",
+          "name" : "watchSpend",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Budget"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "watchSpend",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "budgetList",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "",
+        "fields" : [
+
+        ],
+        "label" : "Budget lines",
+        "name" : "budget",
+        "source" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Groceries",
+        "name" : "groceries",
+        "source" : "",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Brand",
+            "name" : "brand",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Price",
+            "name" : "price",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Watches",
+        "name" : "watches",
+        "source" : "",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 1000,
+        "label" : "Budget",
+        "max" : 10000,
+        "min" : 0,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "integer",
+        "formula" : "count(budget.name)",
+        "label" : "Lines",
+        "name" : "lines",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "sum(watches.price) + budget * 0",
+        "label" : "On watches",
+        "name" : "watchSpend",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Budget"
+  },
+  "converted" : {
+    "accent" : "green",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "watchSpend",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "list",
+        "over" : "",
+        "ref" : "budgetList",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "",
+        "fields" : [
+
+        ],
+        "label" : "Budget lines",
+        "name" : "budget",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Name",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Groceries",
+        "name" : "groceries",
+        "starters" : [
+
+        ]
+      },
+      {
+        "entry" : "",
+        "fields" : [
+          {
+            "label" : "Brand",
+            "name" : "brand",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Price",
+            "name" : "price",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Watches",
+        "name" : "watches",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 1000,
+        "label" : "Budget",
+        "max" : 10000,
+        "min" : 0,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "integer",
+        "formula" : "count(budget.name)",
+        "label" : "Lines",
+        "name" : "lines",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "sum(watches.price) + budget * 0",
+        "label" : "On watches",
+        "name" : "watchSpend",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Budget"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- budget: \"Budget\", currency, starts at 1000, 0 to 10000, step 100\nOutputs:\n- lines: \"Lines\", integer = count(budget.name)\n- watchSpend: \"On watches\", currency = sum(watches.price) + budget * 0",
+    "outline" : "Budget: \nLists:\n- budget: \"Budget lines\", each an entry: \n- groceries: \"Groceries\", each an entry: name (text)\n- watches: \"Watches\", each an entry: brand (text), price (number)\n- hero #block-0 ref watchSpend\n- list #block-1 ref budgetList\n- hero #auto-hero ref lines\n- section #auto-inputs\n  - slider #auto-input-0 ref budget"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- budget: \"Budget\", currency, starts at 1000, 0 to 10000, step 100\nOutputs:\n- lines: \"Lines\", integer = count(budgetList.name)\n- watchSpend: \"On watches\", currency = sum(watches.price) + budget * 0",
+    "outline" : "Budget: \nLists:\n- budgetList: \"Budget lines\", each a line: name (text)\n- groceries: \"Groceries\", each a grocery: name (text)\n- watches: \"Watches\", each a watch: brand (text), price (currency)\n- hero #block-0 ref watchSpend\n- add #budgetList-add ref budgetList\n- list #block-1 ref budgetList\n- add #groceries-add ref groceries\n- list #groceries-list ref groceries\n- add #watches-add ref watches\n- list #watches-list ref watches\n- section #more-inputs\n  - slider #budget-control ref budget\n- section #more-results\n  - metric #lines-metric ref lines"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Renamed the list 'budget' to 'budgetList', since an input or output has its name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave 'budgetList' a name for each entry, since it had no fields."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'watches.price' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'lines', read 'budget.name' as 'budgetList.name'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "watchSpend",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "budgetList",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "line",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Budget lines",
+          "name" : "budgetList",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "grocery",
+          "fields" : [
+            {
+              "label" : "Name",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Groceries",
+          "name" : "groceries",
+          "starters" : [
+
+          ]
+        },
+        {
+          "entry" : "watch",
+          "fields" : [
+            {
+              "label" : "Brand",
+              "name" : "brand",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Price",
+              "name" : "price",
+              "options" : [
+
+              ],
+              "type" : "currency"
+            }
+          ],
+          "label" : "Watches",
+          "name" : "watches",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 1000,
+          "label" : "Budget",
+          "max" : 10000,
+          "min" : 0,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(budgetList.name)",
+          "label" : "Lines",
+          "name" : "lines",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "sum(watches.price) + budget * 0",
+          "label" : "On watches",
+          "name" : "watchSpend",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Budget"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

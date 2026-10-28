@@ -1,0 +1,27 @@
+{
+  "about": "A packing list and nothing to calculate: the list is shown first, with its bar, and starters keep their order; a data block charting the user's entries is bound to the list; lists blocks on a page with no lists are removed.",
+  "fill": true,
+  "wire": {
+    "title": "Beach packing",
+    "subject": "home",
+    "collections": [
+      {"name": "packing", "label": "Packing", "entry": "item", "fields": [
+        {"name": "thing", "label": "Thing", "type": "text"},
+        {"name": "packed", "label": "Packed", "type": "done"},
+        {"name": "bag", "label": "Bag", "type": "choice", "options": ["Carry-on", "Checked"]},
+        {"name": "weight", "label": "Weight", "type": "number"},
+        {"name": "rating", "label": "Need", "type": "rating"}
+      ], "starters": [
+        {"values": ["Sunscreen", "no", "Carry-on", "0.2 kg", "★★★★"]},
+        {"values": ["Towel", "", "checked", "1", "4.6"]},
+        {"values": ["Hat", "x", "", "", "9"]}
+      ]}
+    ],
+    "blocks": [
+      {"kind": "paragraph", "text": "Pack light."},
+      {"kind": "data", "ref": "packing.wieght", "over": "bag", "title": "Weight by bag"},
+      {"kind": "data", "ref": "packing", "over": "", "title": "Things by need"}
+    ],
+    "related": ["Beach safety", "beach SAFETY", "Beach packing"]
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off in the middle of a paragraph's text, after an escape and a half: what's there is kept, the half escape left out.",
+  "text": "{\"subject\": \"science\", \"mode\": \"learn\", \"title\": \"Light\", \"summary\": \"Light travels at about 300,000 km/s.\", \"symbol\": \"lightbulb\", \"collections\": [], \"question\": \"\", \"inputs\": [], \"outputs\": [], \"sounds\": [], \"figures\": [], \"diagrams\": [], \"actions\": [], \"scenes\": [], \"blocks\": [{\"kind\": \"paragraph\", \"title\": \"Speed\", \"text\": \"In a vacuum, $c = 299\\,792\\,458$ m/s.\\nNothing goes faster \\u00e9\\u00"
+}

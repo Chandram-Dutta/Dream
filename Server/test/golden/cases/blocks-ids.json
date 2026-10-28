@@ -1,0 +1,13 @@
+{
+  "about": "Block ids as the model's answer gives them are positions; a partial answer whose blocks repeat the ids the checker then makes unique, and blocks with no kind yet left out. Read as an answer still streaming, so the page keeps its sparkles symbol and blue until the subject arrives.",
+  "partial": true,
+  "wire": {
+    "title": "Partly there",
+    "blocks": [
+      {"kind": "paragraph", "text": "First."},
+      {"title": "No kind yet"},
+      {"kind": "section", "children": [{"kind": "paragraph", "text": "Inside."}, {"text": "kindless child"}, {"kind": "bullets", "items": [{"value": "only a value"}, {"label": "only a label"}]}]}
+    ],
+    "related": ["One"]
+  }
+}

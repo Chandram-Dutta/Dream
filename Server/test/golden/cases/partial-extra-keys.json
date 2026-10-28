@@ -1,0 +1,10 @@
+{
+  "about": "An answer with a property the schema doesn't have, which is ignored, and one written as null.",
+  "partial": true,
+  "wire": {
+    "title": "Extra",
+    "summary": null,
+    "colour": "red",
+    "blocks": [{"kind": "paragraph", "text": "Hello.", "style": "bold"}]
+  }
+}

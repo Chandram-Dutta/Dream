@@ -1,0 +1,1504 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Removed units written after the live values of 'tenure', which show their own."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'monthlyRate' to the screen."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'emi' with the controls that shape it."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "2026-11-05",
+            "notes" : "{emi} is due",
+            "time" : "09:00",
+            "title" : "Pay the EMI"
+          },
+          "kind" : "reminder",
+          "name" : "payReminder"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "tenure",
+              "ref" : "emi",
+              "text" : "",
+              "title" : "EMI by tenure"
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "loanAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "annualRate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "tenure",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your loan"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalInterest",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalPayment",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : "How it's worked out"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Over {tenure} you pay {totalInterest} in interest on top of the loan.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "payReminder",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "monthlyRate-working",
+              "items" : [
+
+              ],
+              "kind" : "equation",
+              "over" : "",
+              "ref" : "monthlyRate",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "working",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "date" : "2026-01-10",
+          "site" : "SBI",
+          "title" : "Home Loan EMI Calculator",
+          "url" : "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Loan amount",
+          "max" : 50000000,
+          "min" : 100000,
+          "name" : "loanAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "P",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "Interest rate",
+          "max" : 15,
+          "min" : 5,
+          "name" : "annualRate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "r",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Tenure",
+          "max" : 30,
+          "min" : 1,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "n",
+          "unit" : "years"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)",
+          "label" : "Monthly EMI",
+          "name" : "emi",
+          "symbol" : "E",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "annualRate / 12 / 100",
+          "label" : "Monthly rate",
+          "name" : "monthlyRate",
+          "symbol" : "i",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "emi * tenure * 12",
+          "label" : "Total payment",
+          "name" : "totalPayment",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "totalPayment - loanAmount",
+          "label" : "Total interest",
+          "name" : "totalInterest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much will I pay each month?",
+      "related" : [
+        "Prepaying a home loan",
+        "Floating vs fixed rates",
+        "Home loan tax benefits"
+      ],
+      "summary" : "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+      "symbol" : "house.fill",
+      "title" : "Home Loan EMI"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "2026-11-05",
+            "notes" : "{emi} is due",
+            "time" : "09:00",
+            "title" : "Pay the EMI"
+          },
+          "kind" : "reminder",
+          "name" : "payReminder"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "loanAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "annualRate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "tenure",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your loan"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "tenure",
+          "ref" : "emi",
+          "text" : "",
+          "title" : "EMI by tenure"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalInterest",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalPayment",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : "How it's worked out"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Over {tenure} years you pay {totalInterest} in interest on top of the loan.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "payReminder",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "date" : "2026-01-10",
+          "site" : "SBI",
+          "title" : "Home Loan EMI Calculator",
+          "url" : "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Loan amount",
+          "max" : 50000000,
+          "min" : 100000,
+          "name" : "loanAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "P",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "Interest rate",
+          "max" : 15,
+          "min" : 5,
+          "name" : "annualRate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "r",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Tenure",
+          "max" : 30,
+          "min" : 1,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "n",
+          "unit" : "years"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)",
+          "label" : "Monthly EMI",
+          "name" : "emi",
+          "symbol" : "E",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "annualRate / 12 / 100",
+          "label" : "Monthly rate",
+          "name" : "monthlyRate",
+          "symbol" : "i",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "emi * tenure * 12",
+          "label" : "Total payment",
+          "name" : "totalPayment",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "totalPayment - loanAmount",
+          "label" : "Total interest",
+          "name" : "totalInterest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much will I pay each month?",
+      "related" : [
+        "Prepaying a home loan",
+        "Floating vs fixed rates",
+        "Home loan tax benefits"
+      ],
+      "summary" : "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+      "symbol" : "house.fill",
+      "title" : "Home Loan EMI"
+    }
+  },
+  "content" : {
+    "actions" : [
+      {
+        "day" : "2026-11-05",
+        "duration" : "",
+        "from" : "",
+        "kind" : "reminder",
+        "name" : "payReminder",
+        "notes" : "{emi} is due",
+        "place" : "",
+        "time" : "09:00",
+        "title" : "Pay the EMI",
+        "travel" : "driving"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "field",
+            "over" : "",
+            "ref" : "loanAmount",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "annualRate",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "tenure",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Your loan"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "tenure",
+        "ref" : "emi",
+        "text" : "",
+        "title" : "EMI by tenure"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "totalInterest",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "totalPayment",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : "How it's worked out"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Over {tenure} years you pay {totalInterest} in interest on top of the loan.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "payReminder",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "Loan amount",
+        "max" : 50000000,
+        "min" : 100000,
+        "name" : "loanAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "P",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 8.5,
+        "label" : "Interest rate",
+        "max" : 15,
+        "min" : 5,
+        "name" : "annualRate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.050000000000000003,
+        "symbol" : "r",
+        "unit" : "%"
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "Tenure",
+        "max" : 30,
+        "min" : 1,
+        "name" : "tenure",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "n",
+        "unit" : "years"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)",
+        "label" : "Monthly EMI",
+        "name" : "emi",
+        "symbol" : "E",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "annualRate / 12 / 100",
+        "label" : "Monthly rate",
+        "name" : "monthlyRate",
+        "symbol" : "i",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "emi * tenure * 12",
+        "label" : "Total payment",
+        "name" : "totalPayment",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "totalPayment - loanAmount",
+        "label" : "Total interest",
+        "name" : "totalInterest",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "How much will I pay each month?",
+    "related" : [
+      "Prepaying a home loan",
+      "Floating vs fixed rates",
+      "Home loan tax benefits"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+    "symbol" : "house.fill",
+    "title" : "Home Loan EMI"
+  },
+  "converted" : {
+    "accent" : "green",
+    "actions" : [
+      {
+        "fields" : {
+          "day" : "2026-11-05",
+          "notes" : "{emi} is due",
+          "time" : "09:00",
+          "title" : "Pay the EMI"
+        },
+        "kind" : "reminder",
+        "name" : "payReminder"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "field",
+            "over" : "",
+            "ref" : "loanAmount",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "annualRate",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-2",
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "tenure",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Your loan"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "tenure",
+        "ref" : "emi",
+        "text" : "",
+        "title" : "EMI by tenure"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-0",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "totalInterest",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-3-1",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "totalPayment",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : "How it's worked out"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-5",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Over {tenure} years you pay {totalInterest} in interest on top of the loan.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-6",
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "payReminder",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "Loan amount",
+        "max" : 50000000,
+        "min" : 100000,
+        "name" : "loanAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "P",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 8.5,
+        "label" : "Interest rate",
+        "max" : 15,
+        "min" : 5,
+        "name" : "annualRate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.050000000000000003,
+        "symbol" : "r",
+        "unit" : "%"
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "Tenure",
+        "max" : 30,
+        "min" : 1,
+        "name" : "tenure",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "n",
+        "unit" : "years"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)",
+        "label" : "Monthly EMI",
+        "name" : "emi",
+        "symbol" : "E",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "annualRate / 12 / 100",
+        "label" : "Monthly rate",
+        "name" : "monthlyRate",
+        "symbol" : "i",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "emi * tenure * 12",
+        "label" : "Total payment",
+        "name" : "totalPayment",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "totalPayment - loanAmount",
+        "label" : "Total interest",
+        "name" : "totalInterest",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "How much will I pay each month?",
+    "related" : [
+      "Prepaying a home loan",
+      "Floating vs fixed rates",
+      "Home loan tax benefits"
+    ],
+    "summary" : "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+    "symbol" : "house.fill",
+    "title" : "Home Loan EMI"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- loanAmount: \"Loan amount\", currency, starts at 5000000, 100000 to 50000000, step 100000, written P\n- annualRate: \"Interest rate\", percent, starts at 8.5, 5 to 15, step 0.05, written r, in %\n- tenure: \"Tenure\", integer, starts at 20, 1 to 30, step 1, written n, in years\nOutputs:\n- emi: \"Monthly EMI\", currency, written E = loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)\n- monthlyRate: \"Monthly rate\", number, written i = annualRate / 12 / 100\n- totalPayment: \"Total payment\", currency = emi * tenure * 12\n- totalInterest: \"Total interest\", currency = totalPayment - loanAmount",
+    "outline" : "Home Loan EMI: A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.\n- hero #block-0 ref emi\n- section #block-1 \"Your loan\"\n  - field #block-1-0 ref loanAmount\n  - slider #block-1-1 ref annualRate\n  - stepper #block-1-2 ref tenure\n- chart #block-2 ref emi over tenure \"EMI by tenure\"\n- row #block-3\n  - metric #block-3-0 ref totalInterest\n  - metric #block-3-1 ref totalPayment\n- equation #block-4 ref emi \"How it's worked out\"\n- paragraph #block-5\n  Over {tenure} years you pay {totalInterest} in interest on top of the loan.\n- action #block-6 ref payReminder\n- section #auto-outputs\n  - metric #auto-output-1 ref monthlyRate\nactions:\n- payReminder: reminder, day \"2026-11-05\", notes \"{emi} is due\", time \"09:00\", title \"Pay the EMI\"\nrelated: Prepaying a home loan, Floating vs fixed rates, Home loan tax benefits\ncitations (pages already read; list again the ones the screen still uses): https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- loanAmount: \"Loan amount\", currency, starts at 5000000, 100000 to 50000000, step 100000, written P\n- annualRate: \"Interest rate\", percent, starts at 8.5, 5 to 15, step 0.05, written r\n- tenure: \"Tenure\", integer, starts at 20, 1 to 30, step 1, written n, in years\nOutputs:\n- emi: \"Monthly EMI\", currency, written E = loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)\n- monthlyRate: \"Monthly rate\", number, written i = annualRate / 12 / 100\n- totalPayment: \"Total payment\", currency = emi * tenure * 12\n- totalInterest: \"Total interest\", currency = totalPayment - loanAmount",
+    "outline" : "Home Loan EMI: A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.\n- hero #block-0 ref emi\n- section #block-1 \"Your loan\"\n  - chart #block-2 ref emi over tenure \"EMI by tenure\"\n  - field #block-1-0 ref loanAmount\n  - slider #block-1-1 ref annualRate\n  - stepper #block-1-2 ref tenure\n- row #block-3\n  - metric #block-3-0 ref totalInterest\n  - metric #block-3-1 ref totalPayment\n- equation #block-4 ref emi \"How it's worked out\"\n- paragraph #block-5\n  Over {tenure} you pay {totalInterest} in interest on top of the loan.\n- action #block-6 ref payReminder\n- section #working\n  - equation #monthlyRate-working ref monthlyRate\nactions:\n- payReminder: reminder, day \"2026-11-05\", notes \"{emi} is due\", time \"09:00\", title \"Pay the EMI\"\nrelated: Prepaying a home loan, Floating vs fixed rates, Home loan tax benefits\ncitations (pages already read; list again the ones the screen still uses): https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+  },
+  "locale" : "en_IN",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'annualRate'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "2026-11-05",
+            "notes" : "{emi} is due",
+            "time" : "09:00",
+            "title" : "Pay the EMI"
+          },
+          "kind" : "reminder",
+          "name" : "payReminder"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "loanAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "annualRate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "tenure",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your loan"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "tenure",
+          "ref" : "emi",
+          "text" : "",
+          "title" : "EMI by tenure"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalInterest",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-3-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "totalPayment",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : "How it's worked out"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Over {tenure} years you pay {totalInterest} in interest on top of the loan.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-6",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "payReminder",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://sbi.co.in/web/personal-banking/loans/home-loans/emi-calculator"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "Loan amount",
+          "max" : 50000000,
+          "min" : 100000,
+          "name" : "loanAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "P",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "Interest rate",
+          "max" : 15,
+          "min" : 5,
+          "name" : "annualRate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "r",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "Tenure",
+          "max" : 30,
+          "min" : 1,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "n",
+          "unit" : "years"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "loanAmount * monthlyRate * (1 + monthlyRate)^(tenure * 12) / ((1 + monthlyRate)^(tenure * 12) - 1)",
+          "label" : "Monthly EMI",
+          "name" : "emi",
+          "symbol" : "E",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "annualRate / 12 / 100",
+          "label" : "Monthly rate",
+          "name" : "monthlyRate",
+          "symbol" : "i",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "emi * tenure * 12",
+          "label" : "Total payment",
+          "name" : "totalPayment",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "totalPayment - loanAmount",
+          "label" : "Total interest",
+          "name" : "totalInterest",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much will I pay each month?",
+      "related" : [
+        "Prepaying a home loan",
+        "Floating vs fixed rates",
+        "Home loan tax benefits"
+      ],
+      "summary" : "A ₹50 lakh loan at 8.5% over 20 years costs about ₹43,391 a month.",
+      "symbol" : "house.fill",
+      "title" : "Home Loan EMI"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

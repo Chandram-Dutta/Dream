@@ -1,0 +1,943 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the diagram 'water', dropped a second part called 'ocean'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the diagram 'water', dropped an edge from 'space' to 'ocean', which aren't both parts."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the diagram 'lonely', which needs at least two parts."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the diagram 'steps'."
+      }
+    ],
+    "surface" : {
+      "accent" : "teal",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The sun drives it.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "diagram-steps",
+          "items" : [
+
+          ],
+          "kind" : "diagram",
+          "over" : "",
+          "ref" : "steps",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "diagram",
+          "over" : "",
+          "ref" : "water",
+          "text" : "",
+          "title" : "The cycle"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Evaporation"
+            },
+            {
+              "label" : "",
+              "value" : "Condensation"
+            }
+          ],
+          "kind" : "steps",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "en.wikipedia.org",
+          "title" : "Water cycle",
+          "url" : "https://en.wikipedia.org/wiki/Water_cycle"
+        }
+      ],
+      "diagrams" : [
+        {
+          "edges" : [
+            {
+              "from" : "ocean",
+              "label" : "evaporation",
+              "to" : "vapor"
+            },
+            {
+              "from" : "vapor",
+              "label" : "condensation",
+              "to" : "clouds"
+            },
+            {
+              "from" : "clouds",
+              "label" : "precipitation",
+              "to" : "Land"
+            },
+            {
+              "from" : "Land",
+              "label" : "infiltration",
+              "to" : "groundWater"
+            }
+          ],
+          "name" : "water",
+          "nodes" : [
+            {
+              "detail" : "Most water is here.\\nIt evaporates.",
+              "id" : "ocean",
+              "label" : "Ocean"
+            },
+            {
+              "detail" : "",
+              "id" : "vapor",
+              "label" : "Water vapour"
+            },
+            {
+              "detail" : "Vapour condenses.",
+              "id" : "clouds",
+              "label" : "Clouds"
+            },
+            {
+              "detail" : "",
+              "id" : "Land",
+              "label" : "Land"
+            },
+            {
+              "detail" : "",
+              "id" : "groundWater",
+              "label" : "Ground water"
+            }
+          ],
+          "shape" : "cycle"
+        },
+        {
+          "edges" : [
+
+          ],
+          "name" : "steps",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "a",
+              "label" : "First"
+            },
+            {
+              "detail" : "",
+              "id" : "b",
+              "label" : "Second"
+            }
+          ],
+          "shape" : "flow"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Water goes round from the sea to the sky and back.",
+      "symbol" : "",
+      "title" : "The water cycle"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "Named no sources, so every page read is credited."
+      }
+    ],
+    "surface" : {
+      "accent" : "teal",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The sun drives it.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "diagram",
+          "over" : "",
+          "ref" : "watr",
+          "text" : "",
+          "title" : "The cycle"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Evaporation"
+            },
+            {
+              "label" : "",
+              "value" : "Condensation"
+            }
+          ],
+          "kind" : "steps",
+          "over" : "",
+          "ref" : "",
+          "text" : "These repeat.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "en.wikipedia.org",
+          "title" : "Water cycle",
+          "url" : "https://en.wikipedia.org/wiki/Water_cycle"
+        }
+      ],
+      "diagrams" : [
+        {
+          "edges" : [
+            {
+              "from" : "ocean",
+              "label" : " evaporation ",
+              "to" : "vapor"
+            },
+            {
+              "from" : "vapour",
+              "label" : "condensation",
+              "to" : "Clouds"
+            },
+            {
+              "from" : "clouds",
+              "label" : "precipitation",
+              "to" : "Land"
+            },
+            {
+              "from" : "land",
+              "label" : "infiltration",
+              "to" : "groundWater"
+            },
+            {
+              "from" : "ocean",
+              "label" : "self",
+              "to" : "ocean"
+            },
+            {
+              "from" : "ocean",
+              "label" : "again",
+              "to" : "vapor"
+            },
+            {
+              "from" : "space",
+              "label" : "comets",
+              "to" : "ocean"
+            }
+          ],
+          "name" : "water",
+          "nodes" : [
+            {
+              "detail" : "Most water is here.\\nIt evaporates.",
+              "id" : "ocean",
+              "label" : "Ocean"
+            },
+            {
+              "detail" : "",
+              "id" : "vapor",
+              "label" : " Water vapour "
+            },
+            {
+              "detail" : "Vapour condenses.",
+              "id" : "clouds",
+              "label" : "Clouds"
+            },
+            {
+              "detail" : "",
+              "id" : "",
+              "label" : "Land"
+            },
+            {
+              "detail" : "",
+              "id" : "ocean",
+              "label" : "Sea again"
+            },
+            {
+              "detail" : "",
+              "id" : "ground water",
+              "label" : ""
+            }
+          ],
+          "shape" : "cycle"
+        },
+        {
+          "edges" : [
+
+          ],
+          "name" : "lonely",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "one",
+              "label" : "One"
+            }
+          ],
+          "shape" : "hub"
+        },
+        {
+          "edges" : [
+
+          ],
+          "name" : "steps",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "a",
+              "label" : "First"
+            },
+            {
+              "detail" : "",
+              "id" : "b",
+              "label" : "Second"
+            }
+          ],
+          "shape" : "flow"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Water goes round from the sea to the sky and back.",
+      "symbol" : "",
+      "title" : "The water cycle"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The sun drives it.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "diagram",
+        "over" : "",
+        "ref" : "watr",
+        "text" : "",
+        "title" : "The cycle"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "",
+            "value" : "Evaporation"
+          },
+          {
+            "label" : "",
+            "value" : "Condensation"
+          }
+        ],
+        "kind" : "steps",
+        "over" : "",
+        "ref" : "",
+        "text" : "These repeat.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+      {
+        "edges" : [
+          {
+            "from" : "ocean",
+            "label" : " evaporation ",
+            "to" : "vapor"
+          },
+          {
+            "from" : "vapour",
+            "label" : "condensation",
+            "to" : "Clouds"
+          },
+          {
+            "from" : "clouds",
+            "label" : "precipitation",
+            "to" : "Land"
+          },
+          {
+            "from" : "land",
+            "label" : "infiltration",
+            "to" : "groundWater"
+          },
+          {
+            "from" : "ocean",
+            "label" : "self",
+            "to" : "ocean"
+          },
+          {
+            "from" : "ocean",
+            "label" : "again",
+            "to" : "vapor"
+          },
+          {
+            "from" : "space",
+            "label" : "comets",
+            "to" : "ocean"
+          }
+        ],
+        "name" : "water",
+        "nodes" : [
+          {
+            "detail" : "Most water is here.\\nIt evaporates.",
+            "id" : "ocean",
+            "label" : "Ocean"
+          },
+          {
+            "detail" : "",
+            "id" : "vapor",
+            "label" : " Water vapour "
+          },
+          {
+            "detail" : "Vapour condenses.",
+            "id" : "clouds",
+            "label" : "Clouds"
+          },
+          {
+            "detail" : "",
+            "id" : "",
+            "label" : "Land"
+          },
+          {
+            "detail" : "",
+            "id" : "ocean",
+            "label" : "Sea again"
+          },
+          {
+            "detail" : "",
+            "id" : "ground water",
+            "label" : ""
+          }
+        ],
+        "shape" : "cycle"
+      },
+      {
+        "edges" : [
+
+        ],
+        "name" : "lonely",
+        "nodes" : [
+          {
+            "detail" : "",
+            "id" : "one",
+            "label" : "One"
+          }
+        ],
+        "shape" : "hub"
+      },
+      {
+        "edges" : [
+
+        ],
+        "name" : "steps",
+        "nodes" : [
+          {
+            "detail" : "",
+            "id" : "a",
+            "label" : "First"
+          },
+          {
+            "detail" : "",
+            "id" : "b",
+            "label" : "Second"
+          }
+        ],
+        "shape" : "flow"
+      }
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "nature",
+    "summary" : "Water goes round from the sea to the sky and back.",
+    "symbol" : "",
+    "title" : "The water cycle"
+  },
+  "converted" : {
+    "accent" : "teal",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The sun drives it.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "diagram",
+        "over" : "",
+        "ref" : "watr",
+        "text" : "",
+        "title" : "The cycle"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+          {
+            "label" : "",
+            "value" : "Evaporation"
+          },
+          {
+            "label" : "",
+            "value" : "Condensation"
+          }
+        ],
+        "kind" : "steps",
+        "over" : "",
+        "ref" : "",
+        "text" : "These repeat.",
+        "title" : ""
+      }
+    ],
+    "diagrams" : [
+      {
+        "edges" : [
+          {
+            "from" : "ocean",
+            "label" : " evaporation ",
+            "to" : "vapor"
+          },
+          {
+            "from" : "vapour",
+            "label" : "condensation",
+            "to" : "Clouds"
+          },
+          {
+            "from" : "clouds",
+            "label" : "precipitation",
+            "to" : "Land"
+          },
+          {
+            "from" : "land",
+            "label" : "infiltration",
+            "to" : "groundWater"
+          },
+          {
+            "from" : "ocean",
+            "label" : "self",
+            "to" : "ocean"
+          },
+          {
+            "from" : "ocean",
+            "label" : "again",
+            "to" : "vapor"
+          },
+          {
+            "from" : "space",
+            "label" : "comets",
+            "to" : "ocean"
+          }
+        ],
+        "name" : "water",
+        "nodes" : [
+          {
+            "detail" : "Most water is here.\\nIt evaporates.",
+            "id" : "ocean",
+            "label" : "Ocean"
+          },
+          {
+            "detail" : "",
+            "id" : "vapor",
+            "label" : " Water vapour "
+          },
+          {
+            "detail" : "Vapour condenses.",
+            "id" : "clouds",
+            "label" : "Clouds"
+          },
+          {
+            "detail" : "",
+            "id" : "",
+            "label" : "Land"
+          },
+          {
+            "detail" : "",
+            "id" : "ocean",
+            "label" : "Sea again"
+          },
+          {
+            "detail" : "",
+            "id" : "ground water",
+            "label" : ""
+          }
+        ],
+        "shape" : "cycle"
+      },
+      {
+        "edges" : [
+
+        ],
+        "name" : "lonely",
+        "nodes" : [
+          {
+            "detail" : "",
+            "id" : "one",
+            "label" : "One"
+          }
+        ],
+        "shape" : "hub"
+      },
+      {
+        "edges" : [
+
+        ],
+        "name" : "steps",
+        "nodes" : [
+          {
+            "detail" : "",
+            "id" : "a",
+            "label" : "First"
+          },
+          {
+            "detail" : "",
+            "id" : "b",
+            "label" : "Second"
+          }
+        ],
+        "shape" : "flow"
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "Water goes round from the sea to the sky and back.",
+    "symbol" : "",
+    "title" : "The water cycle"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "The water cycle: Water goes round from the sea to the sky and back.\n- paragraph #block-0\n  The sun drives it.\n- diagram #block-1 ref watr \"The cycle\"\n- steps #block-2\n  These repeat.\n  • Evaporation\n  • Condensation\ndiagram water, cycle:\n  ocean \"Ocean\": Most water is here.\\nIt evaporates.\n  vapor \" Water vapour \"\n  clouds \"Clouds\": Vapour condenses.\n   \"Land\"\n  ocean \"Sea again\"\n  ground water \"\"\n  ocean → vapor \" evaporation \"\n  vapour → Clouds \"condensation\"\n  clouds → Land \"precipitation\"\n  land → groundWater \"infiltration\"\n  ocean → ocean \"self\"\n  ocean → vapor \"again\"\n  space → ocean \"comets\"\ndiagram lonely, hub:\n  one \"One\"\ndiagram steps, flow:\n  a \"First\"\n  b \"Second\""
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "The water cycle: Water goes round from the sea to the sky and back.\n- paragraph #block-0\n  The sun drives it.\n- diagram #diagram-steps ref steps\n- diagram #block-1 ref water \"The cycle\"\n- steps #block-2\n  • Evaporation\n  • Condensation\ndiagram water, cycle:\n  ocean \"Ocean\": Most water is here.\\nIt evaporates.\n  vapor \"Water vapour\"\n  clouds \"Clouds\": Vapour condenses.\n  Land \"Land\"\n  groundWater \"Ground water\"\n  ocean → vapor \"evaporation\"\n  vapor → clouds \"condensation\"\n  clouds → Land \"precipitation\"\n  Land → groundWater \"infiltration\"\ndiagram steps, flow:\n  a \"First\"\n  b \"Second\"\ncitations (pages already read; list again the ones the screen still uses): https://en.wikipedia.org/wiki/Water_cycle"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "teal",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The sun drives it.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "diagram",
+          "over" : "",
+          "ref" : "watr",
+          "text" : "",
+          "title" : "The cycle"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Evaporation"
+            },
+            {
+              "label" : "",
+              "value" : "Condensation"
+            }
+          ],
+          "kind" : "steps",
+          "over" : "",
+          "ref" : "",
+          "text" : "These repeat.",
+          "title" : ""
+        }
+      ],
+      "diagrams" : [
+        {
+          "edges" : [
+            {
+              "from" : "ocean",
+              "label" : " evaporation ",
+              "to" : "vapor"
+            },
+            {
+              "from" : "vapour",
+              "label" : "condensation",
+              "to" : "Clouds"
+            },
+            {
+              "from" : "clouds",
+              "label" : "precipitation",
+              "to" : "Land"
+            },
+            {
+              "from" : "land",
+              "label" : "infiltration",
+              "to" : "groundWater"
+            },
+            {
+              "from" : "ocean",
+              "label" : "self",
+              "to" : "ocean"
+            },
+            {
+              "from" : "ocean",
+              "label" : "again",
+              "to" : "vapor"
+            },
+            {
+              "from" : "space",
+              "label" : "comets",
+              "to" : "ocean"
+            }
+          ],
+          "name" : "water",
+          "nodes" : [
+            {
+              "detail" : "Most water is here.\\nIt evaporates.",
+              "id" : "ocean",
+              "label" : "Ocean"
+            },
+            {
+              "detail" : "",
+              "id" : "vapor",
+              "label" : " Water vapour "
+            },
+            {
+              "detail" : "Vapour condenses.",
+              "id" : "clouds",
+              "label" : "Clouds"
+            },
+            {
+              "detail" : "",
+              "id" : "",
+              "label" : "Land"
+            },
+            {
+              "detail" : "",
+              "id" : "ocean",
+              "label" : "Sea again"
+            },
+            {
+              "detail" : "",
+              "id" : "ground water",
+              "label" : ""
+            }
+          ],
+          "shape" : "cycle"
+        },
+        {
+          "edges" : [
+
+          ],
+          "name" : "lonely",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "one",
+              "label" : "One"
+            }
+          ],
+          "shape" : "hub"
+        },
+        {
+          "edges" : [
+
+          ],
+          "name" : "steps",
+          "nodes" : [
+            {
+              "detail" : "",
+              "id" : "a",
+              "label" : "First"
+            },
+            {
+              "detail" : "",
+              "id" : "b",
+              "label" : "Second"
+            }
+          ],
+          "shape" : "flow"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Water goes round from the sea to the sky and back.",
+      "symbol" : "",
+      "title" : "The water cycle"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

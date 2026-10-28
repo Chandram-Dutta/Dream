@@ -1,0 +1,21 @@
+{
+  "content" : {
+    "blocks" : [
+      {
+        "kind" : "paragraph",
+        "text" : "Steep it."
+      },
+      {
+        "kind" : "bul"
+      }
+    ],
+    "subject" : "food",
+    "title" : "Tea"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : false,
+    "whole" : false
+  },
+  "locale" : "en_US"
+}

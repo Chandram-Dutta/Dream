@@ -1,0 +1,1996 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "'a' starts at 3 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'a' starts at -3 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'a' starts at 123457 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'a' starts at 7.5 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'b' starts at 1.4142135623730951 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'b' starts at 3 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'b' starts at 1073741824 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'c' starts at 2.718281828459045 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'c' starts at 3 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'c' starts at 14 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'c' starts at 4.605170185988092 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'d' starts at 0.49999999999999994 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'d' starts at 1 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'d' starts at 3.141592653589793 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'d' starts at 5 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'e2' starts at 3628800 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'e2' starts at 11.631728396567448 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'e2' starts at 0 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'f' starts at 4 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'f' starts at 11 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'f' starts at 15 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'f' starts at 3 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'g' starts at 0 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'g' starts at 1 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'g' starts at 0.3333333333333333 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'h' starts at 3.47987598441481 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'h' starts at 3.9269908169872414 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'h' starts at 3.0000000000000004e-05 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'h' starts at 1000000000 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'i' starts at 1e+16 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'i' starts at 9007199254740992.0 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'i' starts at 123456789250 Hz, which people can't hear."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'i' starts at 0.30000000000000004 Hz, which people can't hear."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'x', 'n'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'a'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'b'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'c'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'd'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'e2'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'f'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'g'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'h'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'i'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'g' with the controls that change it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'f' with the controls that change it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'e2' with the controls that change it."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'a' with the controls that change it."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "all",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "g-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "g",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "f-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "f",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "e2-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "e2",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "a-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "a",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "x-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "x",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "n-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "n",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "b-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "b",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "c-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "c",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "d-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "d",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "h-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "h",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "i-sound",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "i",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2.5,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "n",
+          "max" : 20,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "x + n",
+          "label" : "All",
+          "name" : "all",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "Rounding",
+          "name" : "a",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(-x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(1234.5678, 2) * 100",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "floor(x) + ceil(x) + abs(-x)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Powers",
+          "name" : "b",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sqrt(2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cbrt(27)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pow(2, 30)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 3 ^ 2",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Logs",
+          "name" : "c",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "exp(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(8, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log10(1000) + log2(1024) + ln(e)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(100)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Trigonometry",
+          "name" : "d",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sin(pi / 6)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cos(0) + tan(0)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "atan2(1, 1) * 4",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "hypot(3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Counting",
+          "name" : "e2",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(n)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(n, 3)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(3.5)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(5, 7) + choose(2, -1)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Lists",
+          "name" : "f",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "min(3, 1, 2) + max(3, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "first(7, 8) + last(7, 8)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "clamp(x, 3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Signs",
+          "name" : "g",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sign(-x) + sign(0) + sign(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "mod(-7, 3) + -7 % 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1 / 3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Hyperbolic",
+          "name" : "h",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sinh(1) + cosh(1) + tanh(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "asin(1) + acos(0) + atan(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1e-5 * 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1_000_000 * 1e3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Big",
+          "name" : "i",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "10 ^ 16",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 53 + 0.5",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "123456789.25 * 1000",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "0.1 + 0.2",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Every function"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "all",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2.5,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "n",
+          "max" : 20,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "x + n",
+          "label" : "All",
+          "name" : "all",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "Rounding",
+          "name" : "a",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(-x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(1234.5678, 2) * 100",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "floor(x) + ceil(x) + abs(-x)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Powers",
+          "name" : "b",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sqrt(2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cbrt(27)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pow(2, 30)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 3 ^ 2",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Logs",
+          "name" : "c",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "exp(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(8, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log10(1000) + log2(1024) + ln(e)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(100)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Trigonometry",
+          "name" : "d",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sin(pi / 6)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cos(0) + tan(0)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "atan2(1, 1) * 4",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "hypot(3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Counting",
+          "name" : "e2",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(n)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(n, 3)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(3.5)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(5, 7) + choose(2, -1)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Lists",
+          "name" : "f",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "min(3, 1, 2) + max(3, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "first(7, 8) + last(7, 8)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "clamp(x, 3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Signs",
+          "name" : "g",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sign(-x) + sign(0) + sign(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "mod(-7, 3) + -7 % 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1 / 3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Hyperbolic",
+          "name" : "h",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sinh(1) + cosh(1) + tanh(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "asin(1) + acos(0) + atan(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1e-5 * 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1_000_000 * 1e3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Big",
+          "name" : "i",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "10 ^ 16",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 53 + 0.5",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "123456789.25 * 1000",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "0.1 + 0.2",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Every function"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "all",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2.5,
+        "label" : "x",
+        "max" : 10,
+        "min" : -10,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 10,
+        "label" : "n",
+        "max" : 20,
+        "min" : 0,
+        "name" : "n",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "x + n",
+        "label" : "All",
+        "name" : "all",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+      {
+        "kind" : "tones",
+        "label" : "Rounding",
+        "name" : "a",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(-x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(1234.5678, 2) * 100",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "floor(x) + ceil(x) + abs(-x)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Powers",
+        "name" : "b",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sqrt(2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "cbrt(27)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "pow(2, 30)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "2 ^ 3 ^ 2",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Logs",
+        "name" : "c",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "exp(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log(8, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log10(1000) + log2(1024) + ln(e)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log(100)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Trigonometry",
+        "name" : "d",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sin(pi / 6)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "cos(0) + tan(0)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "atan2(1, 1) * 4",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "hypot(3, 4)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Counting",
+        "name" : "e2",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "fact(n)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "choose(n, 3)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "fact(3.5)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "choose(5, 7) + choose(2, -1)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Lists",
+        "name" : "f",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "min(3, 1, 2) + max(3, 1, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "first(7, 8) + last(7, 8)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "clamp(x, 3, 4)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Signs",
+        "name" : "g",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sign(-x) + sign(0) + sign(x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "mod(-7, 3) + -7 % 3",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1 / 3",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Hyperbolic",
+        "name" : "h",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sinh(1) + cosh(1) + tanh(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "asin(1) + acos(0) + atan(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1e-5 * 3",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1_000_000 * 1e3",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Big",
+        "name" : "i",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "10 ^ 16",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "2 ^ 53 + 0.5",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "123456789.25 * 1000",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "0.1 + 0.2",
+            "waveform" : "sine"
+          }
+        ]
+      }
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Every function"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "all",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2.5,
+        "label" : "x",
+        "max" : 10,
+        "min" : -10,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 10,
+        "label" : "n",
+        "max" : 20,
+        "min" : 0,
+        "name" : "n",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "x + n",
+        "label" : "All",
+        "name" : "all",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "sounds" : [
+      {
+        "label" : "Rounding",
+        "name" : "a",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(-x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "round(1234.5678, 2) * 100",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "floor(x) + ceil(x) + abs(-x)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Powers",
+        "name" : "b",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sqrt(2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "cbrt(27)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "pow(2, 30)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "2 ^ 3 ^ 2",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Logs",
+        "name" : "c",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "exp(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log(8, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log10(1000) + log2(1024) + ln(e)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "log(100)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Trigonometry",
+        "name" : "d",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sin(pi / 6)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "cos(0) + tan(0)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "atan2(1, 1) * 4",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "hypot(3, 4)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Counting",
+        "name" : "e2",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "fact(n)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "choose(n, 3)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "fact(3.5)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "choose(5, 7) + choose(2, -1)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Lists",
+        "name" : "f",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "min(3, 1, 2) + max(3, 1, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "first(7, 8) + last(7, 8)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "clamp(x, 3, 4)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Signs",
+        "name" : "g",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sign(-x) + sign(0) + sign(x)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "mod(-7, 3) + -7 % 3",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1 / 3",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Hyperbolic",
+        "name" : "h",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "sinh(1) + cosh(1) + tanh(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "asin(1) + acos(0) + atan(1)",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1e-5 * 3",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "1_000_000 * 1e3",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Big",
+        "name" : "i",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.4",
+            "frequency" : "10 ^ 16",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "2 ^ 53 + 0.5",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "123456789.25 * 1000",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "0.4",
+            "frequency" : "0.1 + 0.2",
+            "waveform" : "sine"
+          }
+        ]
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Every function"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- x: \"x\", number, starts at 2.5, -10 to 10, step 0.5\n- n: \"n\", integer, starts at 10, 0 to 20, step 1\nOutputs:\n- all: \"All\", number = x + n",
+    "outline" : "Every function: \n- hero #block-0 ref all\n- section #auto-inputs\n  - slider #auto-input-0 ref x\n  - stepper #auto-input-1 ref n\nsounds:\n- a \"Rounding\": tones sine at round(x) Hz, amplitude 0.4; sine at round(-x) Hz, amplitude 0.4; sine at round(1234.5678, 2) * 100 Hz, amplitude 0.4; sine at floor(x) + ceil(x) + abs(-x) Hz, amplitude 0.4\n- b \"Powers\": tones sine at sqrt(2) Hz, amplitude 0.4; sine at cbrt(27) Hz, amplitude 0.4; sine at pow(2, 30) Hz, amplitude 0.4; sine at 2 ^ 3 ^ 2 Hz, amplitude 0.4\n- c \"Logs\": tones sine at exp(1) Hz, amplitude 0.4; sine at log(8, 2) Hz, amplitude 0.4; sine at log10(1000) + log2(1024) + ln(e) Hz, amplitude 0.4; sine at log(100) Hz, amplitude 0.4\n- d \"Trigonometry\": tones sine at sin(pi / 6) Hz, amplitude 0.4; sine at cos(0) + tan(0) Hz, amplitude 0.4; sine at atan2(1, 1) * 4 Hz, amplitude 0.4; sine at hypot(3, 4) Hz, amplitude 0.4\n- e2 \"Counting\": tones sine at fact(n) Hz, amplitude 0.4; sine at choose(n, 3) Hz, amplitude 0.4; sine at fact(3.5) Hz, amplitude 0.4; sine at choose(5, 7) + choose(2, -1) Hz, amplitude 0.4\n- f \"Lists\": tones sine at min(3, 1, 2) + max(3, 1, 2) Hz, amplitude 0.4; sine at sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2) Hz, amplitude 0.4; sine at first(7, 8) + last(7, 8) Hz, amplitude 0.4; sine at clamp(x, 3, 4) Hz, amplitude 0.4\n- g \"Signs\": tones sine at sign(-x) + sign(0) + sign(x) Hz, amplitude 0.4; sine at mod(-7, 3) + -7 % 3 Hz, amplitude 0.4; sine at if(x > 2, 1, 0) + (x < 2 ? 10 : 20) Hz, amplitude 0.4; sine at 1 / 3 Hz, amplitude 0.4\n- h \"Hyperbolic\": tones sine at sinh(1) + cosh(1) + tanh(1) Hz, amplitude 0.4; sine at asin(1) + acos(0) + atan(1) Hz, amplitude 0.4; sine at 1e-5 * 3 Hz, amplitude 0.4; sine at 1_000_000 * 1e3 Hz, amplitude 0.4\n- i \"Big\": tones sine at 10 ^ 16 Hz, amplitude 0.4; sine at 2 ^ 53 + 0.5 Hz, amplitude 0.4; sine at 123456789.25 * 1000 Hz, amplitude 0.4; sine at 0.1 + 0.2 Hz, amplitude 0.4"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- x: \"x\", number, starts at 2.5, -10 to 10, step 0.5\n- n: \"n\", integer, starts at 10, 0 to 20, step 1\nOutputs:\n- all: \"All\", number = x + n",
+    "outline" : "Every function: \n- hero #block-0 ref all\n- section #more-inputs\n  - sound #g-sound ref g\n  - sound #f-sound ref f\n  - sound #e2-sound ref e2\n  - sound #a-sound ref a\n  - slider #x-control ref x\n  - stepper #n-control ref n\n- sound #b-sound ref b\n- sound #c-sound ref c\n- sound #d-sound ref d\n- sound #h-sound ref h\n- sound #i-sound ref i\nsounds:\n- a \"Rounding\": tones sine at round(x) Hz, amplitude 0.4; sine at round(-x) Hz, amplitude 0.4; sine at round(1234.5678, 2) * 100 Hz, amplitude 0.4; sine at floor(x) + ceil(x) + abs(-x) Hz, amplitude 0.4\n- b \"Powers\": tones sine at sqrt(2) Hz, amplitude 0.4; sine at cbrt(27) Hz, amplitude 0.4; sine at pow(2, 30) Hz, amplitude 0.4; sine at 2 ^ 3 ^ 2 Hz, amplitude 0.4\n- c \"Logs\": tones sine at exp(1) Hz, amplitude 0.4; sine at log(8, 2) Hz, amplitude 0.4; sine at log10(1000) + log2(1024) + ln(e) Hz, amplitude 0.4; sine at log(100) Hz, amplitude 0.4\n- d \"Trigonometry\": tones sine at sin(pi / 6) Hz, amplitude 0.4; sine at cos(0) + tan(0) Hz, amplitude 0.4; sine at atan2(1, 1) * 4 Hz, amplitude 0.4; sine at hypot(3, 4) Hz, amplitude 0.4\n- e2 \"Counting\": tones sine at fact(n) Hz, amplitude 0.4; sine at choose(n, 3) Hz, amplitude 0.4; sine at fact(3.5) Hz, amplitude 0.4; sine at choose(5, 7) + choose(2, -1) Hz, amplitude 0.4\n- f \"Lists\": tones sine at min(3, 1, 2) + max(3, 1, 2) Hz, amplitude 0.4; sine at sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2) Hz, amplitude 0.4; sine at first(7, 8) + last(7, 8) Hz, amplitude 0.4; sine at clamp(x, 3, 4) Hz, amplitude 0.4\n- g \"Signs\": tones sine at sign(-x) + sign(0) + sign(x) Hz, amplitude 0.4; sine at mod(-7, 3) + -7 % 3 Hz, amplitude 0.4; sine at if(x > 2, 1, 0) + (x < 2 ? 10 : 20) Hz, amplitude 0.4; sine at 1 / 3 Hz, amplitude 0.4\n- h \"Hyperbolic\": tones sine at sinh(1) + cosh(1) + tanh(1) Hz, amplitude 0.4; sine at asin(1) + acos(0) + atan(1) Hz, amplitude 0.4; sine at 1e-5 * 3 Hz, amplitude 0.4; sine at 1_000_000 * 1e3 Hz, amplitude 0.4\n- i \"Big\": tones sine at 10 ^ 16 Hz, amplitude 0.4; sine at 2 ^ 53 + 0.5 Hz, amplitude 0.4; sine at 123456789.25 * 1000 Hz, amplitude 0.4; sine at 0.1 + 0.2 Hz, amplitude 0.4"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "all",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2.5,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 10,
+          "label" : "n",
+          "max" : 20,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "x + n",
+          "label" : "All",
+          "name" : "all",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "Rounding",
+          "name" : "a",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(-x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "round(1234.5678, 2) * 100",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "floor(x) + ceil(x) + abs(-x)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Powers",
+          "name" : "b",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sqrt(2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cbrt(27)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "pow(2, 30)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 3 ^ 2",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Logs",
+          "name" : "c",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "exp(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(8, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log10(1000) + log2(1024) + ln(e)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "log(100)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Trigonometry",
+          "name" : "d",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sin(pi / 6)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "cos(0) + tan(0)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "atan2(1, 1) * 4",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "hypot(3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Counting",
+          "name" : "e2",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(n)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(n, 3)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "fact(3.5)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "choose(5, 7) + choose(2, -1)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Lists",
+          "name" : "f",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "min(3, 1, 2) + max(3, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "first(7, 8) + last(7, 8)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "clamp(x, 3, 4)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Signs",
+          "name" : "g",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sign(-x) + sign(0) + sign(x)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "mod(-7, 3) + -7 % 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1 / 3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Hyperbolic",
+          "name" : "h",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "sinh(1) + cosh(1) + tanh(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "asin(1) + acos(0) + atan(1)",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1e-5 * 3",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "1_000_000 * 1e3",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Big",
+          "name" : "i",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.4",
+              "frequency" : "10 ^ 16",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "2 ^ 53 + 0.5",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "123456789.25 * 1000",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "0.1 + 0.2",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Every function"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

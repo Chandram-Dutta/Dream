@@ -1,0 +1,94 @@
+{
+  "about": "Starting values that break results: a count of 0 that something divides by is started at 1, and a minimum of 0 raised by a step; where raising isn't enough, a warning. A minimum below what a square root can take, which a step up doesn't fix, is a warning.",
+  "fill": true,
+  "wire": {
+    "title": "Starting values",
+    "inputs": [
+      {
+        "name": "people",
+        "label": "People",
+        "format": "integer",
+        "initial": 0,
+        "min": 0,
+        "max": 10,
+        "step": 1
+      },
+      {
+        "name": "hours",
+        "label": "Hours",
+        "initial": 0,
+        "min": 0,
+        "max": 12,
+        "step": 0.5
+      },
+      {
+        "name": "bill",
+        "label": "Bill",
+        "format": "currency",
+        "initial": 120,
+        "min": 0,
+        "max": 500,
+        "step": 10
+      },
+      {
+        "name": "speed",
+        "label": "Speed",
+        "initial": 50,
+        "min": 0,
+        "max": 120,
+        "step": 5
+      },
+      {
+        "name": "offset",
+        "label": "Offset",
+        "initial": 5,
+        "min": -5,
+        "max": 5,
+        "step": 1
+      },
+      {
+        "name": "depth",
+        "label": "Depth",
+        "initial": 5,
+        "min": -5,
+        "max": 10,
+        "step": 0.5
+      }
+    ],
+    "outputs": [
+      {
+        "name": "share",
+        "label": "Each pays",
+        "formula": "bill / people",
+        "format": "currency"
+      },
+      {
+        "name": "rate",
+        "label": "Per hour",
+        "formula": "bill / hours",
+        "format": "currency"
+      },
+      {
+        "name": "eta",
+        "label": "Time",
+        "formula": "100 / speed"
+      },
+      {
+        "name": "inverse",
+        "label": "Inverse",
+        "formula": "1 / offset"
+      },
+      {
+        "name": "root",
+        "label": "Root",
+        "formula": "sqrt(depth - 1)"
+      }
+    ],
+    "blocks": [
+      {
+        "kind": "hero",
+        "ref": "share"
+      }
+    ]
+  }
+}

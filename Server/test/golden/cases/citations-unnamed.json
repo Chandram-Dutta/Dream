@@ -1,0 +1,15 @@
+{
+  "about": "A page that read pages but named none credits every page it read, with a warning; and addresses only URLComponents would read the same way: encoded spaces and accents, and a % that starts no escape.",
+  "fill": true,
+  "read": [
+    {"title": "Café culture", "site": "Example", "url": "https://example.com/café guide?q=a b"},
+    {"title": "Odd", "site": "Example", "url": "https://example.com/100%25/x%zz"},
+    {"title": "Short", "site": "Example", "url": "https://example.com"}
+  ],
+  "wire": {
+    "title": "Cafés of Vienna",
+    "subject": "food",
+    "mode": "read",
+    "blocks": [{"kind": "facts", "items": [{"label": "Oldest", "value": "Café Frauenhuber, 1824"}]}]
+  }
+}

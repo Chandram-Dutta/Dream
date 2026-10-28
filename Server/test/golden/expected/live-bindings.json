@@ -1,0 +1,1173 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the source 'rates', which nothing shows."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'budget'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'rain', 'highTemp', 'windSpeed', 'duration', 'distance', 'missing'."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "goodDay",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "budget-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "budget",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "rain-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "rain",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "highTemp-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "highTemp",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "windSpeed-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "windSpeed",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "duration-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "duration",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "distance-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "distance",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "missing-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "missing",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "section",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 70,
+          "label" : "Chance of rain",
+          "max" : 70,
+          "min" : 70,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 83.299999999995578,
+          "label" : "High",
+          "max" : 83.299999999995578,
+          "min" : 83.299999999995578,
+          "name" : "highTemp",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        },
+        {
+          "format" : "number",
+          "initial" : 3.3333360000000001,
+          "label" : "Wind",
+          "max" : 3.3333360000000001,
+          "min" : 3.3333360000000001,
+          "name" : "windSpeed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.wind",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 0.41666666666666669,
+          "label" : "Drive",
+          "max" : 0.41666666666666669,
+          "min" : 0.41666666666666669,
+          "name" : "duration",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.duration",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "number",
+          "initial" : 4.5981468225562709,
+          "label" : "Distance",
+          "max" : 4.5981468225562709,
+          "min" : 4.5981468225562709,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "currency",
+          "initial" : 83.200000000000003,
+          "label" : "Budget",
+          "max" : 100,
+          "min" : 60,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Missing",
+          "max" : 3,
+          "min" : 3,
+          "name" : "missing",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.uvIndex",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+          "label" : "Go?",
+          "name" : "goodDay",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 70
+            },
+            {
+              "format" : "number",
+              "meaning" : "the day's high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 28.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "wind speed",
+              "name" : "wind",
+              "unit" : "km/h",
+              "value" : 12
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "saturday",
+            "place" : "Bengaluru"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 7.4000000000000004
+            },
+            {
+              "format" : "number",
+              "meaning" : "how long",
+              "name" : "duration",
+              "unit" : "min",
+              "value" : 25
+            }
+          ],
+          "kind" : "route",
+          "name" : "route",
+          "parameters" : {
+            "from" : "current location",
+            "to" : "Cubbon Park",
+            "travel" : "driving"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Picnic weather"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "goodDay",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 70,
+          "label" : "Chance of rain",
+          "max" : 70,
+          "min" : 70,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 83.299999999995578,
+          "label" : "High",
+          "max" : 83.299999999995578,
+          "min" : 83.299999999995578,
+          "name" : "highTemp",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        },
+        {
+          "format" : "number",
+          "initial" : 3.3333360000000001,
+          "label" : "Wind",
+          "max" : 3.3333360000000001,
+          "min" : 3.3333360000000001,
+          "name" : "windSpeed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.wind",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 0.41666666666666669,
+          "label" : "Drive",
+          "max" : 0.41666666666666669,
+          "min" : 0.41666666666666669,
+          "name" : "duration",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.duration",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "number",
+          "initial" : 4.5981468225562709,
+          "label" : "Distance",
+          "max" : 4.5981468225562709,
+          "min" : 4.5981468225562709,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "currency",
+          "initial" : 83.200000000000003,
+          "label" : "Budget",
+          "max" : 100,
+          "min" : 60,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Missing",
+          "max" : 3,
+          "min" : 3,
+          "name" : "missing",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.uvIndex",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+          "label" : "Go?",
+          "name" : "goodDay",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 70
+            },
+            {
+              "format" : "number",
+              "meaning" : "the day's high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 28.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "wind speed",
+              "name" : "wind",
+              "unit" : "km/h",
+              "value" : 12
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "saturday",
+            "place" : "Bengaluru"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 7.4000000000000004
+            },
+            {
+              "format" : "number",
+              "meaning" : "how long",
+              "name" : "duration",
+              "unit" : "min",
+              "value" : 25
+            }
+          ],
+          "kind" : "route",
+          "name" : "route",
+          "parameters" : {
+            "from" : "current location",
+            "to" : "Cubbon Park",
+            "travel" : "driving"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "rupees for a dollar",
+              "name" : "rate",
+              "unit" : "",
+              "value" : 83.200000000000003
+            }
+          ],
+          "kind" : "exchangeRate",
+          "name" : "rates",
+          "parameters" : {
+            "from" : "USD",
+            "to" : "INR"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Picnic weather"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "goodDay",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 10,
+        "label" : "Chance of rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "High",
+        "max" : 100,
+        "min" : 0,
+        "name" : "highTemp",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "wether.high",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "°F"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Wind",
+        "max" : 100,
+        "min" : 0,
+        "name" : "windSpeed",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "wind",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Drive",
+        "max" : 100,
+        "min" : 0,
+        "name" : "duration",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "h"
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Distance",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "route.distance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Budget",
+        "max" : 100,
+        "min" : 60,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "rates.rate",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Missing",
+        "max" : 100,
+        "min" : 0,
+        "name" : "missing",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.uvIndex",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "toggle",
+        "formula" : "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+        "label" : "Go?",
+        "name" : "goodDay",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "places",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Picnic weather"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "goodDay",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 10,
+        "label" : "Chance of rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "High",
+        "max" : 100,
+        "min" : 0,
+        "name" : "highTemp",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "wether.high",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "°F"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Wind",
+        "max" : 100,
+        "min" : 0,
+        "name" : "windSpeed",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "wind",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Drive",
+        "max" : 100,
+        "min" : 0,
+        "name" : "duration",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "h"
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Distance",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "route.distance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Budget",
+        "max" : 100,
+        "min" : 60,
+        "name" : "budget",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "rates.rate",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Missing",
+        "max" : 100,
+        "min" : 0,
+        "name" : "missing",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.uvIndex",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "toggle",
+        "formula" : "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+        "label" : "Go?",
+        "name" : "goodDay",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Picnic weather"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Chance of rain\", live number from weather.rainChance, now 10\n- highTemp: \"High\", live number from wether.high, now 0, in °F\n- windSpeed: \"Wind\", live number from wind, now 0, in m/s\n- duration: \"Drive\", live number from , now 0, in h\n- distance: \"Distance\", given number, 5\n- budget: \"Budget\", number, starts at 50, 60 to 100, step 1\n- missing: \"Missing\", live number from weather.uvIndex, now 3\nOutputs:\n- goodDay: \"Go?\", toggle = rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+    "outline" : "Picnic weather: \n- hero #block-0 ref goodDay\n- section #auto-inputs\n  - slider #auto-input-5 ref budget"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Chance of rain\", live percent from weather.rainChance, now 70\n- highTemp: \"High\", live number from weather.high, now 83.29999999999558, in °F\n- windSpeed: \"Wind\", live number from weather.wind, now 3.333336, in m/s\n- duration: \"Drive\", live number from route.duration, now 0.4166666666666667, in h\n- distance: \"Distance\", live number from route.distance, now 4.598146822556271, in mi\n- budget: \"Budget\", currency, starts at 83.2, 60 to 100, step 1\n- missing: \"Missing\", live number from weather.uvIndex, now 3\nOutputs:\n- goodDay: \"Go?\", toggle = rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+    "outline" : "Picnic weather: \n- hero #block-0 ref goodDay\n- section #more-inputs\n  - slider #budget-control ref budget\n  - section #givens\n    - metric #rain-given ref rain\n    - metric #highTemp-given ref highTemp\n    - metric #windSpeed-given ref windSpeed\n    - metric #duration-given ref duration\n    - metric #distance-given ref distance\n    - metric #missing-given ref missing\nsources (fetched with the live tool; fetch again to change one):\n- weather: weather, day saturday, place Bengaluru; fields weather.rainChance, weather.high, weather.wind\n- route: route, from current location, to Cubbon Park, travel driving; fields route.distance, route.duration"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'budget' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Read the source of 'highTemp' as weather.high."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Read the source of 'windSpeed' as weather.wind."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'distance' live, since it shows route.distance."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'missing' is live, but 'weather.uvIndex' isn't a field the live tool returned. Set its source to one of rates.rate, route.distance, route.duration, weather.high, weather.rainChance, weather.wind, or fetch what it needs with the live tool."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "goodDay",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 70,
+          "label" : "Chance of rain",
+          "max" : 70,
+          "min" : 70,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 83.299999999995578,
+          "label" : "High",
+          "max" : 83.299999999995578,
+          "min" : 83.299999999995578,
+          "name" : "highTemp",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.high",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°F"
+        },
+        {
+          "format" : "number",
+          "initial" : 3.3333360000000001,
+          "label" : "Wind",
+          "max" : 3.3333360000000001,
+          "min" : 3.3333360000000001,
+          "name" : "windSpeed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.wind",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s"
+        },
+        {
+          "format" : "number",
+          "initial" : 0.41666666666666669,
+          "label" : "Drive",
+          "max" : 0.41666666666666669,
+          "min" : 0.41666666666666669,
+          "name" : "duration",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.duration",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "number",
+          "initial" : 4.5981468225562709,
+          "label" : "Distance",
+          "max" : 4.5981468225562709,
+          "min" : 4.5981468225562709,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "route.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "currency",
+          "initial" : 83.200000000000003,
+          "label" : "Budget",
+          "max" : 100,
+          "min" : 60,
+          "name" : "budget",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Missing",
+          "max" : 3,
+          "min" : 3,
+          "name" : "missing",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.uvIndex",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0",
+          "label" : "Go?",
+          "name" : "goodDay",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "percent",
+              "meaning" : "the chance of rain",
+              "name" : "rainChance",
+              "unit" : "",
+              "value" : 70
+            },
+            {
+              "format" : "number",
+              "meaning" : "the day's high",
+              "name" : "high",
+              "unit" : "°C",
+              "value" : 28.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "wind speed",
+              "name" : "wind",
+              "unit" : "km/h",
+              "value" : 12
+            }
+          ],
+          "kind" : "weather",
+          "name" : "weather",
+          "parameters" : {
+            "day" : "saturday",
+            "place" : "Bengaluru"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 7.4000000000000004
+            },
+            {
+              "format" : "number",
+              "meaning" : "how long",
+              "name" : "duration",
+              "unit" : "min",
+              "value" : 25
+            }
+          ],
+          "kind" : "route",
+          "name" : "route",
+          "parameters" : {
+            "from" : "current location",
+            "to" : "Cubbon Park",
+            "travel" : "driving"
+          }
+        },
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "rupees for a dollar",
+              "name" : "rate",
+              "unit" : "",
+              "value" : 83.200000000000003
+            }
+          ],
+          "kind" : "exchangeRate",
+          "name" : "rates",
+          "parameters" : {
+            "from" : "USD",
+            "to" : "INR"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Picnic weather"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

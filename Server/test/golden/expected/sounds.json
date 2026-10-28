@@ -1,0 +1,1464 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the sound 'beats', read 'frequncy' as 'frequency'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the sound 'beats', read 'Second' as 'second'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave a tone of 'beats' a moderate loudness."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a tone of 'beats' whose frequency can't be worked out: frequency * ("
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave a tone of 'beats' a moderate loudness."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'beats' starts at 4.4 Hz, which people can't hear."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a tone of 'silent' whose frequency can't be worked out: nothing(1)"
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the sound 'silent', which has no tone left."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a second sound named 'beats'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a sound with no name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the sound 'loonCall': no recording was found for \"Gavia immer call\"."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the sound 'owl': no recording was found for \"Strix aluco hoot\"."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the sound 'nothing', which has neither tones nor a recording."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a sound block for 'loonCall', which isn't a sound."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a sound block for 'owl', which isn't a sound."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a second block playing 'beats'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a block to play 'frequencySound'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the sound 'frequencySound' with the controls that change it."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "frequencySound-sound",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "frequencySound",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "beats",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "frequency",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "gap",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Play"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "second",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 440,
+          "label" : "Frequency",
+          "max" : 1000,
+          "min" : 100,
+          "name" : "frequency",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "Hz"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Gap",
+          "max" : 10,
+          "min" : 0,
+          "name" : "gap",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "frequency + gap",
+          "label" : "Second note",
+          "name" : "second",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : "Two notes beating",
+          "name" : "beats",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.3",
+              "frequency" : "frequency",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "second",
+              "waveform" : "triangle"
+            },
+            {
+              "amplitude" : "0.4",
+              "frequency" : "frequency / 100",
+              "waveform" : "sawtooth"
+            }
+          ]
+        },
+        {
+          "label" : "Named like an input",
+          "name" : "frequencySound",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "frequency",
+              "waveform" : "sine"
+            }
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beats"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "frequency",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "beat",
+              "text" : "",
+              "title" : "Play the beats"
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "gap",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Play"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "loonCall",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "second",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "beats",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "owl",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 440,
+          "label" : "Frequency",
+          "max" : 1000,
+          "min" : 100,
+          "name" : "frequency",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "Hz"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Gap",
+          "max" : 10,
+          "min" : 0,
+          "name" : "gap",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "frequency + gap",
+          "label" : "Second note",
+          "name" : "second",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : " Two notes beating ",
+          "name" : "beats",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.3",
+              "frequency" : "frequncy",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "",
+              "frequency" : "Second",
+              "waveform" : "triangle"
+            },
+            {
+              "amplitude" : "0.2",
+              "frequency" : "frequency * (",
+              "waveform" : "square"
+            },
+            {
+              "amplitude" : "loudness",
+              "frequency" : "frequency / 100",
+              "waveform" : "sawtooth"
+            },
+            {
+              "amplitude" : "0.1",
+              "frequency" : "frequency * 2",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Silent",
+          "name" : "silent",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.2",
+              "frequency" : "nothing(1)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Named like an input",
+          "name" : "frequency",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "frequency",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Again",
+          "name" : "beats",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "440",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "",
+          "name" : "",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "440",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Loon call",
+          "name" : "",
+          "search" : " Gavia immer call ",
+          "tones" : [
+
+          ]
+        },
+        {
+          "label" : "Owl",
+          "name" : "owl",
+          "search" : "Strix aluco hoot",
+          "tones" : [
+
+          ]
+        },
+        {
+          "label" : "Nothing",
+          "name" : "nothing",
+          "search" : "",
+          "tones" : [
+
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beats"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "frequency",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "sound",
+            "over" : "",
+            "ref" : "beat",
+            "text" : "",
+            "title" : "Play the beats"
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "gap",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Play"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "sound",
+            "over" : "",
+            "ref" : "loonCall",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "second",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "beats",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "owl",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 440,
+        "label" : "Frequency",
+        "max" : 1000,
+        "min" : 100,
+        "name" : "frequency",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "Hz"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Gap",
+        "max" : 10,
+        "min" : 0,
+        "name" : "gap",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "frequency + gap",
+        "label" : "Second note",
+        "name" : "second",
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+      {
+        "kind" : "tones",
+        "label" : " Two notes beating ",
+        "name" : "beats",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.3",
+            "frequency" : "frequncy",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "",
+            "frequency" : "Second",
+            "waveform" : "triangle"
+          },
+          {
+            "amplitude" : "0.2",
+            "frequency" : "frequency * (",
+            "waveform" : "square"
+          },
+          {
+            "amplitude" : "loudness",
+            "frequency" : "frequency / 100",
+            "waveform" : "sawtooth"
+          },
+          {
+            "amplitude" : "0.1",
+            "frequency" : "frequency * 2",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Silent",
+        "name" : "silent",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.2",
+            "frequency" : "nothing(1)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Named like an input",
+        "name" : "frequency",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "frequency",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "Again",
+        "name" : "beats",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "440",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "tones",
+        "label" : "",
+        "name" : "",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "440",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "kind" : "recording",
+        "label" : "Loon call",
+        "name" : "",
+        "search" : " Gavia immer call ",
+        "tones" : [
+
+        ]
+      },
+      {
+        "kind" : "recording",
+        "label" : "Owl",
+        "name" : "owl",
+        "search" : "Strix aluco hoot",
+        "tones" : [
+
+        ]
+      },
+      {
+        "kind" : "recording",
+        "label" : "Nothing",
+        "name" : "nothing",
+        "search" : "",
+        "tones" : [
+
+        ]
+      }
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Beats"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-0",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "frequency",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-1",
+            "items" : [
+
+            ],
+            "kind" : "sound",
+            "over" : "",
+            "ref" : "beat",
+            "text" : "",
+            "title" : "Play the beats"
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-2",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "gap",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Play"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "sound",
+            "over" : "",
+            "ref" : "loonCall",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "second",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "beats",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "sound",
+        "over" : "",
+        "ref" : "owl",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 440,
+        "label" : "Frequency",
+        "max" : 1000,
+        "min" : 100,
+        "name" : "frequency",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "Hz"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Gap",
+        "max" : 10,
+        "min" : 0,
+        "name" : "gap",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "frequency + gap",
+        "label" : "Second note",
+        "name" : "second",
+        "symbol" : "",
+        "unit" : "Hz"
+      }
+    ],
+    "related" : [
+
+    ],
+    "sounds" : [
+      {
+        "label" : " Two notes beating ",
+        "name" : "beats",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.3",
+            "frequency" : "frequncy",
+            "waveform" : "sine"
+          },
+          {
+            "amplitude" : "",
+            "frequency" : "Second",
+            "waveform" : "triangle"
+          },
+          {
+            "amplitude" : "0.2",
+            "frequency" : "frequency * (",
+            "waveform" : "square"
+          },
+          {
+            "amplitude" : "loudness",
+            "frequency" : "frequency / 100",
+            "waveform" : "sawtooth"
+          },
+          {
+            "amplitude" : "0.1",
+            "frequency" : "frequency * 2",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Silent",
+        "name" : "silent",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.2",
+            "frequency" : "nothing(1)",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Named like an input",
+        "name" : "frequency",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "frequency",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Again",
+        "name" : "beats",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "440",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "",
+        "name" : "",
+        "search" : "",
+        "tones" : [
+          {
+            "amplitude" : "0.5",
+            "frequency" : "440",
+            "waveform" : "sine"
+          }
+        ]
+      },
+      {
+        "label" : "Loon call",
+        "name" : "",
+        "search" : " Gavia immer call ",
+        "tones" : [
+
+        ]
+      },
+      {
+        "label" : "Owl",
+        "name" : "owl",
+        "search" : "Strix aluco hoot",
+        "tones" : [
+
+        ]
+      },
+      {
+        "label" : "Nothing",
+        "name" : "nothing",
+        "search" : "",
+        "tones" : [
+
+        ]
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Beats"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- frequency: \"Frequency\", number, starts at 440, 100 to 1000, step 1, in Hz\n- gap: \"Gap\", number, starts at 3, 0 to 10, step 0.5, in Hz\nOutputs:\n- second: \"Second note\", number, in Hz = frequency + gap",
+    "outline" : "Beats: \n- section #block-0 \"Play\"\n  - slider #block-0-0 ref frequency\n  - sound #block-0-1 ref beat \"Play the beats\"\n  - slider #block-0-2 ref gap\n- row #block-1\n  - sound #block-1-0 ref loonCall\n  - metric #block-1-1 ref second\n- sound #block-2 ref beats\n- sound #block-3 ref owl\nsounds:\n- beats \" Two notes beating \": tones sine at frequncy Hz, amplitude 0.3; triangle at Second Hz, amplitude ; square at frequency * ( Hz, amplitude 0.2; sawtooth at frequency / 100 Hz, amplitude loudness; sine at frequency * 2 Hz, amplitude 0.1\n- silent \"Silent\": tones sine at nothing(1) Hz, amplitude 0.2\n- frequency \"Named like an input\": tones sine at frequency Hz, amplitude 0.5\n- beats \"Again\": tones sine at 440 Hz, amplitude 0.5\n-  \"\": tones sine at 440 Hz, amplitude 0.5\n-  \"Loon call\": recording, search \" Gavia immer call \"\n- owl \"Owl\": recording, search \"Strix aluco hoot\"\n- nothing \"Nothing\": recording, search \"\""
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- frequency: \"Frequency\", number, starts at 440, 100 to 1000, step 1, in Hz\n- gap: \"Gap\", number, starts at 3, 0 to 10, step 0.5, in Hz\nOutputs:\n- second: \"Second note\", number, in Hz = frequency + gap",
+    "outline" : "Beats: \n- section #block-0 \"Play\"\n  - sound #frequencySound-sound ref frequencySound\n  - sound #block-0-1 ref beats\n  - slider #block-0-0 ref frequency\n  - slider #block-0-2 ref gap\n- row #block-1\n  - metric #block-1-1 ref second\nsounds:\n- beats \"Two notes beating\": tones sine at frequency Hz, amplitude 0.3; triangle at second Hz, amplitude 0.4; sawtooth at frequency / 100 Hz, amplitude 0.4\n- frequencySound \"Named like an input\": tones sine at frequency Hz, amplitude 0.5"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "frequency",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "beat",
+              "text" : "",
+              "title" : "Play the beats"
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "gap",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Play"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "sound",
+              "over" : "",
+              "ref" : "loonCall",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "second",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "beats",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "sound",
+          "over" : "",
+          "ref" : "owl",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 440,
+          "label" : "Frequency",
+          "max" : 1000,
+          "min" : 100,
+          "name" : "frequency",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "Hz"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Gap",
+          "max" : 10,
+          "min" : 0,
+          "name" : "gap",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "frequency + gap",
+          "label" : "Second note",
+          "name" : "second",
+          "symbol" : "",
+          "unit" : "Hz"
+        }
+      ],
+      "related" : [
+
+      ],
+      "sounds" : [
+        {
+          "label" : " Two notes beating ",
+          "name" : "beats",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.3",
+              "frequency" : "frequncy",
+              "waveform" : "sine"
+            },
+            {
+              "amplitude" : "",
+              "frequency" : "Second",
+              "waveform" : "triangle"
+            },
+            {
+              "amplitude" : "0.2",
+              "frequency" : "frequency * (",
+              "waveform" : "square"
+            },
+            {
+              "amplitude" : "loudness",
+              "frequency" : "frequency / 100",
+              "waveform" : "sawtooth"
+            },
+            {
+              "amplitude" : "0.1",
+              "frequency" : "frequency * 2",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Silent",
+          "name" : "silent",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.2",
+              "frequency" : "nothing(1)",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Named like an input",
+          "name" : "frequency",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "frequency",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Again",
+          "name" : "beats",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "440",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "",
+          "name" : "",
+          "search" : "",
+          "tones" : [
+            {
+              "amplitude" : "0.5",
+              "frequency" : "440",
+              "waveform" : "sine"
+            }
+          ]
+        },
+        {
+          "label" : "Loon call",
+          "name" : "",
+          "search" : " Gavia immer call ",
+          "tones" : [
+
+          ]
+        },
+        {
+          "label" : "Owl",
+          "name" : "owl",
+          "search" : "Strix aluco hoot",
+          "tones" : [
+
+          ]
+        },
+        {
+          "label" : "Nothing",
+          "name" : "nothing",
+          "search" : "",
+          "tones" : [
+
+          ]
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beats"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

@@ -1,0 +1,916 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'n一日の歩数', 'σΑΣΤιμή', 'السعر', 'größeStraße', 'count', 'José'."
+      }
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "歩くのは良い。{total} 🍣",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "n一日の歩数-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "n一日の歩数",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "σΑΣΤιμή-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "σΑΣΤιμή",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "السعر-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "السعر",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "größeStraße-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "größeStraße",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "count-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "count",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "José-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "José",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 8000,
+          "label" : "一日の歩数",
+          "max" : 30000,
+          "min" : 0,
+          "name" : "n一日の歩数",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "ΣΑΣ τιμή",
+          "max" : 10,
+          "min" : 0,
+          "name" : "σΑΣΤιμή",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "السعر",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "السعر",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1.8,
+          "label" : "Größe straße",
+          "max" : 2.5,
+          "min" : 0,
+          "name" : "größeStraße",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 2,
+          "label" : "🍣 count 🇯🇵",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "José",
+          "max" : 5,
+          "min" : 0,
+          "name" : "José",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "n一日の歩数 / 1000 + σΑΣΤιμή + السعر + größeStraße + count + José",
+          "label" : "合計",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "σας Übung",
+        "🇯🇵 Japan"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "ΣΑΣ Übung"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "歩くのは良い。{total} 🍣",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 8000,
+          "label" : "一日の歩数",
+          "max" : 30000,
+          "min" : 0,
+          "name" : "n一日の歩数",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "ΣΑΣ τιμή",
+          "max" : 10,
+          "min" : 0,
+          "name" : "σΑΣΤιμή",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "السعر",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "السعر",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1.8,
+          "label" : "Größe straße",
+          "max" : 2.5,
+          "min" : 0,
+          "name" : "größeStraße",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 2,
+          "label" : "🍣 count 🇯🇵",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "José",
+          "max" : 5,
+          "min" : 0,
+          "name" : "José",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "n一日の歩数 / 1000 + σΑΣΤιμή + السعر + größeStraße + count + José",
+          "label" : "合計",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "ΣΑΣ übung",
+        "σας Übung",
+        "🇯🇵 Japan",
+        "🇯🇵 japan"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "ΣΑΣ Übung"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "歩くのは良い。{total} 🍣",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 8000,
+        "label" : "一日の歩数",
+        "max" : 30000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "ΣΑΣ τιμή",
+        "max" : 10,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "السعر",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1.8,
+        "label" : "Größe straße",
+        "max" : 2.5,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2,
+        "label" : "🍣 count 🇯🇵",
+        "max" : 10,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "José",
+        "max" : 5,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "n一日の歩数 / 1000 + ΣΑΣτιμή + السعر + größeStraße + count + José",
+        "label" : "合計",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+      "ΣΑΣ übung",
+      "σας Übung",
+      "🇯🇵 Japan",
+      "🇯🇵 japan"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "learning",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "ΣΑΣ Übung"
+  },
+  "converted" : {
+    "accent" : "purple",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "歩くのは良い。{total} 🍣",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 8000,
+        "label" : "一日の歩数",
+        "max" : 30000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "ΣΑΣ τιμή",
+        "max" : 10,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "السعر",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1.8,
+        "label" : "Größe straße",
+        "max" : 2.5,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2,
+        "label" : "🍣 count 🇯🇵",
+        "max" : 10,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "José",
+        "max" : 5,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "n一日の歩数 / 1000 + ΣΑΣτιμή + السعر + größeStraße + count + José",
+        "label" : "合計",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+      "ΣΑΣ übung",
+      "σας Übung",
+      "🇯🇵 Japan",
+      "🇯🇵 japan"
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "ΣΑΣ Übung"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- : \"一日の歩数\", integer, starts at 8000, 0 to 30000, step 100\n- : \"ΣΑΣ τιμή\", number, starts at 3, 0 to 10, step 1\n- : \"السعر\", currency, starts at 100, 0 to 1000, step 1\n- : \"Größe straße\", number, starts at 1.8, 0 to 2.5, step 0.01\n- : \"🍣 count 🇯🇵\", integer, starts at 2, 0 to 10, step 1\n- : \"José\", number, starts at 1, 0 to 5, step 1\nOutputs:\n- total: \"合計\", number = n一日の歩数 / 1000 + ΣΑΣτιμή + السعر + größeStraße + count + José",
+    "outline" : "ΣΑΣ Übung: \n- hero #block-0 ref total\n- paragraph #block-1\n  歩くのは良い。{total} 🍣\n- section #auto-inputs\n  - slider #auto-input-0\n  - slider #auto-input-1\n  - slider #auto-input-2\n  - slider #auto-input-3\n  - stepper #auto-input-4\n  - slider #auto-input-5\nrelated: ΣΑΣ übung, σας Übung, 🇯🇵 Japan, 🇯🇵 japan"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- n一日の歩数: \"一日の歩数\", integer, starts at 8000, 0 to 30000, step 100\n- σΑΣΤιμή: \"ΣΑΣ τιμή\", number, starts at 3, 0 to 10, step 1\n- السعر: \"السعر\", currency, starts at 100, 0 to 1000, step 1\n- größeStraße: \"Größe straße\", number, starts at 1.8, 0 to 2.5, step 0.01\n- count: \"🍣 count 🇯🇵\", integer, starts at 2, 0 to 10, step 1\n- José: \"José\", number, starts at 1, 0 to 5, step 1\nOutputs:\n- total: \"合計\", number = n一日の歩数 / 1000 + σΑΣΤιμή + السعر + größeStraße + count + José",
+    "outline" : "ΣΑΣ Übung: \n- hero #block-0 ref total\n- paragraph #block-1\n  歩くのは良い。{total} 🍣\n- section #more-inputs\n  - slider #n一日の歩数-control ref n一日の歩数\n  - slider #σΑΣΤιμή-control ref σΑΣΤιμή\n  - slider #السعر-control ref السعر\n  - slider #größeStraße-control ref größeStraße\n  - stepper #count-control ref count\n  - slider #José-control ref José\nrelated: σας Übung, 🇯🇵 Japan"
+  },
+  "locale" : "ja_JP",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In 'total', read 'ΣΑΣτιμή' as 'σΑΣΤιμή'."
+      }
+    ],
+    "surface" : {
+      "accent" : "purple",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "歩くのは良い。{total} 🍣",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 8000,
+          "label" : "一日の歩数",
+          "max" : 30000,
+          "min" : 0,
+          "name" : "n一日の歩数",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "ΣΑΣ τιμή",
+          "max" : 10,
+          "min" : 0,
+          "name" : "σΑΣΤιμή",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "السعر",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "السعر",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1.8,
+          "label" : "Größe straße",
+          "max" : 2.5,
+          "min" : 0,
+          "name" : "größeStraße",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 2,
+          "label" : "🍣 count 🇯🇵",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "José",
+          "max" : 5,
+          "min" : 0,
+          "name" : "José",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "n一日の歩数 / 1000 + σΑΣΤιμή + السعر + größeStraße + count + José",
+          "label" : "合計",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "ΣΑΣ übung",
+        "σας Übung",
+        "🇯🇵 Japan",
+        "🇯🇵 japan"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "ΣΑΣ Übung"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

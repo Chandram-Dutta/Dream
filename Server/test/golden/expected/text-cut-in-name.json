@@ -1,0 +1,314 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "Grind"
+                },
+                {
+                  "label" : "",
+                  "value" : "Pour"
+                }
+              ],
+              "kind" : "steps",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Brew"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Coffee"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "Grind"
+                },
+                {
+                  "label" : "",
+                  "value" : "Pour"
+                }
+              ],
+              "kind" : "steps",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Brew"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Coffee"
+    }
+  },
+  "content" : {
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "items" : [
+              {
+                "label" : "",
+                "value" : "Grind"
+              },
+              {
+                "label" : "",
+                "value" : "Pour"
+              }
+            ],
+            "kind" : "steps"
+          },
+          {
+            "kind" : "paragraph"
+          }
+        ],
+        "kind" : "section",
+        "title" : "Brew"
+      }
+    ],
+    "subject" : "food",
+    "title" : "Coffee"
+  },
+  "converted" : {
+    "accent" : "orange",
+    "blocks" : [
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-0",
+            "items" : [
+              {
+                "label" : "",
+                "value" : "Grind"
+              },
+              {
+                "label" : "",
+                "value" : "Pour"
+              }
+            ],
+            "kind" : "steps",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-0-1",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Brew"
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "sparkles",
+    "title" : "Coffee"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Coffee: \n- section #block-0 \"Brew\"\n  - steps #block-0-0\n    • Grind\n    • Pour\n  - paragraph #block-0-1"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Coffee: \n- section #block-0 \"Brew\"\n  - steps #block-0-0\n    • Grind\n    • Pour"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-0",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "Grind"
+                },
+                {
+                  "label" : "",
+                  "value" : "Pour"
+                }
+              ],
+              "kind" : "steps",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-0-1",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Brew"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Coffee"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

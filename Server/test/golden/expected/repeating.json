@@ -1,0 +1,307 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "This sentence is long enough to count as one. This sentence is long enough to count as one. Short.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "same"
+            },
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "Other"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A page that loops.",
+      "symbol" : "sparkles",
+      "title" : "Loop"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "This sentence is long enough to count as one. This sentence is long enough to count as one. Short.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "same"
+            },
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "Other"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A page that loops.",
+      "symbol" : "sparkles",
+      "title" : "Loop"
+    }
+  },
+  "content" : {
+    "blocks" : [
+      {
+        "kind" : "paragraph",
+        "text" : "This sentence is long enough to count as one. This sentence is long enough to count as one. Short."
+      },
+      {
+        "items" : [
+          {
+            "value" : "Same"
+          },
+          {
+            "value" : "same"
+          },
+          {
+            "value" : "Same"
+          },
+          {
+            "value" : "Other"
+          }
+        ],
+        "kind" : "bullets"
+      }
+    ],
+    "summary" : "A page that loops.",
+    "title" : "Loop"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "This sentence is long enough to count as one. This sentence is long enough to count as one. Short.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+          {
+            "label" : "",
+            "value" : "Same"
+          },
+          {
+            "label" : "",
+            "value" : "same"
+          },
+          {
+            "label" : "",
+            "value" : "Same"
+          },
+          {
+            "label" : "",
+            "value" : "Other"
+          }
+        ],
+        "kind" : "bullets",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "A page that loops.",
+    "symbol" : "sparkles",
+    "title" : "Loop"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : true,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Loop: A page that loops.\n- paragraph #block-0\n  This sentence is long enough to count as one. This sentence is long enough to count as one. Short.\n- bullets #block-1\n  • Same\n  • same\n  • Same\n  • Other"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : true,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Loop: A page that loops.\n- paragraph #block-0\n  This sentence is long enough to count as one. This sentence is long enough to count as one. Short.\n- bullets #block-1\n  • Same\n  • same\n  • Same\n  • Other"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "This sentence is long enough to count as one. This sentence is long enough to count as one. Short.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "same"
+            },
+            {
+              "label" : "",
+              "value" : "Same"
+            },
+            {
+              "label" : "",
+              "value" : "Other"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A page that loops.",
+      "symbol" : "sparkles",
+      "title" : "Loop"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

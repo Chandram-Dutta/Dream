@@ -1,0 +1,32 @@
+{
+  "about": "Formulas read leniently and names repaired: near misses by case, by punctuation, by spelling and by prefix; maths written with Math., **, ×, ÷, −, ≤, and, or, not, true; choices compared by name rewritten by position; and what can't be repaired sent back: a formula that can't be read, a function that isn't available, a name that's nothing.",
+  "fill": true,
+  "wire": {
+    "title": "Formulas",
+    "inputs": [
+      {"name": "billAmount", "label": "Bill", "format": "currency", "initial": 100, "max": 1000},
+      {"name": "numberOfPeople", "label": "People", "format": "integer", "initial": 4, "min": 1, "max": 20},
+      {"name": "tip_rate", "label": "Tip", "format": "percent", "initial": 10, "max": 30},
+      {"name": "unit", "label": "Unit", "format": "choice", "initial": 0, "options": ["grams", "cups"]},
+      {"name": "system", "label": "System", "format": "choice", "initial": 1, "options": ["Metric", "Imperial"]}
+    ],
+    "outputs": [
+      {"name": "perPerson", "label": "Each", "formula": "BillAmount * (1 + tiprate / 100) / numberofpeople", "format": "currency"},
+      {"name": "rounded", "label": "Rounded", "formula": "Math.round(perPerson ** 2) × 2 ÷ 4 − 1", "format": "currency"},
+      {"name": "check", "label": "Check", "formula": "billAmont ≤ 500 and not (numberOfPeople == 0) or true"},
+      {"name": "byPrefix", "label": "Prefix", "formula": "numberOf + 1"},
+      {"name": "converted", "label": "Converted", "formula": "unit == 'cups' ? billAmount / 240 : billAmount", "format": "number"},
+      {"name": "imperial", "label": "Imperial", "formula": "\"Imperial\" != system ? 1 : 0"},
+      {"name": "broken", "label": "Broken", "formula": "billAmount * (2 +"},
+      {"name": "unknownFunction", "label": "Unknown", "formula": "median(billAmount, 2) + percentile(3)"},
+      {"name": "nothing", "label": "Nothing", "formula": "billAmount + gratuity + pi + e + tau"},
+      {"name": "badNumber", "label": "Bad number", "formula": "1.2.3 + billAmount"},
+      {"name": "badCharacter", "label": "Bad character", "formula": "billAmount # 2"},
+      {"name": "empty", "label": "Empty", "formula": "   "},
+      {"name": "extra", "label": "Extra", "formula": "billAmount 2"},
+      {"name": "unclosed", "label": "Unclosed", "formula": "max(billAmount, 2"},
+      {"name": "wrongComma", "label": "Wrong", "formula": "max(billAmount; 2)"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "perPerson"}]
+  }
+}

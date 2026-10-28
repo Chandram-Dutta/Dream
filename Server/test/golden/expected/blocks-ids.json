@@ -1,0 +1,390 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "First.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-2",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "only a value"
+                }
+              ],
+              "kind" : "bullets",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+        "One"
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Partly there"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "First.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-2",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "only a value"
+                },
+                {
+                  "label" : "only a label",
+                  "value" : ""
+                }
+              ],
+              "kind" : "bullets",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+        "One"
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Partly there"
+    }
+  },
+  "content" : {
+    "blocks" : [
+      {
+        "kind" : "paragraph",
+        "text" : "First."
+      },
+      {
+        "title" : "No kind yet"
+      },
+      {
+        "children" : [
+          {
+            "kind" : "paragraph",
+            "text" : "Inside."
+          },
+          {
+            "text" : "kindless child"
+          },
+          {
+            "items" : [
+              {
+                "value" : "only a value"
+              },
+              {
+                "label" : "only a label"
+              }
+            ],
+            "kind" : "bullets"
+          }
+        ],
+        "kind" : "section"
+      }
+    ],
+    "related" : [
+      "One"
+    ],
+    "title" : "Partly there"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "First.",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-0",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Inside.",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-2",
+            "items" : [
+              {
+                "label" : "",
+                "value" : "only a value"
+              },
+              {
+                "label" : "only a label",
+                "value" : ""
+              }
+            ],
+            "kind" : "bullets",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+      "One"
+    ],
+    "summary" : "",
+    "symbol" : "sparkles",
+    "title" : "Partly there"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Partly there: \n- paragraph #block-0\n  First.\n- section #block-2\n  - paragraph #block-2-0\n    Inside.\n  - bullets #block-2-2\n    • only a value\n    • only a label: \nrelated: One"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Partly there: \n- paragraph #block-0\n  First.\n- section #block-2\n  - paragraph #block-2-0\n    Inside.\n  - bullets #block-2-2\n    • only a value\nrelated: One"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "First.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Inside.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-2",
+              "items" : [
+                {
+                  "label" : "",
+                  "value" : "only a value"
+                },
+                {
+                  "label" : "only a label",
+                  "value" : ""
+                }
+              ],
+              "kind" : "bullets",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+        "One"
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Partly there"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

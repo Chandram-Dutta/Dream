@@ -1,0 +1,345 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "time" : "9",
+            "title" : "Call the dentist"
+          },
+          "kind" : "reminder",
+          "name" : "dentist"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Book a check-up every six months.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "dentist",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Dentist"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "time" : "9",
+            "title" : "Call the dentist"
+          },
+          "kind" : "reminder",
+          "name" : "dentist"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Book a check-up every six months.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "",
+          "text" : "ignored",
+          "title" : "Remind me"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Dentist"
+    }
+  },
+  "content" : {
+    "actions" : [
+      {
+        "day" : "monday",
+        "duration" : "",
+        "from" : "",
+        "kind" : "reminder",
+        "name" : "dentist",
+        "notes" : "",
+        "place" : "",
+        "time" : "9",
+        "title" : "Call the dentist",
+        "travel" : "driving"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Book a check-up every six months.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "",
+        "text" : "ignored",
+        "title" : "Remind me"
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Dentist"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "actions" : [
+      {
+        "fields" : {
+          "day" : "monday",
+          "time" : "9",
+          "title" : "Call the dentist"
+        },
+        "kind" : "reminder",
+        "name" : "dentist"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Book a check-up every six months.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "",
+        "text" : "ignored",
+        "title" : "Remind me"
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Dentist"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Dentist: \n- paragraph #block-0\n  Book a check-up every six months.\n- action #block-1 \"Remind me\"\n  ignored\nactions:\n- dentist: reminder, day \"monday\", time \"9\", title \"Call the dentist\""
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Dentist: \n- paragraph #block-0\n  Book a check-up every six months.\n- action #block-1 ref dentist\nactions:\n- dentist: reminder, day \"monday\", time \"9\", title \"Call the dentist\""
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "monday",
+            "time" : "9",
+            "title" : "Call the dentist"
+          },
+          "kind" : "reminder",
+          "name" : "dentist"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Book a check-up every six months.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "",
+          "text" : "ignored",
+          "title" : "Remind me"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Dentist"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

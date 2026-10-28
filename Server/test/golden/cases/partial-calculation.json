@@ -1,0 +1,28 @@
+{
+  "about": "An answer still streaming, read as it stands: an input whose range hasn't arrived (it gets one from its starting value), one with no name yet (left out), an output with only its name, a collection, a sound, a figure, a diagram, an action and a scene each part way, and the citations, which a partial answer doesn't take.",
+  "partial": true,
+  "wire": {
+    "subject": "money",
+    "mode": "use",
+    "title": "EMI",
+    "summary": "Your EMI",
+    "question": "",
+    "collections": [{"name": "payments", "fields": [{"name": "amount", "type": "currency"}, {"label": "no name yet"}], "starters": [{"values": ["₹500"]}, {}]}, {"label": "no name"}],
+    "inputs": [
+      {"name": "principal", "label": "Loan", "format": "currency", "initial": 500000},
+      {"name": "rate", "initial": -2},
+      {"label": "Nameless"},
+      {"name": "", "initial": 3},
+      {"name": "years", "label": "Years", "format": "integer", "initial": 20, "min": 1}
+    ],
+    "outputs": [{"name": "emi"}, {"label": "no name"}],
+    "sounds": [{"name": "ding", "kind": "tones", "tones": [{"frequency": "880"}, {"amplitude": "0.2"}]}, {"name": "rec", "kind": "recording", "search": "bell"}, {"label": "nameless"}],
+    "figures": [{"name": "bar", "points": [{"name": "A", "x": "0", "y": "0"}, {"name": "B", "x": "1"}], "shapes": [{"kind": "segment", "points": "A,B"}, {"points": "A"}]}, {"points": []}],
+    "diagrams": [{"name": "flow", "nodes": [{"id": "a", "label": "A"}, {"id": "b"}], "edges": [{"from": "a", "to": "b"}, {"from": "a"}]}],
+    "actions": [{"name": "remind", "kind": "reminder", "title": "Pay EMI", "day": "monday"}, {"name": "nokind"}],
+    "scenes": [{"name": "coins", "molecule": " gold ", "objects": [{"name": "coin", "kind": "cylinder", "position": "stack(ground, 5)"}, {"name": "half", "kind": "box"}], "plots": [{"z": "x * y", "xFrom": "-1", "xTo": "1", "yFrom": "-1"}]}],
+    "blocks": [{"kind": "hero", "ref": "emi"}, {"kind": "slider", "ref": "principal"}],
+    "related": ["Home loans"],
+    "citations": ["https://example.com/emi"]
+  }
+}

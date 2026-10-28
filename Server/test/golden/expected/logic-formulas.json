@@ -1,0 +1,1579 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'billAmount', 'numberOfPeople', 'tip_rate', 'unit', 'system'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'rounded', 'check', 'byPrefix', 'converted', 'imperial', 'broken', 'unknownFunction', 'nothing', 'badNumber', 'badCharacter', 'empty', 'extra', 'unclosed', 'wrongComma' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "billAmount-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "billAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "numberOfPeople-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "numberOfPeople",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "tip_rate-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tip_rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "unit-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "unit",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "system-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "system",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "rounded-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "rounded",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "check-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "check",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "byPrefix-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "byPrefix",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "converted-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "converted",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "imperial-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "imperial",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "broken-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "broken",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "unknownFunction-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "unknownFunction",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "nothing-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "nothing",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "badNumber-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "badNumber",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "badCharacter-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "badCharacter",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "empty-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "empty",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "extra-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "extra",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "unclosed-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "unclosed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "wrongComma-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "wrongComma",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 1,
+          "label" : "System",
+          "max" : 1,
+          "min" : 0,
+          "name" : "system",
+          "options" : [
+            "Metric",
+            "Imperial"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "Math.round(perPerson ** 2) × 2 ÷ 4 − 1",
+          "label" : "Rounded",
+          "name" : "rounded",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount <= 500 && !(numberOfPeople == 0) || 1",
+          "label" : "Check",
+          "name" : "check",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "numberOfPeople + 1",
+          "label" : "Prefix",
+          "name" : "byPrefix",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "unit == 1 ? billAmount / 240 : billAmount",
+          "label" : "Converted",
+          "name" : "converted",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "system != 1 ? 1 : 0",
+          "label" : "Imperial",
+          "name" : "imperial",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount * (2 +",
+          "label" : "Broken",
+          "name" : "broken",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "median(billAmount, 2) + percentile(3)",
+          "label" : "Unknown",
+          "name" : "unknownFunction",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount + gratuity + pi + e + tau",
+          "label" : "Nothing",
+          "name" : "nothing",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1.2.3 + billAmount",
+          "label" : "Bad number",
+          "name" : "badNumber",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount # 2",
+          "label" : "Bad character",
+          "name" : "badCharacter",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "   ",
+          "label" : "Empty",
+          "name" : "empty",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount 2",
+          "label" : "Extra",
+          "name" : "extra",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount, 2",
+          "label" : "Unclosed",
+          "name" : "unclosed",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount; 2)",
+          "label" : "Wrong",
+          "name" : "wrongComma",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 1,
+          "label" : "System",
+          "max" : 1,
+          "min" : 0,
+          "name" : "system",
+          "options" : [
+            "Metric",
+            "Imperial"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "Math.round(perPerson ** 2) × 2 ÷ 4 − 1",
+          "label" : "Rounded",
+          "name" : "rounded",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount <= 500 && !(numberOfPeople == 0) || 1",
+          "label" : "Check",
+          "name" : "check",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "numberOfPeople + 1",
+          "label" : "Prefix",
+          "name" : "byPrefix",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "unit == 1 ? billAmount / 240 : billAmount",
+          "label" : "Converted",
+          "name" : "converted",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "system != 1 ? 1 : 0",
+          "label" : "Imperial",
+          "name" : "imperial",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount * (2 +",
+          "label" : "Broken",
+          "name" : "broken",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "median(billAmount, 2) + percentile(3)",
+          "label" : "Unknown",
+          "name" : "unknownFunction",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount + gratuity + pi + e + tau",
+          "label" : "Nothing",
+          "name" : "nothing",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1.2.3 + billAmount",
+          "label" : "Bad number",
+          "name" : "badNumber",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount # 2",
+          "label" : "Bad character",
+          "name" : "badCharacter",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "   ",
+          "label" : "Empty",
+          "name" : "empty",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount 2",
+          "label" : "Extra",
+          "name" : "extra",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount, 2",
+          "label" : "Unclosed",
+          "name" : "unclosed",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount; 2)",
+          "label" : "Wrong",
+          "name" : "wrongComma",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "billAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "numberOfPeople",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip_rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Unit",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unit",
+        "options" : [
+          "grams",
+          "cups"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 1,
+        "label" : "System",
+        "max" : 100,
+        "min" : 0,
+        "name" : "system",
+        "options" : [
+          "Metric",
+          "Imperial"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "BillAmount * (1 + tiprate / 100) / numberofpeople",
+        "label" : "Each",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "Math.round(perPerson ** 2) × 2 ÷ 4 − 1",
+        "label" : "Rounded",
+        "name" : "rounded",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmont ≤ 500 and not (numberOfPeople == 0) or true",
+        "label" : "Check",
+        "name" : "check",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "numberOf + 1",
+        "label" : "Prefix",
+        "name" : "byPrefix",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "unit == 'cups' ? billAmount / 240 : billAmount",
+        "label" : "Converted",
+        "name" : "converted",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "\"Imperial\" != system ? 1 : 0",
+        "label" : "Imperial",
+        "name" : "imperial",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount * (2 +",
+        "label" : "Broken",
+        "name" : "broken",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "median(billAmount, 2) + percentile(3)",
+        "label" : "Unknown",
+        "name" : "unknownFunction",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount + gratuity + pi + e + tau",
+        "label" : "Nothing",
+        "name" : "nothing",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1.2.3 + billAmount",
+        "label" : "Bad number",
+        "name" : "badNumber",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount # 2",
+        "label" : "Bad character",
+        "name" : "badCharacter",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "   ",
+        "label" : "Empty",
+        "name" : "empty",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount 2",
+        "label" : "Extra",
+        "name" : "extra",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "max(billAmount, 2",
+        "label" : "Unclosed",
+        "name" : "unclosed",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "max(billAmount; 2)",
+        "label" : "Wrong",
+        "name" : "wrongComma",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Formulas"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "billAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "numberOfPeople",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip_rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Unit",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unit",
+        "options" : [
+          "grams",
+          "cups"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 1,
+        "label" : "System",
+        "max" : 100,
+        "min" : 0,
+        "name" : "system",
+        "options" : [
+          "Metric",
+          "Imperial"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "BillAmount * (1 + tiprate / 100) / numberofpeople",
+        "label" : "Each",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "Math.round(perPerson ** 2) × 2 ÷ 4 − 1",
+        "label" : "Rounded",
+        "name" : "rounded",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmont ≤ 500 and not (numberOfPeople == 0) or true",
+        "label" : "Check",
+        "name" : "check",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "numberOf + 1",
+        "label" : "Prefix",
+        "name" : "byPrefix",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "unit == 'cups' ? billAmount / 240 : billAmount",
+        "label" : "Converted",
+        "name" : "converted",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "\"Imperial\" != system ? 1 : 0",
+        "label" : "Imperial",
+        "name" : "imperial",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount * (2 +",
+        "label" : "Broken",
+        "name" : "broken",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "median(billAmount, 2) + percentile(3)",
+        "label" : "Unknown",
+        "name" : "unknownFunction",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount + gratuity + pi + e + tau",
+        "label" : "Nothing",
+        "name" : "nothing",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1.2.3 + billAmount",
+        "label" : "Bad number",
+        "name" : "badNumber",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount # 2",
+        "label" : "Bad character",
+        "name" : "badCharacter",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "   ",
+        "label" : "Empty",
+        "name" : "empty",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount 2",
+        "label" : "Extra",
+        "name" : "extra",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "max(billAmount, 2",
+        "label" : "Unclosed",
+        "name" : "unclosed",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "max(billAmount; 2)",
+        "label" : "Wrong",
+        "name" : "wrongComma",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Formulas"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- billAmount: \"Bill\", currency, starts at 100, 0 to 1000, step 1\n- numberOfPeople: \"People\", integer, starts at 4, 1 to 20, step 1\n- tip_rate: \"Tip\", percent, starts at 10, 0 to 30, step 1\n- unit: \"Unit\", choice of grams / cups, starts at option 0\n- system: \"System\", choice of Metric / Imperial, starts at option 1\nOutputs:\n- perPerson: \"Each\", currency = BillAmount * (1 + tiprate / 100) / numberofpeople\n- rounded: \"Rounded\", currency = Math.round(perPerson ** 2) × 2 ÷ 4 − 1\n- check: \"Check\", number = billAmont ≤ 500 and not (numberOfPeople == 0) or true\n- byPrefix: \"Prefix\", number = numberOf + 1\n- converted: \"Converted\", number = unit == 'cups' ? billAmount / 240 : billAmount\n- imperial: \"Imperial\", number = \"Imperial\" != system ? 1 : 0\n- broken: \"Broken\", number = billAmount * (2 +\n- unknownFunction: \"Unknown\", number = median(billAmount, 2) + percentile(3)\n- nothing: \"Nothing\", number = billAmount + gratuity + pi + e + tau\n- badNumber: \"Bad number\", number = 1.2.3 + billAmount\n- badCharacter: \"Bad character\", number = billAmount # 2\n- empty: \"Empty\", number =    \n- extra: \"Extra\", number = billAmount 2\n- unclosed: \"Unclosed\", number = max(billAmount, 2\n- wrongComma: \"Wrong\", number = max(billAmount; 2)",
+    "outline" : "Formulas: \n- hero #block-0 ref perPerson\n- section #auto-inputs\n  - slider #auto-input-0 ref billAmount\n  - stepper #auto-input-1 ref numberOfPeople\n  - slider #auto-input-2 ref tip_rate\n  - picker #auto-input-3 ref unit\n  - picker #auto-input-4 ref system\n- section #auto-outputs\n  - metric #auto-output-1 ref rounded\n  - metric #auto-output-2 ref check\n  - metric #auto-output-3 ref byPrefix\n  - metric #auto-output-4 ref converted\n  - metric #auto-output-5 ref imperial\n  - metric #auto-output-6 ref broken\n  - metric #auto-output-7 ref unknownFunction\n  - metric #auto-output-8 ref nothing\n  - metric #auto-output-9 ref badNumber\n  - metric #auto-output-10 ref badCharacter\n  - metric #auto-output-11 ref empty\n  - metric #auto-output-12 ref extra\n  - metric #auto-output-13 ref unclosed\n  - metric #auto-output-14 ref wrongComma"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- billAmount: \"Bill\", currency, starts at 100, 0 to 1000, step 1\n- numberOfPeople: \"People\", integer, starts at 4, 1 to 20, step 1\n- tip_rate: \"Tip\", percent, starts at 10, 0 to 30, step 1\n- unit: \"Unit\", choice of grams / cups, starts at option 0\n- system: \"System\", choice of Metric / Imperial, starts at option 1\nOutputs:\n- perPerson: \"Each\", currency = billAmount * (1 + tip_rate / 100) / numberOfPeople\n- rounded: \"Rounded\", currency = Math.round(perPerson ** 2) × 2 ÷ 4 − 1\n- check: \"Check\", number = billAmount <= 500 && !(numberOfPeople == 0) || 1\n- byPrefix: \"Prefix\", number = numberOfPeople + 1\n- converted: \"Converted\", number = unit == 1 ? billAmount / 240 : billAmount\n- imperial: \"Imperial\", number = system != 1 ? 1 : 0\n- broken: \"Broken\", number = billAmount * (2 +\n- unknownFunction: \"Unknown\", number = median(billAmount, 2) + percentile(3)\n- nothing: \"Nothing\", number = billAmount + gratuity + pi + e + tau\n- badNumber: \"Bad number\", number = 1.2.3 + billAmount\n- badCharacter: \"Bad character\", number = billAmount # 2\n- empty: \"Empty\", number =    \n- extra: \"Extra\", number = billAmount 2\n- unclosed: \"Unclosed\", number = max(billAmount, 2\n- wrongComma: \"Wrong\", number = max(billAmount; 2)",
+    "outline" : "Formulas: \n- hero #block-0 ref perPerson\n- section #more-inputs\n  - slider #billAmount-control ref billAmount\n  - stepper #numberOfPeople-control ref numberOfPeople\n  - slider #tip_rate-control ref tip_rate\n  - picker #unit-control ref unit\n  - picker #system-control ref system\n- section #more-results\n  - metric #rounded-metric ref rounded\n  - metric #check-metric ref check\n  - metric #byPrefix-metric ref byPrefix\n  - metric #converted-metric ref converted\n  - metric #imperial-metric ref imperial\n  - metric #broken-metric ref broken\n  - metric #unknownFunction-metric ref unknownFunction\n  - metric #nothing-metric ref nothing\n  - metric #badNumber-metric ref badNumber\n  - metric #badCharacter-metric ref badCharacter\n  - metric #empty-metric ref empty\n  - metric #extra-metric ref extra\n  - metric #unclosed-metric ref unclosed\n  - metric #wrongComma-metric ref wrongComma"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In 'converted', compared choices by position instead of by name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'imperial', compared choices by position instead of by name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'perPerson', read 'BillAmount' as 'billAmount', 'numberofpeople' as 'numberOfPeople', 'tiprate' as 'tip_rate'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'check', read 'billAmont' as 'billAmount'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'byPrefix', read 'numberOf' as 'numberOfPeople'."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'broken' can't be read (the formula ends too early): billAmount * (2 +"
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'unknownFunction' uses median(), which isn't available. Use only: abs, acos, asin, atan, atan2, avg, cbrt, ceil, choose, clamp, cos, cosh, count, exp, fact, first, floor, hypot, if, last, ln, log, log10, log2, max, min, mod, pow, round, sign, sin, sinh, sqrt, sum, tan, tanh."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'unknownFunction' uses percentile(), which isn't available. Use only: abs, acos, asin, atan, atan2, avg, cbrt, ceil, choose, clamp, cos, cosh, count, exp, fact, first, floor, hypot, if, last, ln, log, log10, log2, max, min, mod, pow, round, sign, sin, sinh, sqrt, sum, tan, tanh."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'nothing' uses 'gratuity', which isn't an input or output. Add it as an input, or use one of: badCharacter, badNumber, billAmount, broken, byPrefix, check, converted, empty, extra, imperial, nothing, numberOfPeople, perPerson, rounded, system, tip_rate, unclosed, unit, unknownFunction, wrongComma."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'badNumber' can't be read (can't read the number 1.2.3): 1.2.3 + billAmount"
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'badCharacter' can't be read (unexpected character '#'): billAmount # 2"
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'empty' can't be read (the formula is empty):    "
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'extra' can't be read (unexpected 2): billAmount 2"
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'unclosed' can't be read (missing ')'): max(billAmount, 2"
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'wrongComma' can't be read (unexpected character ';'): max(billAmount; 2)"
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 1,
+          "label" : "System",
+          "max" : 1,
+          "min" : 0,
+          "name" : "system",
+          "options" : [
+            "Metric",
+            "Imperial"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "Math.round(perPerson ** 2) × 2 ÷ 4 − 1",
+          "label" : "Rounded",
+          "name" : "rounded",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount <= 500 && !(numberOfPeople == 0) || 1",
+          "label" : "Check",
+          "name" : "check",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "numberOfPeople + 1",
+          "label" : "Prefix",
+          "name" : "byPrefix",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "unit == 1 ? billAmount / 240 : billAmount",
+          "label" : "Converted",
+          "name" : "converted",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "system != 1 ? 1 : 0",
+          "label" : "Imperial",
+          "name" : "imperial",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount * (2 +",
+          "label" : "Broken",
+          "name" : "broken",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "median(billAmount, 2) + percentile(3)",
+          "label" : "Unknown",
+          "name" : "unknownFunction",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount + gratuity + pi + e + tau",
+          "label" : "Nothing",
+          "name" : "nothing",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1.2.3 + billAmount",
+          "label" : "Bad number",
+          "name" : "badNumber",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount # 2",
+          "label" : "Bad character",
+          "name" : "badCharacter",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "   ",
+          "label" : "Empty",
+          "name" : "empty",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount 2",
+          "label" : "Extra",
+          "name" : "extra",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount, 2",
+          "label" : "Unclosed",
+          "name" : "unclosed",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "max(billAmount; 2)",
+          "label" : "Wrong",
+          "name" : "wrongComma",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

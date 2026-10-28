@@ -1,0 +1,19 @@
+{
+  "about": "A tone no block plays gets a block of its own, joins the one section holding the controls that shape it, and comes before those controls; one sound block naming none plays the only sound.",
+  "fill": true,
+  "wire": {
+    "title": "Pitch",
+    "subject": "science",
+    "inputs": [{"name": "octave", "label": "Octave", "format": "integer", "initial": 4, "min": 1, "max": 7}],
+    "outputs": [{"name": "pitch", "label": "Pitch", "formula": "440 * 2 ^ (octave - 4)", "unit": "Hz"}],
+    "sounds": [
+      {"name": "note", "label": "The note", "tones": [{"frequency": "pitch", "amplitude": "0.4"}]},
+      {"name": "drone", "label": "Drone", "tones": [{"frequency": "110", "amplitude": "0.2"}]}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "pitch"},
+      {"kind": "section", "children": [{"kind": "stepper", "ref": "octave"}, {"kind": "paragraph", "text": "Each octave doubles it."}]},
+      {"kind": "sound", "ref": ""}
+    ]
+  }
+}

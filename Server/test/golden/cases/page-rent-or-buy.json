@@ -1,0 +1,50 @@
+{
+  "about": "A whole page to decide with: rent or buy, both sides of the comparison worked out, a choice of city whose formula compares it by name, a toggle, a chart of both costs over the years, facts about the market (with nothing read, so it goes back to look them up), and a verdict.",
+  "wire": {
+    "subject": "money",
+    "mode": "decide",
+    "title": "Rent or Buy",
+    "summary": "Over 10 years, buying costs less than renting if prices grow 5% a year.",
+    "symbol": "house",
+    "collections": [],
+    "question": "Is it cheaper to rent or to buy?",
+    "inputs": [
+      {"name": "price", "label": "Home price", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "number", "initial": 400000, "min": 100000, "max": 2000000, "step": 10000, "options": []},
+      {"name": "downPayment", "label": "Down payment", "role": "adjustable", "source": "", "symbol": "", "unit": "%", "format": "percent", "initial": 20, "min": 0, "max": 50, "step": 1, "options": []},
+      {"name": "mortgageRate", "label": "Mortgage rate", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "percent", "initial": 6.5, "min": 2, "max": 12, "step": 0.1, "options": []},
+      {"name": "monthlyRent", "label": "Monthly rent", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "number", "initial": 2200, "min": 500, "max": 10000, "step": 50, "options": []},
+      {"name": "rentGrowth", "label": "Rent increase", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "percent", "initial": 3, "min": 0, "max": 10, "step": 0.5, "options": []},
+      {"name": "appreciation", "label": "Price growth", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "percent", "initial": 5, "min": -5, "max": 15, "step": 0.5, "options": []},
+      {"name": "years", "label": "Years", "role": "variable", "source": "", "symbol": "", "unit": "years", "format": "integer", "initial": 10, "min": 1, "max": 30, "step": 1, "options": []},
+      {"name": "city", "label": "City", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "choice", "initial": 0, "min": 0, "max": 2, "step": 1, "options": ["Austin", "Denver", "Boston"]},
+      {"name": "hoa", "label": "Has HOA fees", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "toggle", "initial": 0, "min": 0, "max": 1, "step": 1, "options": []}
+    ],
+    "outputs": [
+      {"name": "rentCost", "label": "Cost of renting", "symbol": "", "unit": "", "formula": "monthlyRent * 12 * ((1 + rentGrowth / 100) ^ years - 1) / (rentGrowth / 100 + 0.000001)", "format": "currency"},
+      {"name": "loan", "label": "Loan", "symbol": "", "unit": "", "formula": "price * (1 - downPayment / 100)", "format": "currency"},
+      {"name": "buyCost", "label": "Cost of buying", "symbol": "", "unit": "", "formula": "loan * mortgageRate / 100 * years + price * downPayment / 100 - (price * (1 + appreciation / 100) ^ years - price) + (city == 'Boston' ? 3000 : 1500) * years + hoa * 200 * 12 * years", "format": "currency"},
+      {"name": "difference", "label": "Buying saves", "symbol": "", "unit": "", "formula": "rentCost - buyCost", "format": "currency"},
+      {"name": "buyIsBetter", "label": "Buy?", "symbol": "", "unit": "", "formula": "difference > 0", "format": "toggle"}
+    ],
+    "sounds": [], "figures": [], "diagrams": [], "actions": [], "scenes": [],
+    "blocks": [
+      {"kind": "hero", "title": "", "text": "", "ref": "difference", "over": "", "items": [], "children": []},
+      {"kind": "chart", "title": "Cost over time", "text": "", "ref": "rentCost, buyCost", "over": "years", "items": [], "children": []},
+      {"kind": "section", "title": "Buying", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "field", "title": "", "text": "", "ref": "price", "over": "", "items": [], "children": []},
+        {"kind": "slider", "title": "", "text": "", "ref": "downPayment", "over": "", "items": [], "children": []},
+        {"kind": "slider", "title": "", "text": "", "ref": "mortgageRate", "over": "", "items": [], "children": []},
+        {"kind": "picker", "title": "", "text": "", "ref": "city", "over": "", "items": [], "children": []},
+        {"kind": "toggle", "title": "", "text": "", "ref": "hoa", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "section", "title": "Renting", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "field", "title": "", "text": "", "ref": "monthlyRent", "over": "", "items": [], "children": []},
+        {"kind": "slider", "title": "", "text": "", "ref": "rentGrowth", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "facts", "title": "The market", "text": "Prices rose fast.", "ref": "", "over": "", "items": [{"label": "Median price", "value": "$412,000"}, {"label": "Typical rent", "value": "$2,100"}], "children": []},
+      {"kind": "paragraph", "title": "", "text": "Buying wins if you stay {years} years: {buyIsBetter}.", "ref": "", "over": "", "items": [], "children": []}
+    ],
+    "related": ["Mortgage rates", "Renting vs owning", "Home equity"],
+    "citations": []
+  }
+}

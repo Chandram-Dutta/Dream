@@ -1,0 +1,27 @@
+{
+  "about": "Live values for a reader in the UK: kilometres become miles, Celsius stays, litres per 100 km has no imperial counterpart Swift converts to, and an input written in feet per second keeps the reader's unit instead, since ft/s never converts.",
+  "fill": true,
+  "locale": "en_GB",
+  "sources": [
+    {"name": "trip", "kind": "route", "parameters": {"from": "Leeds", "to": "York"}, "fields": [
+      {"name": "distance", "value": 40, "unit": "km", "format": "number", "meaning": "how far"},
+      {"name": "speed", "value": 20, "unit": "m/s", "format": "number", "meaning": "average speed"},
+      {"name": "economy", "value": 6.5, "unit": "L/100 km", "format": "number", "meaning": "fuel use"},
+      {"name": "temperature", "value": 14, "unit": "°C", "format": "number", "meaning": "outside"},
+      {"name": "days", "value": 2, "unit": "days", "format": "integer", "meaning": "days away"}
+    ]}
+  ],
+  "wire": {
+    "title": "Trip",
+    "inputs": [
+      {"name": "distance", "label": "Distance", "role": "live", "source": "trip.distance"},
+      {"name": "speed", "label": "Speed", "role": "live", "source": "trip.speed", "unit": "ft/s"},
+      {"name": "economy", "label": "Economy", "role": "live", "source": "trip.economy"},
+      {"name": "temperature", "label": "Temperature", "role": "live", "source": "trip.temperature"},
+      {"name": "days", "label": "Days", "role": "live", "source": "trip.days", "unit": "h"},
+      {"name": "fuelPrice", "label": "Fuel price", "format": "currency", "initial": 1.5, "max": 3, "step": 0.05}
+    ],
+    "outputs": [{"name": "cost", "label": "Fuel cost", "formula": "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0", "format": "currency"}],
+    "blocks": [{"kind": "hero", "ref": "cost"}, {"kind": "paragraph", "text": "It's {distance} miles each way, at {speed} m/s on average."}]
+  }
+}

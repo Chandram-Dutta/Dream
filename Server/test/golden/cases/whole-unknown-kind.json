@@ -1,0 +1,16 @@
+{
+  "about": "An answer that isn't whole, because a block's kind is one the schema doesn't have (image): the app reads it as an answer cut short, dropping that block, and with no citations.",
+  "fill": true,
+  "wire": {
+    "title": "Mountains",
+    "subject": "nature",
+    "mode": "read",
+    "blocks": [
+      {"kind": "paragraph", "text": "The Himalaya are young."},
+      {"kind": "image", "text": "A picture"},
+      {"kind": "facts", "items": [{"label": "Highest", "value": "Everest, 8,849 m"}]}
+    ],
+    "citations": ["https://en.wikipedia.org/wiki/Himalayas"]
+  },
+  "reference": {"title": "Himalayas", "extract": "The Himalayas are a mountain range in Asia.", "url": "https://en.wikipedia.org/wiki/Himalayas"}
+}

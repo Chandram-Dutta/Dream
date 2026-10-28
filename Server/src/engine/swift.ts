@@ -255,11 +255,21 @@ export function tgamma(x: number): number {
     return result;
   }
   if (x < 0.5) return Math.PI / (Math.sin(Math.PI * x) * tgamma(1 - x));
-  const z = x - 1;
+  if (x > 171.7) return Infinity;
+  // Γ(x) = (x - 1) Γ(x - 1): brought between 1 and 2, where Γ(1.5) is √π / 2 exactly and the
+  // rest is Lanczos's approximation, so a half like fact(3.5) comes out as the C library's.
+  let product = 1;
+  let y = x;
+  while (y >= 2) {
+    y -= 1;
+    product *= y;
+  }
+  if (y === 1.5) return product * (Math.sqrt(Math.PI) / 2);
+  const z = y - 1;
   let sum = LANCZOS[0];
   for (let k = 1; k < LANCZOS.length; k++) sum += LANCZOS[k] / (z + k);
   const t = z + 7.5;
-  return Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * sum;
+  return product * Math.sqrt(2 * Math.PI) * Math.pow(t, z + 0.5) * Math.exp(-t) * sum;
 }
 
 /** C's lgamma, for the arguments the engine gives it (1 and up), and the rest by reflection. */

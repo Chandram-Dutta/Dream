@@ -1,0 +1,10 @@
+{
+  "about": "A page written from a connected service's data rests on that, and isn't sent back to look things up.",
+  "fill": true,
+  "services": ["Notion"],
+  "wire": {
+    "title": "My notes",
+    "mode": "read",
+    "blocks": [{"kind": "facts", "items": [{"label": "Pages", "value": "12"}]}]
+  }
+}

@@ -1,0 +1,759 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'packing'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "packing-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "packing",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "packing-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "packing",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Pack light.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "packing.bag",
+          "ref" : "packing.weight",
+          "text" : "",
+          "title" : "Weight by bag"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "packing.bag",
+          "ref" : "packing",
+          "text" : "",
+          "title" : "Things by need"
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "item",
+          "fields" : [
+            {
+              "label" : "Thing",
+              "name" : "thing",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Packed",
+              "name" : "packed",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Bag",
+              "name" : "bag",
+              "options" : [
+                "Carry-on",
+                "Checked"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Weight",
+              "name" : "weight",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Need",
+              "name" : "rating",
+              "options" : [
+
+              ],
+              "type" : "rating"
+            }
+          ],
+          "label" : "Packing",
+          "name" : "packing",
+          "starters" : [
+            {
+              "bag" : "Carry-on",
+              "packed" : 0,
+              "rating" : 4,
+              "thing" : "Sunscreen",
+              "weight" : 0.20000000000000001
+            },
+            {
+              "bag" : "Checked",
+              "packed" : 0,
+              "rating" : 5,
+              "thing" : "Towel",
+              "weight" : 1
+            },
+            {
+              "packed" : 1,
+              "rating" : 5,
+              "thing" : "Hat"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Beach safety"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beach packing"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Pack light.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "bag",
+          "ref" : "packing.wieght",
+          "text" : "",
+          "title" : "Weight by bag"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "packing",
+          "text" : "",
+          "title" : "Things by need"
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "item",
+          "fields" : [
+            {
+              "label" : "Thing",
+              "name" : "thing",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Packed",
+              "name" : "packed",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Bag",
+              "name" : "bag",
+              "options" : [
+                "Carry-on",
+                "Checked"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Weight",
+              "name" : "weight",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Need",
+              "name" : "rating",
+              "options" : [
+
+              ],
+              "type" : "rating"
+            }
+          ],
+          "label" : "Packing",
+          "name" : "packing",
+          "starters" : [
+            {
+              "bag" : "Carry-on",
+              "packed" : 0,
+              "rating" : 4,
+              "thing" : "Sunscreen",
+              "weight" : 0.20000000000000001
+            },
+            {
+              "bag" : "Checked",
+              "packed" : 0,
+              "rating" : 5,
+              "thing" : "Towel",
+              "weight" : 1
+            },
+            {
+              "packed" : 1,
+              "rating" : 5,
+              "thing" : "Hat"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Beach safety",
+        "beach SAFETY",
+        "Beach packing"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beach packing"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Pack light.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "bag",
+        "ref" : "packing.wieght",
+        "text" : "",
+        "title" : "Weight by bag"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "packing",
+        "text" : "",
+        "title" : "Things by need"
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "item",
+        "fields" : [
+          {
+            "label" : "Thing",
+            "name" : "thing",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Packed",
+            "name" : "packed",
+            "options" : [
+
+            ],
+            "type" : "done"
+          },
+          {
+            "label" : "Bag",
+            "name" : "bag",
+            "options" : [
+              "Carry-on",
+              "Checked"
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Weight",
+            "name" : "weight",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Need",
+            "name" : "rating",
+            "options" : [
+
+            ],
+            "type" : "rating"
+          }
+        ],
+        "label" : "Packing",
+        "name" : "packing",
+        "source" : "",
+        "starters" : [
+          {
+            "values" : [
+              "Sunscreen",
+              "no",
+              "Carry-on",
+              "0.2 kg",
+              "★★★★"
+            ]
+          },
+          {
+            "values" : [
+              "Towel",
+              "",
+              "checked",
+              "1",
+              "4.6"
+            ]
+          },
+          {
+            "values" : [
+              "Hat",
+              "x",
+              "",
+              "",
+              "9"
+            ]
+          }
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+      "Beach safety",
+      "beach SAFETY",
+      "Beach packing"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Beach packing"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Pack light.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "bag",
+        "ref" : "packing.wieght",
+        "text" : "",
+        "title" : "Weight by bag"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "packing",
+        "text" : "",
+        "title" : "Things by need"
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "item",
+        "fields" : [
+          {
+            "label" : "Thing",
+            "name" : "thing",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Packed",
+            "name" : "packed",
+            "options" : [
+
+            ],
+            "type" : "done"
+          },
+          {
+            "label" : "Bag",
+            "name" : "bag",
+            "options" : [
+              "Carry-on",
+              "Checked"
+            ],
+            "type" : "choice"
+          },
+          {
+            "label" : "Weight",
+            "name" : "weight",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Need",
+            "name" : "rating",
+            "options" : [
+
+            ],
+            "type" : "rating"
+          }
+        ],
+        "label" : "Packing",
+        "name" : "packing",
+        "starters" : [
+          {
+            "bag" : "Carry-on",
+            "packed" : 0,
+            "rating" : 4,
+            "thing" : "Sunscreen",
+            "weight" : 0.20000000000000001
+          },
+          {
+            "bag" : "Checked",
+            "packed" : 0,
+            "rating" : 5,
+            "thing" : "Towel",
+            "weight" : 1
+          },
+          {
+            "packed" : 1,
+            "rating" : 5,
+            "thing" : "Hat"
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "related" : [
+      "Beach safety",
+      "beach SAFETY",
+      "Beach packing"
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Beach packing"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Beach packing: \nLists:\n- packing: \"Packing\", each an item: thing (text), packed (done), bag (choice of Carry-on / Checked), weight (number), rating (rating)\n  starters: Sunscreen, Towel, Hat\n- paragraph #block-0\n  Pack light.\n- data #block-1 ref packing.wieght over bag \"Weight by bag\"\n- data #block-2 ref packing \"Things by need\"\nrelated: Beach safety, beach SAFETY, Beach packing"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Beach packing: \nLists:\n- packing: \"Packing\", each an item: thing (text), packed (done), bag (choice of Carry-on / Checked), weight (number), rating (rating)\n  starters: Sunscreen, Towel, Hat\n- add #packing-add ref packing\n- list #packing-list ref packing\n- paragraph #block-0\n  Pack light.\n- data #block-1 ref packing.weight over packing.bag \"Weight by bag\"\n- data #block-2 ref packing over packing.bag \"Things by need\"\nrelated: Beach safety"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Pack light.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "bag",
+          "ref" : "packing.wieght",
+          "text" : "",
+          "title" : "Weight by bag"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "packing",
+          "text" : "",
+          "title" : "Things by need"
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "item",
+          "fields" : [
+            {
+              "label" : "Thing",
+              "name" : "thing",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Packed",
+              "name" : "packed",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Bag",
+              "name" : "bag",
+              "options" : [
+                "Carry-on",
+                "Checked"
+              ],
+              "type" : "choice"
+            },
+            {
+              "label" : "Weight",
+              "name" : "weight",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Need",
+              "name" : "rating",
+              "options" : [
+
+              ],
+              "type" : "rating"
+            }
+          ],
+          "label" : "Packing",
+          "name" : "packing",
+          "starters" : [
+            {
+              "bag" : "Carry-on",
+              "packed" : 0,
+              "rating" : 4,
+              "thing" : "Sunscreen",
+              "weight" : 0.20000000000000001
+            },
+            {
+              "bag" : "Checked",
+              "packed" : 0,
+              "rating" : 5,
+              "thing" : "Towel",
+              "weight" : 1
+            },
+            {
+              "packed" : 1,
+              "rating" : 5,
+              "thing" : "Hat"
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Beach safety",
+        "beach SAFETY",
+        "Beach packing"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Beach packing"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

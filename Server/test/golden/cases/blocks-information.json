@@ -1,0 +1,34 @@
+{
+  "about": "Information blocks tidied: an equation showing a result's own formula, one naming nothing, one wrapped in $$, \\[ \\] or $, an empty one, one written as sentences (a paragraph); data with fewer than two numbers (facts), with none (dropped), with numbers in words; a paragraph made from its items, one with \\n written out, {names} that aren't the calculation's dropped; facts with no items (a paragraph, or dropped); bullets and steps whose prose repeats the items; ids trimmed and made unique; empty sections dropped; related topics trimmed, deduplicated, without the title, and at most six; and symbols tidied in equations.",
+  "fill": true,
+  "wire": {
+    "title": "Compound interest",
+    "inputs": [{"name": "rate", "label": "Rate", "format": "percent", "initial": 5, "max": 20}],
+    "outputs": [{"name": "factor", "label": "Factor", "formula": "(1 + rate / 100) ^ 10"}],
+    "blocks": [
+      {"kind": "equation", "ref": "factor", "text": "F = (1 + r)^{10}", "items": [{"label": "F", "value": "factor"}]},
+      {"kind": "equation", "ref": "ghost", "text": "\\[ A = P (1 + r)^n \\]", "items": [{"label": "$A$", "value": "the amount"}, {"label": "P", "value": ""}]},
+      {"kind": "equation", "text": "$$ e^{i\\pi} + 1 = 0 $$"},
+      {"kind": "equation", "text": "$x$"},
+      {"kind": "equation", "text": "$"},
+      {"kind": "equation", "text": "\fracwith a form feed"},
+      {"kind": "equation", "text": "   "},
+      {"kind": "equation", "text": "The growth is $A = P(1+r)^n$ over $n$ years."},
+      {"kind": "data", "title": "One point", "items": [{"label": "2020", "value": "1.2 million"}, {"label": "2021", "value": "about"}]},
+      {"kind": "data", "title": "None", "items": []},
+      {"kind": "data", "title": "Population", "items": [{"label": "1950", "value": "1,210.9 million"}, {"label": "2000", "value": "-3.5"}, {"label": "", "value": "7"}, {"label": "2020", "value": "१२"}]},
+      {"kind": "paragraph", "items": [{"label": "", "value": "First."}, {"label": "", "value": "Second {rate}."}]},
+      {"kind": "paragraph", "text": "Line one.\\nLine two at {rate} and {missing}  with  spaces.\\nalpha"},
+      {"kind": "paragraph", "text": "  {nothing}  "},
+      {"kind": "facts", "text": "No items here.", "items": []},
+      {"kind": "facts", "text": "", "items": []},
+      {"kind": "bullets", "text": "These repeat the items.", "items": [{"label": "", "value": "One"}, {"label": "  ", "value": "  "}, {"label": "", "value": "Two"}]},
+      {"kind": "timeline", "items": [{"label": "1626", "value": "Interest is old."}]},
+      {"kind": "stat", "items": [{"label": "8%", "value": "a typical rate"}]},
+      {"kind": "section", "title": "Nothing in it", "children": [{"kind": "paragraph", "text": ""}]},
+      {"kind": "section", "title": "  Spaced  ", "children": [{"kind": "paragraph", "text": "Inside."}]},
+      {"kind": "row", "children": [{"kind": "section", "children": [{"kind": "paragraph", "text": "Nested."}]}]}
+    ],
+    "related": ["  Simple interest  ", "Compound Interest", "simple interest", "", "APR", "Rule of 72", "Annuity", "Inflation", "Bonds", "Stocks"]
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "about": "An answer with a number written as text: not whole, so the input is read as cut short, its starting value missing.",
+  "fill": true,
+  "wire": {
+    "title": "Wrong type",
+    "inputs": [{"name": "x", "label": "x", "initial": "5", "max": 10}],
+    "outputs": [{"name": "double", "label": "Double", "formula": "x * 2"}],
+    "blocks": [{"kind": "hero", "ref": "double"}]
+  }
+}

@@ -1,0 +1,514 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Ruins of the Vijayanagara empire.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "date" : "2025-03-14",
+          "site" : "Lonely Planet",
+          "title" : "Hampi travel guide",
+          "url" : "https://www.lonelyplanet.com/india/karnataka/hampi"
+        },
+        {
+          "site" : "karnatakatourism.org",
+          "title" : "karnatakatourism.org",
+          "url" : "https://www.karnatakatourism.org/hampi/"
+        },
+        {
+          "site" : "Indian Railways",
+          "title" : "Getting there",
+          "url" : "https://indianrail.gov.in/hampi?from=bangalore&to=hospet"
+        },
+        {
+          "site" : "a",
+          "title" : "A",
+          "url" : "https://a.example.com/1"
+        },
+        {
+          "site" : "b",
+          "title" : "B",
+          "url" : "https://b.example.com/2"
+        },
+        {
+          "site" : "c",
+          "title" : "C",
+          "url" : "https://c.example.com/3"
+        },
+        {
+          "site" : "d",
+          "title" : "D",
+          "url" : "https://d.example.com/4"
+        },
+        {
+          "site" : "e",
+          "title" : "E",
+          "url" : "https://e.example.com/5"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "reference" : {
+        "extract" : "Hampi is a UNESCO World Heritage Site in Karnataka.",
+        "title" : "Hampi",
+        "url" : "https://en.wikipedia.org/wiki/Hampi"
+      },
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Hampi"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that wasn't read: www.hampi-tours.example."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that isn't a web address."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that isn't a web address."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a source that isn't a web address."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Kept the first 8 of 9 sources."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Ruins of the Vijayanagara empire.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "date" : "2025-03-14",
+          "site" : "Lonely Planet",
+          "title" : "Hampi travel guide",
+          "url" : "https://www.lonelyplanet.com/india/karnataka/hampi"
+        },
+        {
+          "site" : "karnatakatourism.org",
+          "title" : "karnatakatourism.org",
+          "url" : "https://www.karnatakatourism.org/hampi/"
+        },
+        {
+          "site" : "Indian Railways",
+          "title" : "Getting there",
+          "url" : "https://indianrail.gov.in/hampi?from=bangalore&to=hospet"
+        },
+        {
+          "site" : "a",
+          "title" : "A",
+          "url" : "https://a.example.com/1"
+        },
+        {
+          "site" : "b",
+          "title" : "B",
+          "url" : "https://b.example.com/2"
+        },
+        {
+          "site" : "c",
+          "title" : "C",
+          "url" : "https://c.example.com/3"
+        },
+        {
+          "site" : "d",
+          "title" : "D",
+          "url" : "https://d.example.com/4"
+        },
+        {
+          "site" : "e",
+          "title" : "E",
+          "url" : "https://e.example.com/5"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "reference" : {
+        "extract" : "Hampi is a UNESCO World Heritage Site in Karnataka.",
+        "title" : "Hampi",
+        "url" : "https://en.wikipedia.org/wiki/Hampi"
+      },
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Hampi"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Ruins of the Vijayanagara empire.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      "https://lonelyplanet.com/hampi-guide",
+      "  https://www.lonelyplanet.com/india/karnataka/hampi#history  ",
+      "https://en.wikipedia.org/wiki/Hampi",
+      "https://www.hampi-tours.example/never-read",
+      "lonelyplanet.com/hampi",
+      "https://user:pass@karnatakatourism.org/hampi",
+      "ftp://karnatakatourism.org/hampi",
+      "HTTPS://WWW.KARNATAKATOURISM.ORG/hampi",
+      "https://indianrail.gov.in/hampi?from=bangalore&to=hospet",
+      "https://a.example.com/1",
+      "https://b.example.com/2/",
+      "https://c.example.com/3",
+      "https://d.example.com/4",
+      "https://e.example.com/5",
+      "https://f.example.com/6"
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "places",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Hampi"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Ruins of the Vijayanagara empire.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://lonelyplanet.com/hampi-guide"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://www.lonelyplanet.com/india/karnataka/hampi#history"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://en.wikipedia.org/wiki/Hampi"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://www.hampi-tours.example/never-read"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "lonelyplanet.com/hampi"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://user:pass@karnatakatourism.org/hampi"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "ftp://karnatakatourism.org/hampi"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "HTTPS://WWW.KARNATAKATOURISM.ORG/hampi"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://indianrail.gov.in/hampi?from=bangalore&to=hospet"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://a.example.com/1"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://b.example.com/2/"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://c.example.com/3"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://d.example.com/4"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://e.example.com/5"
+      },
+      {
+        "site" : "",
+        "title" : "",
+        "url" : "https://f.example.com/6"
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "reference" : {
+      "extract" : "Hampi is a UNESCO World Heritage Site in Karnataka.",
+      "title" : "Hampi",
+      "url" : "https://en.wikipedia.org/wiki/Hampi"
+    },
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Hampi"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Hampi: \n- paragraph #block-0\n  Ruins of the Vijayanagara empire.\ncitations (pages already read; list again the ones the screen still uses): https://lonelyplanet.com/hampi-guide, https://www.lonelyplanet.com/india/karnataka/hampi#history, https://en.wikipedia.org/wiki/Hampi, https://www.hampi-tours.example/never-read, lonelyplanet.com/hampi, https://user:pass@karnatakatourism.org/hampi, ftp://karnatakatourism.org/hampi, HTTPS://WWW.KARNATAKATOURISM.ORG/hampi, https://indianrail.gov.in/hampi?from=bangalore&to=hospet, https://a.example.com/1, https://b.example.com/2/, https://c.example.com/3, https://d.example.com/4, https://e.example.com/5, https://f.example.com/6"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Hampi: \n- paragraph #block-0\n  Ruins of the Vijayanagara empire.\ncitations (pages already read; list again the ones the screen still uses): https://www.lonelyplanet.com/india/karnataka/hampi, https://www.karnatakatourism.org/hampi/, https://indianrail.gov.in/hampi?from=bangalore&to=hospet, https://a.example.com/1, https://b.example.com/2, https://c.example.com/3, https://d.example.com/4, https://e.example.com/5"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Ruins of the Vijayanagara empire.",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://lonelyplanet.com/hampi-guide"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://www.lonelyplanet.com/india/karnataka/hampi#history"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://en.wikipedia.org/wiki/Hampi"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://www.hampi-tours.example/never-read"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "lonelyplanet.com/hampi"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://user:pass@karnatakatourism.org/hampi"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "ftp://karnatakatourism.org/hampi"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "HTTPS://WWW.KARNATAKATOURISM.ORG/hampi"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://indianrail.gov.in/hampi?from=bangalore&to=hospet"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://a.example.com/1"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://b.example.com/2/"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://c.example.com/3"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://d.example.com/4"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://e.example.com/5"
+        },
+        {
+          "site" : "",
+          "title" : "",
+          "url" : "https://f.example.com/6"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "reference" : {
+        "extract" : "Hampi is a UNESCO World Heritage Site in Karnataka.",
+        "title" : "Hampi",
+        "url" : "https://en.wikipedia.org/wiki/Hampi"
+      },
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Hampi"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

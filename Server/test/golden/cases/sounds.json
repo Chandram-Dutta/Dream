@@ -1,0 +1,43 @@
+{
+  "about": "Sounds checked: tones whose formulas use near-miss names, a tone with no loudness, one whose frequency can't be worked out, a sound with no tone left, more than four tones, a sound named like an input, a second of a name, a sound with no name, a recording that was found (kept) and one that wasn't (dropped); sound blocks read by near miss and moved in with the controls that change them, a second block playing the same sound removed, a row holding a player made a section, and a block added for a sound none plays.",
+  "fill": true,
+  "recordings": {
+    "Gavia immer call": {"title": "Common loon yodels", "audioURL": "https://upload.wikimedia.org/loon.mp3", "pageURL": "https://commons.wikimedia.org/wiki/File:Loon.ogg", "credit": "A. Birder", "licence": "CC BY-SA 4.0", "duration": 12.5}
+  },
+  "wire": {
+    "title": "Beats",
+    "subject": "science",
+    "mode": "learn",
+    "inputs": [
+      {"name": "frequency", "label": "Frequency", "unit": "Hz", "initial": 440, "min": 100, "max": 1000, "step": 1},
+      {"name": "gap", "label": "Gap", "unit": "Hz", "initial": 3, "min": 0, "max": 10, "step": 0.5}
+    ],
+    "outputs": [{"name": "second", "label": "Second note", "formula": "frequency + gap", "unit": "Hz"}],
+    "sounds": [
+      {"name": "beats", "label": " Two notes beating ", "kind": "tones", "tones": [
+        {"frequency": "frequncy", "amplitude": "0.3", "waveform": "sine"},
+        {"frequency": "Second", "amplitude": "", "waveform": "triangle"},
+        {"frequency": "frequency * (", "amplitude": "0.2", "waveform": "square"},
+        {"frequency": "frequency / 100", "amplitude": "loudness", "waveform": "sawtooth"},
+        {"frequency": "frequency * 2", "amplitude": "0.1", "waveform": "sine"}
+      ]},
+      {"name": "silent", "label": "Silent", "kind": "tones", "tones": [{"frequency": "nothing(1)", "amplitude": "0.2"}]},
+      {"name": "frequency", "label": "Named like an input", "kind": "tones", "tones": [{"frequency": "frequency", "amplitude": "0.5"}]},
+      {"name": "beats", "label": "Again", "kind": "tones", "tones": [{"frequency": "440", "amplitude": "0.5"}]},
+      {"name": "", "label": "", "kind": "tones", "tones": [{"frequency": "440", "amplitude": "0.5"}]},
+      {"name": "", "label": "Loon call", "kind": "recording", "search": " Gavia immer call ", "tones": []},
+      {"name": "owl", "label": "Owl", "kind": "recording", "search": "Strix aluco hoot"},
+      {"name": "nothing", "label": "Nothing", "kind": "recording", "search": ""}
+    ],
+    "blocks": [
+      {"kind": "section", "title": "Play", "children": [
+        {"kind": "slider", "ref": "frequency"},
+        {"kind": "sound", "ref": "beat", "title": "Play the beats"},
+        {"kind": "slider", "ref": "gap"}
+      ]},
+      {"kind": "row", "children": [{"kind": "sound", "ref": "loonCall"}, {"kind": "metric", "ref": "second"}]},
+      {"kind": "sound", "ref": "beats"},
+      {"kind": "sound", "ref": "owl"}
+    ]
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "about": "Near-miss names repaired with nothing else wrong, so the formulas are written back out with only the brackets they need, and the rest of the checks run.",
+  "fill": true,
+  "wire": {
+    "title": "Formulas, repaired",
+    "inputs": [
+      {"name": "billAmount", "label": "Bill", "format": "currency", "initial": 100, "max": 1000},
+      {"name": "numberOfPeople", "label": "People", "format": "integer", "initial": 4, "min": 1, "max": 20},
+      {"name": "tip_rate", "label": "Tip", "format": "percent", "initial": 10, "max": 30},
+      {"name": "unit", "label": "Unit", "format": "choice", "initial": 0, "options": ["grams", "cups"]}
+    ],
+    "outputs": [
+      {"name": "perPerson", "label": "Each", "formula": "BillAmount * (1 + tiprate / 100) / numberofpeople", "format": "currency"},
+      {"name": "power", "label": "Power", "formula": "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 'Cups' ? 1 : 2)"},
+      {"name": "nested", "label": "Nested", "formula": "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4"},
+      {"name": "logic", "label": "Logic", "formula": "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0"},
+      {"name": "minus", "label": "Minus", "formula": "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "perPerson"}]
+  }
+}
