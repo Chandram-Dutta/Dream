@@ -50,7 +50,7 @@ struct ActionBlockView: View {
                 .padding(.vertical, 16)
                 .background {
                     RoundedRectangle(cornerRadius: 22)
-                        .fill(done == nil ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.wash))
+                        .fill(done == nil ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.wash))
                 }
                 .overlay(RoundedRectangle(cornerRadius: 22).strokeBorder(palette.edge, lineWidth: done == nil ? 0 : 0.5))
                 .opacity(performer == nil ? 0.5 : 1)

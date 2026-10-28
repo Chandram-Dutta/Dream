@@ -232,7 +232,7 @@ struct ShareSheet: View {
         .frame(height: 52)
         .background {
             if prominent {
-                Capsule().fill(palette.gradient)
+                Capsule().fill(palette.accent)
             } else {
                 Capsule().fill(palette.wash)
             }

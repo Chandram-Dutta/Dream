@@ -38,8 +38,6 @@ struct SurfaceView: View {
     let surface: Surface
     let state: SurfaceState
     var photo: UIImage?
-    /// What the model is doing right now, as a symbol beside the title.
-    var stage: String?
     var focusedID: String?
     var readingID: String?
     var onChange: ((Block) -> Void)?
@@ -54,7 +52,7 @@ struct SurfaceView: View {
         let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values, records: state.records), state: state, focusedID: focusedID, onChange: onChange, readingID: readingID)
         let blocks = surface.displayBlocks
         PageColumn(spacing: 26) {
-            SurfaceHeader(surface: surface, stage: stage, onAnswer: onAnswer)
+            SurfaceHeader(surface: surface, onAnswer: onAnswer)
                 .readingMark(readingID == Narration.headerID, palette: surface.palette)
             if translation.status != .none {
                 TranslationNote(translation: translation, palette: surface.palette)
@@ -81,19 +79,13 @@ struct SurfaceView: View {
 
 private struct SurfaceHeader: View {
     let surface: Surface
-    let stage: String?
     var onAnswer: ((Answer, String) -> Void)?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                if let stage {
-                    StageMark(symbol: stage, palette: surface.palette)
-                }
-                Text(surface.title.isEmpty ? " " : surface.title)
-                    .font(.display(.largeTitle))
-                    .lineLimit(3)
-            }
+            Text(surface.title.isEmpty ? " " : surface.title)
+                .font(.display(.largeTitle))
+                .lineLimit(3)
             if !surface.summary.isEmpty {
                 RichText(text: surface.summary, style: .title3)
                     .font(.title3)
@@ -106,39 +98,14 @@ private struct SurfaceHeader: View {
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 12)
-        .animation(.smooth, value: stage)
     }
 }
 
-/// What the model is doing, shown rather than said: the symbol changes with each step.
-struct StageMark: View {
-    let symbol: String
-    let palette: Palette
-
-    var body: some View {
-        Image(systemName: symbol)
-            .font(.title2.weight(.semibold))
-            .foregroundStyle(palette.gradient)
-            .symbolEffect(.pulse, options: .repeating)
-            .contentTransition(.symbolEffect(.replace))
-            .transition(.scale(scale: 0.5).combined(with: .opacity))
-            .accessibilityLabel(Self.description(of: symbol))
-    }
-
-    static func description(of symbol: String) -> String {
-        switch symbol {
-        case "book.pages": "Looking it up"
-        case "wrench.adjustable": "Fixing the calculation"
-        default: "Putting it together"
-        }
-    }
-}
-
-/// While nothing's arrived: the request itself, and shapes where the surface will land. If the
-/// model has questions first, they take the shapes' place until they're answered.
+/// While a page forms: the request, in Dream's light (`Aura`), which fills the screen and is
+/// the wait. Nothing stands in for a page that isn't here yet. If the model has questions first,
+/// they come up in the light, which holds still: it's the user's turn.
 struct FormingView: View {
     let intent: String
-    let stage: String?
     let palette: Palette
     var asking: Asking?
     /// A connected service's tool waiting to be allowed.
@@ -147,38 +114,79 @@ struct FormingView: View {
     var body: some View {
         let isAsking = (asking?.isWaiting ?? false) || (consent?.isWaiting ?? false)
         VStack(alignment: .leading, spacing: 22) {
-            HStack(alignment: .firstTextBaseline, spacing: 12) {
-                // Waiting on the user isn't working.
-                if let stage, !isAsking {
-                    StageMark(symbol: stage, palette: palette)
-                }
-                Text(intent)
-                    .font(.display(.title))
-                    .foregroundStyle(.secondary)
-                    .lineLimit(4)
-            }
-            .padding(.top, 12)
+            Text(intent)
+                .font(.display(.title, weight: .bold))
+                .lineLimit(6)
+                .padding(.top, 12)
+                .accessibilityLabel(isAsking ? intent : "Making a page for: \(intent)")
             if let asking, asking.isWaiting || !asking.answers.isEmpty {
                 AskingView(asking: asking, palette: palette)
             }
             if let consent { ConsentView(consent: consent, palette: palette) }
-            if !isAsking {
-                VStack(alignment: .leading, spacing: 12) {
-                    Capsule().frame(height: 14).frame(maxWidth: .infinity)
-                    Capsule().frame(width: 220, height: 14)
-                }
-                .foregroundStyle(palette.wash)
-                .shimmering()
-                .transition(.opacity)
-                RoundedRectangle(cornerRadius: 28)
-                    .fill(palette.wash)
-                    .frame(height: 160)
-                    .shimmering()
-                    .transition(.opacity)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .animation(.smooth(duration: 0.5), value: isAsking)
+    }
+}
+
+/// The latest steps of the work, rising through the light as they happen: newest at the bottom,
+/// older ones fading as they go up, like thoughts surfacing. Each is glass, so the light moves
+/// through it.
+struct WorkGlimpses: View {
+    let trail: [Trace]
+
+    var body: some View {
+        let recent = Array(trail.suffix(3))
+        VStack(alignment: .leading, spacing: 8) {
+            ForEach(Array(recent.enumerated()), id: \.element.id) { index, trace in
+                let age = Double(recent.count - 1 - index)
+                Glimpse(trace: trace)
+                    .opacity(1 - age * 0.32)
+                    .scaleEffect(1 - age * 0.05, anchor: .leading)
+                    .transition(Self.surfacing)
             }
         }
-        .accessibilityElement(children: isAsking ? .contain : .combine)
-        .animation(.smooth(duration: 0.5), value: isAsking)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .animation(.spring(duration: 0.6, bounce: 0.25), value: recent.map(\.id))
+    }
+
+    /// Up out of the bottom, coming into focus; gone by fading.
+    private static let surfacing: AnyTransition = .asymmetric(
+        insertion: AnyTransition(.blurReplace).combined(with: .move(edge: .bottom)),
+        removal: .opacity)
+}
+
+private struct Glimpse: View {
+    let trace: Trace
+
+    var body: some View {
+        Label {
+            Text(trace.text).lineLimit(1)
+        } icon: {
+            Image(systemName: symbol)
+        }
+        .font(.callout.weight(.semibold))
+        .padding(.horizontal, 15)
+        .padding(.vertical, 10)
+        .glassEffect(.regular, in: .capsule)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(description)
+    }
+
+    private var symbol: String {
+        switch trace.kind {
+        case .search: "magnifyingglass"
+        case .read: "doc.text"
+        case .lookup: "book.closed"
+        }
+    }
+
+    private var description: String {
+        switch trace.kind {
+        case .search: "Searching for \(trace.text)"
+        case .read: "Reading \(trace.text)"
+        case .lookup: "Looking up \(trace.text)"
+        }
     }
 }
 
@@ -230,7 +238,7 @@ private struct RelatedTopics: View {
                         Text(topic)
                         Image(systemName: "arrow.up.right")
                             .font(.caption.weight(.bold))
-                            .foregroundStyle(palette.gradient)
+                            .foregroundStyle(palette.accent)
                     }
                     .font(.subheadline.weight(.medium))
                     .padding(.horizontal, 15)

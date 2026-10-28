@@ -244,7 +244,7 @@ private struct RecordRow: View {
                     Text(amount.display(value))
                         .font(.display(.headline))
                         .monospacedDigit()
-                        .foregroundStyle(isDone ? AnyShapeStyle(.secondary) : AnyShapeStyle(palette.numberGradient))
+                        .foregroundStyle(isDone ? AnyShapeStyle(.secondary) : AnyShapeStyle(palette.accent))
                         .contentTransition(.numericText(value: value.numberValue ?? 0))
                     if amount.type == .number {
                         Text(amount.label).font(.caption2).foregroundStyle(.secondary)
@@ -285,7 +285,7 @@ private struct RecordRow: View {
                     case .rating:
                         Text(field.display(record[field.name]))
                             .font(.caption)
-                            .foregroundStyle(palette.gradient)
+                            .foregroundStyle(palette.accent)
                     case .number, .currency:
                         Text("\(field.label) \(field.display(record[field.name]))")
                             .font(.subheadline)
@@ -359,10 +359,10 @@ private struct CheckButton: View {
                 Circle()
                     .strokeBorder(palette.accent.opacity(isOn ? 0 : 0.5), lineWidth: 1.5)
                 if isOn {
-                    Circle().fill(palette.gradient)
+                    Circle().fill(palette.accent)
                     Image(systemName: "checkmark")
                         .font(.system(size: 12, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(palette.onAccent)
                         .transition(.scale(scale: 0.4).combined(with: .opacity))
                 }
             }
@@ -396,7 +396,7 @@ private struct Chip: View {
             .padding(.horizontal, 10)
             .padding(.vertical, 6)
             .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
-            .background(isOn ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.accent.opacity(0.1)), in: .capsule)
+            .background(isOn ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.accent.opacity(0.1)), in: .capsule)
             .contentShape(.capsule)
             .animation(.snappy(duration: 0.25), value: isOn)
         }
@@ -416,7 +416,7 @@ private struct ProgressTrack: View {
             ZStack(alignment: .leading) {
                 Capsule().fill(palette.accent.opacity(0.14))
                 Capsule()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .frame(width: Swift.max(fraction > 0 ? 6 : 0, geometry.size.width * fraction))
             }
         }

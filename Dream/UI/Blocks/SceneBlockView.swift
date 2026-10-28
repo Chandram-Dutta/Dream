@@ -147,10 +147,10 @@ struct SceneBlockView: View {
                 } label: {
                     Image(systemName: playing ? "pause.fill" : "play.fill")
                         .font(.subheadline.weight(.bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(context.palette.onAccent)
                         .contentTransition(.symbolEffect(.replace))
                         .frame(width: 34, height: 34)
-                        .background(context.palette.gradient, in: .circle)
+                        .background(context.palette.accent, in: .circle)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel(playing ? "Pause \(time.label.lowercased())" : "Play \(time.label.lowercased())")

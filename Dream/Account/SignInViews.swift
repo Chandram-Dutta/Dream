@@ -134,7 +134,7 @@ private struct SignInSheet: View {
             }
         }
         .background(alignment: .top) {
-            Aura(palette: Palette.now, energy: 0.08)
+            Aura(palette: Palette.dream, energy: 0.08)
                 .frame(height: 320)
         }
         .presentationDetents(account.offeredMove == nil ? [.medium, .large] : [.large])
@@ -147,7 +147,7 @@ private struct SignInSheet: View {
 struct MoveQuestion: View {
     let summary: LocalData.Summary
     private let account = Account.shared
-    private let palette = Palette.now
+    private let palette = Palette.dream
 
     var body: some View {
         ScrollView {
@@ -179,9 +179,9 @@ struct MoveQuestion: View {
                 Button { account.answerMove(true) } label: {
                     Text("Move them to my account")
                         .font(.headline)
-                        .foregroundStyle(.white)
+                        .foregroundStyle(palette.onAccent)
                         .frame(maxWidth: .infinity, minHeight: 54)
-                        .background(palette.gradient, in: .capsule)
+                        .background(palette.accent, in: .capsule)
                 }
                 .buttonStyle(.plain)
                 Button("Keep them on this iPhone only") { account.answerMove(false) }
@@ -201,7 +201,7 @@ struct MoveQuestion: View {
         HStack(spacing: 14) {
             Image(systemName: symbol)
                 .font(.title3)
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
                 .frame(width: 30)
             Text(text)
                 .font(.display(.body, weight: .medium))

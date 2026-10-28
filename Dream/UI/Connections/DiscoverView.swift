@@ -12,7 +12,7 @@ struct DiscoverView: View {
     @State private var problem: String?
     @FocusState private var focused: Bool
 
-    private let palette = Palette.now
+    private let palette = Palette.dream
 
     var body: some View {
         ScrollView {
@@ -179,7 +179,7 @@ private struct Chip: View {
             .foregroundStyle(isOn ? AnyShapeStyle(.white) : AnyShapeStyle(.primary))
             .padding(.horizontal, 15)
             .padding(.vertical, 9)
-            .background(isOn ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.accent.opacity(0.1)), in: .capsule)
+            .background(isOn ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.accent.opacity(0.1)), in: .capsule)
             .overlay(Capsule().strokeBorder(palette.edge, lineWidth: isOn ? 0 : 0.5))
             .buttonStyle(.plain)
     }
@@ -234,7 +234,7 @@ struct DirectoryCard: View {
             ZStack(alignment: .topTrailing) {
                 palette.wash
                 Circle()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .frame(width: 120, height: 120)
                     .blur(radius: 40)
                     .opacity(0.35)
@@ -290,10 +290,10 @@ struct ConnectButton: View {
                         Text(working ? "Connecting…" : label)
                     }
                     .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(palette.onAccent)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 9)
-                    .background(palette.gradient, in: .capsule)
+                    .background(palette.accent, in: .capsule)
                 }
                 .buttonStyle(.plain)
                 .disabled(working)

@@ -21,7 +21,7 @@ struct ConnectionsView: View {
                         }
                     } icon: {
                         Image(systemName: "sparkle.magnifyingglass")
-                            .foregroundStyle(Palette.now.gradient)
+                            .foregroundStyle(Palette.dream.accent)
                     }
                 }
             }
@@ -119,7 +119,7 @@ struct ServiceMonogram: View {
         let palette = Self.palette(for: name)
         Text(name.first.map { String($0).uppercased() } ?? "?")
             .font(.display(.headline))
-            .foregroundStyle(isOn ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+            .foregroundStyle(isOn ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
             .frame(width: 36, height: 36)
             .background(isOn ? palette.wash : Color(.tertiarySystemFill), in: .rect(cornerRadius: 10))
             .overlay(RoundedRectangle(cornerRadius: 10).strokeBorder(isOn ? palette.edge : .clear, lineWidth: 0.5))

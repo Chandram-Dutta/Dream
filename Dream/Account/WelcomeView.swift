@@ -14,7 +14,7 @@ struct WelcomeView: View {
         if let summary = account.offeredMove {
             MoveQuestion(summary: summary)
                 .background(alignment: .top) {
-                    Aura(palette: Palette.now, energy: 0.08)
+                    Aura(palette: Palette.dream, energy: 0.08)
                         .frame(height: 620)
                 }
                 .background(Color(.systemBackground).ignoresSafeArea())
@@ -76,7 +76,7 @@ struct WelcomeView: View {
                     withAnimation(.smooth(duration: 0.6)) { demo = each }
                 } label: {
                     Capsule()
-                        .fill(each == demo ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(Color.secondary.opacity(0.25)))
+                        .fill(each == demo ? AnyShapeStyle(palette.accent) : AnyShapeStyle(Color.secondary.opacity(0.25)))
                         .frame(width: each == demo ? 22 : 8, height: 8)
                         .padding(.vertical, 12)
                         .contentShape(Rectangle())
@@ -158,9 +158,9 @@ private struct DemoStage: View {
                     }
                 Image(systemName: "arrow.up")
                     .font(.subheadline.weight(.bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(palette.onAccent)
                     .frame(width: 32, height: 32)
-                    .background(palette.gradient, in: .circle)
+                    .background(palette.accent, in: .circle)
                     .opacity(typed >= demo.request.count ? 1 : 0.35)
             }
             .padding(.leading, 16)
@@ -206,7 +206,7 @@ private struct DemoTitle: View {
         HStack(spacing: 10) {
             Image(systemName: symbol)
                 .font(.headline)
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
             Text(text)
                 .font(.display(.headline))
         }
@@ -232,7 +232,7 @@ private struct BillDemo: View {
                 Text(each, format: .currency(code: Self.currency))
                     .font(.display(size: 44, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(palette.numberGradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.numericText(value: each))
                     .animation(.snappy, value: each)
             }
@@ -272,7 +272,7 @@ private struct HorizonDemo: View {
                 Text(Measurement(value: distance, unit: UnitLength.meters).formatted(.measurement(width: .abbreviated, usage: .road, numberFormatStyle: .number.precision(.fractionLength(0...1)))))
                     .font(.display(size: 44, weight: .bold))
                     .monospacedDigit()
-                    .foregroundStyle(palette.numberGradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.numericText(value: distance))
                     .animation(.snappy, value: distance)
             }
@@ -343,7 +343,7 @@ private struct GroceriesDemo: View {
                 Text("\(left) left")
                     .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
-                    .foregroundStyle(palette.numberGradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.numericText(value: Double(left)))
             }
             VStack(spacing: 0) {
@@ -355,7 +355,7 @@ private struct GroceriesDemo: View {
                         HStack(spacing: 12) {
                             Image(systemName: items[index].done ? "checkmark.circle.fill" : "circle")
                                 .font(.title3)
-                                .foregroundStyle(items[index].done ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(Color.secondary.opacity(0.5)))
+                                .foregroundStyle(items[index].done ? AnyShapeStyle(palette.accent) : AnyShapeStyle(Color.secondary.opacity(0.5)))
                                 .contentTransition(.symbolEffect(.replace))
                             Text(items[index].name)
                                 .strikethrough(items[index].done, color: .secondary)

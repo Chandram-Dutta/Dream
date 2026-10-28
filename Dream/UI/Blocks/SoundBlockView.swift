@@ -110,7 +110,7 @@ private struct PlayButton: View {
     var body: some View {
         Button(action: action) {
             ZStack {
-                Circle().fill(isEnabled ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.accent.opacity(0.14)))
+                Circle().fill(isEnabled ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.accent.opacity(0.14)))
                 if isLoading {
                     ProgressView().tint(.white)
                 } else {
@@ -185,7 +185,7 @@ private struct RecordingTrack: View {
                 ZStack(alignment: .leading) {
                     Capsule().fill(palette.accent.opacity(0.14))
                     Capsule()
-                        .fill(palette.gradient)
+                        .fill(palette.accent)
                         .frame(width: max(6, geometry.size.width * fraction))
                         .opacity(progress == nil ? 0 : 1)
                 }

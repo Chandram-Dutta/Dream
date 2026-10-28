@@ -71,7 +71,7 @@ struct AccountButton: View {
     @ViewBuilder private func dot(on size: CGFloat) -> some View {
         if !noticed.isEmpty {
             Circle()
-                .fill(palette.gradient)
+                .fill(palette.accent)
                 .frame(width: 10, height: 10)
                 .background(Circle().fill(Color(.systemBackground)).padding(-2))
                 .offset(x: size * 0.354, y: -size * 0.354)
@@ -157,13 +157,13 @@ private struct AccountCard: View {
         Button { go(place) } label: {
             HStack(spacing: 12) {
                 Image(systemName: systemImage)
-                    .foregroundStyle(palette.gradient)
+                    .foregroundStyle(palette.accent)
                     .frame(width: column)
                 Text(title)
                 Spacer(minLength: 8)
                 if marked {
                     Circle()
-                        .fill(palette.gradient)
+                        .fill(palette.accent)
                         .frame(width: 8, height: 8)
                 }
             }
@@ -180,17 +180,17 @@ struct AccountMark: View {
 
     var body: some View {
         Circle()
-            .fill(palette.gradient)
+            .fill(palette.accent)
             .frame(width: size, height: size)
             .overlay {
                 if account.isSignedIn, let initial = account.profile?.initial {
                     Text(initial)
                         .font(.display(size: size * 0.46, weight: .bold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(palette.onAccent)
                 } else {
                     Image(systemName: "person.fill")
                         .font(.system(size: size * 0.42))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(palette.onAccent)
                 }
             }
             .accessibilityHidden(true)

@@ -158,7 +158,7 @@ struct EquationBlockView: View {
                     MathView(latex: equation, size: size)
                     if let parts = surface.workedParts(for: block.ref, values: context.evaluation.values) {
                         WorkedLine(working: parts.working, result: parts.result, size: size)
-                            .foregroundStyle(context.palette.numberGradient)
+                            .foregroundStyle(context.palette.accent)
                             .padding(.leading, indent(before: surface.texSymbol(block.ref)))
                             .animation(.snappy, value: parts.result)
                     }

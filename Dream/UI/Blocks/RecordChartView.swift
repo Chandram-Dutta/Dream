@@ -44,7 +44,7 @@ struct RecordChartView: View {
                             .foregroundStyle(LinearGradient(colors: [palette.companion.opacity(0.28), palette.accent.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                             .interpolationMethod(.monotone)
                         LineMark(x: .value("Day", day, unit: .day), y: .value("Value", point.value))
-                            .foregroundStyle(palette.gradient)
+                            .foregroundStyle(palette.accent)
                             .interpolationMethod(.monotone)
                             .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
                     }
@@ -88,7 +88,7 @@ struct RecordChartView: View {
     private func bars(_ points: [RecordPoint], format: Format) -> some View {
         Chart(points) { point in
             BarMark(x: .value("Value", point.value), y: .value("Label", point.label))
-                .foregroundStyle(context.palette.gradient)
+                .foregroundStyle(context.palette.accent)
                 .clipShape(.capsule)
                 .annotation(position: .trailing, spacing: 6) {
                     Text(format.display(point.value))

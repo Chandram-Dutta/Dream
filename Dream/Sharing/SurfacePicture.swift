@@ -31,7 +31,7 @@ struct SurfacePicture: View {
             SurfaceView(surface: surface, state: state, photo: image, onExplore: { _ in })
             HStack(spacing: 8) {
                 Image(systemName: surface.symbolName)
-                    .foregroundStyle(surface.palette.gradient)
+                    .foregroundStyle(surface.palette.accent)
                 Text("Made with Dream")
                     .foregroundStyle(.secondary)
             }
@@ -149,7 +149,7 @@ struct StillControl: View {
                 Text(reading: context.surface.reading(input.name, value), unitFont: .display(.title3))
                     .font(.display(.title))
                     .monospacedDigit()
-                    .foregroundStyle(context.palette.numberGradient)
+                    .foregroundStyle(context.palette.accent)
                 Capsule()
                     .fill(context.palette.edge)
                     .frame(height: 1)

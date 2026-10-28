@@ -20,22 +20,22 @@ struct MicButton: View {
             ZStack {
                 // A halo that swells with your voice.
                 Circle()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .opacity(isListening ? 0.3 : 0)
                     .scaleEffect(isListening && !reduceMotion ? 1.1 + 0.4 * listener.level : 1)
                 Circle()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .opacity(isUnavailable ? 0.4 : 1)
                 if let progress {
                     Circle()
                         .trim(from: 0, to: max(progress, 0.02))
-                        .stroke(.white, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
+                        .stroke(palette.onAccent, style: StrokeStyle(lineWidth: 2.5, lineCap: .round))
                         .rotationEffect(.degrees(-90))
                         .padding(4)
                 }
                 Image(systemName: symbol)
                     .font(.headline.weight(.bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(palette.onAccent)
                     .contentTransition(.symbolEffect(.replace))
                     .symbolEffect(.pulse, options: .repeating, isActive: isPreparing)
             }
@@ -192,7 +192,7 @@ private struct ListeningGlow: ViewModifier {
         content
             .background {
                 shape
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .blur(radius: 10 + 14 * level)
                     .opacity(active ? 0.2 + 0.5 * level : 0)
                     .scaleEffect(reduceMotion ? 1 : 1 + 0.05 * level)
@@ -251,14 +251,14 @@ struct VoiceBar: View {
         return HStack(spacing: 14) {
             Image(systemName: "waveform")
                 .font(.headline)
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
                 .symbolEffect(.variableColor.iterative, options: .repeating, isActive: !paused)
                 .accessibilityHidden(true)
             Capsule()
                 .fill(palette.edge)
                 .overlay(alignment: .leading) {
                     Capsule()
-                        .fill(palette.gradient)
+                        .fill(palette.accent)
                         .scaleEffect(x: reader.count > 0 ? Double(reader.position + 1) / Double(reader.count) : 0, anchor: .leading)
                 }
                 .frame(height: 4)
@@ -338,7 +338,7 @@ private struct StepDots: View {
                 HStack(spacing: 5) {
                     ForEach(0..<count, id: \.self) { index in
                         Capsule()
-                            .fill(index == step ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(index < step ? palette.accent.opacity(0.45) : palette.edge))
+                            .fill(index == step ? AnyShapeStyle(palette.accent) : AnyShapeStyle(index < step ? palette.accent.opacity(0.45) : palette.edge))
                             .frame(width: index == step ? 22 : 6, height: 6)
                             .scaleEffect(index == step && listening && !reduceMotion ? 1 + 0.5 * level : 1)
                     }
@@ -347,7 +347,7 @@ private struct StepDots: View {
                 Text("\(step + 1) / \(count)")
                     .font(.subheadline.weight(.semibold))
                     .monospacedDigit()
-                    .foregroundStyle(palette.gradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.numericText(value: Double(step)))
             }
         }

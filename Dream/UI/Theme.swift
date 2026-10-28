@@ -1,67 +1,90 @@
 import SwiftUI
 import UIKit
 
-/// A surface's colors, from its accent: the accent, a neighbouring hue for gradients, and
-/// quiet tints for panels. Every surface gets its own, so each one looks like its subject.
+/// A screen's colors. A page has one ink, from its subject (`Accent`): numbers, controls and
+/// links in one solid color, a neighbouring hue for a second series, and quiet tints for panels.
+/// The only gradient is the light behind it (`Aura`), which moves through `lights`.
 struct Palette: Equatable {
+    /// The ink.
     let accent: Color
     let companion: Color
+    /// What the light behind the screen moves through, in order, round and round.
+    let lights: [Color]
+    /// Text and symbols set on the ink.
+    var onAccent: Color = .white
 
-    /// Panels and tiles: the accent, barely there.
+    /// Panels and tiles: the ink, barely there.
     var wash: Color { accent.opacity(0.09) }
     var edge: Color { accent.opacity(0.2) }
-    var gradient: LinearGradient { LinearGradient(colors: [accent, companion], startPoint: .leading, endPoint: .trailing) }
-    /// Big numbers: reads as one color at a glance, but isn't flat.
-    var numberGradient: LinearGradient { LinearGradient(colors: [accent, companion], startPoint: .top, endPoint: .bottom) }
 
-    /// Before anything's been made: the time of day.
-    static var now: Palette {
-        switch Calendar.current.component(.hour, from: .now) {
-        case 5..<11: return Accent.mint.palette
-        case 11..<17: return Accent.blue.palette
-        case 17..<21: return Accent.orange.palette
-        default: return Accent.indigo.palette
-        }
-    }
+    /// Dream's own screens, and a page before it knows what it's about. No ink of its own, so
+    /// color belongs to pages: black on white, white on black. Its light is the one behind closed
+    /// eyes: rose, apricot and honey over deep plum, with a rare flicker of teal.
+    static let dream = Palette(
+        accent: .primary,
+        companion: .secondary,
+        lights: [plum, rose, apricot, honey, apricot, rose, plum, teal],
+        onAccent: Color(.systemBackground))
+
+    private static let plum = Color(red: 0.42, green: 0.1, blue: 0.36)
+    private static let rose = Color(red: 1, green: 0.24, blue: 0.43)
+    private static let apricot = Color(red: 1, green: 0.54, blue: 0.24)
+    private static let honey = Color(red: 1, green: 0.77, blue: 0.24)
+    private static let teal = Color(red: 0.18, green: 0.88, blue: 0.78)
 }
 
 extension Accent {
+    /// Tuned for each appearance: deep enough to read on white, bright enough on black.
     var color: Color {
         switch self {
-        case .blue: .blue
-        case .teal: .teal
-        case .green: .green
-        case .mint: .mint
-        case .orange: .orange
-        case .pink: .pink
-        case .purple: .purple
-        case .indigo: .indigo
-        case .red: .red
-        case .yellow: .yellow
-        case .cyan: .cyan
-        case .brown: .brown
+        case .blue: Color(light: 0x2563EB, dark: 0x5B8CFF)
+        case .teal: Color(light: 0x0F9488, dark: 0x2DD4BF)
+        case .green: Color(light: 0x0E9F6E, dark: 0x34D399)
+        case .mint: Color(light: 0x0EA5A0, dark: 0x5EEAD4)
+        case .orange: Color(light: 0xE8670C, dark: 0xFF8A3D)
+        case .pink: Color(light: 0xDB2777, dark: 0xFF6B9A)
+        case .purple: Color(light: 0x9333EA, dark: 0xC084FC)
+        case .indigo: Color(light: 0x4F46E5, dark: 0x8B83FF)
+        case .red: Color(light: 0xDC2626, dark: 0xFF5A5A)
+        case .yellow: Color(light: 0xB7791F, dark: 0xFBBF24)
+        case .cyan: Color(light: 0x0891B2, dark: 0x38D5F5)
+        case .brown: Color(light: 0x9A5B2E, dark: 0xD19A66)
         }
     }
 
-    /// A neighbouring hue, so gradients shift a little without turning into a rainbow.
+    /// A neighbouring hue, for a second series and the light.
     var companion: Color {
         switch self {
-        case .blue: .cyan
-        case .teal: .blue
-        case .green: .teal
-        case .mint: .cyan
-        case .orange: .pink
-        case .pink: .orange
-        case .purple: .indigo
-        case .indigo: .blue
-        case .red: .orange
-        case .yellow: .orange
-        case .cyan: .blue
-        case .brown: .orange
+        case .blue: Accent.cyan.color
+        case .teal: Accent.blue.color
+        case .green: Accent.teal.color
+        case .mint: Accent.cyan.color
+        case .orange: Accent.pink.color
+        case .pink: Accent.orange.color
+        case .purple: Accent.indigo.color
+        case .indigo: Accent.blue.color
+        case .red: Accent.orange.color
+        case .yellow: Accent.orange.color
+        case .cyan: Accent.blue.color
+        case .brown: Accent.orange.color
         }
     }
 
-    var palette: Palette { Palette(accent: color, companion: companion) }
+    var palette: Palette {
+        let deep = color.mix(with: .black, by: 0.5)
+        let bright = color.mix(with: .white, by: 0.35)
+        return Palette(accent: color, companion: companion, lights: [deep, color, companion, bright, color, deep])
+    }
+}
+
+extension Color {
+    /// One color in light appearance and another in dark, as 0xRRGGBB.
+    init(light: UInt32, dark: UInt32) {
+        func color(_ hex: UInt32) -> UIColor {
+            UIColor(red: CGFloat(hex >> 16 & 0xFF) / 255, green: CGFloat(hex >> 8 & 0xFF) / 255, blue: CGFloat(hex & 0xFF) / 255, alpha: 1)
+        }
+        self.init(uiColor: UIColor { $0.userInterfaceStyle == .dark ? color(dark) : color(light) })
+    }
 }
 
 extension Surface {

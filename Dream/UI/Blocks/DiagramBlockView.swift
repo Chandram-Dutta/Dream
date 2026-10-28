@@ -91,7 +91,7 @@ struct DiagramBlockView: View {
             .frame(width: frame.width, height: frame.height, alignment: layout.isOutline ? .leading : .center)
             .background {
                 RoundedRectangle(cornerRadius: 14)
-                    .fill(isSelected ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.wash))
+                    .fill(isSelected ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.wash))
                     .background(Color(.systemBackground), in: .rect(cornerRadius: 14))
             }
             .overlay {
@@ -127,7 +127,7 @@ struct DiagramBlockView: View {
                         .labelStyle(TrailingIcon())
                 }
                 .buttonStyle(.plain)
-                .foregroundStyle(context.palette.gradient)
+                .foregroundStyle(context.palette.accent)
                 .padding(.top, 2)
             }
         }

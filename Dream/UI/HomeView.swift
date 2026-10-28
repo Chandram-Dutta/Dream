@@ -19,7 +19,7 @@ struct HomeView: View {
     @FocusState private var focused: Bool
     @MainActor private static var startedAutomatically = false
 
-    private let palette = Palette.now
+    private let palette = Palette.dream
 
     var body: some View {
         NavigationStack {
@@ -96,7 +96,7 @@ struct HomeView: View {
                         Spacer(minLength: 8)
                         Image(systemName: "arrow.up.right")
                             .font(.subheadline.weight(.bold))
-                            .foregroundStyle(palette.gradient)
+                            .foregroundStyle(palette.accent)
                     }
                     .padding(.vertical, 14)
                     .contentShape(Rectangle())
@@ -189,9 +189,9 @@ struct HomeView: View {
                         Button("Make", systemImage: "arrow.up") { make(intent) }
                             .labelStyle(.iconOnly)
                             .font(.headline.weight(.bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(palette.onAccent)
                             .frame(width: 38, height: 38)
-                            .background(palette.gradient, in: .circle)
+                            .background(palette.accent, in: .circle)
                     }
                 }
             }
@@ -268,7 +268,7 @@ struct SurfaceTile: View {
         VStack(alignment: .leading, spacing: 6) {
             Image(systemName: surface.symbolName)
                 .font(.title3.weight(.semibold))
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
             Spacer(minLength: 20)
             Text(surface.title)
                 .font(.display(.subheadline))
@@ -277,7 +277,7 @@ struct SurfaceTile: View {
                 Text(surface.display(main.name, surface.evaluate(saved.values, records: StoredRecord.grouped(stored)).values[main.name]))
                     .font(.display(.title3))
                     .monospacedDigit()
-                    .foregroundStyle(palette.numberGradient)
+                    .foregroundStyle(palette.accent)
                     .lineLimit(1)
                     .minimumScaleFactor(0.5)
             } else {
@@ -302,7 +302,7 @@ struct SurfaceTile: View {
             ZStack(alignment: .topTrailing) {
                 palette.wash
                 Circle()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .frame(width: 150, height: 150)
                     .blur(radius: 44)
                     .opacity(0.5)

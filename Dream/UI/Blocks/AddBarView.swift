@@ -38,7 +38,7 @@ struct AddBarView: View {
                     } else {
                         Image(systemName: "plus")
                             .font(.headline.weight(.bold))
-                            .foregroundStyle(canAdd ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+                            .foregroundStyle(canAdd ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
                     }
                 }
                 .frame(width: 32, height: 32)
@@ -71,7 +71,7 @@ struct AddBarView: View {
         .padding(.vertical, 6)
         .background(depth == 0 ? AnyShapeStyle(palette.wash) : AnyShapeStyle(Color(.systemBackground).opacity(0.7)), in: .capsule)
         .overlay {
-            Capsule().strokeBorder(focused ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(palette.edge), lineWidth: focused ? 1.5 : 0.5)
+            Capsule().strokeBorder(focused ? AnyShapeStyle(palette.accent) : AnyShapeStyle(palette.edge), lineWidth: focused ? 1.5 : 0.5)
         }
         .animation(.snappy, value: focused)
         .animation(.snappy, value: text.isEmpty)

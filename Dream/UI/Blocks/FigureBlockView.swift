@@ -97,7 +97,7 @@ struct FigureBlockView: View {
         let active = dragging == handle
         return Circle()
             .fill(.white)
-            .overlay(Circle().strokeBorder(context.palette.gradient, lineWidth: 2.5))
+            .overlay(Circle().strokeBorder(context.palette.accent, lineWidth: 2.5))
             .shadow(color: context.accent.opacity(0.4), radius: active ? 9 : 3, y: 1)
             .frame(width: 22, height: 22)
             .scaleEffect(active && !reduceMotion ? 1.2 : 1)

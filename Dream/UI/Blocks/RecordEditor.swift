@@ -137,7 +137,7 @@ private struct Stars: View {
                 } label: {
                     Image(systemName: star <= value ? "star.fill" : "star")
                         .font(.body)
-                        .foregroundStyle(star <= value ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+                        .foregroundStyle(star <= value ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
                         .frame(width: 30, height: 30)
                         .contentShape(Rectangle())
                 }

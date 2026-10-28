@@ -3,6 +3,27 @@ import Foundation
 import FoundationModels
 import Observation
 
+/// One step of the work behind a page, as the screen shows it: what was searched for, which
+/// site was read, which article was looked up.
+struct Trace: Identifiable, Equatable, Sendable {
+    enum Kind: Sendable { case search, read, lookup }
+
+    let id = UUID()
+    let kind: Kind
+    let text: String
+
+    init(_ kind: Kind, _ text: String) {
+        self.kind = kind
+        self.text = text
+    }
+
+    /// A page's site as people say it: "livemint.com", not "https://www.livemint.com/…".
+    static func site(_ url: String) -> String {
+        let host = URL(string: url)?.host() ?? url
+        return host.hasPrefix("www.") ? String(host.dropFirst(4)) : host
+    }
+}
+
 /// Turns what the user wants into a surface: one screen that explains, calculates, or both.
 ///
 /// A capable model (Grok, or Private Cloud Compute once Apple grants it) writes the whole surface
@@ -41,6 +62,9 @@ final class Composer {
     let consent = Consent()
     /// Services the request names that the user hasn't connected, which the screen offers to connect.
     private(set) var suggestions: [DirectoryEntry] = []
+    /// The work as it happens: each search, page read and article looked up, as it starts. The
+    /// screen shows the latest while a page forms, and each one stirs the light (FormingView).
+    private(set) var trail: [Trace] = []
     /// The web pages read while writing, which the surface may cite (WebSearch.swift).
     private let web = WebLog()
 
@@ -99,6 +123,7 @@ final class Composer {
     func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
         log = []
+        trail = []
         surface = nil
         isThinking = true
         defer { isThinking = false }
@@ -134,6 +159,7 @@ final class Composer {
     func edit(_ current: Surface, intent: String, instruction: String, focus: Block?) async {
         let started = Date()
         log = []
+        trail = []
         surface = current
         isThinking = true
         defer { isThinking = false }
@@ -197,10 +223,12 @@ final class Composer {
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
-            + WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } })
+            + WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
+                               onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } })
     }
 
     private func lookingUp(_ subject: String) {
+        trail.append(Trace(.lookup, subject))
         researching("Lookup: \(subject)")
     }
 

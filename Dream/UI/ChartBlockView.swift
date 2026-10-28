@@ -178,7 +178,7 @@ struct ChartBlockView: View {
     /// The main curve in the surface's colours; the ones it's compared with in neutral tones,
     /// so they never read as the same line.
     private func style(_ index: Int) -> AnyShapeStyle {
-        index == 0 ? AnyShapeStyle(context.palette.gradient) : AnyShapeStyle(color(at: index))
+        index == 0 ? AnyShapeStyle(context.palette.accent) : AnyShapeStyle(color(at: index))
     }
 
     private func color(of name: String) -> Color {
@@ -248,7 +248,7 @@ struct DataChartView: View {
     private func bars(_ points: [Point]) -> some View {
         Chart(points) { point in
             BarMark(x: .value("Value", grown ? point.value : 0), y: .value("Label", point.label))
-                .foregroundStyle(context.palette.gradient)
+                .foregroundStyle(context.palette.accent)
                 .clipShape(.capsule)
                 .annotation(position: .trailing, spacing: 6) {
                     Text(Format.number.display(point.value))
@@ -276,7 +276,7 @@ struct DataChartView: View {
                     .foregroundStyle(LinearGradient(colors: [context.palette.companion.opacity(0.28), context.accent.opacity(0.02)], startPoint: .top, endPoint: .bottom))
                     .interpolationMethod(.monotone)
                 LineMark(x: .value("Year", point.year), y: .value("Value", grown ? point.value : 0))
-                    .foregroundStyle(context.palette.gradient)
+                    .foregroundStyle(context.palette.accent)
                     .interpolationMethod(.monotone)
                     .lineStyle(StrokeStyle(lineWidth: 2.5, lineCap: .round))
                 PointMark(x: .value("Year", point.year), y: .value("Value", grown ? point.value : 0))

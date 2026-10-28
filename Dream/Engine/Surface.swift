@@ -208,6 +208,27 @@ enum Accent: String, Codable, CaseIterable {
     case blue, teal, green, mint, orange, pink, purple, indigo, red, yellow, cyan, brown
 }
 
+/// What a page is about, which picks its ink, so pages about the same kind of thing look alike:
+/// money is always green.
+enum Subject: String, Codable, CaseIterable {
+    case money, health, food, places, nature, science, tech, home, learning, sport
+
+    var accent: Accent {
+        switch self {
+        case .money: .green
+        case .health: .pink
+        case .food: .orange
+        case .places: .blue
+        case .nature: .teal
+        case .science: .indigo
+        case .tech: .cyan
+        case .home: .yellow
+        case .learning: .purple
+        case .sport: .red
+        }
+    }
+}
+
 enum Format: String, Codable {
     case number, integer, currency, percent, toggle, choice
 

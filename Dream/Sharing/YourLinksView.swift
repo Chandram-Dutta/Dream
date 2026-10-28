@@ -242,7 +242,7 @@ private struct LinkRow: View {
                 .overlay {
                     Image(systemName: symbol)
                         .font(.headline)
-                        .foregroundStyle(link.isShared ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+                        .foregroundStyle(link.isShared ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
                 }
             VStack(alignment: .leading, spacing: 3) {
                 Text(link.title.isEmpty ? "A page" : link.title)
@@ -274,7 +274,7 @@ private struct LinkRow: View {
                     Text(link.views.formatted())
                         .font(.display(.title3))
                         .monospacedDigit()
-                        .foregroundStyle(link.isShared ? AnyShapeStyle(palette.numberGradient) : AnyShapeStyle(.secondary))
+                        .foregroundStyle(link.isShared ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.secondary))
                         .contentTransition(.numericText(value: Double(link.views)))
                     Text(link.views == 1 ? "view" : "views")
                         .font(.caption2)

@@ -46,7 +46,7 @@ private struct ConsentCard: View {
                     ForEach(request.personal, id: \.self) { detail in
                         HStack(alignment: .firstTextBaseline, spacing: 8) {
                             Image(systemName: "person.crop.circle")
-                                .foregroundStyle(palette.gradient)
+                                .foregroundStyle(palette.accent)
                             Text("“\(detail.text)”, from \(detail.from)")
                         }
                     }
@@ -104,7 +104,7 @@ private struct ConsentStyle: ButtonStyle {
             .padding(.vertical, 10)
             .background {
                 switch prominence {
-                case .main: Capsule().fill(palette.gradient)
+                case .main: Capsule().fill(palette.accent)
                 case .tinted: Capsule().fill(palette.accent.opacity(configuration.isPressed ? 0.24 : 0.12))
                 case .quiet: Capsule().fill(Color.clear)
                 }

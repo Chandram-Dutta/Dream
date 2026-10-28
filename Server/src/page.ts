@@ -233,7 +233,7 @@ ${
 const STYLE = `
 :root{color-scheme:light dark;--bg:#fff;--label:#000;--secondary:rgba(60,60,67,.6);--tertiary:rgba(60,60,67,.3);--separator:rgba(60,60,67,.29);
 --wash:color-mix(in srgb,var(--accent) 9%,transparent);--edge:color-mix(in srgb,var(--accent) 20%,transparent);
---gradient:linear-gradient(90deg,var(--accent),var(--companion));--number:linear-gradient(180deg,var(--accent),var(--companion));
+--gradient:var(--accent);--number:var(--accent);
 --display:-apple-system,BlinkMacSystemFont,system-ui,"Segoe UI",Roboto,"Helvetica Neue",sans-serif}
 @media (prefers-color-scheme:dark){:root{--bg:#000;--label:#fff;--secondary:rgba(235,235,245,.6);--tertiary:rgba(235,235,245,.3);--separator:rgba(84,84,88,.6)}}
 *{box-sizing:border-box}

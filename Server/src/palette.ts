@@ -1,20 +1,20 @@
-// A surface's colors on the web, matching Palette in the app (Dream/UI/Theme.swift): the
-// accent, a neighbouring hue for gradients, and quiet tints for panels. Colors are iOS's system
-// colors, in light and dark.
+// A surface's colors on the web, matching Palette in the app (Dream/UI/Theme.swift): the ink,
+// a neighbouring hue for the glow and a second series, and quiet tints for panels. The inks are
+// tuned for each appearance: deep enough to read on white, bright enough on black.
 
 const SYSTEM: Record<string, [light: string, dark: string]> = {
-  blue: ["#0088FF", "#0091FF"],
-  teal: ["#00C3D0", "#00D2E0"],
-  green: ["#34C759", "#30D158"],
-  mint: ["#00C8B3", "#00DAC3"],
-  orange: ["#FF8D28", "#FF9230"],
-  pink: ["#FF2D55", "#FF375F"],
-  purple: ["#CB30E0", "#DB34F2"],
-  indigo: ["#6155F5", "#6D7CFF"],
-  red: ["#FF383C", "#FF4245"],
-  yellow: ["#FFCC00", "#FFD600"],
-  cyan: ["#00C0E8", "#3CD3FE"],
-  brown: ["#AC7F5E", "#B78A66"],
+  blue: ["#2563EB", "#5B8CFF"],
+  teal: ["#0F9488", "#2DD4BF"],
+  green: ["#0E9F6E", "#34D399"],
+  mint: ["#0EA5A0", "#5EEAD4"],
+  orange: ["#E8670C", "#FF8A3D"],
+  pink: ["#DB2777", "#FF6B9A"],
+  purple: ["#9333EA", "#C084FC"],
+  indigo: ["#4F46E5", "#8B83FF"],
+  red: ["#DC2626", "#FF5A5A"],
+  yellow: ["#B7791F", "#FBBF24"],
+  cyan: ["#0891B2", "#38D5F5"],
+  brown: ["#9A5B2E", "#D19A66"],
 };
 
 /** A neighbouring hue, so gradients shift a little without turning into a rainbow. */

@@ -189,14 +189,15 @@ final class WebLog: @unchecked Sendable {
 
 /// The web tools a surface is written with, when this phone can use them.
 enum WebTools {
-    /// For a new session. `onNote` hears what's switched off; `onUse` hears each search and read.
-    static func offered(log: WebLog, language: String, onNote: @escaping @Sendable (String) -> Void, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
+    /// For a new session. `onNote` hears what's switched off; `onUse` hears each search and read,
+    /// and `onTrace` each one as it starts, for the screen.
+    static func offered(log: WebLog, language: String, onNote: @escaping @Sendable (String) -> Void, onUse: @escaping @Sendable (String) -> Void, onTrace: @escaping @Sendable (Trace) -> Void = { _ in }) -> [any Tool] {
         log.beginSession()
         guard WebService.isAvailable else {
             onNote("Web: search and read are off, since \(WebService.unavailableReason) (Under the hood › Web search).")
             return []
         }
-        return [SearchTool(log: log, onUse: onUse), ReadTool(log: log, language: language, onUse: onUse)]
+        return [SearchTool(log: log, onUse: onUse, onTrace: onTrace), ReadTool(log: log, language: language, onUse: onUse, onTrace: onTrace)]
     }
 
     /// Untrusted text between markers no page can know in advance, so none can close them early.
@@ -211,6 +212,7 @@ enum WebTools {
 struct SearchTool: Tool {
     let log: WebLog
     var onUse: @Sendable (String) -> Void = { _ in }
+    var onTrace: @Sendable (Trace) -> Void = { _ in }
     let name = "search"
     let description = "Searches the web and returns pages, each with a short snippet, to choose what to read. Use it for anything current, local, niche, about products or prices, or that Wikipedia doesn't cover. Snippets aren't enough to take facts from: read a page first."
 
@@ -234,6 +236,7 @@ struct SearchTool: Tool {
         let keywords = arguments.keywords.trimmingCharacters(in: .whitespacesAndNewlines)
         let freshness = WebService.Freshness(rawValue: String(describing: arguments.freshness))
         let country = arguments.country.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        onTrace(Trace(.search, keywords))
         onUse("Search: \(keywords)\(freshness.map { ", from the past \($0.rawValue)" } ?? "")\(country.count == 2 ? ", region \(country.uppercased())" : "")")
         let results: [WebService.Result]
         do {
@@ -261,6 +264,7 @@ struct ReadTool: Tool {
     /// The request's language, which pages are asked for first.
     var language = "en"
     var onUse: @Sendable (String) -> Void = { _ in }
+    var onTrace: @Sendable (Trace) -> Void = { _ in }
     let name = "read"
     let description = "Reads a web page and returns its text: the parts about what you're looking for, where it can tell. Read the best one or two pages search found before taking facts from them, and cite each page you use."
 
@@ -278,6 +282,7 @@ struct ReadTool: Tool {
         if log.hasRead(url) { return "You've read that page already; its text is above." }
         guard log.mayRead() else { return "That's enough reading for one screen. Build it from the pages you've read." }
         let focus = arguments.focus.trimmingCharacters(in: .whitespacesAndNewlines)
+        onTrace(Trace(.read, Trace.site(url)))
         onUse("Read: \(URL(string: url)?.host() ?? url)\(focus.isEmpty ? "" : ", for \(focus)")")
         let page: WebService.Page
         do {

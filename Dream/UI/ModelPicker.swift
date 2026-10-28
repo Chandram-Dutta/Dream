@@ -77,7 +77,7 @@ struct ModelChip: View {
             HStack(spacing: 7) {
                 if model?.isAuto == true {
                     Image(systemName: "sparkles")
-                        .foregroundStyle(palette.gradient)
+                        .foregroundStyle(palette.accent)
                 }
                 Text(model?.name ?? "Thinking")
                     .lineLimit(1)
@@ -190,7 +190,7 @@ private struct ModelPicker: View {
                 if isPicked {
                     Image(systemName: "checkmark")
                         .font(.footnote.weight(.bold))
-                        .foregroundStyle(palette.gradient)
+                        .foregroundStyle(palette.accent)
                         .transition(.opacity)
                 }
             }
@@ -228,7 +228,7 @@ private struct ThinkingControl: View {
                 Spacer(minLength: 8)
                 Text(ThinkingChoice.name(current))
                     .font(.display(.subheadline, weight: .semibold))
-                    .foregroundStyle(palette.gradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.opacity)
             }
             GeometryReader { geometry in
@@ -280,7 +280,7 @@ struct ThinkingBars: View {
             ZStack(alignment: .bottomLeading) {
                 bars(width: width, height: size.height) { _ in palette.edge }
                 // One gradient across the whole row, showing through the filled bars.
-                palette.gradient
+                palette.accent
                     .mask(alignment: .bottomLeading) {
                         bars(width: width, height: size.height) { index in index < filled ? .black : .clear }
                     }

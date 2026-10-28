@@ -36,7 +36,7 @@ private struct ValueLabel: View {
         Text(reading: context.surface.reading(input.name, value), unitFont: .display(.subheadline))
             .font(.display(.title3))
             .monospacedDigit()
-            .foregroundStyle(context.palette.numberGradient)
+            .foregroundStyle(context.palette.accent)
             .contentTransition(.numericText(value: value))
             .animation(.snappy, value: value)
     }
@@ -83,7 +83,7 @@ struct DreamSlider: View {
                     .fill(palette.accent.opacity(0.14))
                     .frame(height: 8)
                 Capsule()
-                    .fill(palette.gradient)
+                    .fill(palette.accent)
                     .frame(width: CGFloat(fraction) * travel + thumb / 2, height: 8)
                 Circle()
                     .fill(.white)
@@ -164,7 +164,7 @@ private struct RoundButton: View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.headline.weight(.bold))
-                .foregroundStyle(isEnabled ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+                .foregroundStyle(isEnabled ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
                 .frame(width: 44, height: 44)
                 .background(palette.accent.opacity(isEnabled ? 0.14 : 0.06), in: .circle)
         }
@@ -241,7 +241,7 @@ private struct Segments: View {
                         .background {
                             if selection == index {
                                 Capsule()
-                                    .fill(palette.gradient)
+                                    .fill(palette.accent)
                                     .matchedGeometryEffect(id: "selection", in: namespace)
                             }
                         }
@@ -287,7 +287,7 @@ struct FieldControl: View {
                     .keyboardType(.decimalPad)
                     .font(.display(.title))
                     .monospacedDigit()
-                    .foregroundStyle(context.palette.numberGradient)
+                    .foregroundStyle(context.palette.accent)
                     .focused($focused)
                 if input.format == .percent {
                     Text("%").font(.display(.title2)).foregroundStyle(.secondary)
@@ -297,7 +297,7 @@ struct FieldControl: View {
                 }
             }
             Capsule()
-                .fill(focused ? AnyShapeStyle(context.palette.gradient) : AnyShapeStyle(context.palette.edge))
+                .fill(focused ? AnyShapeStyle(context.palette.accent) : AnyShapeStyle(context.palette.edge))
                 .frame(height: focused ? 2 : 1)
                 .animation(.snappy, value: focused)
         }

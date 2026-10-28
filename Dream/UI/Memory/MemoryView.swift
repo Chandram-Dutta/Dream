@@ -204,10 +204,10 @@ struct NoticedFacts: View {
                     Spacer(minLength: 8)
                     Button("Remember") { Memory.confirm(fact, in: context) }
                         .font(.subheadline.weight(.semibold))
-                        .foregroundStyle(.white)
+                        .foregroundStyle(palette.onAccent)
                         .padding(.horizontal, 14)
                         .frame(height: 36)
-                        .background(palette.gradient, in: .capsule)
+                        .background(palette.accent, in: .capsule)
                     Button("Don't remember", systemImage: "xmark") {
                         context.delete(fact)
                         try? context.save()

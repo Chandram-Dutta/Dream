@@ -103,9 +103,9 @@ private struct QuestionCard: View {
                         Button("Use this", systemImage: "arrow.up", action: submitTyped)
                             .labelStyle(.iconOnly)
                             .font(.subheadline.weight(.bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(palette.onAccent)
                             .frame(width: 30, height: 30)
-                            .background(palette.gradient, in: .circle)
+                            .background(palette.accent, in: .circle)
                             .transition(.scale.combined(with: .opacity))
                     }
                 }
@@ -161,12 +161,12 @@ struct AnswerTag: View {
         HStack(spacing: 5) {
             if answer.isLeftToDream {
                 Image(systemName: "sparkles")
-                    .foregroundStyle(palette.gradient)
+                    .foregroundStyle(palette.accent)
                 Text(answer.question.topic)
             } else {
                 if answer.isRemembered {
                     Image(systemName: "person.crop.circle")
-                        .foregroundStyle(palette.gradient)
+                        .foregroundStyle(palette.accent)
                 }
                 Text(answer.choice)
             }

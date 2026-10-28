@@ -15,7 +15,7 @@ struct SavedSuggestion: View {
                     HStack(spacing: 10) {
                         Image(systemName: surface.symbolName)
                             .font(.subheadline.weight(.semibold))
-                            .foregroundStyle(surface.palette.gradient)
+                            .foregroundStyle(surface.palette.accent)
                         VStack(alignment: .leading, spacing: 1) {
                             Text("You made this before")
                                 .font(.caption)
@@ -27,7 +27,7 @@ struct SavedSuggestion: View {
                         Spacer(minLength: 8)
                         Image(systemName: "arrow.up.right")
                             .font(.caption.weight(.bold))
-                            .foregroundStyle(surface.palette.gradient)
+                            .foregroundStyle(surface.palette.accent)
                     }
                     .padding(.horizontal, 16)
                     .padding(.vertical, 10)

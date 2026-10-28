@@ -173,7 +173,7 @@ private struct ReportSheet: View {
         VStack(spacing: 18) {
             Image(systemName: "checkmark.circle.fill")
                 .font(.system(size: 56))
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
                 .symbolEffect(.bounce, value: sent)
             VStack(spacing: 6) {
                 Text("Thanks for telling us")

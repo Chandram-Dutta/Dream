@@ -16,7 +16,7 @@ struct AccountView: View {
     @State private var failure: String?
     @State private var onPhone = LocalData.Summary()
 
-    private let palette = Palette.now
+    private let palette = Palette.dream
 
     var body: some View {
         NavigationStack {
@@ -259,7 +259,7 @@ private struct DeviceRow: View {
         HStack(spacing: 14) {
             Image(systemName: "iphone")
                 .font(.title3)
-                .foregroundStyle(device.current ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(Color.secondary))
+                .foregroundStyle(device.current ? AnyShapeStyle(palette.accent) : AnyShapeStyle(Color.secondary))
                 .frame(width: 28)
             VStack(alignment: .leading, spacing: 2) {
                 Text(device.device ?? "A device")

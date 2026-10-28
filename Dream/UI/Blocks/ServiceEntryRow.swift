@@ -13,7 +13,7 @@ struct ServiceEntryRow: View {
             if let check = collection.checkField {
                 Image(systemName: record.isOn(check.name) ? "checkmark.circle.fill" : "circle")
                     .font(.title3)
-                    .foregroundStyle(record.isOn(check.name) ? AnyShapeStyle(palette.gradient) : AnyShapeStyle(.tertiary))
+                    .foregroundStyle(record.isOn(check.name) ? AnyShapeStyle(palette.accent) : AnyShapeStyle(.tertiary))
                     .accessibilityHidden(true)
             }
             VStack(alignment: .leading, spacing: 5) {
@@ -32,7 +32,7 @@ struct ServiceEntryRow: View {
                 Text(amount.display(value))
                     .font(.display(.headline))
                     .monospacedDigit()
-                    .foregroundStyle(palette.numberGradient)
+                    .foregroundStyle(palette.accent)
                     .contentTransition(.numericText(value: value.numberValue ?? 0))
             }
         }

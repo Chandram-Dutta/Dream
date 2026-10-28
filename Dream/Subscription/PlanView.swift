@@ -46,7 +46,7 @@ private struct PlanPitch: View {
         VStack(alignment: .leading, spacing: 18) {
             Image(systemName: "sparkles")
                 .font(.title.weight(.semibold))
-                .foregroundStyle(palette.gradient)
+                .foregroundStyle(palette.accent)
             VStack(alignment: .leading, spacing: 6) {
                 Text("Dream Plus")
                     .font(.display(.largeTitle, weight: .bold))
@@ -84,7 +84,7 @@ private struct Comparison: View {
             GridRow {
                 Color.clear.gridCellUnsizedAxes([.horizontal, .vertical])
                 Text("Free").foregroundStyle(.secondary)
-                Text("Plus").foregroundStyle(palette.gradient)
+                Text("Plus").foregroundStyle(palette.accent)
             }
             .font(.subheadline.weight(.semibold))
             row("Pages a day", free: status.free?.pagesPerDay, plus: status.plus?.pagesPerDay)
@@ -101,7 +101,7 @@ private struct Comparison: View {
         GridRow {
             Text(label)
             Text(free.map(String.init) ?? "–").monospacedDigit().foregroundStyle(.secondary)
-            Text(plus.map(String.init) ?? "–").monospacedDigit().font(.display(.body)).foregroundStyle(palette.numberGradient)
+            Text(plus.map(String.init) ?? "–").monospacedDigit().font(.display(.body)).foregroundStyle(palette.accent)
         }
     }
 }

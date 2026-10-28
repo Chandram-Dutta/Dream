@@ -11,7 +11,7 @@ import FoundationModels
 enum WireFormat { case number, integer, currency, percent, toggle, choice }
 
 @Generable
-enum WireAccent { case blue, teal, green, mint, orange, pink, purple, indigo, red, yellow, cyan, brown }
+enum WireSubject { case money, health, food, places, nature, science, tech, home, learning, sport }
 
 @Generable
 enum WireRole { case adjustable, given, variable, live }
@@ -98,13 +98,15 @@ struct WireBlock {
 
 @Generable(description: "A screen that answers the user's request: it can explain, calculate, or both")
 struct WireSurface {
+    // First, so the page has its colors from its first words.
+    @Guide(description: "What it's about, which picks the page's colors: money (prices, budgets, bills, tax), health (body, medicine, sleep), food (cooking, nutrition, eating out), places (travel, maps, weather, cities), nature (animals, plants, earth, climate), science (physics, maths, space, chemistry), tech (computers, phones, the internet), home (house, chores, shopping, plans, everyday life), learning (history, language, arts, culture), sport (sport, fitness, games)")
+    var subject: WireSubject
     @Guide(description: "1 to 4 words")
     var title: String
     @Guide(description: "One sentence that answers the request directly")
     var summary: String
     @Guide(description: "SF Symbols name for the subject")
     var symbol: String
-    var accent: WireAccent
     // Before the calculation, whose formulas can total them.
     @Guide(description: "Lists the user keeps, only when they're keeping track of things like groceries, expenses, habits or packing. Usually empty.", .count(0...3))
     var collections: [WireCollection]
@@ -143,7 +145,7 @@ extension Surface {
             title: wire.title,
             summary: wire.summary,
             symbol: wire.symbol,
-            accent: Accent(wire.accent),
+            accent: Subject(wire.subject).accent,
             inputs: wire.inputs.map { Input($0) },
             outputs: wire.outputs.map { Output($0) },
             blocks: Block.list(wire.blocks),
@@ -164,7 +166,7 @@ extension Surface {
             title: wire.title ?? "",
             summary: wire.summary ?? "",
             symbol: wire.symbol ?? "sparkles",
-            accent: wire.accent.map { Accent($0) } ?? .blue,
+            accent: wire.subject.map { Subject($0).accent } ?? .blue,
             inputs: (wire.inputs ?? []).compactMap { Input(partial: $0) },
             outputs: (wire.outputs ?? []).compactMap { Output(partial: $0) },
             blocks: Block.list(partial: wire.blocks ?? []),
@@ -215,9 +217,9 @@ extension Block {
     }
 }
 
-extension Accent {
-    init(_ wire: WireAccent) {
-        self = Accent(rawValue: String(describing: wire)) ?? .blue
+extension Subject {
+    init(_ wire: WireSubject) {
+        self = Subject(rawValue: String(describing: wire)) ?? .home
     }
 }
 

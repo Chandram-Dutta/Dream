@@ -56,29 +56,43 @@ struct SurfaceScreen: View {
         return false
     }
 
-    /// Before the model has picked colors, the time of day's.
+    /// Dream's own until the page arrives; then the page's, from its subject.
     private var palette: Palette {
-        guard let surface, !surface.isEmpty else { return .now }
+        guard let surface, !surface.isEmpty else { return .dream }
         return surface.palette
     }
 
-    /// What the model is doing, as a symbol. Nil when it's not working.
-    private var stage: String? {
-        switch composer.phase {
-        case .researching: "book.pages"
-        case .fixing: "wrench.adjustable"
-        case .composing: "rectangle.3.group"
-        case .idle, .done, .failed: nil
-        }
+    /// No page to show yet, or questions to answer before there is one.
+    private var isForming: Bool {
+        guard let surface, !surface.isEmpty else { return true }
+        return yourTurn
     }
 
-    /// How lively the color field is: thinking spreads and swirls it, writing calms it, done settles it.
-    private var energy: Double {
-        guard composer.phase.isBusy else { return 0 }
-        // Waiting for answers: calmer than writing, still awake.
-        if composer.asking.isWaiting || composer.consent.isWaiting { return 0.25 }
-        return composer.isThinking ? 1 : 0.45
+    /// The model is waiting on the user: questions, or a connected service's tool to allow.
+    private var yourTurn: Bool { composer.asking.isWaiting || composer.consent.isWaiting }
+
+    /// Dream is on it: making or changing the page, or about to start on a new request.
+    private var isWorking: Bool {
+        composer.phase.isBusy || (composer.phase == .idle && saved == nil && request != nil)
     }
+
+    /// The light means one thing: moving is Dream's turn, still is yours. It churns while Dream
+    /// works on a page that isn't here yet, flows at the top while one writes itself or changes,
+    /// and holds nearly still while questions wait.
+    private var energy: Double {
+        guard isWorking else { return 0 }
+        if yourTurn { return 0.04 }
+        return isForming ? 1 : 0.55
+    }
+
+    /// The light fills the screen while there's no page, from the first frame, and pulls up to
+    /// the top when one comes.
+    private var flood: Double {
+        isWorking && isForming ? 1 : 0
+    }
+
+    /// Blocks shown, so each one landing surges the light.
+    private var blockCount: Int { surface?.displayBlocks.count ?? 0 }
 
     /// The main result, so the field behind it can respond when it changes.
     private var mainValue: Double? {
@@ -86,9 +100,10 @@ struct SurfaceScreen: View {
         return surface.evaluate(state.values, records: state.records).values[main.name]
     }
 
-    var body: some View {
+    /// The page, or the request while it forms, over the light.
+    private var page: some View {
         let busy = composer.phase.isBusy
-        ScrollView {
+        return ScrollView {
             // A service the request names, which the user could connect.
             ConnectSuggestions(entries: composer.suggestions, palette: palette) { Task { await runAgain() } }
                 .padding(.horizontal, 20)
@@ -98,7 +113,6 @@ struct SurfaceScreen: View {
                     surface: surface,
                     state: state,
                     photo: photo,
-                    stage: stage,
                     focusedID: changing?.block?.id ?? changingID,
                     readingID: voice.readingID,
                     onChange: busy ? nil : { beginChange(ChangeTarget(block: $0)) },
@@ -106,17 +120,39 @@ struct SurfaceScreen: View {
                     onAnswer: busy ? nil : { changeAnswer($0, to: $1) })
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
+                    .transition(.blurReplace)
             } else {
-                FormingView(intent: intent, stage: stage, palette: palette, asking: composer.asking, consent: composer.consent)
+                FormingView(intent: intent, palette: palette, asking: composer.asking, consent: composer.consent)
                     .padding(.horizontal, 20)
+                    .transition(.blurReplace)
             }
         }
-        .background(alignment: .top) {
-            Aura(palette: palette, energy: energy, pulse: pulse)
-                .frame(height: 720)
+        .background {
+            Aura(palette: palette, energy: energy, flood: flood, pulse: pulse)
                 .animation(.easeInOut(duration: 1.4), value: energy)
+                .animation(.easeInOut(duration: 1.2), value: flood)
         }
         .background(Color(.systemBackground))
+        // What the work is touching, while there's no page yet.
+        .overlay(alignment: .bottom) {
+            if busy, isForming, !yourTurn {
+                WorkGlimpses(trail: composer.trail)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 12)
+                    .transition(.opacity)
+            }
+        }
+        .animation(.smooth(duration: 0.6), value: isForming)
+        // Each step of the work, and each block as it lands, surges the light; so does the main
+        // result changing once the page is done.
+        .onChange(of: composer.trail.count) { pulse += 1 }
+        .onChange(of: blockCount) { if busy { pulse += 1 } }
+        .onChange(of: mainValue) { if !busy { pulse += 1 } }
+    }
+
+    var body: some View {
+        let busy = composer.phase.isBusy
+        page
         .refreshingLive(surface, state: state)
         .scrollPosition($scroll)
         // Blocks stream in above ones already shown, and the scroll view follows those down.
@@ -147,7 +183,6 @@ struct SurfaceScreen: View {
         .animation(.smooth, value: composer.phase)
         .animation(.smooth, value: changing)
         .sensoryFeedback(trigger: composer.phase) { _, new in new == .done ? .success : nil }
-        .onChange(of: mainValue) { if !busy { pulse += 1 } }
         .navigationBarTitleDisplayMode(.inline)
         // Home hides its bar; said outright here, so a back swipe let go halfway can't leave the
         // page without its own.
@@ -244,9 +279,9 @@ struct SurfaceScreen: View {
                 Button("Send", systemImage: "arrow.up", action: submitChange)
                     .labelStyle(.iconOnly)
                     .font(.headline.weight(.bold))
-                    .foregroundStyle(.white)
+                    .foregroundStyle(palette.onAccent)
                     .frame(width: 38, height: 38)
-                    .background(palette.gradient, in: .circle)
+                    .background(palette.accent, in: .circle)
                     .disabled(instruction.trimmingCharacters(in: .whitespaces).isEmpty)
             }
             Button("Cancel", systemImage: "xmark") { changing = nil }

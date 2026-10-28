@@ -14,7 +14,7 @@ struct BlockView: View {
             .overlay {
                 if context.focusedID == block.id {
                     RoundedRectangle(cornerRadius: 30)
-                        .strokeBorder(context.palette.gradient, lineWidth: 2)
+                        .strokeBorder(context.palette.accent, lineWidth: 2)
                         .padding(-6)
                 }
             }
@@ -113,7 +113,7 @@ struct BlockView: View {
                 ForEach(Array(block.items.enumerated()), id: \.offset) { _, item in
                     HStack(alignment: .firstTextBaseline, spacing: 12) {
                         Circle()
-                            .fill(palette.gradient)
+                            .fill(palette.accent)
                             .frame(width: 7, height: 7)
                             .alignmentGuide(.firstTextBaseline) { $0[.bottom] + 1 }
                         RichText(text: item.value, context: context).lineSpacing(3)
@@ -127,9 +127,9 @@ struct BlockView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 14) {
                         Text("\(index + 1)")
                             .font(.display(.subheadline, weight: .bold))
-                            .foregroundStyle(.white)
+                            .foregroundStyle(palette.onAccent)
                             .frame(width: 28, height: 28)
-                            .background(palette.gradient, in: .circle)
+                            .background(palette.accent, in: .circle)
                             .alignmentGuide(.firstTextBaseline) { $0[VerticalAlignment.center] + 5 }
                         RichText(text: item.value, context: context).lineSpacing(3)
                     }
@@ -143,7 +143,7 @@ struct BlockView: View {
                     HStack(alignment: .top, spacing: 16) {
                         // The line joins events, so the sequence reads at a glance.
                         VStack(spacing: 0) {
-                            Circle().fill(palette.gradient).frame(width: 11, height: 11).padding(.top, 5)
+                            Circle().fill(palette.accent).frame(width: 11, height: 11).padding(.top, 5)
                             if index < block.items.count - 1 {
                                 Rectangle().fill(palette.accent.opacity(0.22)).frame(width: 2).frame(maxHeight: .infinity)
                             }
@@ -164,7 +164,7 @@ struct BlockView: View {
                     VStack(alignment: .leading, spacing: 2) {
                         Text(item.label.isEmpty ? item.value : item.label)
                             .font(.display(size: 46))
-                            .foregroundStyle(palette.numberGradient)
+                            .foregroundStyle(palette.accent)
                             .lineLimit(1)
                             .minimumScaleFactor(0.4)
                         if !item.label.isEmpty {
@@ -198,7 +198,7 @@ struct HeroView: View {
             Text(reading: context.surface.reading(block.ref, value), unitFont: .display(size: size * 0.42))
                 .font(.display(size: size))
                 .monospacedDigit()
-                .foregroundStyle(value == nil ? AnyShapeStyle(.tertiary) : AnyShapeStyle(context.palette.numberGradient))
+                .foregroundStyle(value == nil ? AnyShapeStyle(.tertiary) : AnyShapeStyle(context.palette.accent))
                 .contentTransition(.numericText(value: value ?? 0))
                 .lineLimit(1)
                 .minimumScaleFactor(0.35)
@@ -224,7 +224,7 @@ struct MetricView: View {
             Text(reading: context.surface.reading(block.ref, value), unitFont: .display(.subheadline))
                 .font(.display(.title2))
                 .monospacedDigit()
-                .foregroundStyle(lit ? AnyShapeStyle(context.palette.numberGradient) : AnyShapeStyle(.primary))
+                .foregroundStyle(lit ? AnyShapeStyle(context.palette.accent) : AnyShapeStyle(.primary))
                 .contentTransition(.numericText(value: value ?? 0))
                 .lineLimit(1)
                 .minimumScaleFactor(0.5)
