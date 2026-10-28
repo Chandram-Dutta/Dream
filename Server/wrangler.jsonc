@@ -48,6 +48,12 @@
   // (src/model.ts), signed in as this account, so no gateway token is needed.
   "ai": { "binding": "AI" },
 
+  // Pages made on the server (src/compose/, docs/ServerGeneration.md): one PageJob a page, which
+  // keeps its request and event log in its own SQLite storage and runs the page on its alarm.
+  "durable_objects": { "bindings": [{ "name": "PAGE_JOBS", "class_name": "PageJob" }] },
+  // Durable Object classes as they change, applied in order on deploy, in every environment.
+  "migrations": [{ "tag": "v1-page-jobs", "new_sqlite_classes": ["PageJob"] }],
+
   "vars": {
     // The apps that open /s/ links, as <Team ID>.<bundle ID>, separated by commas. Served in
     // /.well-known/apple-app-site-association; change it here when the app's ID changes.
@@ -100,6 +106,7 @@
           "migrations_dir": "migrations"
         }
       ],
+      "durable_objects": { "bindings": [{ "name": "PAGE_JOBS", "class_name": "PageJob" }] },
       // The same limits, counted apart from production's.
       "ratelimits": [
         { "name": "CREATE_LIMIT", "namespace_id": "5801", "simple": { "limit": 10, "period": 60 } },
