@@ -2,6 +2,7 @@
 // (usage.ts), Dream Plus (appstore.ts) and the app's proof that it's the app (attest.ts).
 //
 //   POST /api/model                    the model, for signed-in users of the app
+//   POST /api/route                    Auto: the model and thinking level for a page (route.ts)
 //   GET  /api/usage                    the plan, and pages used and left
 //   POST /api/appstore/transactions    purchases the app made or restored
 //   POST /api/appstore/notifications   App Store Server Notifications v2
@@ -10,11 +11,12 @@
 import { receiveNotification, receiveTransactions } from "./appstore";
 import { challenge, register } from "./attest";
 import { signInNeeded, userFrom } from "./auth";
-import { model, type ModelEnv } from "./model";
+import { model } from "./model";
 import { bodyBytes, isJSON, json, object, problem } from "./reply";
+import { route, type RouteEnv } from "./route";
 import { status } from "./usage";
 
-export type PlanEnv = ModelEnv;
+export type PlanEnv = RouteEnv;
 
 const only = (method: string) => problem(405, `Only ${method}.`, { Allow: method });
 
@@ -23,6 +25,8 @@ export async function routePlan(request: Request, env: PlanEnv, ctx: ExecutionCo
   switch (url.pathname) {
     case "/api/model":
       return request.method === "POST" ? model(request, env, ctx) : only("POST");
+    case "/api/route":
+      return request.method === "POST" ? route(request, env, ctx) : only("POST");
     case "/api/usage": {
       if (request.method !== "GET") return only("GET");
       const user = await userFrom(request, env);

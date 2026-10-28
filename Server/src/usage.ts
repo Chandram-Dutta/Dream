@@ -10,7 +10,8 @@
 //
 //   GET /api/usage   (signed in) → the plan, today's and this month's pages, and the subscription
 
-import { CATALOG, EFFORTS, offered } from "./models";
+import { CATALOG, EFFORTS, offered, type Model } from "./models";
+import { AUTO } from "./router";
 import { activeSubscription, type StoreEnv, type Subscription } from "./appstore";
 
 export type Plan = "free" | "plus";
@@ -216,6 +217,13 @@ async function add(env: UsageEnv, userID: string, counts: Counts, at: number, al
   await env.DB.batch([upsert(dayOf(at)), upsert(monthOf(at)), ...also]);
 }
 
+const listed = ({ id, name, note, plus }: Model) => ({ id, name, note, plus });
+
+/** Auto in Account's list, right after the default. */
+function withAuto(models: ReturnType<typeof listed>[]): ReturnType<typeof listed>[] {
+  return [...models.slice(0, 1), { id: AUTO, name: "Auto", note: "Picks the model and thinking for each page", plus: true }, ...models.slice(1)];
+}
+
 /** What the app shows: the plan, how many pages are left, and when more come. */
 export async function status(env: UsageEnv, userID: string, at = Date.now()): Promise<Record<string, unknown>> {
   const account = await accountOf(env, userID);
@@ -231,8 +239,9 @@ export async function status(env: UsageEnv, userID: string, at = Date.now()): Pr
     subscription: account.subscription,
     // Both plans, so the app can say what Dream Plus adds without a second request.
     plans: Object.fromEntries(Object.entries(allowances(env)).map(([plan, { pagesPerDay, pagesPerMonth }]) => [plan, { pagesPerDay, pagesPerMonth }])),
-    // The models Account can offer, the default first: every one in the catalogue for testers.
-    models: (account.tester ? CATALOG : offered(env.MODELS)).map(({ id, name, note, plus }) => ({ id, name, note, plus })),
+    // The models Account can offer, the default first: every one in the catalogue for testers,
+    // with Auto, which picks for each page (route.ts), right after the default.
+    models: account.tester ? withAuto(CATALOG.map(listed)) : offered(env.MODELS).map(listed),
     // The thinking levels Account can offer: every one for testers, low to high for Dream Plus.
     thinking: account.tester ? [...EFFORTS] : account.plan === "plus" ? ["low", "medium", "high"] : [],
   };

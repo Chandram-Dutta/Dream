@@ -3,11 +3,12 @@
 //   POST /api/model   an OpenAI-style chat completion  → xAI's answer, streamed as it comes
 //
 // Which model answers is the server's choice (models.ts): the default for everyone, or for Dream
-// Plus the one picked in Account. Requests go through Dream's Cloudflare AI Gateway
-// (`AI_GATEWAY`), which keeps no logs of them: Grok to xAI's Responses API, translated both ways
-// by responses.ts, and Workers AI's models through the AI binding, smoothed by workersai.ts. Either
-// way the app keeps speaking chat completions. Each account's cache key goes along (in the body
-// for xAI, `x-session-affinity` for Workers AI), so repeated prompts are read from a cache.
+// Plus the one picked in Account, or on Auto the one picked for the page (route.ts). Requests go
+// through Dream's Cloudflare AI Gateway (`AI_GATEWAY`), which keeps no logs of them: Grok to xAI's
+// Responses API, translated both ways by responses.ts, and Workers AI's models through the AI
+// binding, smoothed by workersai.ts. Either way the app keeps speaking chat completions. Each
+// account's cache key goes along (in the body for xAI, `x-session-affinity` for Workers AI), so
+// repeated prompts are read from a cache.
 //
 // The app's Dream provider (Dream/Generation/Providers/DreamModel.swift) sends what it would send
 // xAI, with the user's session, proof that it's the app (attest.ts), and `X-Dream-Page` naming
@@ -23,8 +24,10 @@ import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
 import { proveApp, type ProofEnv } from "./attest";
 import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
-import { CATALOG, choose, fitEffort, offered, type Model } from "./models";
+import { allowedEffort, CATALOG, choose, fitEffort, offered, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
+import { guessedPick } from "./route";
+import { AUTO } from "./router";
 import { withHeartbeat } from "./stream";
 import { workersCompletion, workersStream } from "./workersai";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
@@ -338,6 +341,14 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const page = request.headers.get("X-Dream-Page");
   const pageID = page && /^[A-Za-z0-9-]{8,64}$/.test(page) ? page : null;
   const account = await accountOf(env, user.id);
+  // Auto (route.ts): the app asks /api/route once a page and names what it was given here. A
+  // request naming "auto" itself is routed on what it shows on its face, without asking Clef, so
+  // every request of a page lands on the same model.
+  if (body.model === AUTO) {
+    const routed = guessedPick(body.messages, account, env);
+    body.model = routed.model.id;
+    body.reasoning_effort = routed.effort;
+  }
   // Testers (PLUS_ACCOUNTS) and the bench can use any model in the catalogue; everyone else, those offered.
   const anyModel = account.tester || env.DEV_LOGIN === "1";
   const chosen = choose(body.model, account.plan, anyModel ? CATALOG : offered(env.MODELS), anyModel);
@@ -350,8 +361,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   // the nearest level the model takes (models.ts). To bench longer thinking, list the bench's
   // account in PLUS_ACCOUNTS.
   const asked = typeof body.reasoning_effort === "string" ? body.reasoning_effort : undefined;
-  const permitted = account.tester ? asked : account.plan === "plus" ? (asked === "none" ? "low" : asked === "max" ? "high" : asked) : "low";
-  const effort = fitEffort(permitted, chosen);
+  const effort = fitEffort(allowedEffort(asked, account.plan, account.tester), chosen);
   if (effort === null) delete body.reasoning_effort;
   else body.reasoning_effort = effort;
   const refusal = await admitModel(env, user.id, pageID, account);
