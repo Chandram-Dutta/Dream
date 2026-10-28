@@ -121,7 +121,9 @@ public App Store release, the decisions taken, and the work in progress.
 - Server error alerts.
 - A staging environment.
 - Load and latency work. Pages take 20–60 s to build; streaming hides some of it.
-- Model fallbacks. Private Cloud Compute is still awaiting Apple's entitlement.
+- Model fallbacks. A busy or silent model is asked again, and a page that comes out broken or
+  empty is written again once (Composer.swift), but on a phone there's no second model to turn
+  to: Private Cloud Compute is still awaiting Apple's entitlement.
 
 **Quality**
 - Automated tests in Xcode, and CI.

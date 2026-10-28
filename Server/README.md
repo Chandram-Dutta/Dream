@@ -536,17 +536,22 @@ hood as developer options.
 ### Which model
 
 `src/models.ts` lists the models Dream offers, and `MODELS` (wrangler.jsonc) which of them this
-server offers, in Account's order. Everyone gets the first that isn't Dream Plus only, **DeepSeek
-V4.1 Flash** on Workers AI; Dream Plus can pick **Grok 4.7** in Account. The app names the model
-it was given, or none; the server checks the plan on every request, and anything it can't give (a
-Plus model on the free plan, a retired model, an unknown id) gets the default. `GET /api/usage`
-lists the models for Account.
+server offers, in Account's order. Everyone gets the first that isn't Dream Plus only, **Grok
+4.7**; Dream Plus picks how long it thinks, and testers (`PLUS_ACCOUNTS`) can try every model in
+the catalogue. The app names the model it was given, or none; the server checks the plan on every
+request, and anything it can't give (a Plus model on the free plan, a retired model, an unknown
+id) gets the default. `GET /api/usage` lists the models for Account.
 
 They were chosen with the page bench through a local server (`DREAM_SERVER=http://127.0.0.1:8787
 Tools/bench-many.sh out -xaiModel <id> "request" …`, with `DEV_LOGIN=1`, which lets test accounts
-use any model): on four everyday requests, DeepSeek made every page at about $0.004 each, Grok the
-most careful at about $0.05, GLM 5.3 Flash wrote a rupee page in Spanish, and Kimi K2.6 took up to
-six minutes. Bench a model before adding it.
+use any model). A second bench, on seven requests before and after fixing the harness
+(`docs/HarnessBench.md`), found the harness at fault more than the models: GLM 5.3 Flash's rupee
+page in Spanish pesos was a repair that had lost its request, the runaways were padding nothing
+stopped, and the cheaper models never looked anything up because the schema kept them from
+calling tools. Since then Grok 4.7 makes every page at about $0.05, with most of its prompt read
+from cache; DeepSeek V4.1 Flash looks up and cites what it used to leave out, at about $0.01 a
+page, but takes about a minute; Gemma 4 on Sarvam pads its answers, and Sarvam turns away a burst
+of requests. Kimi K2.6 took up to six minutes a page. Bench a model before adding it.
 
 Workers AI's models go through the same gateway by the AI binding, billed to the account in
 neurons (10,000 a day free, then $0.011 per 1,000), with each account's `x-session-affinity` for
@@ -557,11 +562,14 @@ Workers AI and Sarvam hold every token a model writes to the request's JSON sche
 the model can never start a tool call, and writes facts from memory instead (benched: asked who
 won the 2026 World Cup, DeepSeek wrote "I'll look this up." as the page, and Gemma 4 that the final
 hadn't been played). Their models are marked `toolsFirst` in `src/models.ts`, and
-`src/toolsfirst.ts` sends each round that has tools first without the schema, thinking as little
-as the model allows. A tool call there is the answer; once the model starts writing an answer
-instead, it's dropped unread (its cost estimated and counted) and the round is asked again with
-the schema at the level asked for. Grok takes tools and a schema together, so its requests go
-as they are.
+`src/toolsfirst.ts` sends each round that has tools first without the schema. A tool call there
+is the answer; once the model starts writing an answer instead, it's dropped unread (its cost
+estimated and counted) and the round is asked again with the schema, after a short wait if the
+model is busy. After three rounds of tools the schema holds the model to answering. The tool
+calls themselves, which nothing held, are fitted to their tools' schemas (`fitArguments` in
+`src/workersai.ts`): Gemma sent search its keywords as a list. Grok takes tools and a schema
+together, so its requests go as they are. The price is a second prefill, and thinking twice, on
+each page's last round: DeepSeek's pages take about a minute now, but rest on what it read.
 
 ### Through Cloudflare's AI Gateway
 
