@@ -8,8 +8,9 @@ import UniformTypeIdentifiers
 /// (Server/src/model.ts): a Foundation Models request turned into one, and its streamed answer
 /// turned back. Both the xAI and the Dream adapters use it, so they behave the same.
 enum ChatCompletions {
-    /// The request's JSON, and a line describing it for the log.
-    static func body(for request: LanguageModelExecutorGenerationRequest, modelID: String) throws -> (data: Data, summary: String) {
+    /// The request's JSON, and a line describing it for the log. `effort` is the thinking level
+    /// Auto picked for the page (Route.swift); otherwise the one picked in Account.
+    static func body(for request: LanguageModelExecutorGenerationRequest, modelID: String, effort: String? = nil) throws -> (data: Data, summary: String) {
         var body: [String: Any] = [
             "messages": messages(from: request.transcript),
             "stream": true,
@@ -29,7 +30,7 @@ enum ChatCompletions {
         }
         // Screens should arrive in seconds; at default effort, Grok can think for half a minute
         // first. Low unless Dream Plus picked longer in Account (ThinkingChoice).
-        body["reasoning_effort"] = ThinkingChoice.level
+        body["reasoning_effort"] = effort ?? ThinkingChoice.level
         let options = request.generationOptions
         if let temperature = options.temperature { body["temperature"] = temperature }
         if options.samplingMode == .greedy { body["temperature"] = 0 }
