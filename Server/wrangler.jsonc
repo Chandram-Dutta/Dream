@@ -7,9 +7,10 @@
   "main": "src/index.ts",
   "compatibility_date": "2026-10-01",
 
-  // KaTeX's stylesheet and fonts, copied from node_modules before every dev run and deploy.
-  // Requests for files in ./public are answered before the Worker runs.
-  "build": { "command": "node scripts/copy-katex.mjs" },
+  // KaTeX's stylesheet and fonts, copied from node_modules, and the landing page, built from
+  // ../Website (scripts/copy-website.mjs), before every dev run and deploy. Requests for files in
+  // ./public are answered before the Worker runs, so "/" is the landing page.
+  "build": { "command": "node scripts/copy-katex.mjs && node scripts/copy-website.mjs" },
   "assets": { "directory": "./public" },
 
   // Shared surfaces. Replace database_id with the id `npx wrangler d1 create dream-share` prints.

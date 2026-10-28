@@ -1,0 +1,46 @@
+---
+import { DEFAULT_UNITS, ROPE, length, period, seconds, toSlider } from "../../lib/demos";
+import Icon from "../Icon.astro";
+
+const units = DEFAULT_UNITS;
+const worlds = [
+  { id: "earth", name: "Earth" },
+  { id: "moon", name: "Moon" },
+  { id: "mars", name: "Mars" },
+];
+---
+
+<article class="page" data-demo="pendulum" data-accent="purple" aria-label="Why a pendulum swings">
+  <h2 class="title form" style="--i: 0"><Icon name="pendulum" /><span class="voice">Why a pendulum swings</span></h2>
+  <p class="text form" style="--i: 1">
+    Gravity pulls the weight back toward the bottom. It overshoots, and gravity pulls it back again. A longer rope or weaker
+    gravity makes each swing slower; how heavy the weight is makes no difference.
+  </p>
+  <figure class="swing form" style="--i: 2" aria-hidden="true" data-swing>
+    <span class="pivot"></span>
+    <span class="arm" data-arm>
+      <span class="rope" data-rope></span>
+      <span class="bob" data-bob></span>
+    </span>
+  </figure>
+  <div class="panel form" style="--i: 3">
+    <p class="readout">
+      <span class="label">One swing there and back takes</span>
+      <output class="number" data-out="period">{seconds(period(ROPE.start, "earth"), units)}</output>
+    </p>
+    <div class="control">
+      <p class="row"><span class="label">Rope</span> <output data-out="rope">{length(ROPE.start, units)}</output></p>
+      <input class="slider" type="range" min="0" max="1000" value={toSlider(ROPE.start, ROPE.low, ROPE.high)} aria-label="Length of the rope" data-in="rope" />
+    </div>
+    <div class="segmented" role="radiogroup" aria-label="Where it swings" data-worlds>
+      <span class="thumb" aria-hidden="true"></span>
+      {
+        worlds.map((world, index) => (
+          <button type="button" role="radio" aria-checked={index === 0 ? "true" : "false"} data-world={world.id}>
+            {world.name}
+          </button>
+        ))
+      }
+    </div>
+  </div>
+</article>

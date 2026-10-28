@@ -1,0 +1,33 @@
+---
+import { DEFAULT_UNITS, PEOPLE, TIP, money } from "../../lib/demos";
+import Icon from "../Icon.astro";
+
+const units = DEFAULT_UNITS;
+const tip = (units.bill * TIP.start) / 100;
+---
+
+<article class="page" data-demo="bill" data-accent="orange" aria-label="Splitting the bill">
+  <h2 class="title form" style="--i: 0"><Icon name="fork-knife" /><span class="voice">Splitting the bill</span></h2>
+  <div class="panel form" style="--i: 1">
+    <p class="readout">
+      <span class="label">Each of you pays</span>
+      <output class="number" data-out="each">{money((units.bill + tip) / PEOPLE.start, units)}</output>
+    </p>
+    <div class="control">
+      <p class="row"><span class="label">Tip</span> <output data-out="tip">{TIP.start}%</output></p>
+      <input class="slider" type="range" min={TIP.low} max={TIP.high} step="1" value={TIP.start} aria-label="Tip, as a percentage" data-in="tip" />
+    </div>
+    <div class="control stepper">
+      <p class="row"><span class="label">Between</span> <output data-out="people">{PEOPLE.start} people</output></p>
+      <div class="steps">
+        <button type="button" data-step="-1" aria-label="One fewer person">&minus;</button>
+        <button type="button" data-step="1" aria-label="One more person">+</button>
+      </div>
+    </div>
+  </div>
+  <dl class="sums form" style="--i: 2">
+    <div><dt>The bill</dt><dd data-out="bill">{money(units.bill, units)}</dd></div>
+    <div><dt>Tip</dt><dd data-out="tip-amount">{money(tip, units)}</dd></div>
+    <div class="total"><dt>Altogether</dt><dd data-out="total">{money(units.bill + tip, units)}</dd></div>
+  </dl>
+</article>

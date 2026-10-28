@@ -1,0 +1,96 @@
+---
+import Get from "../components/Get.astro";
+import Glimpses from "../components/Glimpses.astro";
+import Icon from "../components/Icon.astro";
+import Bill from "../components/demos/Bill.astro";
+import Groceries from "../components/demos/Groceries.astro";
+import Horizon from "../components/demos/Horizon.astro";
+import Pendulum from "../components/demos/Pendulum.astro";
+import Base from "../layouts/Base.astro";
+import { DEFAULT_UNITS, DEMOS, SHORT } from "../lib/demos";
+import { LINKS } from "../config";
+import "../styles/home.css";
+
+const first = DEMOS[0];
+const request = first.request(DEFAULT_UNITS);
+---
+
+<Base>
+  <div class="aura" aria-hidden="true" data-aura><canvas></canvas></div>
+
+  <header class="top">
+    <a class="mark" href="/" aria-label="Dream, home">
+      <img src="/icon.png" width="28" height="28" alt="" />
+      <span class="voice">Dream</span>
+    </a>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Dream, making a page" data-hero>
+      <div class="ask">
+        <div class="composer" data-composer>
+          <p class="request">
+            <span class="hold" aria-hidden="true" data-hold>{request}</span>
+            <span class="typed" aria-hidden="true"><span data-typed>{request}</span><span class="caret"></span><span class="placeholder">Ask for anything</span></span>
+            <span class="visually-hidden" data-said>Asked: {request}</span>
+          </p>
+          <span class="send" aria-hidden="true"><Icon name="arrow-up" /></span>
+        </div>
+
+        <div class="others" data-others>
+          <p class="others-label">Try another</p>
+          <ul>
+            {
+              DEMOS.map((demo) => (
+                <li>
+                  <button type="button" data-ask={demo.id} aria-pressed={demo.id === first.id ? "true" : "false"}>
+                    {SHORT[demo.id]}
+                  </button>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <div class="sheet" data-sheet>
+          <div class="stage" data-stage>
+            <Horizon />
+            <Bill />
+            <Groceries />
+            <Pendulum />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="paper">
+    <section class="claim">
+      <h1 class="voice">Dream turns what you ask into a page you can use.</h1>
+      <p>
+        Type it, say it, or show it a photo. The page explains it, works it out, or both, with controls to play with.
+        Dream is an app for iPhone.
+      </p>
+      <Get />
+    </section>
+
+    <section class="more" aria-labelledby="more">
+      <h2 class="voice" id="more">What else you can ask</h2>
+      <Glimpses />
+    </section>
+    </div>
+  </main>
+
+  <footer class="foot">
+    <nav aria-label="About Dream">
+      <a href={LINKS.privacy}>Privacy</a>
+      <a href={LINKS.terms}>Terms</a>
+      <a href={LINKS.support}>Support</a>
+      <a href={`mailto:${LINKS.supportEmail}`}>{LINKS.supportEmail}</a>
+    </nav>
+    <p class="maker"><a href="https://onlychan.xyz">onlychan.xyz</a></p>
+  </footer>
+</Base>
+
+<script>
+  import "../scripts/home";
+</script>

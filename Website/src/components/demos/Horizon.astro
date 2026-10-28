@@ -1,0 +1,44 @@
+---
+import { DEFAULT_UNITS, EYES, distance, horizonDistance, horizonFigure, length, toSlider } from "../../lib/demos";
+import Icon from "../Icon.astro";
+
+const figure = horizonFigure(EYES.start);
+const units = DEFAULT_UNITS;
+---
+
+<article class="page" data-demo="horizon" data-accent="indigo" aria-label="Seeing to the horizon">
+  <h2 class="title form" style="--i: 0"><Icon name="eye" /><span class="voice">Seeing to the horizon</span></h2>
+  <p class="text form" style="--i: 1">
+    The Earth curves away beneath you, so the ground drops out of sight a little way off. The higher your eyes, the further
+    away that is.
+  </p>
+  <figure class="figure form" style="--i: 2" aria-hidden="true">
+    <svg viewBox="0 0 600 140" preserveAspectRatio="xMidYMax meet">
+      <defs>
+        <linearGradient id="horizon-sight" gradientUnits="userSpaceOnUse" x1={figure.eye.x} y1={figure.eye.y} x2={figure.horizon.x} y2={figure.horizon.y} data-svg="gradient">
+          <stop offset="0" style="stop-color: var(--accent)"></stop>
+          <stop offset="1" style="stop-color: var(--companion); stop-opacity: 0.3"></stop>
+        </linearGradient>
+        <linearGradient id="horizon-eye" x1="0" x2="1">
+          <stop offset="0" style="stop-color: var(--accent)"></stop>
+          <stop offset="1" style="stop-color: var(--companion)"></stop>
+        </linearGradient>
+      </defs>
+      <circle class="earth" cx={figure.center.x} cy={figure.center.y} r={figure.radius}></circle>
+      <line class="sight" x1={figure.eye.x} y1={figure.eye.y} x2={figure.beyond.x} y2={figure.beyond.y} data-svg="sight"></line>
+      <line class="stance" x1={figure.ground.x} y1={figure.ground.y} x2={figure.eye.x} y2={figure.eye.y} data-svg="stance"></line>
+      <circle class="eye" cx={figure.eye.x} cy={figure.eye.y} r="7" data-svg="eye"></circle>
+      <circle class="touch" cx={figure.horizon.x} cy={figure.horizon.y} r="6" data-svg="horizon"></circle>
+    </svg>
+  </figure>
+  <div class="panel form" style="--i: 3">
+    <p class="readout">
+      <span class="label">The horizon is</span>
+      <output class="number" data-out="distance">{distance(horizonDistance(EYES.start), units)}</output>
+    </p>
+    <div class="control">
+      <p class="row"><span class="label">Your eyes are</span> <output data-out="height">{length(EYES.start, units)} up</output></p>
+      <input class="slider" type="range" min="0" max="1000" value={toSlider(EYES.start, EYES.low, EYES.high)} aria-label="How high your eyes are" data-in="height" />
+    </div>
+  </div>
+</article>

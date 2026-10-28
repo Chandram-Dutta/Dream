@@ -3,3 +3,11 @@ node_modules/
 public/katex/
 worker-configuration.d.ts
 .dev.vars
+# Copied in by scripts/copy-website.mjs: the landing page, built from ../Website.
+public/index.html
+public/_astro/
+public/_headers
+public/favicon.png
+public/apple-touch-icon.png
+public/icon.png
+public/share.jpg

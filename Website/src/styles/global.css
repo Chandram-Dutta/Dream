@@ -1,0 +1,214 @@
+/* Dream's site is a Dream page: the composer, the Aura, panels and controls look and behave as
+   they do in the app (Dream/UI). One typeface, Mona Sans, in two widths, as the app uses SF Pro:
+   expanded when Dream speaks (titles, big numbers, headings), normal for your words and for
+   reading. Colors are iOS's own; the accent is the time of day until a page brings its own.
+
+   Motion is transforms and opacity only. Nothing moves with the scroll. */
+
+@property --accent { syntax: "<color>"; inherits: true; initial-value: #0088ff; }
+@property --companion { syntax: "<color>"; inherits: true; initial-value: #00c0e8; }
+
+:root {
+  color-scheme: light dark;
+  --paper: #ffffff;
+  --ink: #000000;
+  /* iOS's secondary label, a little darker so it reads at 4.5:1. */
+  --ink-2: rgba(60, 60, 67, 0.8);
+  --ink-3: rgba(60, 60, 67, 0.32);
+  --line: rgba(60, 60, 67, 0.16);
+  --fill: rgba(120, 120, 128, 0.14);
+  --glass: rgba(255, 255, 255, 0.74);
+  --glass-edge: rgba(0, 0, 0, 0.07);
+  --glass-shine: rgba(255, 255, 255, 0.9);
+  --sheet: rgba(255, 255, 255, 0.8);
+  --knob: #ffffff;
+  --face: "Mona Sans Variable", -apple-system, system-ui, sans-serif;
+  --expanded: 125%;
+  --column: 680px;
+  --gutter: clamp(20px, 5vw, 48px);
+  /* SwiftUI's .smooth, near enough. */
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --snappy: cubic-bezier(0.3, 1.3, 0.5, 1);
+
+  /* Elements of Typographic Style: 15, 17, 21, 28, 36, 48, 64. */
+  --t-small: 15px;
+  --t-body: 17px;
+  --t-ask: clamp(19px, 2vw, 23px);
+  --t-lead: clamp(17px, 1.7vw, 21px);
+  --t-title: clamp(24px, 2.8vw, 30px);
+  --t-head: clamp(28px, 3.6vw, 40px);
+  --t-number: clamp(44px, 6vw, 64px);
+
+  /* --accent and --companion come from data-accent (palette.ts). */
+  transition: --accent 1.2s var(--ease), --companion 1.2s var(--ease);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #000000;
+    --ink: #ffffff;
+    --ink-2: rgba(235, 235, 245, 0.72);
+    --ink-3: rgba(235, 235, 245, 0.3);
+    --line: rgba(235, 235, 245, 0.16);
+    --fill: rgba(120, 120, 128, 0.32);
+    --glass: rgba(30, 30, 32, 0.66);
+    --glass-edge: rgba(255, 255, 255, 0.1);
+    --glass-shine: rgba(255, 255, 255, 0.08);
+    --sheet: rgba(12, 12, 14, 0.6);
+    --knob: #f2f2f7;
+  }
+}
+
+/* Colors made from the accent, worked out wherever an accent is set (palette.ts), so a page in
+   its own colors gets its own. Accent text is darkened in light mode, so a big orange number
+   still reads on white. */
+[data-accent] {
+  --accent-ink: color-mix(in oklab, var(--accent), #000 24%);
+  --companion-ink: color-mix(in oklab, var(--companion), #000 24%);
+  --wash: color-mix(in srgb, var(--accent) 9%, transparent);
+  --edge: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-accent] {
+    --accent-ink: var(--accent);
+    --companion-ink: var(--companion);
+    --wash: color-mix(in srgb, var(--accent) 16%, transparent);
+    --edge: color-mix(in srgb, var(--accent) 30%, transparent);
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--face);
+  font-size: var(--t-body);
+  line-height: 1.5;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+h1,
+h2,
+h3,
+p,
+ul,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+ul {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: color-mix(in srgb, var(--accent) 30%, transparent);
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Dream speaking: titles, headings and big numbers. */
+.voice {
+  font-stretch: var(--expanded);
+  font-weight: 650;
+  letter-spacing: -0.015em;
+  line-height: 1.12;
+  text-wrap: balance;
+}
+
+.number {
+  display: block;
+  font-stretch: var(--expanded);
+  font-weight: 700;
+  font-size: var(--t-number);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  background: linear-gradient(180deg, var(--accent-ink), var(--companion-ink));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The App Store button, or what stands in for it before the app is out. */
+.get {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 0 24px 0 20px;
+  border-radius: 999px;
+  background: var(--ink);
+  color: var(--paper);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.get svg {
+  width: 20px;
+  height: 20px;
+  flex: none;
+}
+
+.get[aria-disabled="true"] {
+  background: var(--fill);
+  color: var(--ink);
+  cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    transition: none;
+  }
+
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}

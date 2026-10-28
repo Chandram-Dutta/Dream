@@ -1,0 +1,367 @@
+---
+// More of what Dream does, each as a request and a glimpse of the page it makes: the way the app
+// draws these blocks, small and still. Each page has its own colors, as in the app.
+import Icon from "./Icon.astro";
+
+const hours = [
+  { time: "9am", rain: 10, temp: 18 },
+  { time: "12pm", rain: 20, temp: 21 },
+  { time: "3pm", rain: 70, temp: 19 },
+  { time: "6pm", rain: 80, temp: 17 },
+  { time: "9pm", rain: 40, temp: 15 },
+];
+const runs = [3.2, 5, 4.1, 6, 3.5, 7.2, 5];
+const longest = Math.max(...runs);
+const total = Math.round(runs.reduce((sum, run) => sum + run, 0));
+const menu = [
+  { said: "Soupe à l’oignon", means: "Onion soup, under melted cheese" },
+  { said: "Croque-monsieur", means: "Toasted ham and cheese sandwich" },
+  { said: "Tarte Tatin", means: "Caramelised upside-down apple tart" },
+];
+const dinners = [
+  { day: "Mon", meal: "Dal with rice" },
+  { day: "Tue", meal: "Mushroom risotto" },
+  { day: "Wed", meal: "Paneer tikka wraps" },
+  { day: "Thu", meal: "Black bean chilli" },
+];
+---
+
+<ul class="glimpses">
+  <li>
+    <figure data-accent="teal">
+      <div class="card">
+        <p class="asked">How tall is Everest?</p>
+        <div class="made">
+          <p class="small">Its summit, measured in 2020</p>
+          <p class="number">8,849 m</p>
+          <p class="sources"><span>wikipedia.org</span><span>britannica.com</span></p>
+        </div>
+      </div>
+      <figcaption>It looks things up, and shows where each fact came from.</figcaption>
+    </figure>
+  </li>
+
+  <li>
+    <figure data-accent="blue">
+      <div class="card">
+        <p class="asked">Will it rain on Saturday?</p>
+        <div class="made">
+          <p class="heading voice">Rain from about 3pm</p>
+          <ol class="hours">
+            {
+              hours.map((hour) => (
+                <li>
+                  <span class="chance">{hour.rain}%</span>
+                  <span class="bar" style={`--rain: ${hour.rain / 100}`} />
+                  <span class="temp">{hour.temp}°</span>
+                  <span class="small">{hour.time}</span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+      </div>
+      <figcaption>It checks the forecast where you are, hour by hour.</figcaption>
+    </figure>
+  </li>
+
+  <li>
+    <figure data-accent="orange">
+      <div class="card">
+        <p class="asked">Should I rent or buy?</p>
+        <div class="made">
+          <p class="heading voice">First, how long will you stay?</p>
+          <p class="choices"><span>Under 3 years</span><span class="picked">3 to 7 years</span><span>Longer</span></p>
+          <p class="small">Then your rent, and the price of the home.</p>
+        </div>
+      </div>
+      <figcaption>When it needs more to go on, it asks first. Then it works it out.</figcaption>
+    </figure>
+  </li>
+
+  <li>
+    <figure data-accent="pink">
+      <div class="card">
+        <p class="asked"><span class="photo"><Icon name="photo" /></span>What does this say?</p>
+        <div class="made">
+          <dl class="menu">
+            {
+              menu.map((dish) => (
+                <div>
+                  <dt>{dish.said}</dt>
+                  <dd>{dish.means}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </div>
+      <figcaption>Show it a photo of a menu or a sign. It reads it, and says it in your language.</figcaption>
+    </figure>
+  </li>
+
+  <li>
+    <figure data-accent="green">
+      <div class="card">
+        <p class="asked">Keep track of my runs</p>
+        <div class="made">
+          <p class="small">This month</p>
+          <p class="number">{total} km</p>
+          <p class="runs">{runs.map((run) => <span style={`--run: ${run / longest}`} />)}</p>
+          <p class="add">+ Add a run</p>
+        </div>
+      </div>
+      <figcaption>Lists and logs stay with your pages, and grow as you add to them.</figcaption>
+    </figure>
+  </li>
+
+  <li>
+    <figure data-accent="indigo">
+      <div class="card">
+        <p class="asked">Plan dinners for the week</p>
+        <div class="made">
+          <p class="knows">Remembering you’re vegetarian</p>
+          <dl class="dinners">
+            {
+              dinners.map((dinner) => (
+                <div>
+                  <dt>{dinner.day}</dt>
+                  <dd>{dinner.meal}</dd>
+                </div>
+              ))
+            }
+          </dl>
+        </div>
+      </div>
+      <figcaption>It remembers what you tell it, and you can see and change what it knows.</figcaption>
+    </figure>
+  </li>
+</ul>
+
+<style>
+  .glimpses {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+    gap: 36px 20px;
+    margin-top: 36px;
+  }
+
+  figure {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%;
+  }
+
+  /* A page in its own colors, with the request that made it on top, as the composer shows it. */
+  .card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 12px 12px 20px;
+    border-radius: 28px;
+    background: var(--wash);
+    box-shadow: inset 0 0 0 0.5px var(--edge);
+  }
+
+  .asked {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 14px;
+    border-radius: 18px;
+    background: var(--glass);
+    box-shadow:
+      inset 0 0 0 0.5px var(--glass-edge),
+      inset 0 1px 0 var(--glass-shine);
+    font-size: var(--t-small);
+    font-weight: 500;
+  }
+
+  .photo {
+    display: inline-grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 7px;
+    background: linear-gradient(135deg, var(--accent), var(--companion));
+    color: #fff;
+  }
+
+  .photo :global(svg) {
+    width: 15px;
+    height: 15px;
+  }
+
+  .made {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 8px;
+  }
+
+  .small {
+    color: var(--ink-2);
+    font-size: 13px;
+  }
+
+  .made .number {
+    margin-top: -6px;
+    font-size: 40px;
+  }
+
+  .heading {
+    font-size: var(--t-body);
+  }
+
+  figcaption {
+    padding: 0 4px;
+    color: var(--ink-2);
+  }
+
+  /* Sources */
+  .sources {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sources span {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    color: var(--accent-ink);
+    font-size: 13px;
+    font-weight: 500;
+  }
+
+  /* Hours */
+  .hours {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 4px 0 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  .hours li {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .chance {
+    color: var(--accent-ink);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .bar {
+    width: 100%;
+    max-width: 30px;
+    height: 56px;
+    border-radius: 8px;
+    background:
+      linear-gradient(to top, var(--accent), var(--companion)) bottom / 100% calc(var(--rain) * 100%) no-repeat,
+      color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .temp {
+    font-weight: 600;
+    font-size: var(--t-small);
+  }
+
+  .hours .small {
+    font-size: 12px;
+  }
+
+  /* Choices */
+  .choices {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .choices span {
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--glass);
+    box-shadow: inset 0 0 0 0.5px var(--glass-edge);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .choices .picked {
+    background: linear-gradient(135deg, var(--accent), var(--companion));
+    box-shadow: none;
+    color: #fff;
+  }
+
+  /* Menu */
+  .menu div + div {
+    margin-top: 8px;
+    padding-top: 8px;
+    box-shadow: inset 0 0.5px 0 var(--line);
+  }
+
+  .menu dt {
+    font-weight: 600;
+  }
+
+  .menu dd {
+    color: var(--ink-2);
+    font-size: var(--t-small);
+  }
+
+  /* Runs */
+  .runs {
+    display: flex;
+    align-items: flex-end;
+    gap: 6px;
+    height: 56px;
+  }
+
+  .runs span {
+    flex: 1;
+    height: calc(var(--run) * 100%);
+    border-radius: 6px;
+    background: linear-gradient(to top, var(--accent), var(--companion));
+  }
+
+  .add {
+    padding-top: 8px;
+    box-shadow: inset 0 0.5px 0 var(--line);
+    color: var(--accent-ink);
+    font-weight: 500;
+  }
+
+  /* Memory */
+  .knows {
+    align-self: flex-start;
+    padding: 5px 12px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, var(--accent), var(--companion));
+    color: #fff;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .dinners div {
+    display: flex;
+    gap: 12px;
+    padding: 6px 0;
+  }
+
+  .dinners div + div {
+    box-shadow: inset 0 0.5px 0 var(--line);
+  }
+
+  .dinners dt {
+    width: 2.6em;
+    color: var(--ink-2);
+  }
+</style>
