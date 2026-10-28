@@ -9,6 +9,7 @@ struct DebugView: View {
     let modelName: String
     @AppStorage("provider") private var provider = Composer.Provider.dream.rawValue
     @AppStorage("xaiModel") private var xaiModel = Composer.xaiModelID
+    @AppStorage(ServerCompose.key) private var serverCompose = false
     @State private var xaiKey = ""
     @State private var hasXAIKey = XAILanguageModel.savedKey != nil
     @Environment(\.dismiss) private var dismiss
@@ -42,6 +43,13 @@ struct DebugView: View {
                     Text("Model")
                 } footer: {
                     Text("Dream reaches Grok through its own server, with your account's pages. Grok with my key sends requests straight to xAI with your API key, kept in the Keychain. Private Cloud Compute needs an entitlement Apple grants on request. If the chosen model can't be used, Dream tries the next one.")
+                }
+                Section {
+                    Toggle("Make pages on Dream's server", isOn: $serverCompose)
+                } header: {
+                    Text("Pages")
+                } footer: {
+                    Text("New pages are made by Dream's server, with your account, instead of on this iPhone, so a page goes on being made when you leave it and is on the shelf when it's done. Changes to a page are still made here. Launching with -DreamServerCompose 1 turns it on too.")
                 }
                 PlanSection()
                 ShareServerSettings()

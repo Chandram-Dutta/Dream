@@ -7,6 +7,8 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \SavedSurface.updatedAt, order: .reverse) private var surfaces: [SavedSurface]
+    /// Pages still being made on Dream's server.
+    @Query(sort: \StartedPage.startedAt, order: .reverse) private var started: [StartedPage]
     @State private var intent = ""
     @State private var photoItem: PhotosPickerItem?
     @State private var photo: UIImage?
@@ -43,7 +45,7 @@ struct HomeView: View {
                         .buttonStyle(.plain)
                         .panel(palette)
                     }
-                    if !surfaces.isEmpty {
+                    if !surfaces.isEmpty || !forming.isEmpty {
                         shelf
                     }
                     ideaList
@@ -64,6 +66,7 @@ struct HomeView: View {
             // whole page off in any direction, and pages are full of things a finger drags sideways.
             .navigationDestination(item: $request) { SurfaceScreen(request: $0) }
             .navigationDestination(for: SavedSurface.self) { SurfaceScreen(saved: $0) }
+            .navigationDestination(for: FormingPage.self) { SurfaceScreen(forming: $0) }
             // Shared with the user, from a link (SharedLinks.swift).
             .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
@@ -119,8 +122,30 @@ struct HomeView: View {
 
     // MARK: - Shelf
 
+    /// Started pages that aren't saved yet. One that came by sync before its record went is
+    /// shown once, as the page.
+    private var forming: [StartedPage] {
+        let saved = Set(surfaces.map(\.id))
+        return started.filter { !saved.contains($0.pageID) }
+    }
+
     private var shelf: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
+            ForEach(forming) { started in
+                NavigationLink(value: FormingPage(started)) {
+                    FormingTile(started: started)
+                }
+                .buttonStyle(.plain)
+                .transition(.blurReplace)
+                .contextMenu {
+                    // Nothing on the server stops a page part way, so only one that failed can go.
+                    if started.failure != nil {
+                        Button("Delete", systemImage: "trash", role: .destructive) {
+                            ServerPages.shared.discard(started.pageID)
+                        }
+                    }
+                }
+            }
             ForEach(surfaces) { saved in
                 NavigationLink(value: saved) {
                     SurfaceTile(saved: saved)
@@ -312,6 +337,68 @@ struct SurfaceTile: View {
         .clipShape(.rect(cornerRadius: 26))
         .overlay(RoundedRectangle(cornerRadius: 26).strokeBorder(palette.edge, lineWidth: 0.5))
         .contentShape(.rect(cornerRadius: 26))
+    }
+}
+
+/// A page still being made on Dream's server, on the shelf. Nothing stands in for the page:
+/// Dream's light moves through the tile while Dream works and holds still while a question waits
+/// for the user, and it turns to the page's colors once the page knows its subject, with its
+/// title as it's written, or the request until there is one.
+struct FormingTile: View {
+    let started: StartedPage
+    private let pages = ServerPages.shared
+
+    var body: some View {
+        let composer = pages.following[started.pageID]
+        let page = composer?.surface.flatMap { $0.title.isEmpty ? nil : $0 }
+        let failure = started.failure ?? composer.flatMap(Self.failure)
+        let waiting = composer?.asking.isWaiting ?? false
+        let palette = page?.palette ?? .dream
+        VStack(alignment: .leading, spacing: 6) {
+            if failure != nil {
+                Image(systemName: "exclamationmark.triangle.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.orange)
+            } else if let page {
+                Image(systemName: page.symbolName)
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(palette.accent)
+                    .transition(.blurReplace)
+            }
+            Spacer(minLength: 20)
+            Text(page?.title ?? started.intent)
+                .font(.display(.subheadline))
+                .lineLimit(3)
+                .contentTransition(.opacity)
+            if let failure {
+                Text(failure)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .lineLimit(2)
+            }
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
+        .background {
+            // Moving while it's Dream's turn, still while it's the user's; each step of the
+            // work and each block landing surges it, as on the page's own screen.
+            Aura(palette: palette, energy: failure != nil ? 0 : waiting ? 0.04 : 0.8, flood: failure != nil ? 0 : 1,
+                 pulse: (composer?.trail.count ?? 0) + (composer?.surface?.blocks.count ?? 0))
+                .animation(.easeInOut(duration: 1.4), value: waiting)
+                .animation(.easeInOut(duration: 1.2), value: failure != nil)
+        }
+        .clipShape(.rect(cornerRadius: 26))
+        .overlay(RoundedRectangle(cornerRadius: 26).strokeBorder(palette.edge, lineWidth: 0.5))
+        .contentShape(.rect(cornerRadius: 26))
+        .animation(.smooth(duration: 0.6), value: page?.title)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(failure.map { "\(started.intent). Couldn't make this page: \($0)" }
+            ?? (waiting ? "\(page?.title ?? started.intent). Dream has a question" : "Making a page for: \(started.intent)"))
+    }
+
+    private static func failure(_ composer: Composer) -> String? {
+        if case .failed(let message) = composer.phase { return message }
+        return nil
     }
 }
 
