@@ -4,7 +4,7 @@
 // in-process (model.ts), so the answer arrives as the app's would: chat completion chunks, with
 // ": thinking" comments while the model is quiet (stream.ts).
 //
-// No imports, so test/unit.mjs runs it in Node.
+// No imports, so test/compose.mjs runs it in Node.
 
 type JSONObject = Record<string, unknown>;
 

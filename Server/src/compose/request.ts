@@ -2,7 +2,7 @@
 // and its photo within the sizes the app sends, the locale's fields, the context lines, and an id
 // the app's sync can keep the page under.
 //
-// No imports, so test/unit.mjs runs it in Node.
+// Only types are imported, so test/compose.mjs runs it in Node.
 
 import type { ComposeRequest } from "./contract";
 

@@ -3,7 +3,7 @@
 // same articles a page made on the phone would. In another language, that language's Wikipedia
 // is searched first, and English is the fallback.
 //
-// No imports, so test/unit.mjs runs it in Node. `fetch` can be a stand-in.
+// No imports, so test/compose.mjs runs it in Node, with a stand-in for `fetch`.
 
 /** Wikipedia's article for a page, as the app's Reference. */
 export interface Reference {

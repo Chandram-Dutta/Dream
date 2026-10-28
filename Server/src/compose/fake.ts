@@ -5,7 +5,7 @@
 // about Mercury and nothing otherwise; the writing looks its subject up first when the request
 // says "look up", then streams a small page, thinking a little before it starts.
 //
-// No imports, so test/unit.mjs runs it in Node.
+// No imports, so test/compose.mjs runs it in Node.
 
 type JSONObject = Record<string, unknown>;
 

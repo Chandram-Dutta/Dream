@@ -3,7 +3,7 @@
 // (docs/ServerGeneration.md). Nothing here is a prompt of its own. Templates hold {{slots}};
 // this fills them, and joins lists the way the Swift functions do.
 //
-// No imports, so test/unit.mjs runs it in Node.
+// No imports, so test/compose.mjs runs it in Node.
 
 type JSONObject = Record<string, unknown>;
 

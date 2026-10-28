@@ -336,6 +336,15 @@ console.log("The loop: a page, held while the check decides");
   expect(lines().some((line) => line === "Written in English, for metric units") && lines().at(-1).startsWith("Done in "), "it says what it's written in, and when it's done");
 }
 
+console.log("The loop: Auto, when it can't be asked");
+{
+  const model = fakeModelOf({ write: () => stream(pieces(JSON.stringify(page()))) });
+  const { outcome, lines } = await runLoop(model, { route: async () => { throw new Error("down"); } });
+  expect(outcome.kind === "done" && lines().includes("Auto → Dream's default · low (the router didn't answer: Something went wrong. Try again in a moment.)") && !("model" in model.calls.write[0]) && model.calls.write[0].reasoning_effort === "low", "the page is made on the server's default, thinking low");
+  const named = await runLoop(model, {}, startFresh(), { ...REQUEST, model: "grok-4.7", thinking: "high" });
+  expect(named.outcome.model === "Dream (grok-4.7)" && model.calls.write.at(-1).model === "grok-4.7" && model.calls.write.at(-1).reasoning_effort === "high", "a model picked by name isn't routed, and thinks as long as asked");
+}
+
 console.log("The loop: tools");
 {
   const tools = fakeTools();

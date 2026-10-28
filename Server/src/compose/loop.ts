@@ -349,7 +349,18 @@ export class PageLoop {
   private async route(): Promise<void> {
     const started = this.now;
     const image = this.request.image ? `data:image/jpeg;base64,${this.request.image}` : undefined;
-    const pick = await abortable(this.services.route(this.request.request.slice(0, 4_000), image), this.signal);
+    let pick: PagePick;
+    try {
+      pick = await abortable(this.services.route(this.request.request.slice(0, 4_000), image), this.signal);
+    } catch (error) {
+      if (this.signal.aborted) throw this.signal.reason;
+      // Auto shouldn't stop a page from being made: the server's default, as if Auto weren't on.
+      pick = { model: "", effort: "low", name: "Dream's default", category: "other", difficulty: "easy", why: "" };
+      this.pick = pick;
+      this.events.picked(pick);
+      this.note(`Auto → ${pick.name} · ${pick.effort} (the router didn't answer: ${describe(error)})`);
+      return;
+    }
     this.pick = pick;
     this.events.picked(pick);
     this.note(`Auto → ${pick.name} · ${pick.effort} (${pick.category}, ${pick.difficulty}: ${pick.why}; ${elapsed(started, this.now)})`);

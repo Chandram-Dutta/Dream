@@ -8,7 +8,7 @@
 // to the schema the model writes to, as the app's decoding does: an enum's value that isn't one
 // of its cases (yet) is left out, like a block whose kind so far is "hea".
 //
-// No imports, so test/unit.mjs runs it in Node.
+// No imports, so test/compose.mjs runs it in Node.
 
 type JSONObject = Record<string, unknown>;
 

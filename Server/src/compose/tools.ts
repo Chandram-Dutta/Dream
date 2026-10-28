@@ -8,7 +8,7 @@
 // What comes back from the web is untrusted. It reaches the model only between random markers,
 // labelled as data, and kept short.
 //
-// No imports, so test/unit.mjs runs it in Node.
+// Only types are imported, so test/compose.mjs runs it in Node.
 
 import type { Generation, ToolDefinition } from "./prompts";
 import type { Reference } from "./lookup";
