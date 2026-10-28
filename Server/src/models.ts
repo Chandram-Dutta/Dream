@@ -3,9 +3,9 @@
 // for none; the server decides, so models can change without an app update.
 //
 // Each model is reached through Dream's AI Gateway (model.ts): xAI's through its Responses API
-// with Dream's xAI key, Workers AI's through the Worker's AI binding, billed to the account, and
-// Sarvam's through the gateway's custom provider `sarvam` (made with `cf ai-gateway
-// custom-providers create`) with Dream's Sarvam key.
+// with Dream's xAI key, and Workers AI's through the Worker's AI binding, billed to the account.
+// Sarvam's go straight to Sarvam with Dream's Sarvam key: the gateway's custom provider for it
+// fails every request (model.ts, askSarvam).
 //
 // No imports, so test/unit.mjs runs it in Node.
 

@@ -285,9 +285,11 @@ async function askWorkersAI(env: ModelEnv, model: Model, chat: Record<string, un
   return Response.json(workersCompletion(answer, model.id));
 }
 
-/** Asks one of Sarvam's models (its OpenAI-compatible `/v2/chat/completions`), through the
- * gateway's custom provider, or straight there without a gateway. Its stream is OpenAI's chunks,
- * smoothed as Workers AI's are (workersai.ts). */
+/** Asks one of Sarvam's models (its OpenAI-compatible `/v2/chat/completions`), straight from the
+ * Worker. The gateway's custom provider `sarvam` answers every request with error 2006 ("the
+ * provider did not return a valid response") while the same request sent directly works, so
+ * Sarvam skips the gateway; a direct call is logged nowhere either. Its stream is OpenAI's
+ * chunks, smoothed as Workers AI's are (workersai.ts). */
 async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unknown>, conversation: string): Promise<Response> {
   const headers = {
     "api-subscription-key": env.SARVAM_API_KEY?.trim() ?? "",
@@ -297,11 +299,7 @@ async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unkno
     "x-session-affinity": conversation,
   };
   const request = { ...chat, model: model.upstream };
-  const gateway = env.AI_GATEWAY?.trim();
-  const upstream =
-    gateway && env.AI
-      ? await env.AI.gateway(gateway).run({ provider: "custom-sarvam", endpoint: "v2/chat/completions", headers: { ...headers, "cf-aig-collect-log": "false", "cf-aig-skip-cache": "true" }, query: request })
-      : await fetch("https://api.sarvam.ai/v2/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
+  const upstream = await fetch("https://api.sarvam.ai/v2/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
   if (!upstream.ok) return upstream;
   if (chat.stream === true && upstream.body) {
     return new Response(workersStream(upstream.body, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
