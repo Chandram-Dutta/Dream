@@ -24,11 +24,12 @@ const composer = element("[data-composer]");
 const hold = element("[data-hold]");
 const typed = element("[data-typed]");
 const said = element("[data-said]");
+const sheet = element("[data-sheet]");
 const stage = element("[data-stage]");
 const others = element("[data-others]");
 const pages = new Map(DEMOS.map((demo) => [demo.id, element(`[data-demo="${demo.id}"]`)]));
 const working = controllers(stage, units);
-const aura = startAura(element("[data-aura]"), root.dataset.accent as Accent);
+const aura = startAura(element("[data-aura]"), root.dataset.accent as Accent, element("[data-hero]"));
 
 const wait = (ms: number) => new Promise((done) => setTimeout(done, ms));
 
@@ -50,10 +51,8 @@ async function ask(id: DemoID, opening = false) {
     button.setAttribute("aria-pressed", String(button.dataset.ask === id));
   }
 
-  // The page that's there goes, holding its space until the next one forms, and the other
-  // requests step aside until it has.
-  if (!opening) stage.style.minHeight = `${stage.offsetHeight}px`;
-  others.removeAttribute("data-ready");
+  // The page that's there goes, and the sheet holds its size until the next one forms.
+  if (sheet.hasAttribute("data-open")) sheet.style.height = `${sheet.offsetHeight}px`;
   for (const [other, element] of pages) {
     if (other === id || !element.hasAttribute("data-shown")) continue;
     element.setAttribute("data-leaving", "");
@@ -81,7 +80,8 @@ async function ask(id: DemoID, opening = false) {
     page.removeAttribute("data-leaving");
     page.setAttribute("data-shown", "");
     page.setAttribute("data-formed", "");
-    stage.style.minHeight = "";
+    sheet.setAttribute("data-open", "");
+    sheet.style.height = "";
     others.setAttribute("data-ready", "");
     working[id].shown();
     return;
@@ -108,19 +108,36 @@ async function ask(id: DemoID, opening = false) {
   await wait(opening ? 1700 : 1000);
   if (!current()) return;
 
-  // It writes, and the page forms.
+  // It writes, and the page forms on its sheet.
   aura.energy(0.5, 0.8);
+  sheet.setAttribute("data-open", "");
   page.removeAttribute("data-leaving");
   page.setAttribute("data-shown", "");
-  stage.style.minHeight = "";
+  fit();
   // The blocks start from their unformed state before they form.
   void page.offsetWidth;
   page.setAttribute("data-formed", "");
   working[id].shown();
   await wait(900);
   if (!current()) return;
-  aura.energy(0.12, 1.8);
+  aura.energy(0, 1.8);
   others.setAttribute("data-ready", "");
+}
+
+/** Eases the sheet from the size it held to the new page's, then lets it size itself again, so a
+ * list can grow. */
+function fit() {
+  if (!sheet.style.height) return;
+  const style = getComputedStyle(sheet);
+  const target = stage.offsetHeight + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom);
+  if (Math.abs(target - sheet.offsetHeight) < 1) {
+    sheet.style.height = "";
+    return;
+  }
+  sheet.style.height = `${target}px`;
+  setTimeout(() => {
+    if (sheet.style.height === `${target}px`) sheet.style.height = "";
+  }, 700);
 }
 
 others.addEventListener("click", (event) => {

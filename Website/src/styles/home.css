@@ -10,11 +10,13 @@ body {
 
 /* MARK: - Aura */
 
+/* Behind the whole window, and fixed there: the first screen scrolls over it, and the rest of
+   the page slides up over it. Its size never changes, so neither does the field. */
 .aura {
-  position: absolute;
+  position: fixed;
+  z-index: -1;
   inset: 0 0 auto;
-  height: max(640px, min(100svh, 1000px));
-  z-index: 0;
+  height: 100lvh;
   pointer-events: none;
 }
 
@@ -34,9 +36,10 @@ body {
 html:not(.js) .aura,
 .aura[data-still] {
   background:
-    radial-gradient(70% 60% at 12% 0%, color-mix(in srgb, var(--accent) 42%, transparent), transparent 70%),
-    radial-gradient(60% 55% at 70% 0%, color-mix(in srgb, var(--companion) 34%, transparent), transparent 70%),
-    radial-gradient(40% 40% at 95% 20%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 70%);
+    radial-gradient(60% 50% at 10% 5%, color-mix(in srgb, var(--accent) 50%, transparent), transparent 75%),
+    radial-gradient(55% 45% at 90% 15%, color-mix(in srgb, var(--companion) 45%, transparent), transparent 75%),
+    radial-gradient(60% 50% at 50% 70%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 75%),
+    color-mix(in srgb, var(--accent) 22%, var(--paper));
 }
 
 /* MARK: - Header */
@@ -47,7 +50,7 @@ html:not(.js) .aura,
   display: flex;
   align-items: center;
   height: calc(64px + env(safe-area-inset-top));
-  padding: env(safe-area-inset-top) var(--gutter) 0;
+  padding: env(safe-area-inset-top) max(var(--gutter), (100% - var(--column)) / 2) 0;
 }
 
 .mark {
@@ -68,10 +71,18 @@ html:not(.js) .aura,
 
 /* MARK: - Composer */
 
+/* The first screen: at least the whole window, all of it Aura. */
 .hero {
   position: relative;
-  z-index: 1;
-  padding: 0 var(--gutter);
+  min-height: calc(100svh - 64px - env(safe-area-inset-top));
+  padding: 0 var(--gutter) 120px;
+}
+
+/* Everything after the first screen, on the page's own color, rising out of the Aura. */
+.paper {
+  position: relative;
+  padding-top: 1px;
+  background: linear-gradient(to bottom, transparent, var(--paper) 200px);
 }
 
 .ask {
@@ -146,6 +157,17 @@ html:not(.js) .aura,
   display: inline-block;
 }
 
+/* Before it types, the composer says what it's for, as the app's does. */
+.placeholder {
+  display: none;
+  margin-left: 2px;
+  color: var(--ink-2);
+}
+
+.js .composer:not([data-live]) .placeholder {
+  display: inline;
+}
+
 @keyframes blink {
   50% {
     opacity: 0;
@@ -186,9 +208,31 @@ html:not(.js) .aura,
 
 /* MARK: - The page it makes */
 
+/* The page forms on a frosted sheet, so it reads over the moving colors. Between pages the sheet
+   holds its size, then eases to the next one's (scripts/home.ts). */
+.sheet {
+  margin-top: 16px;
+  padding: 30px;
+  overflow: clip;
+  border-radius: 34px;
+  background: var(--sheet);
+  box-shadow:
+    inset 0 0 0 0.5px var(--glass-edge),
+    inset 0 1px 0 var(--glass-shine),
+    0 40px 80px -48px color-mix(in srgb, var(--accent) 70%, transparent);
+  transition:
+    opacity 0.7s var(--ease),
+    transform 0.9s var(--ease),
+    height 0.6s var(--ease);
+}
+
+.js .sheet:not([data-open]) {
+  opacity: 0;
+  transform: translateY(24px) scale(0.98);
+}
+
 .stage {
   display: grid;
-  margin-top: 28px;
 }
 
 .page {
@@ -248,6 +292,7 @@ html:not(.js) .aura,
 
 .text {
   max-width: 36em;
+  text-wrap: pretty;
   font-size: var(--t-lead);
   line-height: 1.45;
 }
@@ -652,7 +697,7 @@ html:not(.js) .aura,
 .segmented {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(var(--count, 3), 1fr);
   padding: 3px;
   border-radius: 999px;
   background: var(--fill);
@@ -663,7 +708,7 @@ html:not(.js) .aura,
   top: 3px;
   bottom: 3px;
   left: 3px;
-  width: calc((100% - 6px) / 3);
+  width: calc((100% - 6px) / var(--count, 3));
   border-radius: 999px;
   background: var(--knob);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
@@ -689,8 +734,13 @@ html:not(.js) .aura,
 
 /* MARK: - Asking another */
 
+/* Other requests, right under the composer, so they're always on the first screen. */
 .others {
-  margin-top: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  margin-top: 14px;
   transition:
     opacity 0.6s var(--ease),
     transform 0.8s var(--ease),
@@ -704,7 +754,6 @@ html:not(.js) .aura,
 }
 
 .others-label {
-  margin-bottom: 10px;
   color: var(--ink-2);
   font-size: var(--t-small);
 }
@@ -738,30 +787,27 @@ html:not(.js) .aura,
 }
 
 .others button[aria-pressed="true"] {
-  background: var(--wash);
-  box-shadow: inset 0 0 0 0.5px var(--edge);
-  color: var(--accent-ink);
+  background: linear-gradient(135deg, var(--accent), var(--companion));
+  box-shadow: none;
+  color: #fff;
+  font-weight: 600;
 }
 
 /* MARK: - Sections */
 
 .claim,
-.more,
-.details,
-.foot {
+.more {
   width: min(100% - 2 * var(--gutter), var(--column));
   margin-inline: auto;
 }
 
-.claim {
-  width: min(100%, var(--column));
-  margin-top: clamp(96px, 14vh, 160px);
+.claim h1,
+.more h2 {
+  font-size: var(--t-head);
 }
 
-.claim h1,
-.more h2,
-.details h2 {
-  font-size: var(--t-head);
+.claim {
+  margin-top: clamp(120px, 16vh, 176px);
 }
 
 .claim p {
@@ -775,85 +821,10 @@ html:not(.js) .aura,
   margin-top: clamp(112px, 16vh, 176px);
 }
 
-.asks {
-  margin-top: 40px;
-}
-
-.asks li + li {
-  margin-top: 36px;
-}
-
-.said {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: var(--t-title);
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-}
-
-.attached {
-  display: inline-grid;
-  flex: none;
-  place-items: center;
-  width: 1.5em;
-  height: 1.5em;
-  border-radius: 10px;
-  background: var(--wash);
-  color: var(--accent-ink);
-}
-
-.attached svg {
-  width: 0.9em;
-  height: 0.9em;
-}
-
-.made {
-  max-width: 34em;
-  margin-top: 8px;
-  color: var(--ink-2);
-  font-size: var(--t-lead);
-}
-
-.details {
-  margin-top: clamp(96px, 14vh, 152px);
-}
-
-.details dl {
-  margin-top: 28px;
-}
-
-.details dl > div {
-  display: grid;
-  grid-template-columns: 9.5em 1fr;
-  gap: 4px 24px;
-  padding: 18px 0;
-  box-shadow: inset 0 0.5px 0 var(--line);
-}
-
-.details dt {
-  font-weight: 600;
-}
-
-.details dd {
-  color: var(--ink-2);
-}
-
-.details a {
-  color: var(--accent-ink);
-  text-underline-offset: 3px;
-}
-
-@media (max-width: 560px) {
-  .details dl > div {
-    grid-template-columns: 1fr;
-  }
-}
-
 .foot {
-  margin-top: clamp(120px, 18vh, 200px);
-  padding-bottom: calc(56px + env(safe-area-inset-bottom));
+  position: relative;
+  padding: clamp(120px, 18vh, 200px) max(var(--gutter), (100% - var(--column)) / 2) calc(56px + env(safe-area-inset-bottom));
+  background: var(--paper);
 }
 
 .foot nav {
@@ -881,6 +852,28 @@ html:not(.js) .aura,
 }
 
 @media (max-width: 560px) {
+  /* One row the width of the screen, swiped sideways. */
+  .others {
+    flex-wrap: nowrap;
+    margin-inline: calc(-1 * var(--gutter));
+    padding: 2px var(--gutter);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .others::-webkit-scrollbar {
+    display: none;
+  }
+
+  .others ul {
+    flex-wrap: nowrap;
+  }
+
+  .others-label,
+  .others li {
+    flex: none;
+  }
+
   .composer {
     padding-left: 18px;
     border-radius: 24px;
@@ -891,8 +884,13 @@ html:not(.js) .aura,
     height: 40px;
   }
 
+  .sheet {
+    padding: 22px 18px;
+    border-radius: 30px;
+  }
+
   .panel {
     padding: 20px 18px;
-    border-radius: 26px;
+    border-radius: 24px;
   }
 }

@@ -1,5 +1,6 @@
 ---
 import Get from "../components/Get.astro";
+import Glimpses from "../components/Glimpses.astro";
 import Icon from "../components/Icon.astro";
 import Bill from "../components/demos/Bill.astro";
 import Groceries from "../components/demos/Groceries.astro";
@@ -12,18 +13,6 @@ import "../styles/home.css";
 
 const first = DEMOS[0];
 const request = first.request(DEFAULT_UNITS);
-
-// What else Dream does, as someone would ask for it, and what they'd get.
-const asks = [
-  { said: "Will it rain on Saturday?", made: "It checks the forecast where you are and lays out Saturday hour by hour." },
-  { said: "Keep track of my runs", made: "You get a log to add to. It stays with your pages, and its chart grows as you go." },
-  {
-    said: "Should I rent or buy?",
-    made: "When it needs more to go on, it asks first: your rent, the price, how long you’ll stay. Then it works it out, and leaves the numbers for you to change.",
-  },
-  { said: "What does this say?", photo: true, made: "Show it a photo of a sign or a menu. It reads it, translates it, and explains what’s on it." },
-  { said: "Who won last night’s match?", made: "It searches the web, and shows where each fact came from." },
-];
 ---
 
 <Base>
@@ -37,22 +26,15 @@ const asks = [
   </header>
 
   <main>
-    <section class="hero" aria-label="Dream, making a page">
+    <section class="hero" aria-label="Dream, making a page" data-hero>
       <div class="ask">
-        <div class="composer" data-composer data-state="asked">
+        <div class="composer" data-composer>
           <p class="request">
             <span class="hold" aria-hidden="true" data-hold>{request}</span>
-            <span class="typed" aria-hidden="true"><span data-typed>{request}</span><span class="caret"></span></span>
+            <span class="typed" aria-hidden="true"><span data-typed>{request}</span><span class="caret"></span><span class="placeholder">Ask for anything</span></span>
             <span class="visually-hidden" data-said>Asked: {request}</span>
           </p>
           <span class="send" aria-hidden="true"><Icon name="arrow-up" /></span>
-        </div>
-
-        <div class="stage" data-stage data-showing={first.id}>
-          <Horizon />
-          <Bill />
-          <Groceries />
-          <Pendulum />
         </div>
 
         <div class="others" data-others>
@@ -69,76 +51,33 @@ const asks = [
             }
           </ul>
         </div>
-      </div>
 
-      <div class="claim">
-        <h1 class="voice">Dream turns what you ask into a page you can use.</h1>
-        <p>
-          Type it, say it, or show it a photo. The page explains it, works it out, or both, with controls to play with.
-          Dream is an app for iPhone.
-        </p>
-        <Get />
+        <div class="sheet" data-sheet>
+          <div class="stage" data-stage>
+            <Horizon />
+            <Bill />
+            <Groceries />
+            <Pendulum />
+          </div>
+        </div>
       </div>
+    </section>
+
+    <div class="paper">
+    <section class="claim">
+      <h1 class="voice">Dream turns what you ask into a page you can use.</h1>
+      <p>
+        Type it, say it, or show it a photo. The page explains it, works it out, or both, with controls to play with.
+        Dream is an app for iPhone.
+      </p>
+      <Get />
     </section>
 
     <section class="more" aria-labelledby="more">
-      <h2 class="voice" id="more">More to ask</h2>
-      <ul class="asks">
-        {
-          asks.map((ask) => (
-            <li>
-              <p class="said">
-                {ask.photo && (
-                  <span class="attached" aria-label="With a photo">
-                    <Icon name="photo" />
-                  </span>
-                )}
-                {ask.said}
-              </p>
-              <p class="made">{ask.made}</p>
-            </li>
-          ))
-        }
-      </ul>
+      <h2 class="voice" id="more">What else you can ask</h2>
+      <Glimpses />
     </section>
-
-    <section class="details" aria-labelledby="yours">
-      <h2 class="voice" id="yours">Your pages are yours</h2>
-      <dl>
-        <div>
-          <dt>Your account</dt>
-          <dd>
-            Sign in with Apple. Your pages, lists and what Dream remembers about you are kept in your account, so they’re on
-            any iPhone you sign in on.
-          </dd>
-        </div>
-        <div>
-          <dt>Privacy</dt>
-          <dd>
-            They’re encrypted on the way and on disk. Nobody at Dream looks at them, unless you ask for help with something
-            specific or the law requires it. <a href={LINKS.privacy}>Read the privacy policy</a>
-          </dd>
-        </div>
-        <div>
-          <dt>Sharing</dt>
-          <dd>Share a page and it becomes a link anyone can open in a browser. Stop sharing, and the link stops working.</dd>
-        </div>
-      </dl>
-    </section>
-
-    <section class="details" aria-labelledby="price">
-      <h2 class="voice" id="price">What it costs</h2>
-      <dl>
-        <div>
-          <dt>Free</dt>
-          <dd>Five pages a day, up to 30 a month.</dd>
-        </div>
-        <div>
-          <dt>Dream Plus</dt>
-          <dd>25 pages a day, a choice of model, and how long it thinks. $9.99 a month, or $79.99 a year.</dd>
-        </div>
-      </dl>
-    </section>
+    </div>
   </main>
 
   <footer class="foot">

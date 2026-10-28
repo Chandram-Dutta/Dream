@@ -239,3 +239,4 @@ function pendulum(page: HTMLElement, units: Units): Controller {
     },
   };
 }
+

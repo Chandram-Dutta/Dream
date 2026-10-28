@@ -20,16 +20,11 @@
   --glass: rgba(255, 255, 255, 0.74);
   --glass-edge: rgba(0, 0, 0, 0.07);
   --glass-shine: rgba(255, 255, 255, 0.9);
+  --sheet: rgba(255, 255, 255, 0.8);
   --knob: #ffffff;
-  /* Accent text: darkened in light mode so a big orange number still reads on white. */
-  --accent-ink: color-mix(in oklab, var(--accent), #000 24%);
-  --companion-ink: color-mix(in oklab, var(--companion), #000 24%);
-  --wash: color-mix(in srgb, var(--accent) 9%, transparent);
-  --edge: color-mix(in srgb, var(--accent) 22%, transparent);
-
   --face: "Mona Sans Variable", -apple-system, system-ui, sans-serif;
   --expanded: 125%;
-  --column: 660px;
+  --column: 680px;
   --gutter: clamp(20px, 5vw, 48px);
   /* SwiftUI's .smooth, near enough. */
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -39,7 +34,7 @@
   --t-small: 15px;
   --t-body: 17px;
   --t-ask: clamp(19px, 2vw, 23px);
-  --t-lead: clamp(19px, 1.7vw, 21px);
+  --t-lead: clamp(17px, 1.7vw, 21px);
   --t-title: clamp(24px, 2.8vw, 30px);
   --t-head: clamp(28px, 3.6vw, 40px);
   --t-number: clamp(44px, 6vw, 64px);
@@ -59,7 +54,23 @@
     --glass: rgba(30, 30, 32, 0.66);
     --glass-edge: rgba(255, 255, 255, 0.1);
     --glass-shine: rgba(255, 255, 255, 0.08);
+    --sheet: rgba(12, 12, 14, 0.6);
     --knob: #f2f2f7;
+  }
+}
+
+/* Colors made from the accent, worked out wherever an accent is set (palette.ts), so a page in
+   its own colors gets its own. Accent text is darkened in light mode, so a big orange number
+   still reads on white. */
+[data-accent] {
+  --accent-ink: color-mix(in oklab, var(--accent), #000 24%);
+  --companion-ink: color-mix(in oklab, var(--companion), #000 24%);
+  --wash: color-mix(in srgb, var(--accent) 9%, transparent);
+  --edge: color-mix(in srgb, var(--accent) 22%, transparent);
+}
+
+@media (prefers-color-scheme: dark) {
+  [data-accent] {
     --accent-ink: var(--accent);
     --companion-ink: var(--companion);
     --wash: color-mix(in srgb, var(--accent) 16%, transparent);

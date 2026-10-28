@@ -22,17 +22,24 @@ Versions are pinned exactly (Astro 7.3.8, Mona Sans 5.3.0 from Fontsource), and
 The page is a Dream page. When it opens, it shows what using Dream is like. Nothing explains it
 first:
 
-1. The Aura, in the time of day's colors, and an empty composer in the middle of the screen.
+1. The Aura fills the window in the time of day's colors, with the composer in the middle
+   saying "Ask for anything".
 2. "How far away is the horizon?" types itself in, and is sent. The composer rises to the top.
-3. The Aura thinks: it spreads down the screen and swirls, turning the colors of the page to come.
-4. The page forms, one block at a time, and works. Its slider moves the eye and the horizon in
-   the figure, and works out the distance.
+3. The Aura thinks: its lights speed up, swirl and brighten, turning the colors of the page to
+   come.
+4. The page forms on a frosted sheet, one block at a time, and works. Its slider moves the eye
+   and the horizon in the figure, and works out the distance.
 
-Then nothing moves unless the visitor asks for another page: splitting a bill (a slider and a
-stepper), a grocery list (tick things off, add your own) or a pendulum (it swings at the
-period shown, on Earth, the Moon or Mars). The bill is in the visitor's currency, and
-distances are in miles where people use them, from the browser's language. Below that, a few
-plain sections: what Dream is, more things to ask, privacy and sharing, and the price.
+Then the visitor can ask for another page, from the buttons under the composer: splitting a
+bill (a slider and a stepper), a grocery list (tick things off, add your own) or a pendulum (it
+swings at the period shown, on Earth, the Moon or Mars). The bill is in the visitor's currency,
+and distances are in miles where people use them, from the browser's language.
+
+Below the first screen: one line on what Dream is, then six more requests, each with a still
+glimpse of the page it makes (`src/components/Glimpses.astro`): looking things up with
+sources, the weather where you are, asking before it answers, reading a photo and translating
+it, a log that grows, and remembering you. The page talks about what Dream does; privacy, terms
+and support are the links in the footer.
 
 How it's built:
 
@@ -40,9 +47,12 @@ How it's built:
   Dream speaks: titles, headings and big numbers. Normal for your words and for reading.
 - **The app's own look.** iOS's system colors over white or black, the composer, the tinted
   panels, and iOS sliders, steppers and segmented controls (`src/styles/home.css`).
-- **The Aura** (`src/scripts/aura.ts`) is the app's `Aura.swift` in WebGL: nine points of the
-  page's two colors, blended by distance, drawn at a third of the screen's resolution. It
-  stops when it's off screen or the tab is hidden.
+- **The Aura** (`src/scripts/aura.ts`) is the app's `Aura.swift`, full screen, in WebGL:
+  wandering lights in three neighbouring hues of the page's color, and one that follows the
+  pointer or a finger. It's fixed behind the window, so its size never changes as the page
+  forms; the first screen scrolls over it and the rest of the page rises over it. It's drawn at
+  a third of the screen's resolution, and stops when the first screen is off screen or the tab
+  is hidden.
 - **Motion is transforms and opacity only.** Nothing is tied to the scroll and nothing snaps.
   The opening is the one thing that moves by itself (`src/scripts/home.ts`).
 - **Reduce Motion:** every page is simply there, and the Aura holds still.
@@ -55,10 +65,9 @@ Keep these in step when the product changes:
 
 | On the page | Source |
 |---|---|
-| Plans: 5 a day and 30 a month free, 25 a day with Plus, which also picks the model and how long it thinks; $9.99 a month or $79.99 a year | `Server/src/usage.ts` (`ALLOWANCES`, `status`), `Dream/Subscription/PlanView.swift` |
-| Encrypted on the way and on disk; nobody at Dream looks at pages, lists or memory | `Server/src/legal.ts` (privacy policy) |
-| Sharing makes a link that opens in a browser, and stops when you stop sharing | `Server/src/sharing.ts`, `Server/src/legal.ts` |
 | Weather, logs with charts, asking first, photos, translation, web search with sources | the app's blocks and tools (`Dream/UI/Blocks`, `Dream/Generation`) |
+| Remembering you, and seeing and changing what it knows | "What Dream knows" in the app (`Dream/UI/Memory`) |
+| Type it, say it, or show it a photo | the composer (`Dream/UI/HomeView.swift`) |
 
 ### Open TODOs
 

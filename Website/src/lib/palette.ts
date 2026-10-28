@@ -32,6 +32,21 @@ export const COMPANION: Record<Accent, Accent> = {
   cyan: "blue",
 };
 
+/** A hue on the accent's other side, for the site's Aura only: three neighbouring hues give the
+ * full-screen field more depth than two, still without a rainbow. */
+export const THIRD: Record<Accent, Accent> = {
+  blue: "indigo",
+  teal: "mint",
+  green: "mint",
+  mint: "green",
+  orange: "red",
+  pink: "purple",
+  purple: "pink",
+  indigo: "purple",
+  red: "pink",
+  cyan: "teal",
+};
+
 /** Palette.now in Theme.swift: mint in the morning, blue by day, orange in the evening, indigo at night. */
 export function accentAt(hour: number): Accent {
   return hour >= 5 && hour < 11 ? "mint" : hour >= 11 && hour < 17 ? "blue" : hour >= 17 && hour < 21 ? "orange" : "indigo";
