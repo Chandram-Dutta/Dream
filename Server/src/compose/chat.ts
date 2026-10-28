@@ -356,5 +356,8 @@ export async function readRound(stream: ReadableStream<Uint8Array>, activity: Ac
     return done(null);
   } finally {
     signal.removeEventListener("abort", stop);
+    // Lets go of the stream however the answer ended, so model.ts counts what it used: its meter
+    // records a stream once it ends or is let go, as when the app hangs up after [DONE].
+    reader.cancel().catch(() => undefined);
   }
 }

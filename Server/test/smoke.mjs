@@ -776,7 +776,7 @@ try {
   await runSync(server.base, expect, { quota: LOCAL_SYNC_QUOTA });
   if (!remote) await runPlan(server.base, xai);
   if (!remote) await runRoute(server.base, clef, xai);
-  if (!remote) await runCompose(server.base, expect, { appKey: LOCAL_APP_KEY, signIn: (name) => signIn(server.base, name) });
+  if (!remote) await runCompose(server.base, expect, { appKey: LOCAL_APP_KEY, signIn: (name) => signIn(server.base, name), query });
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;

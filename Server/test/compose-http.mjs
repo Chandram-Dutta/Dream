@@ -41,7 +41,7 @@ async function watch(base, token, id, after = 0, stop = (event) => event.type ==
   return { status: 200, events, text, type: response.headers.get("content-type") };
 }
 
-export async function runCompose(base, expect, { appKey, signIn }) {
+export async function runCompose(base, expect, { appKey, signIn, query }) {
   const alice = await signIn("compose-alice");
   const bob = await signIn("compose-bob");
   const carol = await signIn("compose-carol");
@@ -95,6 +95,12 @@ export async function runCompose(base, expect, { appKey, signIn }) {
   expect(body.history?.[0]?.kind === "asked" && body.history[0].text === ada.request && /^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d\.\d{3}Z$/.test(body.createdAt) && body.openCount === 0 && body.generationLog?.[0] === lines[0], "as the app's SurfacePayload, with its log");
   const usage = await (await fetch(`${base}/api/usage`, { headers: { Authorization: `Bearer ${alice.token}` } })).json();
   expect(usage.pages?.today === 1, "and it counted as one page, whatever it asked the model");
+  if (query && alice.user) {
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    const [day] = query(`SELECT tokens_in, tokens_out FROM usage WHERE user_id = '${alice.user}' AND period = '${new Date().toISOString().slice(0, 10)}'`);
+    const [counted] = query(`SELECT cost_micros FROM usage_pages WHERE user_id = '${alice.user}' AND page = '${id}'`);
+    expect(day?.tokens_in > 0 && day.tokens_out > 0 && counted?.cost_micros > 0, "what its model requests used is counted against the account, under the page");
+  }
 
   console.log("Pages on the server: a question, answered");
   const mercury = { request: "tell me about mercury", locale, pageID: uuid() };

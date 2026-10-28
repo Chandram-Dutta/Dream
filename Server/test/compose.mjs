@@ -277,6 +277,17 @@ console.log("Chat completions");
   expect(problem.transient && problem.message === "busy" && !allowance.transient && allowance.allowance, "busy is worth asking again; a used-up allowance isn't");
   const activity = new Activity(0);
   const round = await readRound(stream([{ reasoning_content: "hmm" }, { beat: true }, { content: '{"a":' }, { tool_calls: [{ index: 0, id: "c1", type: "function", function: { name: "lookup", arguments: '{"subject":' } }] }, { tool_calls: [{ index: 0, function: { arguments: '"x"}' } }] }]).body, activity, Date.now, () => undefined, new AbortController().signal);
+  let released = false;
+  const open = new ReadableStream({
+    start(controller) {
+      controller.enqueue(new TextEncoder().encode(`${chunk({ content: "{}" })}data: ${JSON.stringify({ choices: [], usage: { prompt_tokens: 1 } })}\n\ndata: [DONE]\n\n`));
+    },
+    cancel() {
+      released = true;
+    },
+  });
+  await readRound(open, new Activity(0), Date.now, () => undefined, new AbortController().signal);
+  expect(released, "after [DONE] the stream is let go, so model.ts's meter counts what it used");
   expect(round.text === '{"a":' && round.toolCalls.length === 1 && round.toolCalls[0].arguments === '{"subject":"x"}' && activity.heard > 0, "a round's text, and a tool call put together from its pieces");
 }
 
