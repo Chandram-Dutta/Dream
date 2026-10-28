@@ -1186,5 +1186,50 @@
     "type": "object"
    }
   }
- ]
+ ],
+ "templates": {
+  "gapRequest": "Request: {{request}}",
+  "gapRequestRemembering": "Request: {{request}}\n\nDream remembers these about the user: {{topics}}.",
+  "surfaceRequest": {
+   "alone": "Request: {{request}}",
+   "withContext": "Request: {{request}}\n\n{{context}}",
+   "withPhoto": "Request: {{request}}\n\nThe user attached a photo. If they're asking what something is, identify it; if it shows amounts or items, use them as starting values.",
+   "withPhotoAndContext": "Request: {{request}}\n\nThe user attached a photo. If they're asking what something is, identify it; if it shows amounts or items, use them as starting values.\n\n{{context}}"
+  },
+  "answers": {
+   "block": "Before building, the user answered:\n{{lines}}\nBuild the screen for these answers.",
+   "line": "- {{question}} {{choice}}",
+   "leftToDream": "- {{question}} You choose: pick what's most likely.",
+   "remembered": "- {{question}} {{choice}} (from what Dream remembers)"
+  },
+  "repair": {
+   "block": "That screen has problems:\n{{problems}}\n\nReturn the whole screen again with these problems fixed. Keep everything else the same.",
+   "problem": "- {{problem}}",
+   "restating": "{{asked}}\n\nYou began this screen, but it stopped before it was finished. What it has so far:\n{{screen}}\n\nIt has problems:\n{{problems}}\n\nReturn the whole screen, finished, with these problems fixed. Keep what's already there.",
+   "screen": "{{outline}}",
+   "screenWithLogic": "{{logic}}\nScreen:\n{{outline}}"
+  }
+ },
+ "toolText": {
+  "lookupEnough": "That's enough looking up for one screen. Build it from what you've found.",
+  "searchEnough": "That's enough searching for one screen. Build it from the pages you've read.",
+  "readEnough": "That's enough reading for one screen. Build it from the pages you've read.",
+  "readNotAddress": "That isn't a web address. Use one search gave you.",
+  "readAlready": "You've read that page already; its text is above.",
+  "searchFailed": "{{error}} Don't make up anything current: say on the screen what couldn't be checked.",
+  "readFailed": "{{error}} Don't use anything from that page; try another, or say what couldn't be checked.",
+  "webErrors": {
+   "-1": "Web search isn't set up on this phone.",
+   "0": "The web couldn't be reached just now.",
+   "400": "That address can't be read: Dream reads public web pages only.",
+   "401": "Web search didn't accept this phone: it needs someone signed in, using the app.",
+   "402": "Today's web searches and reads are used up.",
+   "403": "That site asks tools like Dream not to read it.",
+   "404": "There's no page at that address.",
+   "415": "That's a file, not a web page.",
+   "429": "Web search is busy, or has done all it can for today.",
+   "503": "Web search is busy, or has done all it can for today.",
+   "500": "That couldn't be read just now."
+  }
+ }
 }
