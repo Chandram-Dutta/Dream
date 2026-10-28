@@ -12,15 +12,15 @@
 // account like any small job that isn't a page. Nothing asked is logged or kept.
 //
 // The pick stays inside the account's plan, as /api/model would hold it anyway: testers may get
-// any model in the catalogue, everyone else only those offered (`MODELS`); Dream Plus thinks from
-// low to high, and the free plan low. If Clef can't be asked, or answers something that doesn't
+// any model in the catalogue, everyone else those offered (`MODELS`) and the ones the table routes
+// to (`routed` in models.ts); Dream Plus thinks from none to high, and the free plan none or low. If Clef can't be asked, or answers something that doesn't
 // read, the answer is the default (Grok 4.7, thinking low), never an error: Auto shouldn't stop a
 // page from being made.
 
 import { proveApp } from "./attest";
 import { signInNeeded, userFrom } from "./auth";
 import type { ModelEnv } from "./model";
-import { allowedEffort, CATALOG, choose, fitEffort, offered, type Effort, type Model } from "./models";
+import { allowedEffort, choose, fitEffort, usable as modelsFor, type Effort, type Model } from "./models";
 import { allowed, bodyBytes, isJSON, json, object, problem } from "./reply";
 import { classify, clefCost, clefInput, CLEF, DEFAULT_PICK, firstUsable, guess, readAnswers, TABLE, type Category, type Pick, type Row, type Signals } from "./router";
 import { accountOf, recordModel, type Account } from "./usage";
@@ -76,13 +76,13 @@ function withTimeout<T>(work: Promise<T>, ms: number): Promise<T> {
  * the level its plan allows. */
 export function pickFor(row: Row | null, account: Account, env: RouteEnv): { model: Model; effort: Effort | "none" } {
   // The same lists /api/model holds a request to: testers and the bench any model, everyone else
-  // those offered, and the Plus-only ones only on Dream Plus.
+  // those offered and the ones the table routes to, and the Plus-only ones only on Dream Plus.
   const anyModel = account.tester || env.DEV_LOGIN === "1";
-  const models = anyModel ? CATALOG : offered(env.MODELS);
+  const models = modelsFor(env.MODELS, anyModel);
   const level = (asked: Effort, model: Model) => fitEffort(allowedEffort(asked, account.plan, account.tester), model) ?? "none";
   const usable = (pick: Pick) => {
     const model = models.find((each) => each.id === pick.model);
-    return model !== undefined && (anyModel || !model.plus || account.plan === "plus") && level(pick.effort, model) === pick.effort;
+    return model !== undefined && (anyModel || !model.plus || model.routed || account.plan === "plus") && level(pick.effort, model) === pick.effort;
   };
   const picked = (row && firstUsable(row, usable)) ?? DEFAULT_PICK;
   const model = choose(picked.model, account.plan, models, anyModel);

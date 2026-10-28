@@ -32,6 +32,9 @@ export interface Model {
    * call: a round with tools goes first without the schema (toolsfirst.ts). True of what Workers
    * AI and Sarvam serve; Grok takes tools and a schema together. */
   toolsFirst: boolean;
+  /** Auto may send any account to it (router.ts): every pick in the routing table, none dearer
+   * than Grok 4.7. Picking it by hand is still for Dream Plus or testers. */
+  routed?: boolean;
 }
 
 /** How long a model thinks before it answers, from not at all to as long as it needs. */
@@ -76,6 +79,7 @@ export const CATALOG: Model[] = [
     price: { input: 2, cached: 0.5, output: 6 },
     efforts: [],
     toolsFirst: false,
+    routed: true,
   },
   {
     id: "deepseek-v4.1-flash",
@@ -87,6 +91,7 @@ export const CATALOG: Model[] = [
     price: { input: 0.3, cached: 0.006, output: 1.2 },
     efforts: ["none", "low", "high", "max"],
     toolsFirst: true,
+    routed: true,
   },
   {
     id: "glm-5.3-flash",
@@ -150,6 +155,7 @@ export const CATALOG: Model[] = [
     price: { input: 0.284, cached: 0.0057, output: 1.193 },
     efforts: ["low", "high", "max"],
     toolsFirst: true,
+    routed: true,
   },
   {
     id: "sarvam-gemma-4",
@@ -217,8 +223,17 @@ export function fitEffort(asked: string | undefined, model: Model): Effort | nul
  * Dream Plus low to high, everyone else low. */
 export function allowedEffort(asked: string | undefined, plan: string, tester: boolean): string | undefined {
   if (tester) return asked;
-  if (plan === "plus") return asked === "none" ? "low" : asked === "max" ? "high" : asked;
-  return "low";
+  // Not thinking is cheaper than thinking a little, so anyone may have it (Auto picks it often).
+  if (plan === "plus") return asked === "max" ? "high" : asked;
+  return asked === "none" ? "none" : "low";
+}
+
+/** The models a request may run on: every one for testers and the bench; for everyone else the
+ * ones offered (`MODELS`) and the ones Auto routes to. */
+export function usable(list: string | undefined, anyModel: boolean): Model[] {
+  if (anyModel) return CATALOG;
+  const models = offered(list);
+  return [...models, ...CATALOG.filter((model) => model.routed && !models.includes(model))];
 }
 
 /** The model a request runs on: the one asked for, if this server offers it and the account may
@@ -228,5 +243,5 @@ export function choose(asked: unknown, plan: string, models: Model[], anyModel =
   const fallback = models.find((model) => !model.plus) ?? models[0];
   const model = typeof asked === "string" ? models.find((each) => each.id === asked) : undefined;
   if (!model) return fallback;
-  return !model.plus || plan === "plus" || anyModel ? model : fallback;
+  return !model.plus || model.routed || plan === "plus" || anyModel ? model : fallback;
 }

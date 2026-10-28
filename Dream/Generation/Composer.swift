@@ -76,7 +76,7 @@ final class Composer {
     /// The model Dream's server is asked for: the one picked in Account, which only Dream Plus
     /// can use, or none, for the server's default (Server/src/models.ts). Testing builds can name
     /// one at launch, like `-xaiModel grok-4.7`.
-    nonisolated static var dreamModelID: String { Build.setting("xaiModel") ?? ModelChoice.picked ?? "" }
+    nonisolated static var dreamModelID: String { Build.setting("xaiModel") ?? ModelChoice.picked ?? ModelChoice.auto }
 
     /// Whether any model can make screens right now.
     static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }

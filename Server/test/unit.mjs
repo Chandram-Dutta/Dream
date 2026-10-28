@@ -11,7 +11,7 @@ import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
 import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
-import { CATALOG, allowedEffort, choose, fitEffort, offered } from "../src/models.ts";
+import { CATALOG, allowedEffort, choose, fitEffort, offered, usable } from "../src/models.ts";
 import { CLEF, DEFAULT_PICK, HARD_FROM, QUESTIONS, READS_PHOTOS, TABLE, TOPICS, classify, clefCost, clefInput, firstUsable, guess, nonLatin, readAnswers } from "../src/router.ts";
 import { withHeartbeat } from "../src/stream.ts";
 import { asksToolsFirst, TOOL_ROUNDS, toolsFirst, withoutSchema } from "../src/toolsfirst.ts";
@@ -343,11 +343,14 @@ const failedStream = await new Response(chatStream(events([{ type: "response.cre
 expect(failedStream.trimEnd().endsWith("data: [DONE]") && !failedStream.includes("secret prompt words"), "a failed answer ends without passing on what xAI said");
 
 console.log("Which model answers");
-const all = offered("grok-4.7,nonsense,grok-4.20-fast");
-expect(all.map((model) => model.id).join() === "grok-4.7,grok-4.20-fast" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
+const all = offered("grok-4.7,nonsense,kimi-k2.6");
+expect(all.map((model) => model.id).join() === "grok-4.7,kimi-k2.6" && offered("").length === CATALOG.length, "the models offered, in order, ignoring unknown ones");
 expect(choose(undefined, "free", all).id === "grok-4.7" && choose("default", "plus", all).id === "grok-4.7", "nothing asked for is the default, on either plan");
-expect(choose("grok-4.20-fast", "plus", all).id === "grok-4.20-fast" && choose("grok-4.20-fast", "free", all).id === "grok-4.7", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
-expect(choose("grok-4.20-fast", "free", all, true).id === "grok-4.20-fast", "test accounts on the bench may use any");
+expect(choose("kimi-k2.6", "plus", all).id === "kimi-k2.6" && choose("kimi-k2.6", "free", all).id === "grok-4.7", "a Plus model for Dream Plus; the default for everyone else, so older apps and lapsed plans still work");
+expect(choose("kimi-k2.6", "free", all, true).id === "kimi-k2.6", "test accounts on the bench may use any");
+const anyone = usable("grok-4.7", false);
+expect(anyone.some((model) => model.id === "deepseek-v4.1-flash") && !anyone.some((model) => model.id === "kimi-k2.6") && usable("grok-4.7", true).length === CATALOG.length, "everyone may run what Auto routes to; testers anything");
+expect(choose("deepseek-v4.1-flash", "free", anyone).id === "deepseek-v4.1-flash" && choose("sarvam-deepseek-v4.1-flash", "free", anyone).id === "sarvam-deepseek-v4.1-flash", "so a free account runs Auto's cheap picks");
 expect(choose("grok-5-heavy", "plus", all).id === "grok-4.7" && choose(42, "plus", all).id === "grok-4.7", "a model nobody offers, or one since retired, gets the default instead");
 expect(choose(undefined, "free", offered("grok-4.20-fast")).id === "grok-4.20-fast", "with only Plus models offered, the first is everyone's");
 const byID = (id) => CATALOG.find((model) => model.id === id);
@@ -357,8 +360,8 @@ expect(fitEffort("medium", byID("deepseek-v4.1-flash")) === "high" && fitEffort(
 expect(fitEffort("high", byID("mistral-small-3.1")) === null && fitEffort("low", byID("kimi-k2.6")) === "none", "a model that doesn't think gets no level at all");
 expect(CATALOG.every((model) => model.efforts.every((level) => ["none", "low", "medium", "high", "max"].includes(level))), "every model's levels are known ones");
 expect(allowedEffort("max", "plus", true) === "max" && allowedEffort("none", "plus", true) === "none", "testers may ask any level");
-expect(allowedEffort("none", "plus", false) === "low" && allowedEffort("max", "plus", false) === "high" && allowedEffort("medium", "plus", false) === "medium", "Dream Plus low to high");
-expect(allowedEffort("high", "free", false) === "low" && allowedEffort(undefined, "free", false) === "low", "the free plan low");
+expect(allowedEffort("none", "plus", false) === "none" && allowedEffort("max", "plus", false) === "high" && allowedEffort("medium", "plus", false) === "medium", "Dream Plus none to high");
+expect(allowedEffort("high", "free", false) === "low" && allowedEffort(undefined, "free", false) === "low" && allowedEffort("none", "free", false) === "none", "the free plan none or low: not thinking is cheaper");
 
 console.log("Auto: reading Clef");
 const clefSays = (answers) => ({ model: "clef-flash", answers, usage: { input_tokens: 812, output_tokens: 0 } });
@@ -408,17 +411,17 @@ expect(rows.every(({ row }) => row.picks.at(-1).model === DEFAULT_PICK.model && 
 // What route.ts asks of a pick: a model the account may use, at the level the bench used.
 const usableFor = (plan, tester, offeredIDs = ids) => (each) => {
   const model = byID(each.model);
-  return offeredIDs.includes(each.model) && (tester || !model.plus || plan === "plus") && (fitEffort(allowedEffort(each.effort, plan, tester), model) ?? "none") === each.effort;
+  return (offeredIDs.includes(each.model) || model.routed) && (tester || !model.plus || model.routed || plan === "plus") && (fitEffort(allowedEffort(each.effort, plan, tester), model) ?? "none") === each.effort;
 };
-// A row that starts on a pick thinking "none", which only testers may ask for.
+// A row that starts on a pick thinking "none".
 const unthinking = rows.map(({ row }) => row).find((row) => row.picks[0].effort === "none" && byID(row.picks[0].model).efforts.includes("none"));
 expect(unthinking && firstUsable(unthinking, usableFor("plus", true)) === unthinking.picks[0], "a tester gets the row's first pick as benched");
 const plusGets = unthinking && firstUsable(unthinking, usableFor("plus", false));
-expect(plusGets && plusGets !== unthinking.picks[0] && unthinking.picks.indexOf(plusGets) > 0, "Dream Plus can't think 'none', so that pick gives way to the row's next, not to a level never benched");
-expect(unthinking && firstUsable(unthinking, usableFor("free", false)) === unthinking.picks.at(-1), "the free plan, held to low and without Plus-only models, gets the row's last pick: the default");
+expect(plusGets === unthinking.picks[0], "and so does Dream Plus: Auto's picks, thinking none included, are open to everyone");
+expect(unthinking && firstUsable(unthinking, usableFor("free", false)) === unthinking.picks[0], "the free plan too");
 const live = TABLE.live.easy;
-expect(firstUsable(live, usableFor("plus", false)) === live.picks[0] && firstUsable(live, usableFor("free", false)) === live.picks.at(-1), "a Plus-only model for Dream Plus; the default for the free plan");
-expect(firstUsable(live, usableFor("plus", false, [DEFAULT_PICK.model])) === live.picks.at(-1), "only the models this server offers (MODELS)");
+expect(firstUsable(live, usableFor("plus", false)) === live.picks[0] && firstUsable(live, usableFor("free", false)) === live.picks[0], "a cheaper model the table routes to, on either plan");
+expect(firstUsable(live, usableFor("plus", false, [DEFAULT_PICK.model])) === live.picks[0], "Auto's picks run even where MODELS offers only the default to pick by hand");
 expect(firstUsable(live, () => false) === null, "and nothing usable gives nothing, so the default");
 const said = (content, more = []) => [{ role: "system", content: "Make one page." }, { role: "user", content }, ...more];
 expect(guess(said([{ type: "text", text: "Request: what is this?" }, { type: "image_url", image_url: { url: "data:image/jpeg;base64,AAAA" } }])).category === "photo", "without Clef: a photo in any message makes it a photo page");

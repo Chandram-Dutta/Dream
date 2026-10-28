@@ -620,9 +620,12 @@ logged).
 
 ### Routing
 
-**Auto** has the server pick the model, and how long it thinks, for each page. Testers see it in
-Account, right after the default (`GET /api/usage`). When it's picked, the app asks once as a page
-or a change starts (`Dream/Generation/Providers/Route.swift`):
+**Auto** has the server pick the model, and how long it thinks, for each page. It's everyone's
+default: first in the list `GET /api/usage` gives, and the free plan's only entry. Dream Plus can
+pick Grok 4.7 and its thinking by hand instead, and testers any model. Anyone may be routed to the
+table's picks (`routed` in models.ts), all of them no dearer than Grok 4.7, and to thinking "none",
+which is cheaper than low. Unless something else was picked, the app asks once as a page or a
+change starts (`Dream/Generation/Providers/Route.swift`):
 
 ```
 POST /api/route   { "request": "split this bill between the 4 of us", "hasImage": true,

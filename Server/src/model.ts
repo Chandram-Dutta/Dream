@@ -25,7 +25,7 @@ import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
 import { proveApp, type ProofEnv } from "./attest";
 import { userFrom, signInNeeded, type AuthEnv } from "./auth";
 import { allowed, bodyBytes, isJSON, problem } from "./reply";
-import { allowedEffort, CATALOG, choose, fitEffort, offered, type Model } from "./models";
+import { allowedEffort, CATALOG, choose, fitEffort, usable, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
 import { guessedPick } from "./route";
 import { AUTO } from "./router";
@@ -359,9 +359,10 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
     body.model = routed.model.id;
     body.reasoning_effort = routed.effort;
   }
-  // Testers (PLUS_ACCOUNTS) and the bench can use any model in the catalogue; everyone else, those offered.
+  // Testers (PLUS_ACCOUNTS) and the bench can use any model in the catalogue; everyone else, those
+  // offered and the ones Auto routes to.
   const anyModel = account.tester || env.DEV_LOGIN === "1";
-  const chosen = choose(body.model, account.plan, anyModel ? CATALOG : offered(env.MODELS), anyModel);
+  const chosen = choose(body.model, account.plan, usable(env.MODELS, anyModel), anyModel);
   const key = env.XAI_API_KEY?.trim();
   if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
   if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");

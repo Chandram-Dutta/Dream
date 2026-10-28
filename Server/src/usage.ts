@@ -219,10 +219,8 @@ async function add(env: UsageEnv, userID: string, counts: Counts, at: number, al
 
 const listed = ({ id, name, note, plus }: Model) => ({ id, name, note, plus });
 
-/** Auto in Account's list, right after the default. */
-function withAuto(models: ReturnType<typeof listed>[]): ReturnType<typeof listed>[] {
-  return [...models.slice(0, 1), { id: AUTO, name: "Auto", note: "Picks the model and thinking for each page", plus: true }, ...models.slice(1)];
-}
+/** Auto, everyone's default: it picks the model and thinking for each page (route.ts). */
+const AUTO_ENTRY = { id: AUTO, name: "Auto", note: "Picks the model and thinking for each page", plus: false };
 
 /** What the app shows: the plan, how many pages are left, and when more come. */
 export async function status(env: UsageEnv, userID: string, at = Date.now()): Promise<Record<string, unknown>> {
@@ -239,10 +237,12 @@ export async function status(env: UsageEnv, userID: string, at = Date.now()): Pr
     subscription: account.subscription,
     // Both plans, so the app can say what Dream Plus adds without a second request.
     plans: Object.fromEntries(Object.entries(allowances(env)).map(([plan, { pagesPerDay, pagesPerMonth }]) => [plan, { pagesPerDay, pagesPerMonth }])),
-    // The models Account can offer, the default first: every one in the catalogue for testers,
-    // with Auto, which picks for each page (route.ts), right after the default.
-    models: account.tester ? withAuto(CATALOG.map(listed)) : offered(env.MODELS).map(listed),
-    // The thinking levels Account can offer: every one for testers, low to high for Dream Plus.
+    // The models the app can offer, the default first: Auto for everyone; then, to pick by hand,
+    // the ones offered on Dream Plus, or every one in the catalogue for testers. The free plan has
+    // Auto alone, so there's nothing to pick.
+    models: [AUTO_ENTRY, ...(account.tester ? CATALOG : account.plan === "plus" ? offered(env.MODELS) : []).map(listed)],
+    // The thinking levels the app can offer by hand, beside a model that isn't Auto: every one for
+    // testers, low to high for Dream Plus.
     thinking: account.tester ? [...EFFORTS] : account.plan === "plus" ? ["low", "medium", "high"] : [],
   };
 }

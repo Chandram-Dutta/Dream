@@ -496,7 +496,7 @@ async function runPlan(base, xai) {
   let status = await usage();
   expect(status.plan === "free" && status.pages.today === 1 && status.pages.perDay === LOCAL_ALLOWANCES.free.pagesPerDay, `two requests for the same page count as one page (${status.pages?.today})`);
   expect(status.accountToken === me.user && status.subscription === null && status.plans?.plus?.pagesPerDay > status.plans?.free?.pagesPerDay, "with the account's purchase token, and what Dream Plus adds");
-  expect(status.models?.[0]?.id === "grok-4.7" && typeof status.models[0].name === "string" && "plus" in status.models[0], "and the models Account can offer");
+  expect(status.models?.[0]?.id === "auto" && status.models.length === 1 && typeof status.models[0].name === "string", "and Auto, the free plan's only model, so there's nothing to pick");
   const [row] = query(`SELECT tokens_in, tokens_cached, tokens_out, cost_micros FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
   // Five requests reached xAI and were answered: three streamed for page a (one a tool call), and two plain. Errors cost nothing.
   expect(row?.tokens_in === 5 * 1261 && row?.tokens_cached === 5 * 1152 && row?.tokens_out === 5 * 65, `tokens are counted from xAI's usage, reasoning as output (${JSON.stringify(row)})`);
@@ -707,11 +707,9 @@ async function runRoute(base, clef, xai) {
   const sent = clef.calls.at(-1);
   expect(response.status === 200 && picked.category === "science" && picked.difficulty === "hard" && picked.why?.length > 0, `Clef's reading picks the row (${picked.category}, ${picked.difficulty}): ${picked.why}`);
   expect(sent?.model === CLEF.selector && sent.state.includes('"derive the quadratic formula"') && sent.questions?.topic?.type === "choice" && !("images" in sent), "Clef was asked about the request, with typed questions and no photo");
-  // The row starts on DeepSeek thinking none, which the free plan, held to low, can't run as
-  // benched; with DEV_LOGIN it may use any model, so it gets the row's first pick at low.
-  const atLow = TABLE.science.hard.picks.find((each) => (fitEffort("low", byID(each.model)) ?? "none") === each.effort);
-  expect(TABLE.science.hard.picks[0].effort === "none" && picked.model === atLow.model && picked.effort === atLow.effort && picked.name === byID(atLow.model)?.name && /best your plan has/.test(picked.why), `on the free plan, a pick that thinks none gives way to the row's next it can run, named, and said why (${picked.model} · ${picked.effort})`);
-  expect(picked.effort === (fitEffort("low", byID(picked.model)) ?? "none"), `the free plan thinks low (${picked.effort})`);
+  // The row starts on DeepSeek thinking none, which every plan may run: not thinking is cheaper.
+  const first = TABLE.science.hard.picks[0];
+  expect(first.effort === "none" && picked.model === first.model && picked.effort === "none" && picked.name === byID(first.model)?.name, `the free plan gets the row's first pick, as benched (${picked.model} · ${picked.effort})`);
   response = await ask({ request: "derive the quadratic formula" }, { session: tester.token });
   picked = await response.json();
   expect(picked.model === TABLE.science.hard.picks[0].model && picked.effort === TABLE.science.hard.picks[0].effort, `a tester gets the row's pick as it is (${picked.model} · ${picked.effort})`);
@@ -753,8 +751,8 @@ async function runRoute(base, clef, xai) {
   console.log("Auto: in Account");
   const list = async (token) => (await (await fetch(`${base}/api/usage`, { headers: { Authorization: `Bearer ${token}` } })).json()).models.map((model) => model.id);
   const testers = await list(tester.token);
-  expect(testers[0] === "grok-4.7" && testers[1] === "auto" && testers.length === CATALOG.length + 1, "testers see Auto, right after the default");
-  expect(!(await list(me.token)).includes("auto"), "everyone else doesn't yet");
+  expect(testers[0] === "auto" && testers[1] === "grok-4.7" && testers.length === CATALOG.length + 1, "testers see Auto first, then every model");
+  expect((await list(me.token))[0] === "auto", "and Auto is everyone's default");
 }
 
 const remote = process.env.DREAM_SHARE_URL;
