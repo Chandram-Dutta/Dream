@@ -117,7 +117,8 @@ struct SurfaceScreen: View {
                     readingID: voice.readingID,
                     onChange: busy ? nil : { beginChange(ChangeTarget(block: $0)) },
                     onExplore: busy ? nil : { exploring = ComposeRequest(intent: $0, image: nil) },
-                    onAnswer: busy ? nil : { changeAnswer($0, to: $1) })
+                    onAnswer: busy ? nil : { changeAnswer($0, to: $1) },
+                    isStreaming: composer.isStreaming)
                     .padding(.horizontal, 20)
                     .padding(.bottom, 40)
                     .transition(.blurReplace)

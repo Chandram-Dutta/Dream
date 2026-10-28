@@ -34,10 +34,13 @@ struct Aura: View, Animatable {
 
     var body: some View {
         let lively = energy > 0.01 || flood > 0.01
+        // Resolved here, once each time the palette or appearance changes, not on every frame.
+        let current = resolved(palette)
+        let from = turning.map { (lights: resolved($0.from), at: $0.at) }
         TimelineView(.animation(minimumInterval: lively ? 1.0 / 60 : 1.0 / 15, paused: reduceMotion)) { timeline in
             let time = reduceMotion ? 0 : timeline.date.timeIntervalSince(start)
             let surge = reduceMotion ? 0 : surge(at: time)
-            MeshGradient(width: 4, height: 4, points: points(at: time, surge: surge), colors: colors(at: time), smoothsColors: true)
+            MeshGradient(width: 4, height: 4, points: points(at: time, surge: surge), colors: colors(at: time, current: current, turning: from), smoothsColors: true)
                 .brightness(surge * (colorScheme == .dark ? 0.12 : 0.06) + breath(at: time))
         }
         .mask {
@@ -102,15 +105,14 @@ struct Aura: View, Animatable {
 
     /// Each point runs through the palette's lights on its own rhythm: slowly at rest, quickly
     /// while working, a step further on each surge.
-    private func colors(at time: Double) -> [Color] {
+    private func colors(at time: Double, current: [SIMD4<Float>], turning: (lights: [SIMD4<Float>], at: Double)?) -> [Color] {
         let strength = colorScheme == .dark ? 0.7 + 0.2 * energy : 0.4 + 0.3 * energy
         let shift = surgeShift(at: time)
-        let current = resolved(palette)
         var from: [SIMD4<Float>]?
         var progress = 1.0
         if let turning {
             progress = smoothstep((time - turning.at) / 1.6)
-            if progress < 1 { from = resolved(turning.from) }
+            if progress < 1 { from = turning.lights }
         }
         return (0..<16).map { index in
             let place = Double(index) * 0.37 + Double(index / 4) * 0.23

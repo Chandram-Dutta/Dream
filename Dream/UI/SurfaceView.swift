@@ -44,6 +44,9 @@ struct SurfaceView: View {
     var onExplore: ((String) -> Void)?
     /// A different answer to one of the questions asked before building.
     var onAnswer: ((Answer, String) -> Void)?
+    /// Streaming in, when blocks change on every update: only a block landing animates, or the
+    /// whole page would re-animate many times a second.
+    var isStreaming = false
     /// Shows a surface written in a language the reader doesn't read in theirs (TranslationNote.swift).
     @State private var translation = SurfaceTranslation()
 
@@ -70,7 +73,7 @@ struct SurfaceView: View {
             }
             SourceNote(surface: surface)
         }
-        .animation(.smooth(duration: 0.5), value: blocks)
+        .animation(.smooth(duration: 0.5), value: isStreaming ? AnyHashable(blocks.map(\.id)) : AnyHashable(blocks))
         .animation(.smooth(duration: 0.5), value: surface.related)
         .translating(self.surface, with: translation)
         .keepingLive(self.surface, state: state)

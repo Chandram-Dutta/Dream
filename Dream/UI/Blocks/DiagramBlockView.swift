@@ -154,7 +154,8 @@ private struct DiagramLines: View {
     let palette: Palette
 
     var body: some View {
-        Canvas { graphics, _ in
+        // Drawn off the main thread, so a page can scroll while a diagram changes.
+        Canvas(rendersAsynchronously: true) { graphics, _ in
             // The quiet lines first, so the highlighted ones sit on top.
             let routes = layout.routes.sorted { !isLit($0) && isLit($1) }
             for route in routes {

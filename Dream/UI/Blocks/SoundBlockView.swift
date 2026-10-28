@@ -144,7 +144,7 @@ private struct WavePicture: View {
         let moving = isPlaying && !reduceMotion
         TimelineView(.animation(paused: !moving)) { timeline in
             let start = moving ? timeline.date.timeIntervalSince(startedAt) * window : 0
-            Canvas { canvas, size in
+            Canvas(rendersAsynchronously: true) { canvas, size in
                 let shading = GraphicsContext.Shading.linearGradient(
                     Gradient(colors: [palette.accent, palette.companion]), startPoint: .zero, endPoint: CGPoint(x: size.width, y: 0))
                 canvas.fill(Path(CGRect(x: 0, y: size.height / 2 - 0.25, width: size.width, height: 0.5)), with: .color(palette.edge))

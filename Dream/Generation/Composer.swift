@@ -62,6 +62,9 @@ final class Composer {
     let consent = Consent()
     /// Services the request names that the user hasn't connected, which the screen offers to connect.
     private(set) var suggestions: [DirectoryEntry] = []
+    /// A page is streaming in: its blocks change many times a second, so only a block landing
+    /// is animated (SurfaceView).
+    private(set) var isStreaming = false
     /// The work as it happens: each search, page read and article looked up, as it starts. The
     /// screen shows the latest while a page forms, and each one stirs the light (FormingView).
     private(set) var trail: [Trace] = []
@@ -362,11 +365,24 @@ final class Composer {
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
     /// A repair is one too, and keeps what it finished the same way.
     private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
-        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { self.show(Surface(partial: $0, reference: found.first ?? fallback).answered(self.asking.answers)) } : nil
+        // The page so far, about six times a second rather than on every token: each update lays
+        // out and compares the whole page, and on every token that took the main thread whole
+        // while a page streamed in, so it couldn't scroll. The runaway check keeps the same pace.
+        let shown = Pace(every: 0.15)
+        let checked = Pace(every: 0.25)
+        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { partial in
+            guard shown.isDue else { return }
+            self.show(Surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers))
+        } : nil
+        if streaming { isStreaming = true }
+        defer { if streaming { isStreaming = false } }
         do {
             let wire = try await generate(WireSurface.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
-                                          onPartial: onPartial, isRunaway: { Surface(partial: $0, reference: nil).isRepeatingItself })
-            return Surface(wire, reference: found.first ?? fallback)
+                                          onPartial: onPartial, isRunaway: { checked.isDue && Surface(partial: $0, reference: nil).isRepeatingItself })
+            let surface = Surface(wire, reference: found.first ?? fallback)
+            // The whole answer at once, not the last update before it, while the checks run.
+            if streaming { show(surface.answered(asking.answers)) }
+            return surface
         } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
             let kept = await salvaged(Surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: unfinished.partial.related != nil)
             // Finished blocks are worth keeping, and so is a calculation with none, if it has
@@ -586,6 +602,24 @@ enum ModelActivity {
     /// When the model, a tool or the user last did something. Heartbeats don't count.
     static var lastHeard: Date {
         lock.withLock { heard }
+    }
+}
+
+/// Lets something happen at most once every so often.
+@MainActor
+private final class Pace {
+    private let interval: TimeInterval
+    private var last = Date.distantPast
+
+    init(every interval: TimeInterval) {
+        self.interval = interval
+    }
+
+    /// True, and starts the wait again, if the interval has passed.
+    var isDue: Bool {
+        guard Date.now.timeIntervalSince(last) >= interval else { return false }
+        last = .now
+        return true
     }
 }
 
