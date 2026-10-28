@@ -41,6 +41,17 @@ struct GenerationTests {
         for _ in 0..<2_000 where ended == nil { ended = long.read(entry) }
         #expect(ended?.contains("longer than any screen") == true, "an answer longer than any screen, however it's made")
 
+        var pieces = ChatCompletions.Padding()
+        ended = nil
+        for _ in 0..<20_000 where ended == nil { ended = pieces.read(",") }
+        #expect(ended?.contains("longer than any screen") == true, "a loop of one-character pieces too")
+
+        var thinking = ChatCompletions.Padding()
+        #expect(thinking.rethink(String(repeating: "Let me check the list again. ", count: 100)) == nil, "a little thinking once the answer began is fine")
+        ended = nil
+        for _ in 0..<2_000 where ended == nil { ended = thinking.rethink("Wait, maybe add a hat. ") }
+        #expect(ended?.contains("thinking again") == true, "thinking on and on after the answer began is not")
+
         var digits = ChatCompletions.Padding()
         #expect(digits.read(#"{"inputs": [{"name": "a", "max": 2.0000000000"#) == nil)
         #expect(digits.read(String(repeating: "0", count: 40))?.contains("digits") == true, "a number that keeps growing digits")

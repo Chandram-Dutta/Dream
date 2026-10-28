@@ -111,7 +111,7 @@ enum ChatCompletions {
         var answer = ""
         defer {
             let tokens = usage.map { String(format: " (%d tokens in, %d of them cached; %d out, %d of them thinking)", $0.promptTokens ?? 0, $0.promptTokensDetails?.cachedTokens ?? 0, ($0.completionTokens ?? 0) + ($0.completionTokensDetails?.reasoningTokens ?? 0), $0.completionTokensDetails?.reasoningTokens ?? 0) } ?? ""
-            trace(label, String(format: "done after %.1fs%@%@", Date().timeIntervalSince(started), finish.map { ", finished: \($0)" } ?? "", tokens))
+            trace(label, String(format: "done after %.1fs%@%@, %d characters of reasoning", Date().timeIntervalSince(started), finish.map { ", finished: \($0)" } ?? "", tokens, reasoningCharacters))
             if !answer.isEmpty, answer.count < 400 { trace(label, "the whole answer: \(answer)") }
         }
         for try await line in bytes.lines {
@@ -124,7 +124,13 @@ enum ChatCompletions {
             if let used = chunk.usage { usage = used }
             if let reason = chunk.choices.first?.finishReason { finish = reason }
             guard let delta = chunk.choices.first?.delta else { continue }
-            if let reasoning = delta.reasoningContent { reasoningCharacters += reasoning.count }
+            if let reasoning = delta.reasoningContent {
+                reasoningCharacters += reasoning.count
+                if !firstText, let kind = padding.rethink(reasoning) {
+                    trace(label, String(format: "stopped after %.1fs: the answer turned to %@", Date().timeIntervalSince(started), kind))
+                    return
+                }
+            }
             if let text = delta.content, !text.isEmpty {
                 if firstText {
                     firstText = false
@@ -258,23 +264,35 @@ enum ChatCompletions {
     /// can fall into either and go on until it runs out of room: a packing list once ran for 155
     /// seconds that way, and a quadratic for 90, both ending in nothing. Neither changes what's
     /// been parsed, so the composer can't see it, and tokens keep coming, so it isn't a stall.
-    /// Nor is any screen longer than `lengthLimit`, ten times the longest on the bench (about
-    /// 1,500 tokens): a loop the other checks miss, like DeepSeek's on a packing list, would
-    /// otherwise run on to the 32,000-token cap.
+    /// Nor is any screen longer than `lengthLimit` characters or `pieceLimit` pieces, ten times
+    /// the longest on the bench (about 1,500 tokens), however it loops. And a model that goes back
+    /// to thinking once its answer has begun, for more than `rethinkLimit` characters, is lost:
+    /// DeepSeek did that twice on a packing list, until it hit the 32,000-token cap.
     struct Padding {
         static let blankLimit = 400
         static let digitLimit = 40
         static let lengthLimit = 60_000
+        static let pieceLimit = 15_000
+        static let rethinkLimit = 20_000
         private var inString = false
         private var escaped = false
         private var blanks = 0
         private var digits = 0
         private var length = 0
+        private var pieces = 0
+        private var rethinking = 0
+
+        /// Reads thinking that comes after the answer began; what it has turned into, once it's lost.
+        mutating func rethink(_ text: String) -> String? {
+            rethinking += text.count
+            return rethinking > Self.rethinkLimit ? "thinking again, \(rethinking) characters after the answer began" : nil
+        }
 
         /// Reads the next piece of the answer; what it has turned into, once it's padding.
         mutating func read(_ text: String) -> String? {
             length += text.count
-            if length > Self.lengthLimit { return "more than \(Self.lengthLimit) characters, longer than any screen" }
+            pieces += 1
+            if length > Self.lengthLimit || pieces > Self.pieceLimit { return "\(length) characters in \(pieces) pieces, longer than any screen" }
             for scalar in text.unicodeScalars {
                 if scalar == " " || scalar == "\n" || scalar == "\r" || scalar == "\t" {
                     blanks += 1
