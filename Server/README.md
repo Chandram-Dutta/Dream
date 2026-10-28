@@ -673,21 +673,46 @@ should, except "a bar chart of India's GDP growth by decade", which went to live
 good enough first, each row ending on Grok 4.7 thinking low. Its comment has the numbers behind
 every row.
 
-| Row | Picks | Why, from the bench |
+In the table below, "DeepSeek" is DeepSeek V4.1 Flash on Workers AI, and "Sarvam's DeepSeek" is
+the same model hosted by Sarvam, thinking low.
+
+| Row | Picks, in order | Why, from the bench of 2026-10-28 |
 |---|---|---|
-| Money, easy | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 10 on the EMI page like Grok, in about 10 s for 0.2¢ |
-| Money, hard | Grok 4.7 low | 10 on a split with a catch; DeepSeek 6, Grok 4.20 Fast 2 |
-| Science, easy and hard | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 9.5 to Grok's 10, at a twentieth of the cost |
-| Figures, easy and hard | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 9 to Grok's 9.5, for 0.2¢ |
-| Live facts | Grok 4.20 Fast, then Grok 4.7 low | Looked them up, 9.5, in 10 s for 40% of Grok 4.7's cost |
-| Lists, photos, other languages, everything else | Grok 4.7 low | The cheaper models left things out, misread photos, or stumbled in Tamil and Hindi |
+| Money, easy | Sarvam's DeepSeek; DeepSeek (none); Grok 4.7 low | 10 on the EMI page like Grok, for 1¢ to Grok's 4.8¢ |
+| Money, hard | Grok 4.7 low | 10 on a split with a catch; the DeepSeeks 5 and 6 |
+| Science | DeepSeek (none); DeepSeek (low); Sarvam's DeepSeek; Grok 4.7 low | 9 like Grok, in 24 s for 0.3¢ |
+| Lists | Sarvam's DeepSeek; Grok 4.7 low | 9 to Grok's 10, for a tenth of the cost |
+| Live facts | Sarvam's DeepSeek; DeepSeek (low); Grok 4.20 Fast; Grok 4.7 low | Looked them up and scored 10, in 24 s for 0.8¢ |
+| Photos, easy | DeepSeek (low); Grok 4.7 low | Read the bill and the plant right (8, 9), for half Grok's cost |
+| Photos, hard | Sarvam's DeepSeek; Grok 4.7 low | Solved the worksheet from the photo (10), for 1.2¢ |
+| Other languages | DeepSeek (low); Grok 4.7 low | 8.7 to Grok's 9.3 in Hindi and Tamil, for 0.7¢ |
+| Figures, easy | Sarvam's DeepSeek; DeepSeek (low); Grok 4.7 low | 10 on the 3D molecule like Grok, for 0.9¢ |
+| Figures, hard | DeepSeek (none); Sarvam's DeepSeek; DeepSeek (low); Grok 4.7 low | 10 on the pendulum like Grok, for 0.4¢ |
+| Everything else | Grok 4.7 low | Not benched as a category |
 
-On the bench's own requests the table scores 9.4 at 3.7¢ a page and a median of 20 s. Grok 4.7
-low on every page scores 9.6 at 7.0¢ and a median of 42 s. Those are the requests the table was
-made from, so the comparison flatters it.
+On the merged code's bench, how the choices compare:
 
-**The bench.** It ran on 2026-10-27, spent about $6.25 in all, and the tool to run it again is
-`Tools/router-bench/bench.py`.
+| Choice | Score | Cost a page | Median time |
+|---|---|---|---|
+| This table | 9.3 | 1.0¢ | 43 s |
+| Grok 4.7 low on every page | 9.6 | 6.0¢ | 39 s |
+| The table before this bench | 9.2 | 3.8¢ | — |
+
+The table was made from those same pages, so the comparison flatters it. With one run of 16
+requests, a row rests on one or two pages.
+
+Auto now saves money, not time. The DeepSeeks look things up and think twice on a page's last
+round, so they take about a minute a page, while Grok 4.7 reads most of its prompt from cache.
+
+**The bench** ran twice, and the tool to run it again is `Tools/router-bench/bench.py`:
+
+- **2026-10-27:** every candidate, about $6.25.
+- **2026-10-28, on the merged code:** after the harness began sending Workers AI's and Sarvam's
+  models their tools before the schema (`docs/HarnessBench.md`). It ran the table's picks, Grok 4.7
+  low as the reference, both DeepSeek levels and Sarvam's DeepSeek, for $2.12. The table comes
+  from this run.
+
+Both ran the same way:
 
 - **Requests:** 16, two or three in each of seven kinds of page: money, science and maths
   explainers, lists and trackers, live facts, photos (a restaurant bill, a maths worksheet, a
@@ -699,6 +724,21 @@ made from, so the comparison flatters it.
   (2), usefulness (2) and clarity (2). Live facts not backed by a search or live tool call in the
   page's log count as invented.
 - **Failures:** a page not made scores 0.
+
+On the merged code (2026-10-28):
+
+| Model and thinking | Made | Score | Median time | Cost a page |
+|---|---|---|---|---|
+| Grok 4.7, low | 16/16 | 9.6 | 39 s | 6.0¢ |
+| Grok 4.20 Fast (live facts only) | 2/2 | 9.0 | 12 s | 2.6¢ |
+| DeepSeek V4.1 Flash, none | 16/16 † | 7.1 | 57 s | 1.2¢ |
+| DeepSeek V4.1 Flash, low | 16/16 † | 8.0 | 65 s | 1.4¢ |
+| Sarvam's DeepSeek V4.1 Flash, low | 16/16 | 8.8 | 50 s | 1.0¢ |
+
+† Started 16 at once, 7 and 6 of these pages were turned away by Workers AI's per-minute limit
+(error 3021), even after the app's three retries. They were made again one at a time.
+
+Before the harness changes (2026-10-27):
 
 | Model and thinking | Made | Score | Median time | Cost a page |
 |---|---|---|---|---|
@@ -713,23 +753,29 @@ made from, so the comparison flatters it.
 | Sarvam 105B * | 2/16 | 0.4 | — | 1.3¢ |
 | Gemma 4 on Sarvam * | 2/16 | 1.0 | — | 1.1¢ |
 
-\* Sarvam was reached directly. Through the gateway's custom provider, every request failed with
-error 2006, "The provider did not return a valid response".
+\* Sarvam was reached directly, as the Worker now always does. Through the gateway's custom
+provider, every request failed with error 2006, "The provider did not return a valid response".
 
-What it showed:
+What they showed:
 
+- **Tools changed the cheap models.** With their tools sent first, both DeepSeeks look things up
+  and cite them. DeepSeek at low went from 3.2 to 8.0, and Sarvam's DeepSeek from 7.2 to 8.8.
+  The price is time: about a minute a page, where they used to take 10 to 30 s.
+- **The cheap models are now the slower ones.** Grok 4.7, reading most of its prompt from cache,
+  went from 42 s and 7.0¢ to 39 s and 6.0¢.
+- **Workers AI's per-minute limit.** It turned away 13 of 32 DeepSeek pages started 16 at once,
+  because tools first means several requests a page. The Worker reports that as a 502 ("didn't
+  answer"). Under load, Auto's Workers AI rows would meet it too.
 - **Thinking high never paid.** Grok 4.7 high scored lower than low, took twice as long (one
   photo page ten minutes) and cost half again as much. No row asks for it.
-- **DeepSeek V4.1 Flash on Workers AI is better with thinking off.** At low it left four pages
-  empty and ran away for six minutes on a repair.
-- **GLM 5.3 Flash** wrote JSON that didn't parse on a quarter of its pages.
+- **GLM 5.3 Flash** wrote JSON that didn't parse on a quarter of its pages (first run).
 - **Sarvam 105B** stopped partway through most pages: its plan caps the answer, and its thinking
-  counts against that. It refused photos, and so did Sarvam's GLM 5.3.
+  counts against that. It refused photos, and so did Sarvam's GLM 5.3 (first run).
 - **Gemma 4** was mostly refused by Sarvam's per-minute limit, even one page at a time, and
-  stalled when it wasn't.
-- **Sarvam's DeepSeek** was the best value of all, and it read photos despite Sarvam's docs. By
-  the rule below it would lead hard money, lists and photos, so it goes into the table once the
-  gateway reaches Sarvam.
+  stalled when it wasn't (first run).
+- **Sarvam's DeepSeek** is the best of the cheap models. It made every page, four at a time, and
+  reads photos despite Sarvam's docs. It leads easy money, lists, live facts, hard photos and easy
+  figures.
 
 The full model × category matrix is in the comment above `TABLE`.
 
@@ -744,7 +790,8 @@ numbers exist yet for most of these):
   figure pages, though it searched properly for live facts.
 - **Where they disagree.**
   - DeepSeek V4.1 Flash (index 45, the best at maths of the set on MathArena) did better here with
-    its thinking off.
+    its thinking off until it could call tools; since then thinking low scores higher (8.0 to
+    7.1), still well below Grok 4.7.
   - GLM 5.3 Flash (index 42) broke JSON on a quarter of its pages.
   - Grok 4.7 at high rates above low publicly but scored below it here.
   - Sarvam's self-reported numbers (τ² 68, IFEval 85) are far above independent ones (τ² 47).
@@ -764,9 +811,13 @@ calls. No public benchmark measures that, so the page bench decides.
    `PLUS_ACCOUNTS` in `.dev.vars`, so those accounts may think at any level, and restart the
    server.
 3. **Make the pages.** Run `Tools/router-bench/bench.py run g47l dsn g420` for each config in
-   turn. For Sarvam, whose plan limits requests a minute, run them two at a time:
-   `Tools/router-bench/bench.py run -p 2 sds`. Don't edit `Server/src` while pages are being
-   made: `wrangler dev` reloads and cuts the streams in flight.
+   turn.
+   - Sarvam and Workers AI both limit requests a minute, and with tools first a page makes
+     several, so run their configs a few at a time: `Tools/router-bench/bench.py run -p 4 sds`.
+   - A page turned away with error 3021 in the Worker's log is the limit, not the model. Run it
+     again on its own, like `run dsn:m1`; its cost is counted from where the account was.
+   - Don't edit `Server/src` while pages are being made: `wrangler dev` reloads and cuts the
+     streams in flight.
 4. **Score them.** Run `judge` (about $0.40) and then `matrix`. `probe` shows what Clef and the
    table pick for each request.
 5. **Change the table by the rule.** A pick is good enough for a row when it made every page of

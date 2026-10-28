@@ -410,9 +410,12 @@ const usableFor = (plan, tester, offeredIDs = ids) => (each) => {
   const model = byID(each.model);
   return offeredIDs.includes(each.model) && (tester || !model.plus || plan === "plus") && (fitEffort(allowedEffort(each.effort, plan, tester), model) ?? "none") === each.effort;
 };
-const sums = TABLE.money.easy;
-expect(sums.picks[0].effort === "none" && firstUsable(sums, usableFor("plus", true)) === sums.picks[0], "a tester gets the row's first pick as benched");
-expect(firstUsable(sums, usableFor("plus", false))?.model === DEFAULT_PICK.model && firstUsable(sums, usableFor("free", false))?.model === DEFAULT_PICK.model, "Dream Plus and the free plan can't think 'none', so that pick gives way to the next, not to a level never benched");
+// A row that starts on a pick thinking "none", which only testers may ask for.
+const unthinking = rows.map(({ row }) => row).find((row) => row.picks[0].effort === "none" && byID(row.picks[0].model).efforts.includes("none"));
+expect(unthinking && firstUsable(unthinking, usableFor("plus", true)) === unthinking.picks[0], "a tester gets the row's first pick as benched");
+const plusGets = unthinking && firstUsable(unthinking, usableFor("plus", false));
+expect(plusGets && plusGets !== unthinking.picks[0] && unthinking.picks.indexOf(plusGets) > 0, "Dream Plus can't think 'none', so that pick gives way to the row's next, not to a level never benched");
+expect(unthinking && firstUsable(unthinking, usableFor("free", false)) === unthinking.picks.at(-1), "the free plan, held to low and without Plus-only models, gets the row's last pick: the default");
 const live = TABLE.live.easy;
 expect(firstUsable(live, usableFor("plus", false)) === live.picks[0] && firstUsable(live, usableFor("free", false)) === live.picks.at(-1), "a Plus-only model for Dream Plus; the default for the free plan");
 expect(firstUsable(live, usableFor("plus", false, [DEFAULT_PICK.model])) === live.picks.at(-1), "only the models this server offers (MODELS)");

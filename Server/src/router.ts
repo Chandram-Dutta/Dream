@@ -42,49 +42,57 @@ export interface Row {
 
 const pick = (model: string, effort: Effort): Pick => ({ model, effort });
 
-// The table, from Dream's page bench through the server on 2026-10-27 (README.md, "Routing"): 16
-// requests in 7 categories, each made by every candidate through the real pipeline, scored 0–10
-// by Grok 4.7 against the same rubric and ground truth (a page not made scores 0). Per category,
-// pages made · mean score · median time · mean cost:
+// The table, from Dream's page bench (Tools/router-bench/bench.py; README.md, "Routing"): 16
+// requests in 7 categories, each made through the real pipeline and a local server, scored 0–10 by
+// Grok 4.7 against the same rubric and ground truth (a page not made scores 0). These numbers are
+// from the merged code of 2026-10-28, after the harness began sending Workers AI's and Sarvam's
+// models their tools before the schema. Per category, pages made · mean score · median time ·
+// mean cost:
 //
-//                     money          science        lists          live           photo          language       figures
-//   Grok 4.7 low      2/2 10  50s 4.2¢   2/2 10  80s 8.3¢   2/2 9.5 17s 2.9¢   2/2 10  31s 9.5¢   3/3 9.3 42s 6.9¢   3/3 9.0 42s 6.7¢   2/2 9.5 66s 11¢
-//   Grok 4.7 high     2/2 10 175s 15¢    2/2 10  32s 6.1¢   1/2 5.0 181s 9.7¢  2/2 9.0 46s 8.6¢   3/3 9.7 188s 14¢   3/3 9.0 85s 7.8¢   2/2 10  57s 9.7¢
-//   Grok 4.20 Fast    2/2 3.5 26s 6.5¢   2/2 8.5 15s 2.6¢   2/2 6.5 15s 3.7¢   2/2 9.5 10s 3.7¢   3/3 7.0 43s 8.2¢   3/3 7.3 29s 5.7¢   2/2 5.5 41s 9.6¢
-//   DeepSeek V4.1 F   2/2 8.0  9s 0.2¢   2/2 9.5 17s 0.4¢   2/2 4.5  6s 0.2¢   2/2 2.0 12s 0.3¢   3/3 6.0  8s 0.6¢   3/3 3.7 13s 0.2¢   2/2 9.0  8s 0.2¢   (thinking none)
-//   DeepSeek V4.1 F   1/2 4.0 24s 0.3¢   1/2 5.0 41s 0.4¢   1/2 5.0 28s 0.3¢   1/2 0.5  4s 2.0¢   3/3 2.0 53s 0.7¢   3/3 5.3 29s 0.6¢   1/2 0.5 22s 0.2¢   (thinking low)
-//   GLM 5.3 Flash     1/2 5.0 23s 0.2¢   2/2 7.5 57s 0.3¢   1/2 4.0 48s 0.2¢   2/2 1.5 52s 0.2¢   3/3 4.0 26s 0.2¢   2/3 6.0 132s 0.5¢  1/2 4.0 109s 0.3¢
-//   Sarvam's DeepSeek 2/2 10  32s 1.3¢   2/2 8.5 20s 0.8¢   2/2 10  17s 0.9¢   1/2 2.0  8s 0.6¢   3/3 9.3 43s 1.4¢   2/3 2.7 13s 0.5¢   2/2 9.5 19s 1.0¢   (direct; see below)
-//   Sarvam's GLM 5.3  6 of 8 made, 4.8 overall, no photos; Sarvam 105B 2/16 and Gemma 4 2/16 made (output cap, rate limit)
+//                       money             science           lists              live              photo             language          figures
+//   Grok 4.7 low        2/2 10  48s 4.8¢  2/2 9.0 46s 4.7¢  2/2 10  32s 5.2¢   2/2 10  29s 7.8¢  3/3 9.3 44s 6.6¢  3/3 9.3 51s 5.9¢  2/2 10  48s 6.5¢
+//   Grok 4.20 Fast                                                             2/2 9.0 12s 2.6¢
+//   DeepSeek, none      2/2 7.0 80s 1.1¢  2/2 9.0 24s 0.3¢  2/2 5.0 158s 1.7¢  2/2 5.5 20s 0.3¢  3/3 7.0 56s 2.7¢  3/3 7.7 83s 1.4¢  2/2 8.0 56s 0.4¢
+//   DeepSeek, low       2/2 6.0 101s 1.5¢ 2/2 9.5 81s 0.9¢  2/2 5.0 39s 0.5¢   2/2 8.5 37s 1.1¢  3/3 8.0 66s 3.4¢  3/3 8.7 63s 0.7¢  2/2 10  82s 1.0¢
+//   Sarvam's DeepSeek   2/2 8.0 66s 1.0¢  2/2 9.5 75s 1.1¢  2/2 9.0 38s 0.5¢   2/2 10  24s 0.8¢  3/3 8.0 81s 1.2¢  3/3 7.7 40s 1.2¢  2/2 10  65s 0.9¢
 //
-// A pick is good enough for a row when it made every page of the category, scored none below 5
-// there, and averaged 8 or more on the row's own requests (the category's, where the bench had none
-// at that difficulty). The cheapest good enough comes first; every row ends on Grok 4.7 thinking
-// low, everyone's model, so an account that may only use the default still gets a page. Thinking
-// high never paid: Grok 4.7 high scored 9.0 overall to low's 9.6, at twice the time and 1.5× the
-// cost, so no row asks for it. Sarvam's DeepSeek was the best value of all (7.2 overall at 0.9¢;
-// by the rule, first for hard money, lists and photos), but Dream's AI Gateway answers its custom
-// provider with error 2006, so it's left out until that's fixed; the bench reached Sarvam directly.
+// ("DeepSeek" is DeepSeek V4.1 Flash on Workers AI; Sarvam's is the same model, hosted by Sarvam,
+// thinking low.) A pick is good enough for a row when it made every page of the category, scored
+// none below 5 there, and averaged 8 or more on the row's own requests (the category's, where the
+// bench had none at that difficulty). The good enough picks come cheapest first, and every row
+// ends on Grok 4.7 thinking low, everyone's model, so an account that may use only the default
+// still gets a page, and a plan that can't run a pick as benched gets the next.
+//
+// Three caveats:
+// - Speed. The DeepSeeks now look things up and think twice on a page's last round, so they take
+//   about a minute a page, and Grok 4.7 reads most of its prompt from cache: Auto saves money, not
+//   time.
+// - Workers AI's per-minute limit. Its error 3021 turned away 13 of 32 DeepSeek pages when 16
+//   started at once; those were made again one at a time.
+// - Sample size. One run of 16 requests, so a row's numbers are one or two pages.
+//
+// The first bench (2026-10-27, before the harness changes) is in README.md. Thinking high never
+// paid there: Grok 4.7 high scored 9.0 to low's 9.6, at twice the time, so no row asks for it.
 export const TABLE: Record<Category, Record<Difficulty, Row>> = {
   money: {
-    // EMI for a loan: DeepSeek 10, Grok 10. A bill split with a catch: Grok 10, DeepSeek 6, Grok 4.20 Fast 2.
-    easy: { picks: [pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Simple sums: DeepSeek V4.1 Flash, no thinking, scored 10 like Grok, in about 10 s for 0.2¢" },
-    hard: { picks: [pick("grok-4.7", "low")], why: "Money with a catch: Grok 4.7 scored 10, DeepSeek 6 and Grok 4.20 Fast 2" },
+    // An EMI: Sarvam's DeepSeek 10, DeepSeek none 9, Grok 10. A bill split with a catch: Grok 10, the DeepSeeks 5 and 6.
+    easy: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Simple sums: Sarvam's DeepSeek V4.1 Flash scored 10 like Grok, for 1¢ to Grok's 4.8¢" },
+    hard: { picks: [pick("grok-4.7", "low")], why: "Money with a catch: Grok 4.7 scored 10; the DeepSeeks 5 and 6" },
   },
   science: {
-    // Deriving the quadratic formula, time dilation: DeepSeek 9 and 10, Grok 10 and 10.
-    easy: { picks: [pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Explainers: DeepSeek V4.1 Flash scored 9.5 to Grok's 10, at a twentieth of the cost" },
-    hard: { picks: [pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Explainers: DeepSeek V4.1 Flash scored 9.5 to Grok's 10, at a twentieth of the cost" },
+    // Deriving the quadratic formula, time dilation: DeepSeek none 9 and 9, low 9 and 10, Sarvam's 10 and 9; Grok 8 and 10.
+    easy: { picks: [pick("deepseek-v4.1-flash", "none"), pick("deepseek-v4.1-flash", "low"), pick("sarvam-deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Explainers: DeepSeek V4.1 Flash, no thinking, scored 9 like Grok, in 24 s for 0.3¢" },
+    hard: { picks: [pick("deepseek-v4.1-flash", "none"), pick("deepseek-v4.1-flash", "low"), pick("sarvam-deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Explainers: DeepSeek V4.1 Flash, no thinking, scored 9 like Grok, in 24 s for 0.3¢" },
   },
   lists: {
-    // A packing list for a winter trek, a habit tracker: Grok 9 and 10; DeepSeek 2 and 7, Grok 4.20 Fast 5 and 8.
-    easy: { picks: [pick("grok-4.7", "low")], why: "Lists: Grok 4.7 scored 9.5; the cheaper models left things out" },
-    hard: { picks: [pick("grok-4.7", "low")], why: "Lists: Grok 4.7 scored 9.5; the cheaper models left things out" },
+    // A packing list for a winter trek, a habit tracker: Sarvam's DeepSeek 8 and 10, Grok 10 and 10; DeepSeek none 5 and 5, low 8 and 2.
+    easy: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Lists: Sarvam's DeepSeek V4.1 Flash scored 9 to Grok's 10, for a tenth of the cost" },
+    hard: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Lists: Sarvam's DeepSeek V4.1 Flash scored 9 to Grok's 10, for a tenth of the cost" },
   },
   figures: {
-    // A pendulum to play with, a water molecule in 3D: DeepSeek 10 and 8, Grok 10 and 9.
-    easy: { picks: [pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Simulations and 3D: DeepSeek V4.1 Flash scored 9 to Grok's 9.5, for 0.2¢" },
-    hard: { picks: [pick("deepseek-v4.1-flash", "none"), pick("grok-4.7", "low")], why: "Simulations and 3D: DeepSeek V4.1 Flash scored 9 to Grok's 9.5, for 0.2¢" },
+    // A pendulum to play with: every model 10. A water molecule in 3D: Sarvam's DeepSeek and DeepSeek low 10, DeepSeek none 6.
+    easy: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Simulations and 3D: Sarvam's DeepSeek V4.1 Flash scored 10 like Grok, for 0.9¢" },
+    hard: { picks: [pick("deepseek-v4.1-flash", "none"), pick("sarvam-deepseek-v4.1-flash", "low"), pick("deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Simulations: DeepSeek V4.1 Flash, no thinking, scored 10 like Grok, for 0.4¢" },
   },
   other: {
     // Not benched as a category: facts, advice and how-tos stay on the default.
@@ -92,19 +100,22 @@ export const TABLE: Record<Category, Record<Difficulty, Row>> = {
     hard: { picks: [pick("grok-4.7", "low")], why: "Grok 4.7, Dream's default, which looks things up and explains" },
   },
   photo: {
-    // A restaurant bill to split, a maths worksheet, a plant: Grok 10, 10, 8. DeepSeek misread the bill (3).
-    easy: { picks: [pick("grok-4.7", "low")], why: "Photos: Grok 4.7 read the bill and the plant right; cheaper models misread them" },
-    hard: { picks: [pick("grok-4.7", "low")], why: "Photos: Grok 4.7 solved the worksheet from the photo (10) and misread nothing" },
+    // A restaurant bill to split, a plant: DeepSeek low 8 and 9, Grok 9 and 9, Sarvam's 5 and 9, DeepSeek none 3 and 8.
+    // A maths worksheet: Sarvam's DeepSeek 10, DeepSeek none 10, Grok 10, DeepSeek low 7.
+    easy: { picks: [pick("deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Photos: DeepSeek V4.1 Flash, thinking low, read the bill and the plant right (8, 9) for half Grok's cost" },
+    hard: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "A worksheet to solve: Sarvam's DeepSeek V4.1 Flash solved it from the photo (10) for 1.2¢" },
   },
   live: {
-    // The dollar in rupees right now, the latest Formula 1 standings: Grok 4.20 Fast 10 and 9, Grok 4.7 10 and 10.
-    easy: { picks: [pick("grok-4.20-fast", "none"), pick("grok-4.7", "low")], why: "Live facts: Grok 4.20 Fast looked them up and scored 9.5, in 10 s for 40% of Grok 4.7's cost" },
-    hard: { picks: [pick("grok-4.20-fast", "none"), pick("grok-4.7", "low")], why: "Live facts: Grok 4.20 Fast looked them up and scored 9.5, in 10 s for 40% of Grok 4.7's cost" },
+    // The dollar in rupees right now, the latest Formula 1 standings: Sarvam's DeepSeek 10 and 10, DeepSeek low 9 and 8,
+    // Grok 4.20 Fast 8 and 10, Grok 4.7 10 and 10; DeepSeek none didn't look the race up and gave no result (1).
+    easy: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("deepseek-v4.1-flash", "low"), pick("grok-4.20-fast", "none"), pick("grok-4.7", "low")], why: "Live facts: Sarvam's DeepSeek V4.1 Flash looked them up and scored 10, in 24 s for 0.8¢" },
+    hard: { picks: [pick("sarvam-deepseek-v4.1-flash", "low"), pick("deepseek-v4.1-flash", "low"), pick("grok-4.20-fast", "none"), pick("grok-4.7", "low")], why: "Live facts: Sarvam's DeepSeek V4.1 Flash looked them up and scored 10, in 24 s for 0.8¢" },
   },
   language: {
-    // Compound interest and photosynthesis in Hindi, a trip in Tamil: Grok 10, 8, 9; Grok 4.20 Fast 5 in Tamil, DeepSeek 0 and 1.
-    easy: { picks: [pick("grok-4.7", "low")], why: "Other languages: Grok 4.7 wrote Hindi and Tamil well (9); the rest stumbled" },
-    hard: { picks: [pick("grok-4.7", "low")], why: "Other languages: Grok 4.7 wrote Hindi and Tamil well (9); the rest stumbled" },
+    // Compound interest and photosynthesis in Hindi, a trip in Tamil: DeepSeek low 10, 10, 6; Grok 10, 9, 9;
+    // Sarvam's DeepSeek 10, 7, 6; DeepSeek none 10, 5, 8.
+    easy: { picks: [pick("deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Other languages: DeepSeek V4.1 Flash, thinking low, scored 8.7 to Grok's 9.3 in Hindi and Tamil, for 0.7¢" },
+    hard: { picks: [pick("deepseek-v4.1-flash", "low"), pick("grok-4.7", "low")], why: "Other languages: DeepSeek V4.1 Flash, thinking low, scored 8.7 to Grok's 9.3 in Hindi and Tamil, for 0.7¢" },
   },
 };
 
