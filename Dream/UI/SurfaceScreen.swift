@@ -31,6 +31,7 @@ struct SurfaceScreen: View {
     @State private var scroll = ScrollPosition(edge: .top)
     @State private var userScrolled = false
     @State private var voice = PageVoice()
+    @AppStorage(ConstructionStyle.key) private var style = ConstructionStyle.warp
     @FocusState private var instructionFocused: Bool
 
     init(request: ComposeRequest) {
@@ -94,6 +95,19 @@ struct SurfaceScreen: View {
         return isForming ? 1 : 0.6
     }
 
+    /// How strongly the screen's border glows in the border-and-stars style: fully while Dream
+    /// works, from the first frame until the page is done; dimly while it waits on the user.
+    private var border: Double {
+        guard isWorking else { return 0 }
+        return yourTurn ? 0.3 : 1
+    }
+
+    /// Stars stream into the border the whole time Dream thinks, before there's a page; not
+    /// while it writes, and not while it's the user's turn.
+    private var stars: Double {
+        isWorking && isForming && !yourTurn ? 1 : 0
+    }
+
     /// Blocks shown, so each one landing surges the light.
     private var blockCount: Int { surface?.displayBlocks.count ?? 0 }
 
@@ -132,11 +146,23 @@ struct SurfaceScreen: View {
             }
         }
         .background {
-            Aura(palette: palette, energy: energy, flood: flood, pulse: pulse)
+            // In the warp style the stars and the border show the work, never the light with
+            // them; it comes back as a glow at the top once the page is done.
+            Aura(palette: palette, energy: style == .light ? energy : 0, flood: style == .light ? flood : 0, pulse: pulse)
                 .animation(.easeInOut(duration: 1.4), value: energy)
                 .animation(.easeInOut(duration: 1.2), value: flood)
+                .opacity(style == .warp && isWorking ? 0 : 1)
+                .animation(.easeInOut(duration: 1), value: isWorking)
         }
         .background(Color(.systemBackground))
+        .overlay {
+            // The border while Dream works, and stars flying into it at each step of the work.
+            if style == .warp {
+                ConstructionGlow(palette: palette, border: border, stars: stars, pulse: pulse)
+                    .animation(.easeInOut(duration: 1), value: border)
+                    .animation(.easeInOut(duration: 0.8), value: stars)
+            }
+        }
         // What the work is touching, while there's no page yet.
         .overlay(alignment: .bottom) {
             if busy, isForming, !yourTurn {

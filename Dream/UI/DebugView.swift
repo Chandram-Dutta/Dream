@@ -13,6 +13,8 @@ struct DebugView: View {
     @State private var hasXAIKey = XAILanguageModel.savedKey != nil
     @Environment(\.dismiss) private var dismiss
 
+    @AppStorage(ConstructionStyle.key) private var constructionStyle = ConstructionStyle.warp
+
     var body: some View {
         NavigationStack {
             List {
@@ -42,6 +44,15 @@ struct DebugView: View {
                     Text("Model")
                 } footer: {
                     Text("Dream reaches Grok through its own server, with your account's pages. Grok with my key sends requests straight to xAI with your API key, kept in the Keychain. Private Cloud Compute needs an entitlement Apple grants on request. If the chosen model can't be used, Dream tries the next one.")
+                }
+                Section {
+                    Picker("While a page is made", selection: $constructionStyle) {
+                        ForEach(ConstructionStyle.allCases, id: \.self) { Text($0.name).tag($0) }
+                    }
+                } header: {
+                    Text("Look")
+                } footer: {
+                    Text("Border and stars: the screen's border glows while a page is made, and stars fly into it at each step. Light: Dream's light fills the screen.")
                 }
                 PlanSection()
                 ShareServerSettings()
