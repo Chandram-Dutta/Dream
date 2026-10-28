@@ -11,7 +11,7 @@ enum Prompts {
         Calculate only when changing numbers helps the user: their own figures (a bill, a loan, a trip), a decision, or a what-if worth exploring, like how the angle changes a throw or how a graph moves when a term changes. A number that's simply true is a fact, not an input: a population, a death toll, a date, a distance, a record. Show facts in facts, stat or data blocks, never on a slider, and don't invent a formula to restate or project them.
         """
 
-    private static var formulaRules: String {
+    private static func formulaRules(currency: String) -> String {
         """
         Each input has a role:
         - adjustable: the user sets it. Give it a realistic starting value, a sensible range and a step. Anything the user divides by (people, months, years, items) starts at 1 or more, with a minimum of at least 1.
@@ -20,7 +20,7 @@ enum Prompts {
         Outputs are results calculated from the inputs, main result first. A formula can use inputs and earlier outputs, never itself. If the user should type a value in, it's an input, not an output. When part of a formula has its own name in the maths, like n for periods per year, make it an output too, so each equation stays readable.
         Formulas use names, numbers, + - * / ^ ( ), comparisons (< <= > >= == !=) and condition ? a : b. Functions: min, max, round, floor, ceil, abs, sqrt, pow, exp, ln, log10, sin, cos, tan, asin, acos, atan, atan2, hypot, fact, choose. Angles are radians: sin(angle * pi / 180). Constants: pi, e. No units or symbols inside formulas.
         symbol: how a quantity is written in an equation, in LaTeX (c, \\theta, v_0), for maths and science. Empty for everyday quantities like a bill.
-        Formats: currency for money, in \(Currency.code). percent for percentages, as whole numbers: 18 means 18%, so divide by 100 in formulas. integer for counts. number for anything else. toggle for yes or no (1 or 0). choice for one of a few options; its value is the option's position, starting at 0.
+        Formats: currency for money, in \(currency). percent for percentages, as whole numbers: 18 means 18%, so divide by 100 in formulas. integer for counts. number for anything else. toggle for yes or no (1 or 0). choice for one of a few options; its value is the option's position, starting at 0.
         """
     }
 
@@ -67,7 +67,11 @@ enum Prompts {
 
     // MARK: - Writing a surface
 
-    static var surface: String {
+    static var surface: String { surface(currency: Currency.code) }
+
+    /// With the currency named, so the server can be given it with a placeholder for each
+    /// user's own (Tools/export-generation.sh).
+    static func surface(currency: String) -> String {
         """
         You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Before you write, look up the facts, numbers, dates and names the screen will state about the world, with the lookup tool, or search and read for the web, and take them only from what they return. A calculation with the user's own numbers, like splitting a bill, states no such facts and needs no tools.
 
@@ -75,7 +79,7 @@ enum Prompts {
 
         \(whenToCalculate)
         If there's something worth changing, write the question it answers, then the calculation. Otherwise leave question, inputs and outputs empty.
-        \(formulaRules)
+        \(formulaRules(currency: currency))
 
         Then compose the screen from blocks.
         \(informationRules)

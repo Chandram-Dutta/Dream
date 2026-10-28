@@ -58,11 +58,17 @@ engine, because it runs every page's formulas on the phone.
   "thinking": "low",
   "locale": { "language": "en", "region": "IN", "currency": "INR", "measurementSystem": "metric" },
   "context": ["lines the phone adds, like what it remembers about the user"],
-  "editing": { "surface": {}, "instruction": "make it four people", "focus": "block id" }
+  "pageID": "the id the finished page is kept under, made by the app"
 }
 ```
 
-`editing` is for a change to a page (Stage 2); without it, a new page. Answers `{ "id": "job id" }`.
+Answers `{ "id": "job id" }`. The types are `Server/src/compose/contract.ts`. Changes to a page
+(Stage 2) add an `editing` field. The finished page is written to sync as a `surface` item
+(the app's `SurfacePayload`, Dream/Sync/SyncPayloads.swift) under `pageID`, and the app saves a
+page it watched under the same id, so it's never kept twice.
+
+The engine's interface is `Server/src/engine/index.ts`: the job runner calls it, the engine port
+fills it in.
 
 Events, one JSON object per `data:` line, each with `seq`:
 
