@@ -14,8 +14,10 @@ keys in .dev.vars, as README.md says):
                                                      any level
   Tools/router-bench/bench.py run [-p N] CONFIG[:REQUEST]…
                                                      make the pages, one config at a time, N at once
-                                                     (default all; 2 for Sarvam, whose plan limits
-                                                     requests a minute)
+                                                     (default all; 4 for Sarvam's and Workers AI's
+                                                     models, which limit requests a minute; a page
+                                                     turned away with 3021 is the limit, so run it
+                                                     again on its own)
   Tools/router-bench/bench.py judge [REQUEST…]       score the pages made (Grok 4.7 thinking low, ~$0.40)
   Tools/router-bench/bench.py matrix                 made, mean score, median time and mean cost,
                                                      by config and category
@@ -131,8 +133,16 @@ def session(name):
 
 
 def database():
+    """The local D1, for reading usage while `wrangler dev` runs."""
     file = [p for p in glob.glob(str(D1 / "*.sqlite")) if not p.endswith("metadata.sqlite")][0]
-    return sqlite3.connect(f"file:{file}?mode=ro", uri=True)
+    try:
+        db = sqlite3.connect(f"file:{file}?mode=ro", uri=True)
+        db.execute("SELECT 1 FROM usage LIMIT 1")
+        return db
+    except sqlite3.OperationalError:
+        # Read-only can't open a WAL database the server hasn't opened yet (it has no -shm file to
+        # read); a plain connection makes one, and only reads.
+        return sqlite3.connect(file)
 
 
 def spent(db, user):
@@ -260,6 +270,10 @@ def judge(reqs):
                 "messages": [{"role": "system", "content": RUBRIC}, {"role": "user", "content": f"Request: {REQUESTS[req][1]}\nGround truth: {TRUTH[req]}\n\n{pages}"}]}
         content = post("/api/model", body, found["rb-judge"]["token"], key)["choices"][0]["message"]["content"]
         graded = json.loads(content[content.index("{"): content.rindex("}") + 1])
+        for grade in graded.values():
+            # Now and then the judge gives the parts without their sum.
+            if isinstance(grade, dict) and not isinstance(grade.get("score"), (int, float)):
+                grade["score"] = sum(grade.get(part, 0) for part in ("correct", "fit", "useful", "clear"))
         scores[req] = {labels[label]: grade for label, grade in graded.items() if label in labels}
         save("scores.json", scores)
         print(req, {cfg: grade.get("score") for cfg, grade in scores[req].items()}, flush=True)
