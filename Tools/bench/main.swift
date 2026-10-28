@@ -1,4 +1,6 @@
+import CoreGraphics
 import Foundation
+import ImageIO
 
 // Runs the composer on this Mac and prints what came out, so prompt and checker changes can be
 // judged without the app. Build and run with Tools/bench.sh. It uses Grok, with XAI_API_KEY set
@@ -13,12 +15,18 @@ let defaultRequests = [
     "is it worth buying solar panels for my house",
 ]
 
+/// "-image path/to/photo.jpg" asks every request about that photo, as the app does when a photo
+/// is attached.
+let photo: CGImage? = UserDefaults.standard.string(forKey: "image").flatMap { path in
+    CGImageSourceCreateWithURL(URL(fileURLWithPath: path) as CFURL, nil).flatMap { CGImageSourceCreateImageAtIndex($0, 0, nil) }
+}
+
 @MainActor func run(_ requests: [String]) async {
     var problemCount = 0
     for request in requests {
-        print("\n==================== \(request)")
+        print("\n==================== \(request)\(photo == nil ? "" : " (with photo)")")
         let composer = Composer()
-        await composer.compose(intent: request)
+        await composer.compose(intent: request, image: photo)
         let answers = composer.surface?.answers ?? []
         print(answers.isEmpty ? "Asked: nothing" : "Asked: " + answers.map { "\($0.question.text)\($0.isRemembered ? " (remembered: \($0.choice))" : "")" }.joined(separator: "; "))
         if let surface = composer.surface { await BenchConnections.showLive(surface, suggesting: composer.suggestions) }

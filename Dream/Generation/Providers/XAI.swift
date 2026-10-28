@@ -22,9 +22,11 @@ struct XAILanguageModel: LanguageModel {
     /// Far more than anything Dream sends.
     var contextSize: Int { 256_000 }
 
-    /// The key from the environment (for the Mac bench), else the Keychain.
+    /// The key from the environment (for the Mac bench), else the Keychain. `XAI_API_KEY=off`
+    /// leaves Grok out, so a bench of Dream's server models isn't quietly finished by Grok when
+    /// one of them fails (Composer tries the next usable provider).
     static var savedKey: String? {
-        if let key = Build.environment("XAI_API_KEY") { return key }
+        if let key = Build.environment("XAI_API_KEY") { return key == "off" ? nil : key }
         return Keychain.read("xai")
     }
 }
