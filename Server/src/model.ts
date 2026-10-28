@@ -7,7 +7,9 @@
 // (`AI_GATEWAY`), which keeps no logs of them: Grok to xAI's Responses API, translated both ways
 // by responses.ts, and Workers AI's models through the AI binding, smoothed by workersai.ts. Either
 // way the app keeps speaking chat completions. Each account's cache key goes along (in the body
-// for xAI, `x-session-affinity` for Workers AI), so repeated prompts are read from a cache.
+// for xAI, `x-session-affinity` for Workers AI), so repeated prompts are read from a cache. Models
+// that can't call a tool while a JSON schema holds them get each round with tools first without
+// the schema (toolsfirst.ts).
 //
 // The app's Dream provider (Dream/Generation/Providers/DreamModel.swift) sends what it would send
 // xAI, with the user's session, proof that it's the app (attest.ts), and `X-Dream-Page` naming
@@ -26,6 +28,7 @@ import { allowed, bodyBytes, isJSON, problem } from "./reply";
 import { CATALOG, choose, fitEffort, offered, type Model } from "./models";
 import { chatCompletion, chatStream, toResponses } from "./responses";
 import { withHeartbeat } from "./stream";
+import { asksToolsFirst, toolsFirst, withoutSchema } from "./toolsfirst";
 import { workersCompletion, workersStream } from "./workersai";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
 
@@ -280,7 +283,7 @@ async function askWorkersAI(env: ModelEnv, model: Model, chat: Record<string, un
     extraHeaders: { "x-session-affinity": conversation },
   });
   if (chat.stream === true && answer instanceof ReadableStream) {
-    return new Response(workersStream(answer as ReadableStream<Uint8Array>, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
+    return new Response(workersStream(answer as ReadableStream<Uint8Array>, model.id, chat.tools), { status: 200, headers: { "Content-Type": "text/event-stream" } });
   }
   return Response.json(workersCompletion(answer, model.id));
 }
@@ -302,9 +305,19 @@ async function askSarvam(env: ModelEnv, model: Model, chat: Record<string, unkno
   const upstream = await fetch("https://api.sarvam.ai/v2/chat/completions", { method: "POST", headers, body: JSON.stringify(request) });
   if (!upstream.ok) return upstream;
   if (chat.stream === true && upstream.body) {
-    return new Response(workersStream(upstream.body, model.id), { status: 200, headers: { "Content-Type": "text/event-stream" } });
+    return new Response(workersStream(upstream.body, model.id, chat.tools), { status: 200, headers: { "Content-Type": "text/event-stream" } });
   }
   return Response.json(workersCompletion(await upstream.json(), model.id));
+}
+
+/** A round for a model that can't call a tool while a schema holds it (toolsfirst.ts): first
+ * without the schema, and if it answers instead of calling a tool, again with it. Both think at
+ * the level asked for. Thinking less in the first was tried: DeepSeek then called lookup over and
+ * over on a bill split, and Workers AI limits its no-thinking requests per minute far sooner. */
+async function askToolsFirst(ask: (chat: Record<string, unknown>) => Promise<Response>, chat: Record<string, unknown>, dropped: (events: number) => void): Promise<Response> {
+  const first = await ask(withoutSchema(chat));
+  if (!first.ok || !first.body) return first;
+  return new Response(toolsFirst(first.body, () => ask(chat), dropped), { status: 200, headers: { "Content-Type": "text/event-stream" } });
 }
 
 async function conversationID(userID: string): Promise<string> {
@@ -381,26 +394,34 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   // are read from the cache at about a third of the price. It's a hash, so xAI never sees Dream's
   // id for anyone.
   const conversation = await conversationID(user.id);
+  const record = (use: ModelUse, firstAt: number | null = null) => {
+    ctx.waitUntil(recordModel(env, user.id, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
+    generation(use, 200, firstAt);
+  };
+  const ask = (chat: Record<string, unknown>) => (chosen.provider === "sarvam" ? askSarvam(env, chosen, chat, conversation) : askWorkersAI(env, chosen, chat, conversation));
+  // A dropped answer's usage never arrives, so it's estimated, as for any stream cut short.
+  const droppedRound = (events: number) => {
+    const tokensIn = Math.ceil(raw.length / 4);
+    record({ tokensIn, tokensCached: 0, tokensOut: events, cost: priced(modelID, tokensIn, 0, events) });
+  };
   let upstream: Response;
   try {
     upstream =
       chosen.provider === "xai"
         ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation)
-        : chosen.provider === "sarvam"
-          ? await askSarvam(env, chosen, body, conversation)
-          : await askWorkersAI(env, chosen, body, conversation);
-  } catch {
-    console.error("Model provider unreachable");
+        : chosen.toolsFirst && asksToolsFirst(body)
+          ? await askToolsFirst(ask, body, droppedRound)
+          : await ask(body);
+  } catch (error) {
+    // Only the provider's error code, like Workers AI's 3021 for its per-minute limit: its message
+    // could repeat what was asked.
+    console.error("Model provider unreachable", (error instanceof Error ? error.message : "").match(/^\d{3,5}\b/)?.[0] ?? "");
     return problem(502, "The model didn't answer. Try again in a moment.");
   }
   if (!upstream.ok) {
     generation(null, upstream.status);
     return upstreamProblem(upstream);
   }
-  const record = (use: ModelUse, firstAt: number | null = null) => {
-    ctx.waitUntil(recordModel(env, user.id, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
-    generation(use, 200, firstAt);
-  };
 
   if (body.stream && upstream.body) {
     const chat = chosen.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;

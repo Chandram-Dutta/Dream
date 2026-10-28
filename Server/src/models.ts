@@ -28,6 +28,10 @@ export interface Model {
   /** The thinking levels it takes, from least to most; empty for a model that doesn't think. A
    * level it doesn't take is moved to the nearest one it does (`fitEffort`). */
   efforts: Effort[];
+  /** It holds every token to a request's JSON schema, so with one it can never start a tool
+   * call: a round with tools goes first without the schema (toolsfirst.ts). True of what Workers
+   * AI and Sarvam serve; Grok takes tools and a schema together. */
+  toolsFirst: boolean;
 }
 
 /** How long a model thinks before it answers, from not at all to as long as it needs. */
@@ -42,6 +46,14 @@ export type Effort = (typeof EFFORTS)[number];
 // GLM 5.3 Flash wrote a rupee page in Spanish pesos; Kimi K2.6 took up to six minutes a page;
 // Grok 4.20 Fast was no faster than 4.7 and cost more; Mistral Small 3.1 and Llama 4 Scout failed
 // most pages. Thinking levels are from Workers AI's catalogue and xAI's API.
+//
+// Benched again 2026-10-28, seven pages each, before and after fixing the harness
+// (docs/HarnessBench.md), which was more at fault than the models: the Spanish page was a repair
+// that had lost its request, the runaways were padding nothing stopped, and no model here but
+// Grok could call a tool with a schema on (`toolsFirst`). Since then Grok 4.7 makes every page at
+// about $0.05 with most of its prompt cached; DeepSeek V4.1 Flash looks up and cites current facts
+// it used to leave out, at about $0.01 a page, but takes about a minute; Gemma 4 on Sarvam
+// searches too, but pads its answers, and Sarvam turns away a burst of requests.
 export const CATALOG: Model[] = [
   {
     id: "grok-4.7",
@@ -52,6 +64,7 @@ export const CATALOG: Model[] = [
     plus: false,
     price: { input: 2, cached: 0.5, output: 6 },
     efforts: ["low", "medium", "high"],
+    toolsFirst: false,
   },
   {
     id: "grok-4.20-fast",
@@ -62,26 +75,29 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 2, cached: 0.5, output: 6 },
     efforts: [],
+    toolsFirst: false,
   },
   {
     id: "deepseek-v4.1-flash",
     name: "DeepSeek V4.1 Flash",
-    note: "Cheap and quick; thinking off is quicker still",
+    note: "Cheap; looks things up, so takes about a minute",
     provider: "workers-ai",
     upstream: "@cf/deepseek-ai/deepseek-v4.1-flash-1017",
     plus: true,
     price: { input: 0.3, cached: 0.006, output: 1.2 },
     efforts: ["none", "low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "glm-5.3-flash",
     name: "GLM 5.3 Flash",
-    note: "Cheapest; wrote a rupee page in Spanish once",
+    note: "Cheapest",
     provider: "workers-ai",
     upstream: "@cf/zai-org/glm-5.3-flash",
     plus: true,
     price: { input: 0.15, cached: 0.03, output: 0.5 },
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "kimi-k2.6",
@@ -92,6 +108,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.95, cached: 0.16, output: 4 },
     efforts: ["none", "high"],
+    toolsFirst: true,
   },
   // Sarvam's open models (POST /v2/chat/completions), not yet tried on pages. Sarvam prices in
   // rupees and hasn't been measured here: guesses on the high side, so limits err toward caution.
@@ -104,6 +121,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 1, cached: 1, output: 4 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "sarvam-glm-5.3",
@@ -115,6 +133,7 @@ export const CATALOG: Model[] = [
     price: { input: 1.4, cached: 1.4, output: 4.4 },
     // Sarvam thinks at max when no level is sent; one always is.
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "sarvam-deepseek-v4.1-flash",
@@ -125,6 +144,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.5, cached: 0.5, output: 2 },
     efforts: ["low", "high", "max"],
+    toolsFirst: true,
   },
   {
     id: "sarvam-gemma-4",
@@ -135,6 +155,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.5, cached: 0.5, output: 1.5 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "mistral-small-3.1",
@@ -145,6 +166,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.351, cached: 0.351, output: 0.555 },
     efforts: [],
+    toolsFirst: true,
   },
   {
     id: "llama-4-scout",
@@ -155,6 +177,7 @@ export const CATALOG: Model[] = [
     plus: true,
     price: { input: 0.27, cached: 0.27, output: 0.85 },
     efforts: [],
+    toolsFirst: true,
   },
 ];
 

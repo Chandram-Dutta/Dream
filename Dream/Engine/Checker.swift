@@ -137,6 +137,12 @@ enum Checker {
                 problem("'\(output.name)' doesn't use any input, so it never changes. Calculate it from the inputs, or make it an input if the user should enter it.")
             }
         }
+        // A chart of something the calculation doesn't have, usually the very curve the screen is
+        // about, like y along x, written as a name or a formula. Left alone, the chart is dropped
+        // and the screen loses the part the user came to play with.
+        for chart in charts(in: surface.blocks) where !chart.refs.isEmpty && !chart.refs.contains(where: { surface.output($0) != nil }) {
+            problem("The chart plots '\(chart.ref)', which isn't a result. Add what it plots as an output, calculated from the inputs, and chart that.")
+        }
         if hasProblems { return issues }
 
         // Minimums that break results: raise them by one step if that's enough.

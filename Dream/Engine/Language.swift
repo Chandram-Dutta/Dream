@@ -52,8 +52,10 @@ enum Languages {
 
     /// The language a surface is written in, from its sentences, since labels like "Triangle
     /// rectangle" can belong to several languages. Maths and live values are left out. A page
-    /// of text needs no hints, and they'd only tip close languages, like Spanish into Catalan;
-    /// `likely` is only used when the text can't settle it.
+    /// of text needs no hints, and they'd only tip close languages, like Spanish into Catalan.
+    /// `likely`, the request's language, which the model was told to write in, wins whenever the
+    /// text leaves it in the running: a Hindi page read as Marathi when it only had to lose the
+    /// close call.
     static func of(_ surface: Surface, likely: String? = nil) -> NLLanguage? {
         let texts = surface.readableTexts.map { text in
             Placeholders.parts(text).compactMap { part -> String? in
@@ -66,7 +68,7 @@ enum Languages {
         recognizer.processString((sentences.isEmpty ? texts : sentences).joined(separator: "\n"))
         let hypotheses = recognizer.languageHypotheses(withMaximum: 3)
         guard let (best, confidence) = hypotheses.max(by: { $0.value < $1.value }) else { return likely.map { NLLanguage(rawValue: $0) } }
-        if confidence < 0.6, let likely, hypotheses[NLLanguage(likely)] != nil { return NLLanguage(likely) }
+        if let likely, let chance = hypotheses[NLLanguage(likely)], chance >= 0.1 || confidence < 0.6 { return NLLanguage(likely) }
         return best
     }
 

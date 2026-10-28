@@ -33,11 +33,50 @@ enum ChatCompletions {
         let options = request.generationOptions
         if let temperature = options.temperature { body["temperature"] = temperature }
         if options.samplingMode == .greedy { body["temperature"] = 0 }
-        if let maximum = options.maximumResponseTokens { body["max_tokens"] = maximum }
+        // Providers count thinking against max_tokens, so the answer's budget gets room for it on
+        // top: the gap check, given 600 tokens, used to spend them all thinking and answer nothing.
+        if let maximum = options.maximumResponseTokens { body["max_tokens"] = maximum + thinkingRoom(ThinkingChoice.level) }
 
         let messages = body["messages"] as? [[String: Any]] ?? []
         let summary = "\(messages.count) messages (last: \(messages.last?["role"] as? String ?? "?")), schema: \(request.schema != nil), tools: \(request.enabledToolDefinitions.map(\.name))"
-        return (try JSONSerialization.data(withJSONObject: body), summary)
+        return (try ordered(body), summary)
+    }
+
+    /// JSON whose keys always come in the same order, so the same request is the same bytes and
+    /// a provider can serve what it has seen from its prompt cache. A schema's properties come in
+    /// the order they were declared (its "x-order", which then goes): models write them in that
+    /// order, so names come before the formulas that use them and a screen's related topics come
+    /// last (Wire.swift). Swift's dictionaries used to set both orders at random, differently in
+    /// every process, so a screen could start with its citations.
+    static func ordered(_ value: Any) throws -> Data {
+        var out = Data()
+        try write(value, into: &out)
+        return out
+    }
+
+    private static func write(_ value: Any, order: [String]? = nil, into out: inout Data) throws {
+        switch value {
+        case let object as [String: Any]:
+            let keys = object.keys.filter { $0 != "x-order" }
+            let declared = (order ?? []).filter(keys.contains)
+            out.append(UInt8(ascii: "{"))
+            for (index, key) in (declared + keys.filter { !declared.contains($0) }.sorted()).enumerated() {
+                if index > 0 { out.append(UInt8(ascii: ",")) }
+                try write(key, into: &out)
+                out.append(UInt8(ascii: ":"))
+                try write(object[key] ?? NSNull(), order: key == "properties" ? object["x-order"] as? [String] : nil, into: &out)
+            }
+            out.append(UInt8(ascii: "}"))
+        case let array as [Any]:
+            out.append(UInt8(ascii: "["))
+            for (index, item) in array.enumerated() {
+                if index > 0 { out.append(UInt8(ascii: ",")) }
+                try write(item, into: &out)
+            }
+            out.append(UInt8(ascii: "]"))
+        default:
+            out.append(try JSONSerialization.data(withJSONObject: value, options: [.fragmentsAllowed, .withoutEscapingSlashes]))
+        }
     }
 
     /// Sends a request that's ready to go and streams the answer into `channel`. Every line that
@@ -64,18 +103,45 @@ enum ChatCompletions {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         var firstText = true
         var reasoningCharacters = 0
+        var padding = Padding()
+        var usage: Chunk.Usage?
+        // Why it ended: stop, tool_calls, or length when it ran out of room.
+        var finish: String?
+        // A short answer is shown whole, since one that short is usually a broken or empty one.
+        var answer = ""
+        defer {
+            let tokens = usage.map { String(format: " (%d tokens in, %d of them cached; %d out, %d of them thinking)", $0.promptTokens ?? 0, $0.promptTokensDetails?.cachedTokens ?? 0, ($0.completionTokens ?? 0) + ($0.completionTokensDetails?.reasoningTokens ?? 0), $0.completionTokensDetails?.reasoningTokens ?? 0) } ?? ""
+            trace(label, String(format: "done after %.1fs%@%@, %d characters of reasoning", Date().timeIntervalSince(started), finish.map { ", finished: \($0)" } ?? "", tokens, reasoningCharacters))
+            if !answer.isEmpty, answer.count < 400 { trace(label, "the whole answer: \(answer)") }
+        }
         for try await line in bytes.lines {
             ModelActivity.touch()
             guard line.hasPrefix("data:") else { continue }
             let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
             if payload == "[DONE]" { break }
-            guard let chunk = try? decoder.decode(Chunk.self, from: Data(payload.utf8)), let delta = chunk.choices.first?.delta else { continue }
-            if let reasoning = delta.reasoningContent { reasoningCharacters += reasoning.count }
+            guard let chunk = try? decoder.decode(Chunk.self, from: Data(payload.utf8)) else { continue }
+            // What the request used comes last, in a chunk of its own, for the log.
+            if let used = chunk.usage { usage = used }
+            if let reason = chunk.choices.first?.finishReason { finish = reason }
+            guard let delta = chunk.choices.first?.delta else { continue }
+            if let reasoning = delta.reasoningContent {
+                reasoningCharacters += reasoning.count
+                if !firstText, let kind = padding.rethink(reasoning) {
+                    trace(label, String(format: "stopped after %.1fs: the answer turned to %@", Date().timeIntervalSince(started), kind))
+                    return
+                }
+            }
             if let text = delta.content, !text.isEmpty {
                 if firstText {
                     firstText = false
                     trace(label, String(format: "first text after %.1fs (%d characters of reasoning before it)", Date().timeIntervalSince(started), reasoningCharacters))
                 }
+                // Padding goes no further: the answer ends here, and the composer keeps what's finished.
+                if let kind = padding.read(text) {
+                    trace(label, String(format: "stopped after %.1fs: the answer turned to %@", Date().timeIntervalSince(started), kind))
+                    return
+                }
+                if answer.count < 400 { answer += text }
                 await channel.send(.response(action: .appendText(text, tokenCount: tokens(in: text))))
             }
             // Streamed tool calls arrive whole, in a single chunk.
@@ -88,7 +154,17 @@ enum ChatCompletions {
                     action: .appendArguments(arguments, tokenCount: tokens(in: arguments)))))
             }
         }
-        trace(label, String(format: "done after %.1fs", Date().timeIntervalSince(started)))
+    }
+
+    /// Tokens of thinking to allow beside an answer's own budget, by level. Never none: the server
+    /// may raise a level the app asks for (Server/src/model.ts).
+    static func thinkingRoom(_ level: String) -> Int {
+        switch level {
+        case "medium": 8_000
+        case "high": 16_000
+        case "max": 32_000
+        default: 4_000
+        }
     }
 
     /// The `error` an answer's JSON carries, as a string or an object with a message.
@@ -161,17 +237,10 @@ enum ChatCompletions {
         }
     }
 
-    /// Apple's schemas are JSON Schema already; only the ordering extension needs to go.
+    /// Apple's schemas are JSON Schema already, with an "x-order" extension that `ordered` puts
+    /// the properties in, and drops.
     private static func json(_ schema: GenerationSchema) throws -> Any {
-        let object = try JSONSerialization.jsonObject(with: JSONEncoder().encode(schema))
-        func clean(_ value: Any) -> Any {
-            if let dictionary = value as? [String: Any] {
-                return dictionary.filter { $0.key != "x-order" }.mapValues(clean)
-            }
-            if let array = value as? [Any] { return array.map(clean) }
-            return value
-        }
-        return clean(object)
+        try JSONSerialization.jsonObject(with: JSONEncoder().encode(schema))
     }
 
     private static func jpeg(_ image: CGImage) -> Data? {
@@ -190,9 +259,68 @@ enum ChatCompletions {
         max(1, text.count / 4)
     }
 
+    /// Spots an answer that has turned to padding. JSON never needs hundreds of blank characters
+    /// in a row, or a number dozens of digits long, but a model held to a schema token by token
+    /// can fall into either and go on until it runs out of room: a packing list once ran for 155
+    /// seconds that way, and a quadratic for 90, both ending in nothing. Neither changes what's
+    /// been parsed, so the composer can't see it, and tokens keep coming, so it isn't a stall.
+    /// Nor is any screen longer than `lengthLimit` characters or `pieceLimit` pieces, ten times
+    /// the longest on the bench (about 1,500 tokens), however it loops. And a model that goes back
+    /// to thinking once its answer has begun, for more than `rethinkLimit` characters, is lost:
+    /// DeepSeek did that twice on a packing list, until it hit the 32,000-token cap.
+    struct Padding {
+        static let blankLimit = 400
+        static let digitLimit = 40
+        static let lengthLimit = 60_000
+        static let pieceLimit = 15_000
+        static let rethinkLimit = 20_000
+        private var inString = false
+        private var escaped = false
+        private var blanks = 0
+        private var digits = 0
+        private var length = 0
+        private var pieces = 0
+        private var rethinking = 0
+
+        /// Reads thinking that comes after the answer began; what it has turned into, once it's lost.
+        mutating func rethink(_ text: String) -> String? {
+            rethinking += text.count
+            return rethinking > Self.rethinkLimit ? "thinking again, \(rethinking) characters after the answer began" : nil
+        }
+
+        /// Reads the next piece of the answer; what it has turned into, once it's padding.
+        mutating func read(_ text: String) -> String? {
+            length += text.count
+            pieces += 1
+            if length > Self.lengthLimit || pieces > Self.pieceLimit { return "\(length) characters in \(pieces) pieces, longer than any screen" }
+            for scalar in text.unicodeScalars {
+                if scalar == " " || scalar == "\n" || scalar == "\r" || scalar == "\t" {
+                    blanks += 1
+                    if blanks >= Self.blankLimit { return "\(blanks) blank characters in a row" }
+                } else {
+                    blanks = 0
+                }
+                // Digits only count in numbers: a string may quote as many as it likes, like π's.
+                if inString {
+                    if escaped { escaped = false } else if scalar == "\\" { escaped = true } else if scalar == "\"" { inString = false }
+                } else if scalar == "\"" {
+                    inString = true
+                    digits = 0
+                } else if ("0"..."9").contains(scalar) {
+                    digits += 1
+                    if digits >= Self.digitLimit { return "a number \(digits) digits long" }
+                } else if !".-+eE".unicodeScalars.contains(scalar) {
+                    digits = 0
+                }
+            }
+            return nil
+        }
+    }
+
     private struct Chunk: Decodable {
         struct Choice: Decodable {
             let delta: Delta?
+            let finishReason: String?
         }
 
         struct Delta: Decodable {
@@ -211,7 +339,17 @@ enum ChatCompletions {
             let arguments: String?
         }
 
+        struct Usage: Decodable {
+            struct Prompt: Decodable { let cachedTokens: Int? }
+            struct Completion: Decodable { let reasoningTokens: Int? }
+            let promptTokens: Int?
+            let completionTokens: Int?
+            let promptTokensDetails: Prompt?
+            let completionTokensDetails: Completion?
+        }
+
         let choices: [Choice]
+        let usage: Usage?
     }
 }
 

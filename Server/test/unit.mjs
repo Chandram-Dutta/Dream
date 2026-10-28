@@ -13,7 +13,8 @@ import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
 import { CATALOG, choose, fitEffort, offered } from "../src/models.ts";
 import { withHeartbeat } from "../src/stream.ts";
-import { workersCompletion, workersStream, workersUsage } from "../src/workersai.ts";
+import { asksToolsFirst, TOOL_ROUNDS, toolsFirst, withoutSchema } from "../src/toolsfirst.ts";
+import { fitArguments, workersCompletion, workersStream, workersUsage } from "../src/workersai.ts";
 import { aiGeneration, capture, countsAllowed, limitReached } from "../src/analytics.ts";
 import { MAX_REPORTS, MAX_STACK, parseReports, ReportError, signatureOf } from "../src/metrickit.ts";
 import { robotsAllows } from "../src/robots.ts";
@@ -392,6 +393,81 @@ expect(workers.includes('"reasoning_content":"Thinking"') && workers.includes('"
 const workerUsage = workerChunks.filter((chunk) => chunk.usage);
 expect(workerUsage.length === 1 && workerUsage[0].usage.total_tokens === 220 && workerUsage[0].usage.prompt_tokens_details.cached_tokens === 128 && workerUsage[0].usage.cost_in_usd_ticks === 440_000, "one usage, the total, with neurons as dollars");
 expect(workersUsage({ prompt_tokens: 10, completion_tokens: 5, neurons: 1 })?.cost_in_usd_ticks === 110_000 && workersCompletion({ choices: [], usage: { prompt_tokens: 1, neurons: 2 } }, "deepseek-v4.1-flash").usage.cost_in_usd_ticks === 220_000, "a neuron is $0.000011");
+
+console.log("Tool calls fitted to their tools' schemas");
+const searchSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: { question: { type: "string" }, keywords: { type: "string" }, freshness: { type: "string", enum: ["any", "day", "week", "month", "year"] }, country: { type: "string" } },
+  required: ["question", "keywords", "freshness", "country"],
+};
+const fittedSearch = JSON.parse(fitArguments('{"question":"Who won?","keywords":["2026 World Cup final","score"],"freshness":"Month","extra":1}', searchSchema));
+expect(fittedSearch.keywords === "2026 World Cup final score" && fittedSearch.freshness === "month" && fittedSearch.country === "" && !("extra" in fittedSearch), "a list where one string goes is joined, a choice in the wrong case matched, a left-out field filled, an unknown one dropped");
+const liveSchema = { type: "object", properties: { kind: { $ref: "#/$defs/Kind" }, days: { type: "integer" }, topics: { type: "array", items: { type: "string" } } }, required: ["kind", "days", "topics"], $defs: { Kind: { type: "string", enum: ["weather", "route"] } } };
+const fittedLive = JSON.parse(fitArguments('{"kind":"forecast","days":"3","topics":"home city"}', liveSchema));
+expect(fittedLive.kind === "weather" && fittedLive.days === 3 && fittedLive.topics.length === 1 && fittedLive.topics[0] === "home city", "references followed, a choice that isn't one becomes the first, numbers from text, one item as a list");
+expect(fitArguments("not json", searchSchema) === "not json" && fitArguments('{"q":1}', undefined) === '{"q":1}', "arguments that aren't JSON, or a tool with no schema, go on as they are");
+const fittedStream = await new Response(
+  workersStream(
+    piecesOf([delta({ tool_calls: [{ id: "call_2", index: 0, type: "function", function: { name: "search", arguments: '{"question":"Who won?","keywords":["final"]}' } }] }), "[DONE]"]),
+    "sarvam-gemma-4",
+    [{ type: "function", function: { name: "search", parameters: searchSchema } }],
+  ),
+).text();
+const streamedCall = fittedStream.split("\n").filter((line) => line.startsWith("data:") && !line.includes("[DONE]")).map((line) => JSON.parse(line.slice(5))).flatMap((chunk) => chunk.choices?.[0]?.delta?.tool_calls ?? [])[0];
+expect(JSON.parse(streamedCall.function.arguments).keywords === "final" && JSON.parse(streamedCall.function.arguments).freshness === "any", "a streamed tool call goes on fitted");
+
+console.log("Tools before the schema, for models that can't have both");
+expect(asksToolsFirst({ stream: true, tools: [{}], response_format: { type: "json_schema", json_schema: {} } }), "a streamed round with tools and a schema goes first without the schema");
+expect(!asksToolsFirst({ stream: true, tools: [], response_format: { type: "json_schema", json_schema: {} } }) && !asksToolsFirst({ stream: true, tools: [{}] }) && !asksToolsFirst({ tools: [{}], response_format: { type: "json_schema" } }), "not without tools, a schema, or a stream");
+const shapedAnswer = { model: "x", messages: [], tools: [{}], response_format: { type: "json_schema" } };
+expect(!("response_format" in withoutSchema(shapedAnswer)) && withoutSchema(shapedAnswer).tools.length === 1 && "response_format" in shapedAnswer, "the free round is the same request without its schema");
+const freeRound = (list) => workersStream(piecesOf(list), "deepseek-v4.1-flash");
+let shapedAsked = 0;
+let droppedEvents = -1;
+const shapedReply = async () => {
+  shapedAsked++;
+  return new Response(piecesOf([delta({ content: '{"title":"Spain"}' }), "[DONE]"]));
+};
+const called = await new Response(
+  toolsFirst(
+    freeRound([
+      delta({ role: "assistant", content: "" }),
+      delta({ reasoning_content: "Need the result" }),
+      delta({ content: "\n\n" }),
+      delta({ tool_calls: [{ id: "call_9", index: 0, type: "function", function: { name: "lookup", arguments: '{"subject":' } }] }),
+      delta({ tool_calls: [{ index: 0, function: { arguments: '"2026 FIFA World Cup"}' } }] }),
+      { id: "w1", choices: [{ index: 0, delta: {}, finish_reason: "tool_calls" }] },
+      { response: "", usage: { prompt_tokens: 900, completion_tokens: 20, total_tokens: 920, neurons: 3 } },
+      "[DONE]",
+    ]),
+    shapedReply,
+    (events) => (droppedEvents = events),
+  ),
+).text();
+const calledChunks = called.split("\n").filter((line) => line.startsWith("data:") && !line.includes("[DONE]")).map((line) => JSON.parse(line.slice(5)));
+const passedCall = calledChunks.flatMap((chunk) => chunk.choices?.[0]?.delta?.tool_calls ?? [])[0];
+expect(passedCall?.function?.arguments === '{"subject":"2026 FIFA World Cup"}' && shapedAsked === 0 && droppedEvents === -1, "a tool call in the free round is the answer, whole, and nothing is asked again");
+expect(called.includes("Need the result") && !calledChunks.some((chunk) => typeof chunk.choices?.[0]?.delta?.content === "string") && calledChunks.some((chunk) => chunk.usage?.cost_in_usd_ticks === 330_000) && called.trimEnd().endsWith("data: [DONE]"), "reasoning and usage pass on; blank text before the call doesn't");
+const answered = await new Response(
+  toolsFirst(
+    freeRound([delta({ role: "assistant", content: "" }), delta({ reasoning_content: "Easy" }), delta({ content: '{"title":"From memory' }), delta({ content: ' and more"}' }), "[DONE]"]),
+    shapedReply,
+    (events) => (droppedEvents = events),
+  ),
+).text();
+expect(shapedAsked === 1 && droppedEvents === 3 && answered.includes("Easy") && answered.includes('{\\"title\\":\\"Spain\\"}') && !answered.includes("From memory"), "an answer in the free round is dropped unread and asked again with the schema");
+const toolRound = { role: "assistant", content: "", tool_calls: [{ id: "c", type: "function", function: { name: "lookup", arguments: "{}" } }] };
+const rounds = (count) => ({ stream: true, tools: [{}], response_format: { type: "json_schema", json_schema: {} }, messages: [{ role: "system" }, { role: "user" }, ...Array.from({ length: count }, () => [toolRound, { role: "tool" }]).flat()] });
+expect(asksToolsFirst(rounds(TOOL_ROUNDS - 1)) && !asksToolsFirst(rounds(TOOL_ROUNDS)), "after a few rounds of tools, the schema holds the model to answering");
+let busyTimes = 0;
+const busyOnce = async () => (busyTimes++ ? shapedReply() : new Response("busy", { status: 429 }));
+const askedAgain = await new Response(toolsFirst(freeRound([delta({ content: "Hi" }), "[DONE]"]), busyOnce, () => {}, [1, 1])).text();
+expect(busyTimes === 2 && askedAgain.includes('{\\"title\\":\\"Spain\\"}'), "a busy model is asked again for the answer");
+let refusedTimes = 0;
+const refusing = async () => (refusedTimes++, new Response("bad", { status: 400 }));
+const turnedAway = await new Response(toolsFirst(freeRound([delta({ content: "Hi" }), "[DONE]"]), refusing, () => {}, [1, 1])).text();
+expect(turnedAway.trim() === "data: [DONE]" && refusedTimes === 1, "a request it refuses isn't asked again, and the answer just ends");
 
 console.log("Apple's sign-in keys, kept for every server");
 const { publicKey } = await crypto.subtle.generateKey({ name: "RSASSA-PKCS1-v1_5", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["sign", "verify"]);

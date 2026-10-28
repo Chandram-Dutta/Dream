@@ -58,7 +58,7 @@ enum Prompts {
 
     static var surface: String {
         """
-        You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Use the lookup tool, or search and read for the web, whenever facts, numbers, dates or names matter, and take them only from what they return.
+        You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Before you write, look up the facts, numbers, dates and names the screen will state about the world, with the lookup tool, or search and read for the web, and take them only from what they return. A calculation with the user's own numbers, like splitting a bill, states no such facts and needs no tools.
 
         \(whenToCalculate)
         If there's something worth changing, write the question it answers, then the calculation. Otherwise leave question, inputs and outputs empty.
@@ -88,13 +88,31 @@ enum Prompts {
         return parts.joined(separator: "\n\n")
     }
 
-    static func repair(_ problems: [Issue]) -> String {
-        """
-        The calculation in that screen has problems:
-        \(problems.map { "- \($0.message)" }.joined(separator: "\n"))
+    /// The checker's problems, sent back in the session the screen was written in. When the
+    /// screen stopped early (it looped, padded or broke off), the session lost the request and
+    /// the screen, so `restating` the request and the `screen` as it stands go along: without
+    /// them, a model rebuilt a rupee bill split as a Spanish one in pesos.
+    static func repair(_ problems: [Issue], restating asked: String? = nil, screen current: Surface? = nil) -> String {
+        let list = problems.map { "- \($0.message)" }.joined(separator: "\n")
+        guard let asked, let current else {
+            return """
+                The calculation in that screen has problems:
+                \(list)
 
-        Return the whole screen again with these problems fixed. Keep everything else the same.
-        """
+                Return the whole screen again with these problems fixed. Keep everything else the same.
+                """
+        }
+        return """
+            \(asked)
+
+            You began this screen, but it stopped before it was finished. What it has so far:
+            \(screen(current))
+
+            Its calculation has problems:
+            \(list)
+
+            Return the whole screen, finished, with these problems fixed. Keep what's already there.
+            """
     }
 
     static func edit(intent: String, surface: Surface, instruction: String, focus: Block?, context: [String]) -> String {

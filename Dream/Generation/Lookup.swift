@@ -21,6 +21,7 @@ struct LookupTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
+        guard found.mayLookUp() else { return "That's enough looking up for one screen. Build it from what you've found." }
         onLookup(arguments.subject)
         let code = arguments.language.trimmingCharacters(in: .whitespaces)
         let language = Locale(identifier: "en").localizedString(forLanguageCode: code) != nil ? code : self.language
@@ -34,11 +35,24 @@ struct LookupTool: Tool {
 
 /// What the lookup tool found, so the surface can credit its source and show its image.
 final class ReferenceLog: @unchecked Sendable {
+    /// Enough for a screen, as for the web (`WebLog`); more is a model going round in circles.
+    /// Grok looks up five at most; DeepSeek once looked up the same few subjects a dozen times.
+    static let lookupLimit = 6
+
     private let lock = NSLock()
     private var references: [Reference] = []
+    private var lookups = 0
 
     func append(_ reference: Reference) {
         lock.withLock { references.append(reference) }
+    }
+
+    /// Whether another lookup may go ahead, counting it if so.
+    func mayLookUp() -> Bool {
+        lock.withLock {
+            lookups += 1
+            return lookups <= Self.lookupLimit
+        }
     }
 
     var first: Reference? {
