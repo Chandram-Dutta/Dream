@@ -1,0 +1,1141 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "people",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tipPercent",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your bill"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "tip",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "total",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each.  pays more.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 2400,
+          "label" : "Bill amount",
+          "max" : 20000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill * (1 + tipPercent / 100) / people",
+          "label" : "Each pays",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill * tipPercent / 100",
+          "label" : "Tip",
+          "name" : "tip",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill + tip",
+          "label" : "Total with tip",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much does each person pay?",
+      "related" : [
+        "Tipping in India",
+        "Splitting rent"
+      ],
+      "summary" : "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+      "symbol" : "fork.knife",
+      "title" : "Split the Dinner"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "people",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tipPercent",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your bill"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "tip",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "hero",
+              "over" : "",
+              "ref" : "total",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Totals"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  ",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 2400,
+          "label" : "Bill amount",
+          "max" : 20000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill * (1 + tipPercent / 100) / people",
+          "label" : "Each pays",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill * tipPercent / 100",
+          "label" : "Tip",
+          "name" : "tip",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill + tip",
+          "label" : "Total with tip",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much does each person pay?",
+      "related" : [
+        "Tipping in India",
+        "Split the Dinner",
+        "Splitting rent",
+        "Tipping in India",
+        "  "
+      ],
+      "summary" : "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+      "symbol" : "fork.knife",
+      "title" : "Split the Dinner"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "field",
+            "over" : "",
+            "ref" : "bill",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "people",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "tipPercent",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Your bill"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "tip",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "hero",
+            "over" : "",
+            "ref" : "total",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Totals"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  ",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2400,
+        "label" : "Bill amount",
+        "max" : 20000,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 50,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip (%)",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tipPercent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill * (1 + tipPercent / 100) / people",
+        "label" : "Each pays",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "bill * tipPercent / 100",
+        "label" : "Tip",
+        "name" : "tip",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "bill + tip",
+        "label" : "Total with tip",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "How much does each person pay?",
+    "related" : [
+      "Tipping in India",
+      "Split the Dinner",
+      "Splitting rent",
+      "Tipping in India",
+      "  "
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+    "symbol" : "fork.knife",
+    "title" : "Split the Dinner"
+  },
+  "converted" : {
+    "accent" : "green",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "field",
+            "over" : "",
+            "ref" : "bill",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "people",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-2",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "tipPercent",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Your bill"
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-0",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "tip",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-1",
+            "items" : [
+
+            ],
+            "kind" : "hero",
+            "over" : "",
+            "ref" : "total",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Totals"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  ",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2400,
+        "label" : "Bill amount",
+        "max" : 20000,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 50,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip (%)",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tipPercent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill * (1 + tipPercent / 100) / people",
+        "label" : "Each pays",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "bill * tipPercent / 100",
+        "label" : "Tip",
+        "name" : "tip",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "bill + tip",
+        "label" : "Total with tip",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "How much does each person pay?",
+    "related" : [
+      "Tipping in India",
+      "Split the Dinner",
+      "Splitting rent",
+      "Tipping in India",
+      "  "
+    ],
+    "summary" : "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+    "symbol" : "fork.knife",
+    "title" : "Split the Dinner"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- bill: \"Bill amount\", number, starts at 2400, 0 to 20000, step 50\n- people: \"People\", integer, starts at 3, 1 to 20, step 1\n- tipPercent: \"Tip (%)\", percent, starts at 10, 0 to 30, step 1, in %\nOutputs:\n- perPerson: \"Each pays\", currency = bill * (1 + tipPercent / 100) / people\n- tip: \"Tip\", currency = bill * tipPercent / 100\n- total: \"Total with tip\", number = bill + tip",
+    "outline" : "Split the Dinner: Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.\n- hero #block-0 ref perPerson\n- section #block-1 \"Your bill\"\n  - field #block-1-0 ref bill\n  - stepper #block-1-1 ref people\n  - slider #block-1-2 ref tipPercent\n- row #block-2 \"Totals\"\n  - metric #block-2-0 ref tip\n  - hero #block-2-1 ref total\n- paragraph #block-3\n    With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  \nrelated: Tipping in India, Split the Dinner, Splitting rent, Tipping in India,   "
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- bill: \"Bill amount\", currency, starts at 2400, 0 to 20000, step 50\n- people: \"People\", integer, starts at 3, 1 to 20, step 1\n- tipPercent: \"Tip\", percent, starts at 10, 0 to 30, step 1\nOutputs:\n- perPerson: \"Each pays\", currency = bill * (1 + tipPercent / 100) / people\n- tip: \"Tip\", currency = bill * tipPercent / 100\n- total: \"Total with tip\", currency = bill + tip",
+    "outline" : "Split the Dinner: Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.\n- hero #block-0 ref perPerson\n- section #block-1 \"Your bill\"\n  - field #block-1-0 ref bill\n  - stepper #block-1-1 ref people\n  - slider #block-1-2 ref tipPercent\n- row #block-2\n  - metric #block-2-0 ref tip\n  - metric #block-2-1 ref total\n- paragraph #block-3\n  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each.  pays more.\nrelated: Tipping in India, Splitting rent"
+  },
+  "locale" : "en_IN",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'bill', 'total' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'tipPercent'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "field",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "people",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tipPercent",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Your bill"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "tip",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "hero",
+              "over" : "",
+              "ref" : "total",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Totals"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  ",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 2400,
+          "label" : "Bill amount",
+          "max" : 20000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill * (1 + tipPercent / 100) / people",
+          "label" : "Each pays",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill * tipPercent / 100",
+          "label" : "Tip",
+          "name" : "tip",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill + tip",
+          "label" : "Total with tip",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "question" : "How much does each person pay?",
+      "related" : [
+        "Tipping in India",
+        "Split the Dinner",
+        "Splitting rent",
+        "Tipping in India",
+        "  "
+      ],
+      "summary" : "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+      "symbol" : "fork.knife",
+      "title" : "Split the Dinner"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

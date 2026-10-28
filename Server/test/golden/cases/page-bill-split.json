@@ -1,0 +1,43 @@
+{
+  "about": "A whole page: a 2400 rupee dinner split between friends, with a tip. Money words become currency, the tip label loses its (%), and the blocks are tidied.",
+  "locale": "en_IN",
+  "wire": {
+    "subject": "money",
+    "mode": "use",
+    "title": "Split the Dinner",
+    "summary": "Each of 3 friends pays ₹880 for a ₹2,400 dinner with a 10% tip.",
+    "symbol": "fork.knife",
+    "collections": [],
+    "question": "How much does each person pay?",
+    "inputs": [
+      {"name": "bill", "label": "Bill amount", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "number", "initial": 2400, "min": 0, "max": 20000, "step": 50, "options": []},
+      {"name": "people", "label": "People", "role": "adjustable", "source": "", "symbol": "", "unit": "", "format": "integer", "initial": 3, "min": 1, "max": 20, "step": 1, "options": []},
+      {"name": "tipPercent", "label": "Tip (%)", "role": "adjustable", "source": "", "symbol": "", "unit": "%", "format": "percent", "initial": 10, "min": 0, "max": 30, "step": 1, "options": []}
+    ],
+    "outputs": [
+      {"name": "perPerson", "label": "Each pays", "symbol": "", "unit": "", "formula": "bill * (1 + tipPercent / 100) / people", "format": "currency"},
+      {"name": "tip", "label": "Tip", "symbol": "", "unit": "", "formula": "bill * tipPercent / 100", "format": "currency"},
+      {"name": "total", "label": "Total with tip", "symbol": "", "unit": "", "formula": "bill + tip", "format": "number"}
+    ],
+    "sounds": [],
+    "figures": [],
+    "diagrams": [],
+    "actions": [],
+    "scenes": [],
+    "blocks": [
+      {"kind": "hero", "title": "", "text": "", "ref": "perPerson", "over": "", "items": [], "children": []},
+      {"kind": "section", "title": "Your bill", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "field", "title": "", "text": "", "ref": "bill", "over": "", "items": [], "children": []},
+        {"kind": "stepper", "title": "", "text": "", "ref": "people", "over": "", "items": [], "children": []},
+        {"kind": "slider", "title": "", "text": "", "ref": "tipPercent", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "row", "title": "Totals", "text": "", "ref": "", "over": "", "items": [], "children": [
+        {"kind": "metric", "title": "", "text": "", "ref": "tip", "over": "", "items": [], "children": []},
+        {"kind": "hero", "title": "", "text": "", "ref": "total", "over": "", "items": [], "children": []}
+      ]},
+      {"kind": "paragraph", "title": "", "text": "  With a {tipPercent} tip, the {total} total splits {people} ways into {perPerson} each. {nobody} pays more.  ", "ref": "", "over": "", "items": [], "children": []}
+    ],
+    "related": ["Tipping in India", "Split the Dinner", "Splitting rent", "Tipping in India", "  "],
+    "citations": []
+  }
+}
