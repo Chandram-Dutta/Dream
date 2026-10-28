@@ -1,9 +1,9 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
 // domains file, web search and reading, the policy pages, crash reports, the model proxy,
 // allowances, Dream Plus, App Attest, and the protections. With no address given, it applies the migrations to a local database and
-// starts `wrangler dev` itself, with web search pointed at a stand-in for Parallel and the model
-// at a stand-in for xAI on this Mac (test/stub-parallel.mjs, test/stub-xai.mjs), so nothing is
-// paid for, and with test roots for the App Store and App Attest (test/vectors.mjs). Reading
+// starts `wrangler dev` itself, with web search pointed at a stand-in for Parallel, the model at
+// a stand-in for xAI, and Auto's router at a stand-in for Clef on this Mac (test/stub-parallel.mjs,
+// test/stub-xai.mjs, test/stub-clef.mjs), so nothing is paid for, and with test roots for the App Store and App Attest (test/vectors.mjs). Reading
 // fetches example.com and example.org, and asks Cloudflare's resolver about names, so it needs
 // the network.
 //
@@ -25,6 +25,9 @@ import { runSharing } from "./sharing.mjs";
 import { STUB_KEY, startStub } from "./stub-parallel.mjs";
 import { runSync } from "./sync.mjs";
 import { STUB_XAI_KEY, startXAIStub } from "./stub-xai.mjs";
+import { startClefStub } from "./stub-clef.mjs";
+import { CATALOG, fitEffort } from "../src/models.ts";
+import { CLEF, DEFAULT_PICK, TABLE } from "../src/router.ts";
 import { appStoreChain, assertion, attest, attestRoot, jws, requestData, transaction } from "./vectors.mjs";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
@@ -47,6 +50,8 @@ const LOCAL_ADMIN_KEY = "test-admin-key-0123456789abcdef-0123456789";
 const LEGACY_ID = `Old${Math.random().toString(36).slice(2, 9).padEnd(7, "0")}`.slice(0, 10);
 /** What one person may keep in sync, small enough to fill in a test. */
 const LOCAL_SYNC_QUOTA = 3_000_000;
+/** A tester's id (PLUS_ACCOUNTS), made before the server starts so it can be named there. */
+const ROUTE_TESTER = "00000000-0000-4000-8000-000000000a70";
 /** Allowances low enough to reach in a test. */
 const LOCAL_ALLOWANCES = { free: { pagesPerDay: 2, searchesPerDay: 10 } };
 /** The roots the local server trusts besides Apple's, made for this run. */
@@ -55,11 +60,14 @@ const attestCA = attestRoot();
 /** Everything the test writes, cleared before and after so runs don't affect each other. */
 const CLEAR = ["web_cache", "web_usage", "usage", "usage_pages", "spend", "subscriptions", "appstore_notifications", "attest_keys", "attest_challenges", "diagnostics"].map((table) => `DELETE FROM ${table};`).join(" ");
 
-async function startLocal(stub, xai) {
+async function startLocal(stub, xai, clef) {
   const env = { ...process.env, WRANGLER_SEND_METRICS: "false" };
   execFileSync("npx", ["wrangler", "d1", "migrations", "apply", "dream-share", "--local"], { cwd: root, env, stdio: "ignore" });
   // Each run starts with nothing cached and nothing spent today.
   execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command", CLEAR], { cwd: root, env, stdio: "ignore" });
+  // A tester (PLUS_ACCOUNTS) for Auto, under a known id, signed in as this run's "router-tester".
+  execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command",
+    `INSERT INTO users (id, apple_sub, name, created_at) VALUES ('${ROUTE_TESTER}', 'dev:router-tester-${RUN}', 'router-tester', 0) ON CONFLICT (id) DO UPDATE SET apple_sub = excluded.apple_sub`], { cwd: root, env, stdio: "ignore" });
   const { answers: _, ...surface } = JSON.parse(fixture).surface;
   const legacy = JSON.stringify({ format: 1, surface }).replace(/'/g, "''");
   execFileSync("npx", ["wrangler", "d1", "execute", "dream-share", "--local", "--command",
@@ -85,6 +93,9 @@ async function startLocal(stub, xai) {
     "POSTHOG_KEY:",
     // Only Grok, which goes to the stand-in: Workers AI's models would be real requests.
     "MODELS:grok-4.7",
+    // Auto asks the stand-in for Clef, never Workers AI.
+    `CLEF_URL:${clef.url}`,
+    `PLUS_ACCOUNTS:${ROUTE_TESTER}`,
   ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
@@ -654,10 +665,101 @@ async function runRelease(base, local) {
   }
 }
 
+/** Auto (route.ts) against the stand-in for Clef: who may ask, what's refused before Clef is
+ * asked, what each plan gets, and the default when Clef fails. */
+async function runRoute(base, clef, xai) {
+  const me = await signIn(base, "route");
+  const tester = await signIn(base, "router-tester");
+  const today = new Date().toISOString().slice(0, 10);
+  const ask = (body, { session = me.token, key = LOCAL_APP_KEY, headers = {} } = {}) =>
+    fetch(`${base}/api/route`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(session ? { Authorization: `Bearer ${session}` } : {}), ...(key ? { "X-Dream-Key": key } : {}), ...headers },
+      body: typeof body === "string" ? body : JSON.stringify(body),
+    });
+  const byID = (id) => CATALOG.find((model) => model.id === id);
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 400));
+
+  console.log("Auto: who may ask, and what");
+  let response = await ask({ request: "split a bill" }, { session: null });
+  expect(response.status === 401, "no session is refused");
+  response = await ask({ request: "split a bill" }, { key: null });
+  expect(response.status === 401 && (await response.json()).error === "This is for the Dream app.", "a session without the app's proof is refused");
+  response = await fetch(`${base}/api/route`, { headers: { Authorization: `Bearer ${me.token}` } });
+  expect(response.status === 405, "only POST");
+  response = await ask(JSON.stringify({ request: "split a bill" }), { headers: { "Content-Type": "text/plain" } });
+  expect(response.status === 415, "only application/json");
+  response = await ask({});
+  expect(response.status === 400, "the request is needed");
+  response = await ask({ request: "x".repeat(4_001) });
+  expect(response.status === 400, "and at most 4,000 characters of it");
+  response = await ask({ request: "what is this?", image: "https://example.com/cat.jpg" });
+  expect(response.status === 400, "a photo only as a data: URL, never an address to fetch");
+  response = await ask({ request: "what is this?", hasImage: "yes" });
+  expect(response.status === 400, "hasImage is true or false");
+  response = await ask({ request: "what is this?", image: `data:image/jpeg;base64,${"A".repeat(1_600_000)}` });
+  expect(response.status === 413, "a body over 1.5 MB is refused");
+  expect(clef.calls.length === 0, "nothing refused reached Clef");
+
+  console.log("Auto: picking");
+  response = await ask({ request: "derive the quadratic formula" });
+  let picked = await response.json();
+  const sent = clef.calls.at(-1);
+  expect(response.status === 200 && picked.category === "science" && picked.difficulty === "hard" && picked.why?.length > 0, `Clef's reading picks the row (${picked.category}, ${picked.difficulty}): ${picked.why}`);
+  expect(sent?.model === CLEF.selector && sent.state.includes('"derive the quadratic formula"') && sent.questions?.topic?.type === "choice" && !("images" in sent), "Clef was asked about the request, with typed questions and no photo");
+  // The row starts on DeepSeek thinking none, which the free plan, held to low, can't run as benched.
+  expect(TABLE.science.hard.picks[0].effort === "none" && picked.model === DEFAULT_PICK.model && picked.name === byID(DEFAULT_PICK.model)?.name && /best your plan has/.test(picked.why), "on the free plan, a pick that thinks none gives way to the row's next, named, and said why");
+  expect(picked.effort === (fitEffort("low", byID(picked.model)) ?? "none"), `the free plan thinks low (${picked.effort})`);
+  response = await ask({ request: "derive the quadratic formula" }, { session: tester.token });
+  picked = await response.json();
+  expect(picked.model === TABLE.science.hard.picks[0].model && picked.effort === TABLE.science.hard.picks[0].effort, `a tester gets the row's pick as it is (${picked.model} · ${picked.effort})`);
+  const photo = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQ==";
+  response = await ask({ request: "split this bill", image: photo }, { session: tester.token });
+  picked = await response.json();
+  expect(picked.category === "photo" && picked.model === TABLE.photo[picked.difficulty].picks[0].model && clef.calls.at(-1)?.images?.[0] === photo, "a photo goes to Clef, and the photo row decides");
+  response = await ask({ request: "split this bill", hasImage: true }, { session: tester.token });
+  picked = await response.json();
+  expect(picked.category === "photo" && !("images" in clef.calls.at(-1)) && clef.calls.at(-1).state.includes("attached a photo"), "a photo only mentioned is still a photo page");
+  response = await ask({ request: "the dollar rate right now" });
+  expect((await response.json()).category === "live", "facts that change make it a live page");
+
+  console.log("Auto: when Clef fails");
+  for (const words of ["please fail", "nonsense"]) {
+    response = await ask({ request: words });
+    picked = await response.json();
+    expect(response.status === 200 && picked.model === DEFAULT_PICK.model && picked.effort === DEFAULT_PICK.effort && /default/.test(picked.why), `${words === "please fail" ? "Clef down" : "an answer that doesn't read"}: the default, not an error`);
+  }
+  await settle();
+  const [used] = query(`SELECT cost_micros, pages FROM usage WHERE user_id = '${me.user}' AND period = '${today}'`);
+  // Three of this account's questions were answered: the quadratic formula, the dollar rate, and the nonsense.
+  expect(used?.cost_micros === 3 * Math.round(900 * CLEF.inputPrice) && used.pages === 0, `what Clef cost is counted, and no page (${JSON.stringify(used)})`);
+
+  console.log("Auto: a model request naming it");
+  // Without /api/route first, the row the request shows on its face (router.ts, guess): here the
+  // default's, which is Grok, so it reaches the stand-in for xAI and nothing is paid for.
+  const before = xai.calls.responses.length;
+  response = await fetch(`${base}/api/model`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${me.token}`, "X-Dream-Key": LOCAL_APP_KEY },
+    body: JSON.stringify({ model: "auto", reasoning_effort: "high", messages: [{ role: "user", content: "Request: what's 2+2" }] }),
+  });
+  await response.text();
+  const routed = xai.calls.responses.at(-1);
+  expect(TABLE.other.easy.picks[0].model === "grok-4.7" && response.status === 200 && xai.calls.responses.length === before + 1, "is routed on the server, not refused");
+  expect(routed?.model === "grok-4.7" && routed?.reasoning?.effort === "low", `to the row's pick, at the level the free plan allows (${routed?.model}, ${routed?.reasoning?.effort})`);
+
+  console.log("Auto: in Account");
+  const list = async (token) => (await (await fetch(`${base}/api/usage`, { headers: { Authorization: `Bearer ${token}` } })).json()).models.map((model) => model.id);
+  const testers = await list(tester.token);
+  expect(testers[0] === "grok-4.7" && testers[1] === "auto" && testers.length === CATALOG.length + 1, "testers see Auto, right after the default");
+  expect(!(await list(me.token)).includes("auto"), "everyone else doesn't yet");
+}
+
 const remote = process.env.DREAM_SHARE_URL;
 const stub = remote ? null : await startStub();
 const xai = remote ? null : await startXAIStub();
-const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub, xai);
+const clef = remote ? null : await startClefStub();
+const server = remote ? { base: remote.replace(/\/$/, ""), stop() {} } : await startLocal(stub, xai, clef);
 try {
   await run(server.base);
   // Owners, reports, blocks and the admin need several test users, so only run locally.
@@ -669,6 +771,7 @@ try {
   else console.log("\nWeb search and reading: skipped, since DREAM_WEB_KEY or DREAM_SESSION isn't set for this server.");
   await runSync(server.base, expect, { quota: LOCAL_SYNC_QUOTA });
   if (!remote) await runPlan(server.base, xai);
+  if (!remote) await runRoute(server.base, clef, xai);
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;
@@ -676,6 +779,7 @@ try {
   server.stop();
   stub?.stop();
   xai?.stop();
+  clef?.stop();
 }
 console.log(failures ? `\n${failures} failed` : "\nAll passed");
 process.exit(failures ? 1 : 0);

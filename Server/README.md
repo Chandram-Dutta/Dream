@@ -618,6 +618,166 @@ streamed yet: Sarvam turns away a second request at once, a page's check and wri
 together, and Workers AI limits requests per minute (its error code, like 3021, is the one thing
 logged).
 
+### Routing
+
+**Auto** has the server pick the model, and how long it thinks, for each page. Testers see it in
+Account, right after the default (`GET /api/usage`). When it's picked, the app asks once as a page
+or a change starts (`Dream/Generation/Providers/Route.swift`):
+
+```
+POST /api/route   { "request": "split this bill between the 4 of us", "hasImage": true,
+                    "image": "data:image/jpeg;base64,…" }
+→ 200 { "model": "grok-4.7", "name": "Grok 4.7", "effort": "low", "category": "photo",
+        "difficulty": "easy", "why": "Photos: Grok 4.7 read the bill and the plant right; cheaper models misread them" }
+```
+
+Then every request of that page, the gap check and repairs included, names that model and level
+to `/api/model`. The composer's log and model name say so: "Auto → Grok 4.7 · low".
+
+- **Request.** `request` is the person's words, up to 4,000 characters. `image` is the page's
+  photo as a JPEG, PNG or WebP `data:` URL; the app sends it at most 768 pixels on the longer
+  side. `hasImage` says there's a photo without sending it.
+- **Who may ask.** As for `/api/model`: a session and proof that it's the app, limited per account
+  (`MODEL_LIMIT`, key `route:<id>`). The answers are 401, 405, 415, 413 (over 1.5 MB), 400 (a
+  missing or long request, an image that isn't a `data:` URL) and 429.
+- **The plan holds.** The pick is what `/api/model` would allow anyway: testers any model and
+  level; everyone else only the offered models (`MODELS`), with Plus-only models on Dream Plus;
+  Dream Plus thinks from low to high, and the free plan low. A row's pick is used only as it was
+  benched. DeepSeek thinking "none" isn't turned into DeepSeek thinking low, which made 11 of 16
+  pages, for a plan held to low; the row's next pick is used instead, and `why` says it's "the
+  best your plan has".
+- **Never an error from Clef.** If Clef fails, takes more than 6 seconds, or answers something that
+  doesn't read, the answer is Dream's default, Grok 4.7 thinking low. If the route itself fails,
+  the app uses the server's default at low.
+- **"auto" sent to `/api/model` directly.** It's routed on what the request shows on its face,
+  without Clef: a photo, a run of another script in the first user message, or else the
+  default's row. That's the same for every request of a page.
+- **Local development.** With `DEV_LOGIN`, the answer also carries Clef's `signals`, for tuning.
+
+**How it decides.** `src/route.ts` asks Cloudflare's **Clef Flash** (`@cf/cloudflare/clef-flash`:
+9B, $0.038 per million input tokens and nothing for output) through the gateway. It answers four
+typed questions (`QUESTIONS` in `src/router.ts`):
+
+- `topic`: a choice of money, science, lists, figures or other;
+- `fresh`: a yes/no on whether it needs facts looked up now;
+- `foreign`: a yes/no on whether it's not in English;
+- `difficulty`: a score from 0 to 3.
+
+A request lands on a row in this order: a photo; another language (Clef's answer, or the script
+itself); live facts; then the topic. It's "hard" from a difficulty of 1.5. A call is about 550
+tokens, $0.00002, counted against the account like a small job. On 2026-10-27 it answered in
+0.45 s median, under a second nine times in ten. On 32 test requests every one landed where it
+should, except "a bar chart of India's GDP growth by decade", which went to live facts.
+
+**The table** is data: `TABLE` in `src/router.ts` maps category × difficulty to picks, cheapest
+good enough first, each row ending on Grok 4.7 thinking low. Its comment has the numbers behind
+every row.
+
+| Row | Picks | Why, from the bench |
+|---|---|---|
+| Money, easy | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 10 on the EMI page like Grok, in about 10 s for 0.2¢ |
+| Money, hard | Grok 4.7 low | 10 on a split with a catch; DeepSeek 6, Grok 4.20 Fast 2 |
+| Science, easy and hard | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 9.5 to Grok's 10, at a twentieth of the cost |
+| Figures, easy and hard | DeepSeek V4.1 Flash (none), then Grok 4.7 low | 9 to Grok's 9.5, for 0.2¢ |
+| Live facts | Grok 4.20 Fast, then Grok 4.7 low | Looked them up, 9.5, in 10 s for 40% of Grok 4.7's cost |
+| Lists, photos, other languages, everything else | Grok 4.7 low | The cheaper models left things out, misread photos, or stumbled in Tamil and Hindi |
+
+On the bench's own requests the table scores 9.4 at 3.7¢ a page and a median of 20 s. Grok 4.7
+low on every page scores 9.6 at 7.0¢ and a median of 42 s. Those are the requests the table was
+made from, so the comparison flatters it.
+
+**The bench.** It ran on 2026-10-27, spent about $6.25 in all, and the tool to run it again is
+`Tools/router-bench/bench.py`.
+
+- **Requests:** 16, two or three in each of seven kinds of page: money, science and maths
+  explainers, lists and trackers, live facts, photos (a restaurant bill, a maths worksheet, a
+  plant), Hindi and Tamil, and simulations and 3D.
+- **How they ran:** every candidate made every page through the real pipeline (the Mac bench and
+  a local server), each page on its own tester account, so its cost is that account's usage.
+- **How they were scored:** Grok 4.7, thinking low, scored each request's pages 0 to 10, side by
+  side, anonymised and shuffled. Against ground truth it judged correctness (4), fit and language
+  (2), usefulness (2) and clarity (2). Live facts not backed by a search or live tool call in the
+  page's log count as invented.
+- **Failures:** a page not made scores 0.
+
+| Model and thinking | Made | Score | Median time | Cost a page |
+|---|---|---|---|---|
+| Grok 4.7, low | 16/16 | 9.6 | 42 s | 7.0¢ |
+| Grok 4.7, high | 15/16 | 9.0 | 85 s | 10.4¢ |
+| Grok 4.20 Fast | 16/16 | 6.9 | 22 s | 5.9¢ |
+| DeepSeek V4.1 Flash, none | 16/16 | 5.9 | 9 s | 0.3¢ |
+| DeepSeek V4.1 Flash, low | 11/16 | 3.2 | 28 s | 0.6¢ |
+| GLM 5.3 Flash, low | 12/16 | 4.6 | 41 s | 0.3¢ |
+| Sarvam's DeepSeek V4.1 Flash, low * | 14/16 | 7.2 | 20 s | 0.9¢ |
+| Sarvam's GLM 5.3, low * (8 requests) | 6/8 | 4.8 | 15 s | 1.9¢ |
+| Sarvam 105B * | 2/16 | 0.4 | — | 1.3¢ |
+| Gemma 4 on Sarvam * | 2/16 | 1.0 | — | 1.1¢ |
+
+\* Sarvam was reached directly. Through the gateway's custom provider, every request failed with
+error 2006, "The provider did not return a valid response".
+
+What it showed:
+
+- **Thinking high never paid.** Grok 4.7 high scored lower than low, took twice as long (one
+  photo page ten minutes) and cost half again as much. No row asks for it.
+- **DeepSeek V4.1 Flash on Workers AI is better with thinking off.** At low it left four pages
+  empty and ran away for six minutes on a repair.
+- **GLM 5.3 Flash** wrote JSON that didn't parse on a quarter of its pages.
+- **Sarvam 105B** stopped partway through most pages: its plan caps the answer, and its thinking
+  counts against that. It refused photos, and so did Sarvam's GLM 5.3.
+- **Gemma 4** was mostly refused by Sarvam's per-minute limit, even one page at a time, and
+  stalled when it wasn't.
+- **Sarvam's DeepSeek** was the best value of all, and it read photos despite Sarvam's docs. By
+  the rule below it would lead hard money, lists and photos, so it goes into the table once the
+  gateway reaches Sarvam.
+
+The full model × category matrix is in the comment above `TABLE`.
+
+**Public benchmarks, against ours** (October 2026; no public IFEval, BFCL or structured-output
+numbers exist yet for most of these):
+
+- **Where they agree.** Grok 4.7 has the highest Artificial Analysis index of the set (42 at low,
+  46 at high), and it was the most reliable here. Gemma 4 (index 14–15) and Sarvam 105B (index 9,
+  IFBench 34) are weak with long instructions and strict schemas. They failed most pages here, and
+  Sarvam's own docs warn that Gemma returns whitespace under `response_format`. Grok 4.20 Fast's
+  index (14) and Artificial Analysis's 97% hallucination rate for it fit its weak money and
+  figure pages, though it searched properly for live facts.
+- **Where they disagree.**
+  - DeepSeek V4.1 Flash (index 45, the best at maths of the set on MathArena) did better here with
+    its thinking off.
+  - GLM 5.3 Flash (index 42) broke JSON on a quarter of its pages.
+  - Grok 4.7 at high rates above low publicly but scored below it here.
+  - Sarvam's self-reported numbers (τ² 68, IFEval 85) are far above independent ones (τ² 47).
+
+What decides a Dream page is following a 60–120 KB prompt into one strict schema, with tool
+calls. No public benchmark measures that, so the page bench decides.
+
+**Benching again, and changing the table.**
+
+1. **Start a local server.** Write `.dev.vars` (made with `umask 077`, keys from the Keychain):
+   `DEV_LOGIN=1`, the app key, the xAI, Parallel and Sarvam keys, `MODELS` with every catalogue
+   id, and generous `ALLOWANCES`. Then run
+   `CI=1 npx wrangler d1 migrations apply dream-share --local` and
+   `npx wrangler dev --port 8792 --ip 127.0.0.1`.
+2. **Build the bench and make accounts.** Run `Tools/router-bench/bench.py build`, then
+   `Tools/router-bench/bench.py accounts g47l dsn g420 …`. Add the ids it prints to
+   `PLUS_ACCOUNTS` in `.dev.vars`, so those accounts may think at any level, and restart the
+   server.
+3. **Make the pages.** Run `Tools/router-bench/bench.py run g47l dsn g420` for each config in
+   turn. For Sarvam, whose plan limits requests a minute, run them two at a time:
+   `Tools/router-bench/bench.py run -p 2 sds`. Don't edit `Server/src` while pages are being
+   made: `wrangler dev` reloads and cuts the streams in flight.
+4. **Score them.** Run `judge` (about $0.40) and then `matrix`. `probe` shows what Clef and the
+   table pick for each request.
+5. **Change the table by the rule.** A pick is good enough for a row when it made every page of
+   the category, scored none below 5 there, and averaged 8 or more on the row's own requests (the
+   category's, where there were none at that difficulty). Put the cheapest such pick first and
+   update the numbers in the comment.
+6. **Test, and clean up.** `npm test` checks every pick is in the catalogue at a level its model
+   takes, that each row ends on Grok 4.7 low, and that photo rows only name models that read
+   photos. It also clears the local usage tables, so read the matrix first. Delete `.dev.vars`
+   when you're done.
+
 ## Plans and limits
 
 `GET /api/usage` tells the app the plan, pages used today and this month, the limits of both

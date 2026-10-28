@@ -11,7 +11,8 @@ import { checkPublish, words } from "../src/moderation.ts";
 import { adminAccess } from "../src/adminkey.ts";
 import { AppleUnavailable, appleKeys } from "../src/apple.ts";
 import { chatCompletion, chatStream, chatUsage, toResponses } from "../src/responses.ts";
-import { CATALOG, choose, fitEffort, offered } from "../src/models.ts";
+import { CATALOG, allowedEffort, choose, fitEffort, offered } from "../src/models.ts";
+import { CLEF, DEFAULT_PICK, HARD_FROM, QUESTIONS, READS_PHOTOS, TABLE, TOPICS, classify, clefCost, clefInput, firstUsable, guess, nonLatin, readAnswers } from "../src/router.ts";
 import { withHeartbeat } from "../src/stream.ts";
 import { asksToolsFirst, TOOL_ROUNDS, toolsFirst, withoutSchema } from "../src/toolsfirst.ts";
 import { fitArguments, workersCompletion, workersStream, workersUsage } from "../src/workersai.ts";
@@ -355,6 +356,71 @@ expect(fitEffort("none", byID("grok-4.7")) === "low" && fitEffort("max", byID("g
 expect(fitEffort("medium", byID("deepseek-v4.1-flash")) === "high" && fitEffort("none", byID("deepseek-v4.1-flash")) === "none", "a level the model doesn't take moves to the nearest, leaning longer");
 expect(fitEffort("high", byID("mistral-small-3.1")) === null && fitEffort("low", byID("kimi-k2.6")) === "none", "a model that doesn't think gets no level at all");
 expect(CATALOG.every((model) => model.efforts.every((level) => ["none", "low", "medium", "high", "max"].includes(level))), "every model's levels are known ones");
+expect(allowedEffort("max", "plus", true) === "max" && allowedEffort("none", "plus", true) === "none", "testers may ask any level");
+expect(allowedEffort("none", "plus", false) === "low" && allowedEffort("max", "plus", false) === "high" && allowedEffort("medium", "plus", false) === "medium", "Dream Plus low to high");
+expect(allowedEffort("high", "free", false) === "low" && allowedEffort(undefined, "free", false) === "low", "the free plan low");
+
+console.log("Auto: reading Clef");
+const clefSays = (answers) => ({ model: "clef-flash", answers, usage: { input_tokens: 812, output_tokens: 0 } });
+const plainAnswers = {
+  topic: { type: "choice", choice: "money", probabilities: { money: 0.9, science: 0.04, lists: 0.02, figures: 0.02, other: 0.02 }, confidence: 0.86 },
+  fresh: { type: "noul", noul: 0.08 },
+  foreign: { type: "noul", noul: 0.02 },
+  difficulty: { type: "score", score: 1.8, legend: {}, probabilities: { 0: 0.1, 1: 0.2, 2: 0.5, 3: 0.2 }, confidence: 0.4 },
+};
+const read = readAnswers(clefSays(plainAnswers), false);
+expect(read?.topic === "money" && read.fresh === 0.08 && read.foreign === 0.02 && read.difficulty === 1.8 && read.photo === false, "Clef's typed answers, read as the router's signals");
+expect(readAnswers({ result: clefSays(plainAnswers) }, true)?.photo === true, "and the same wrapped in the REST API's result");
+const without = (key, value) => clefSays({ ...plainAnswers, [key]: value });
+expect(
+  readAnswers(without("topic", undefined), false) === null &&
+    readAnswers(without("topic", { ...plainAnswers.topic, choice: "poetry" }), false) === null &&
+    readAnswers(without("fresh", { type: "noul", noul: 1.4 }), false) === null &&
+    readAnswers(without("foreign", { type: "noul", noul: "yes" }), false) === null &&
+    readAnswers(without("difficulty", { type: "score", score: Number.NaN }), false) === null &&
+    readAnswers(null, false) === null && readAnswers({ error: "busy" }, false) === null,
+  "an answer missing, out of range or of the wrong kind reads as nothing, so the default is used",
+);
+expect(readAnswers(without("difficulty", { type: "score", score: 3.4 }), false)?.difficulty === 3, "a score past the top is held to it");
+expect(clefCost(clefSays(plainAnswers)).tokensIn === 812 && Math.abs(clefCost(clefSays(plainAnswers)).cost - 812 * CLEF.inputPrice) < 1e-9 && clefCost({}).cost === 0, "what Clef cost, from its input tokens alone");
+const clefAsked = clefInput("split a ₹2,000 bill", true, "data:image/jpeg;base64,AAAA");
+expect(clefAsked.model === "clef-flash" && clefAsked.state.includes('"split a ₹2,000 bill"') && clefAsked.images?.[0] === "data:image/jpeg;base64,AAAA" && clefAsked.questions === QUESTIONS, "Clef gets the request as state, the questions, and the photo");
+expect(!("images" in clefInput("hello", false)) && clefInput("hello", true).state.includes("attached a photo"), "no photo sent unless there is one; one only mentioned is said");
+expect(Object.keys(QUESTIONS.topic.criteria).join() === TOPICS.join() && QUESTIONS.difficulty.criteria.length === 4, "the topic question offers exactly the router's topics, and difficulty four levels");
+
+console.log("Auto: the table");
+const signals = (extra) => ({ topic: "money", fresh: 0.1, foreign: 0.1, difficulty: 1, photo: false, ...extra });
+expect(classify(signals({})).category === "money" && classify(signals({})).difficulty === "easy", "the topic decides, easy below the line");
+expect(classify(signals({ difficulty: HARD_FROM })).difficulty === "hard", `hard from ${HARD_FROM}`);
+expect(classify(signals({ photo: true, fresh: 0.9, foreign: 0.9 })).category === "photo", "a photo outranks everything: the model has to read it");
+expect(classify(signals({ fresh: 0.7, foreign: 0.9 })).category === "language" && classify(signals({}), "मेरे ₹50,000 पर ब्याज कितना होगा?").category === "language", "then another language, from Clef or from the script itself, even for live facts");
+expect(classify(signals({ fresh: 0.7 })).category === "live", "then facts that must be looked up now");
+expect(classify(signals({}), "Wie viel Zinsen?").category === "money" && !nonLatin("café crème brûlée") && nonLatin("சென்னை பயணம்"), "Latin letters with accents aren't another script");
+const ids = CATALOG.map((model) => model.id);
+const rows = Object.entries(TABLE).flatMap(([category, byLevel]) => Object.entries(byLevel).map(([level, row]) => ({ category, level, row })));
+expect(rows.length === 16 && Object.keys(TABLE).sort().join() === [...TOPICS, "photo", "live", "language"].sort().join(), "a row for every category, easy and hard");
+expect(rows.every(({ row }) => row.picks.length > 0 && row.why.length > 0 && row.why.length <= 120), "each with picks and one short line why");
+expect(rows.every(({ row }) => row.picks.every((each) => ids.includes(each.model))), "only models in the catalogue");
+expect(rows.every(({ row }) => row.picks.every((each) => { const model = byID(each.model); return model.efforts.length ? model.efforts.includes(each.effort) : each.effort === "none"; })), "each at a level its model takes (none for one that doesn't think)");
+expect(rows.every(({ row }) => row.picks.some((each) => each.model === DEFAULT_PICK.model)), "every row names the default model too, so an account limited to it still gets the row's thinking level");
+expect(rows.filter(({ category }) => category === "photo").every(({ row }) => row.picks.every((each) => READS_PHOTOS.has(each.model))), "a photo row only names models that read photos");
+expect(rows.every(({ row }) => row.picks.at(-1).model === DEFAULT_PICK.model && row.picks.at(-1).effort === "low"), "and ends on it thinking low, which every plan may use");
+// What route.ts asks of a pick: a model the account may use, at the level the bench used.
+const usableFor = (plan, tester, offeredIDs = ids) => (each) => {
+  const model = byID(each.model);
+  return offeredIDs.includes(each.model) && (tester || !model.plus || plan === "plus") && (fitEffort(allowedEffort(each.effort, plan, tester), model) ?? "none") === each.effort;
+};
+const sums = TABLE.money.easy;
+expect(sums.picks[0].effort === "none" && firstUsable(sums, usableFor("plus", true)) === sums.picks[0], "a tester gets the row's first pick as benched");
+expect(firstUsable(sums, usableFor("plus", false))?.model === DEFAULT_PICK.model && firstUsable(sums, usableFor("free", false))?.model === DEFAULT_PICK.model, "Dream Plus and the free plan can't think 'none', so that pick gives way to the next, not to a level never benched");
+const live = TABLE.live.easy;
+expect(firstUsable(live, usableFor("plus", false)) === live.picks[0] && firstUsable(live, usableFor("free", false)) === live.picks.at(-1), "a Plus-only model for Dream Plus; the default for the free plan");
+expect(firstUsable(live, usableFor("plus", false, [DEFAULT_PICK.model])) === live.picks.at(-1), "only the models this server offers (MODELS)");
+expect(firstUsable(live, () => false) === null, "and nothing usable gives nothing, so the default");
+const said = (content, more = []) => [{ role: "system", content: "Make one page." }, { role: "user", content }, ...more];
+expect(guess(said([{ type: "text", text: "Request: what is this?" }, { type: "image_url", image_url: { url: "data:image/jpeg;base64,AAAA" } }])).category === "photo", "without Clef: a photo in any message makes it a photo page");
+expect(guess(said("Request: प्रकाश संश्लेषण कैसे काम करता है?")).category === "language" && guess(said("Request: what's 2+2")).category === "other", "a run of another script in the first user message makes it another language; else the default's row");
+expect(guess(said("Request: what's 2+2", [{ role: "assistant", content: "" }, { role: "tool", content: "प्रकाश संश्लेषण ".repeat(5) }])).category === "other" && guess(null).category === "other", "only the first user message is read, so a page's later tool results don't move it");
 
 console.log("A quiet stream kept alive");
 const slow = new ReadableStream({

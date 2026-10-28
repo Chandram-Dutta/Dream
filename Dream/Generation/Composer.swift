@@ -55,7 +55,8 @@ final class Composer {
 
         var name: String {
             switch self {
-            case .dream: "Dream (\(Composer.dreamModelID.isEmpty ? "default" : Composer.dreamModelID))"
+            // On Auto, what the router picked for this page (Route.swift), like "Auto → Grok 4.7 · high".
+            case .dream: Route.current?.label ?? "Dream (\(Composer.dreamModelID.isEmpty ? "default" : Composer.dreamModelID))"
             case .xai: "Grok (\(Composer.xaiModelID))"
             case .privateCloud: "Private Cloud Compute"
             }
@@ -111,6 +112,8 @@ final class Composer {
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
         suggestions = Connections.unconnected(in: intent)
+        // Auto (Route.swift): the server picks this page's model and thinking once, up front.
+        if let line = await Route.start(page: page, request: intent, image: image) { note(line) }
         do {
             let context = await Prompts.context(for: intent)
             try await withModel {
@@ -142,6 +145,8 @@ final class Composer {
         web.start(keeping: current.credits)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
+        // Auto (Route.swift): a change is picked for like a new page.
+        if let line = await Route.start(page: page, request: request, image: nil) { note(line) }
         do {
             let context = await Prompts.context(for: intent)
             let asked = Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context)

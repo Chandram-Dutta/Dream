@@ -51,7 +51,11 @@ struct DreamExecutor: LanguageModelExecutor {
 
     func respond(to request: LanguageModelExecutorGenerationRequest, model: DreamLanguageModel, streamingInto channel: LanguageModelExecutorGenerationChannel) async throws {
         guard let base = ServerAddress.dream, Session.isSignedIn else { throw DreamServiceError(message: "Sign in to make pages.") }
-        let (body, summary) = try ChatCompletions.body(for: request, modelID: configuration.modelID)
+        // On Auto, the model and thinking the router picked for this page (Route.swift); for a
+        // small job that isn't a page, the server's default.
+        let routed = configuration.modelID == Route.auto ? Route.pick(for: configuration.page) : nil
+        let modelID = configuration.modelID == Route.auto ? routed?.model ?? "" : configuration.modelID
+        let (body, summary) = try ChatCompletions.body(for: request, modelID: modelID, effort: routed?.effort)
         // A busy or unreachable model often answers a moment later, and nothing has streamed yet,
         // so asking again is safe. Without it, a provider that takes one request at a time turned
         // away most pages, whose check and writing start together.
@@ -135,7 +139,8 @@ enum Allowance {
 
 /// The model picked in Account, or from the chip by the composer and the change bar
 /// (ModelPicker.swift). Only models the plan offers can be picked; the server checks the plan on
-/// every request, and anyone else gets the default.
+/// every request, and anyone else gets the default. "auto" (`Route.auto`) has the server pick for
+/// each page instead (Route.swift).
 enum ModelChoice {
     /// The UserDefaults key, which views can watch with `@AppStorage`. Empty is the default.
     static let key = "model"
