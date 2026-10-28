@@ -16,6 +16,8 @@
 // to (`routed` in models.ts); Dream Plus thinks from none to high, and the free plan none or low. If Clef can't be asked, or answers something that doesn't
 // read, the answer is the default (Grok 4.7, thinking low), never an error: Auto shouldn't stop a
 // page from being made.
+//
+// The page loop on the server (compose/) asks the same once a page, in-process (`routePage`).
 
 import { proveApp } from "./attest";
 import { signInNeeded, userFrom } from "./auth";
@@ -96,6 +98,51 @@ export function guessedPick(messages: unknown, account: Account, env: RouteEnv):
   return pickFor(TABLE[where.category][where.difficulty], account, env);
 }
 
+/** Auto's pick for a page, as /api/route answers it, with what Clef said. */
+export interface RouteAnswer {
+  model: string;
+  name: string;
+  effort: string;
+  category: Category;
+  difficulty: string;
+  why: string;
+  signals: Signals | null;
+}
+
+/** Asks Clef about a request and picks from the table, within the account's plan. Never fails:
+ * when Clef can't be asked, or `fake` (local development's stand-in) says not to, the default. */
+export async function routePage(env: RouteEnv, ctx: { waitUntil: ExecutionContext["waitUntil"] }, userID: string, text: string, photo: boolean, image?: string, fake = false): Promise<RouteAnswer> {
+  const account = await accountOf(env, userID);
+  let where: ReturnType<typeof classify> | null = null;
+  let signals: Signals | null = null;
+  if (!fake) {
+    try {
+      const output = await withTimeout(askClef(env, clefInput(text, photo, image)), CLEF_TIMEOUT);
+      signals = readAnswers(output, photo);
+      if (signals) where = classify(signals, text);
+      else console.error("Clef's answer didn't read");
+      const { tokensIn, cost } = clefCost(output);
+      if (tokensIn > 0) {
+        ctx.waitUntil(recordModel(env, userID, null, { tokensIn, tokensCached: 0, tokensOut: 0, cost }).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
+      }
+    } catch (error) {
+      // The kind of failure only, never the request.
+      console.error("Clef failed", error instanceof Error ? error.message.slice(0, 80) : typeof error);
+    }
+  }
+
+  const row = where ? TABLE[where.category][where.difficulty] : null;
+  const { model, effort } = pickFor(row, account, env);
+  // The row's reason is about its first pick, the model at that level; anything else is the plan's.
+  const why = !row || !where
+    ? "Couldn't tell what kind of page this is, so Dream's default"
+    : model.id === row.picks[0].model && effort === row.picks[0].effort
+      ? row.why
+      : `${model.name}: the best your plan has for ${NAMES[where.category]}`;
+  // `name` too, so the app can say what Auto picked without a list of models.
+  return { model: model.id, name: model.name, effort, category: where?.category ?? "other", difficulty: where?.difficulty ?? "easy", why, signals };
+}
+
 export async function route(request: Request, env: RouteEnv, ctx: ExecutionContext): Promise<Response> {
   const user = await userFrom(request, env);
   if (!user) return signInNeeded();
@@ -118,33 +165,7 @@ export async function route(request: Request, env: RouteEnv, ctx: ExecutionConte
   const image = body.image as string | undefined;
   const photo = body.hasImage === true || image !== undefined;
 
-  const account = await accountOf(env, user.id);
-  let where: ReturnType<typeof classify> | null = null;
-  let signals: Signals | null = null;
-  try {
-    const output = await withTimeout(askClef(env, clefInput(text, photo, image)), CLEF_TIMEOUT);
-    signals = readAnswers(output, photo);
-    if (signals) where = classify(signals, text);
-    else console.error("Clef's answer didn't read");
-    const { tokensIn, cost } = clefCost(output);
-    if (tokensIn > 0) {
-      ctx.waitUntil(recordModel(env, user.id, null, { tokensIn, tokensCached: 0, tokensOut: 0, cost }).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
-    }
-  } catch (error) {
-    // The kind of failure only, never the request.
-    console.error("Clef failed", error instanceof Error ? error.message.slice(0, 80) : typeof error);
-  }
-
-  const row = where ? TABLE[where.category][where.difficulty] : null;
-  const { model, effort } = pickFor(row, account, env);
-  // The row's reason is about its first pick, the model at that level; anything else is the plan's.
-  const why = !row || !where
-    ? "Couldn't tell what kind of page this is, so Dream's default"
-    : model.id === row.picks[0].model && effort === row.picks[0].effort
-      ? row.why
-      : `${model.name}: the best your plan has for ${NAMES[where.category]}`;
-  // `name` too, so the app can say what Auto picked without a list of models. In local
-  // development, what Clef said as well, for tuning the table.
-  const answer = { model: model.id, name: model.name, effort, category: where?.category ?? "other", difficulty: where?.difficulty ?? "easy", why };
+  const { signals, ...answer } = await routePage(env, ctx, user.id, text, photo, image);
+  // In local development, what Clef said as well, for tuning the table.
   return json(env.DEV_LOGIN === "1" ? { ...answer, signals } : answer);
 }

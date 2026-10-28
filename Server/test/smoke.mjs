@@ -1,6 +1,7 @@
 // Checks the Worker end to end over HTTP: creating, fetching, the web viewer, the associated
 // domains file, web search and reading, the policy pages, crash reports, the model proxy,
-// allowances, Dream Plus, App Attest, and the protections. With no address given, it applies the migrations to a local database and
+// allowances, Dream Plus, App Attest, pages made on the server (test/compose-http.mjs, on the
+// stand-in model), and the protections. With no address given, it applies the migrations to a local database and
 // starts `wrangler dev` itself, with web search pointed at a stand-in for Parallel, the model at
 // a stand-in for xAI, and Auto's router at a stand-in for Clef on this Mac (test/stub-parallel.mjs,
 // test/stub-xai.mjs, test/stub-clef.mjs), so nothing is paid for, and with test roots for the App Store and App Attest (test/vectors.mjs). Reading
@@ -24,6 +25,7 @@ import { fileURLToPath } from "node:url";
 import { runSharing } from "./sharing.mjs";
 import { STUB_KEY, startStub } from "./stub-parallel.mjs";
 import { runSync } from "./sync.mjs";
+import { runCompose } from "./compose-http.mjs";
 import { STUB_XAI_KEY, startXAIStub } from "./stub-xai.mjs";
 import { startClefStub } from "./stub-clef.mjs";
 import { CATALOG, fitEffort } from "../src/models.ts";
@@ -96,6 +98,8 @@ async function startLocal(stub, xai, clef) {
     // Auto asks the stand-in for Clef, never Workers AI.
     `CLEF_URL:${clef.url}`,
     `PLUS_ACCOUNTS:${ROUTE_TESTER}`,
+    // Pages made on the server ask the stand-in model (src/compose/fake.ts); /api/model never does.
+    "MODEL_FAKE:1",
   ].flatMap((pair) => ["--var", pair]);
   const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
@@ -772,6 +776,7 @@ try {
   await runSync(server.base, expect, { quota: LOCAL_SYNC_QUOTA });
   if (!remote) await runPlan(server.base, xai);
   if (!remote) await runRoute(server.base, clef, xai);
+  if (!remote) await runCompose(server.base, expect, { appKey: LOCAL_APP_KEY, signIn: (name) => signIn(server.base, name), query });
 } catch (error) {
   console.log(`  FAIL  ${error.stack ?? error}`);
   failures++;

@@ -19,6 +19,10 @@
 // included, so the app sees the model is working through a long think. The usage xAI reports at
 // the end of the stream is counted against the account (usage.ts).
 //
+// The page loop on the server (compose/) asks the model through the same path, in-process
+// (`askModel`): the same account checks, Auto, metering, translation and fallback, without an
+// HTTP round trip.
+//
 // Nothing that was asked or answered is logged or kept: only token counts and what they cost.
 
 import { aiGeneration, countsAllowed, type AnalyticsEnv } from "./analytics";
@@ -31,6 +35,7 @@ import { guessedPick } from "./route";
 import { AUTO } from "./router";
 import { withHeartbeat } from "./stream";
 import { asksToolsFirst, toolsFirst, withoutSchema } from "./toolsfirst";
+import { fakeModel } from "./compose/fake";
 import { workersCompletion, workersStream } from "./workersai";
 import { accountOf, admitModel, recordModel, refusalResponse, type ModelUse, type UsageEnv } from "./usage";
 
@@ -52,6 +57,24 @@ export interface ModelEnv extends ProofEnv, UsageEnv, AuthEnv, AnalyticsEnv {
   /** The most a single answer may be, in tokens. */
   MAX_OUTPUT_TOKENS?: string;
   MODEL_LIMIT?: RateLimit;
+  /** "1", with DEV_LOGIN, answers the page loop's requests with a stand-in (compose/fake.ts),
+   * so `wrangler dev` makes a whole page without a provider's key. Never /api/model's. */
+  MODEL_FAKE?: string;
+}
+
+type Context = Pick<ExecutionContext, "waitUntil">;
+
+/** One model request, already checked, for someone already known to be signed in. */
+export interface ModelCall {
+  userID: string;
+  /** The page it's part of, counted once however many requests it takes; null for small jobs. */
+  pageID: string | null;
+  /** The person lets Dream count what's used (analytics.ts). */
+  counted: boolean;
+  /** The request's size, for estimating what it used when the provider doesn't say. */
+  bytes: number;
+  /** Answered by the stand-in (compose/fake.ts): the page loop asks for it with MODEL_FAKE. */
+  fake?: boolean;
 }
 
 /** A page's prompt is 60–120 KB, with a photo up to about 400 KB more. */
@@ -350,7 +373,28 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
 
   const page = request.headers.get("X-Dream-Page");
   const pageID = page && /^[A-Za-z0-9-]{8,64}$/.test(page) ? page : null;
-  const account = await accountOf(env, user.id);
+  return answer(env, ctx, body, { userID: user.id, pageID, counted: countsAllowed(request), bytes: raw.length });
+}
+
+/** The model for the page loop (compose/), in-process: a chat completions request checked as
+ * /api/model checks one, for an account the job already knows, answered the same way. */
+export async function askModel(env: ModelEnv, ctx: Context, chat: Record<string, unknown>, call: Omit<ModelCall, "bytes">): Promise<Response> {
+  if (!(await allowed(env.MODEL_LIMIT, `model:${call.userID}`))) return problem(429, "Too many requests at once. Try again in a minute.", { "Retry-After": "60" });
+  let body: Record<string, unknown>;
+  try {
+    body = upstreamBody(chat, env);
+  } catch (error) {
+    if (error instanceof Invalid) return problem(400, error.message);
+    throw error;
+  }
+  return answer(env, ctx, body, { ...call, fake: call.fake === true && env.DEV_LOGIN === "1", bytes: new TextEncoder().encode(JSON.stringify(chat)).length });
+}
+
+/** A checked request, answered: the model picked for the account (or by Auto), its allowance,
+ * the provider's answer streamed back as chat completions, and what it used counted. */
+async function answer(env: ModelEnv, ctx: Context, body: Record<string, unknown>, call: ModelCall): Promise<Response> {
+  const { userID, pageID } = call;
+  const account = await accountOf(env, userID);
   // Auto (route.ts): the app asks /api/route once a page and names what it was given here. A
   // request naming "auto" itself is routed on what it shows on its face, without asking Clef, so
   // every request of a page lands on the same model.
@@ -364,9 +408,11 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const anyModel = account.tester || env.DEV_LOGIN === "1";
   const chosen = choose(body.model, account.plan, usable(env.MODELS, anyModel), anyModel);
   const key = env.XAI_API_KEY?.trim();
-  if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
-  if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
-  if (chosen.provider === "sarvam" && !env.SARVAM_API_KEY?.trim()) return problem(503, "Sarvam isn't set up on this server yet.");
+  if (!call.fake) {
+    if (chosen.provider === "xai" && !key) return problem(503, "Dream's model isn't set up on this server yet.");
+    if (chosen.provider === "workers-ai" && !env.AI) return problem(503, "Dream's model isn't set up on this server yet.");
+    if (chosen.provider === "sarvam" && !env.SARVAM_API_KEY?.trim()) return problem(503, "Sarvam isn't set up on this server yet.");
+  }
   body.model = chosen.upstream;
   // How long it thinks first: testers any level, Dream Plus low to high, everyone else low; then
   // the nearest level the model takes (models.ts). To bench longer thinking, list the bench's
@@ -375,7 +421,7 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   const effort = fitEffort(allowedEffort(asked, account.plan, account.tester), chosen);
   if (effort === null) delete body.reasoning_effort;
   else body.reasoning_effort = effort;
-  const refusal = await admitModel(env, user.id, pageID, account);
+  const refusal = await admitModel(env, userID, pageID, account);
   if (refusal) return refusalResponse(refusal);
 
   // The model that answers: the chosen one, or Grok when a cheaper one is too busy (below). Usage
@@ -383,11 +429,11 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   let answeredBy = chosen;
   let modelID = chosen.id;
   // For PostHog's LLM analytics, only when the person lets Dream count what's used (analytics.ts).
-  const counted = countsAllowed(request);
+  const counted = call.counted;
   const started = Date.now();
   const generation = (use: ModelUse | null, status: number, firstAt: number | null = null) => {
     if (!counted) return;
-    aiGeneration(env, ctx, user.id, {
+    aiGeneration(env, ctx, userID, {
       model: modelID,
       provider: answeredBy.provider === "workers-ai" ? "cloudflare-workers-ai" : answeredBy.provider,
       page: pageID,
@@ -406,15 +452,15 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   // per account means a page's tool rounds and repairs, and the next page's long instructions,
   // are read from the cache at about a third of the price. It's a hash, so xAI never sees Dream's
   // id for anyone.
-  const conversation = await conversationID(user.id);
+  const conversation = await conversationID(userID);
   const record = (use: ModelUse, firstAt: number | null = null) => {
-    ctx.waitUntil(recordModel(env, user.id, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
+    ctx.waitUntil(recordModel(env, userID, pageID, use).catch((error) => console.error("Usage not recorded", error instanceof Error ? error.name : typeof error)));
     generation(use, 200, firstAt);
   };
   const ask = (chat: Record<string, unknown>) => (chosen.provider === "sarvam" ? askSarvam(env, chosen, chat, conversation) : askWorkersAI(env, chosen, chat, conversation));
   // A dropped answer's usage never arrives, so it's estimated, as for any stream cut short.
   const droppedRound = (events: number) => {
-    const tokensIn = Math.ceil(raw.length / 4);
+    const tokensIn = Math.ceil(call.bytes / 4);
     record({ tokensIn, tokensCached: 0, tokensOut: events, cost: priced(modelID, tokensIn, 0, events) });
   };
   // When Workers AI or Sarvam turns a request away for being busy (Workers AI's per-minute limit
@@ -434,13 +480,14 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   };
   let upstream: Response;
   try {
-    upstream =
-      chosen.provider === "xai"
+    upstream = call.fake
+      ? fakeModel(body)
+      : chosen.provider === "xai"
         ? await askXAI(env, key ?? "", toResponses(body, conversation), conversation)
         : chosen.toolsFirst && asksToolsFirst(body)
           ? await askToolsFirst(ask, body, droppedRound)
           : await ask(body);
-    if (chosen.provider === "sarvam" && upstream.status === 429) upstream = (await byGrok()) ?? upstream;
+    if (!call.fake && chosen.provider === "sarvam" && upstream.status === 429) upstream = (await byGrok()) ?? upstream;
   } catch (error) {
     // Only the provider's error code, like Workers AI's 3021 for its per-minute limit: its message
     // could repeat what was asked.
@@ -458,8 +505,8 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   }
 
   if (body.stream && upstream.body) {
-    const chat = answeredBy.provider === "xai" ? chatStream(upstream.body, modelID) : upstream.body;
-    return new Response(metered(withHeartbeat(chat), modelID, raw.length, record), {
+    const chat = answeredBy.provider === "xai" && !call.fake ? chatStream(upstream.body, modelID) : upstream.body;
+    return new Response(metered(withHeartbeat(chat), modelID, call.bytes, record), {
       status: 200,
       headers: { "Content-Type": "text/event-stream; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" },
     });
@@ -467,13 +514,13 @@ export async function model(request: Request, env: ModelEnv, ctx: ExecutionConte
   let text = "";
   let use: ModelUse | null = null;
   try {
-    const answer = answeredBy.provider === "xai" ? chatCompletion(await upstream.json(), modelID) : ((await upstream.json()) as Record<string, unknown>);
-    text = JSON.stringify(answer);
-    use = useFrom(answer.usage, modelID);
+    const answered = answeredBy.provider === "xai" && !call.fake ? chatCompletion(await upstream.json(), modelID) : ((await upstream.json()) as Record<string, unknown>);
+    text = JSON.stringify(answered);
+    use = useFrom(answered.usage, modelID);
   } catch {
     return problem(502, "The model didn't answer. Try again in a moment.");
   }
-  const tokensIn = Math.ceil(raw.length / 4);
+  const tokensIn = Math.ceil(call.bytes / 4);
   record(use ?? { tokensIn, tokensCached: 0, tokensOut: Math.ceil(text.length / 4), cost: priced(modelID, tokensIn, 0, Math.ceil(text.length / 4)) });
   return new Response(text, { status: 200, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
 }

@@ -25,7 +25,7 @@ export interface AnalyticsEnv {
 
 const DEFAULT_HOST = "https://us.i.posthog.com";
 
-type Value = string | number | boolean | null;
+type Value = string | number | boolean | null | string[];
 
 /** Whether the person lets Dream count what's used: the app sends `X-Dream-Analytics: on` with
  * its requests while "Help improve Dream" is on (Dream/Generation/Providers/DreamModel.swift). */

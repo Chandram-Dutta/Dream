@@ -11,6 +11,9 @@
 // The reader fetches only public http(s) pages, checks where names resolve before fetching,
 // follows robots.txt, and says who it is.
 //
+// The page loop on the server (compose/) searches and reads through the same checks, in-process
+// (`searchFor`, `readFor`), for the account whose page it's making.
+//
 // Nothing personal is logged or kept: no queries, no addresses, no page addresses. Cached
 // answers are keyed by a hash of what was asked, and expire.
 
@@ -52,7 +55,7 @@ function problem(status: number, message: string, headers: Record<string, string
 export async function routeWeb(request: Request, env: WebEnv, ctx: ExecutionContext, url: URL): Promise<Response | null> {
   switch (url.pathname) {
     case "/api/search":
-      return request.method === "POST" ? search(request, env, ctx) : problem(405, "Only POST.", { Allow: "POST" });
+      return request.method === "POST" ? search(request, env) : problem(405, "Only POST.", { Allow: "POST" });
     case "/api/read":
       return request.method === "POST" ? read(request, env, ctx, url.origin) : problem(405, "Only POST.", { Allow: "POST" });
     case "/reader":
@@ -156,11 +159,20 @@ const pageProvider = (env: WebEnv): PageProvider | null => parallel(env);
 
 const words = (value: unknown, max: number) => (typeof value === "string" ? value.replace(/\s+/g, " ").trim().slice(0, max + 1) : "");
 
-async function search(request: Request, env: WebEnv, ctx: ExecutionContext): Promise<Response> {
+async function search(request: Request, env: WebEnv): Promise<Response> {
   const gated = await gate(request, env, env.SEARCH_LIMIT, "search");
   if (gated instanceof Response) return gated;
-  const { body, user } = gated;
+  return searching(env, gated.user, gated.body);
+}
 
+/** For the page loop: a search for someone the job knows is signed in, limited per account
+ * rather than per address, and otherwise as /api/search answers it. */
+export async function searchFor(env: WebEnv, userID: string, body: Record<string, unknown>): Promise<Response> {
+  if (env.SEARCH_LIMIT && !(await env.SEARCH_LIMIT.limit({ key: `search:${userID}` })).success) return problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" });
+  return searching(env, { id: userID }, body);
+}
+
+async function searching(env: WebEnv, user: Pick<User, "id">, body: Record<string, unknown>): Promise<Response> {
   const query = words(body.query, 300);
   if (query.length < 2 || query.length > 300) return problem(400, "Send a query of 2 to 300 characters.");
   const objective = words(body.objective, 500);
@@ -230,8 +242,18 @@ interface ReadAnswer {
 async function read(request: Request, env: WebEnv, ctx: ExecutionContext, origin: string): Promise<Response> {
   const gated = await gate(request, env, env.PAGE_LIMIT, "page");
   if (gated instanceof Response) return gated;
-  const { body, user } = gated;
+  return reading(env, ctx, gated.user, gated.body, origin);
+}
 
+/** For the page loop: a page read for someone the job knows is signed in, limited per account
+ * rather than per address, and otherwise as /api/read answers it. `origin` is the server's own,
+ * for the reader's User-Agent. */
+export async function readFor(env: WebEnv, ctx: Pick<ExecutionContext, "waitUntil">, userID: string, body: Record<string, unknown>, origin: string): Promise<Response> {
+  if (env.PAGE_LIMIT && !(await env.PAGE_LIMIT.limit({ key: `page:${userID}` })).success) return problem(429, "Too many requests. Try again in a minute.", { "Retry-After": "60" });
+  return reading(env, ctx, { id: userID }, body, origin);
+}
+
+async function reading(env: WebEnv, ctx: Pick<ExecutionContext, "waitUntil">, user: Pick<User, "id">, body: Record<string, unknown>, origin: string): Promise<Response> {
   const checked = checkURL(body.url);
   if ("refused" in checked) return problem(400, REFUSED[checked.refused]);
   const url = checked.url;

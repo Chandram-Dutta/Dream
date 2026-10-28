@@ -25,6 +25,9 @@ their own account instead, for their devices only: see [Sync](#sync).
 | `GET /api/sync`, `POST /api/sync` | A signed-in person's changes, read and sent. See [Sync](#sync). |
 | `PUT`, `GET`, `DELETE /api/photos/:id` | Photos from a signed-in person's pages. |
 | `POST /api/model` | The model, for signed-in users of the app. See [The model](#the-model). |
+| `POST /api/compose` | Starts a page made on the server; answers `{ id }`. See [Pages made on the server](#pages-made-on-the-server). |
+| `GET /api/compose/:id/events?after=<seq>` | The page's events as server-sent events: from the log after `seq`, then live. |
+| `POST /api/compose/:id/answers` | The answers to the page's questions. |
 | `GET /api/usage` | The account's plan, and pages used and left. See [Plans and limits](#plans-and-limits). |
 | `POST /api/appstore/transactions` | Dream Plus purchases the app made or restored. See [Dream Plus](#dream-plus). |
 | `POST /api/appstore/notifications` | App Store Server Notifications v2. |
@@ -831,6 +834,34 @@ calls. No public benchmark measures that, so the page bench decides.
    takes, that each row ends on Grok 4.7 low, and that photo rows only name models that read
    photos. It also clears the local usage tables, so read the matrix first. Delete `.dev.vars`
    when you're done.
+
+## Pages made on the server
+
+The page loop the app runs (`Dream/Generation/Composer.swift`) also runs here, so a page is made
+whether or not anyone watches (docs/ServerGeneration.md, Stage 1). `POST /api/compose` takes the
+request (`src/compose/contract.ts`) with the session and the app's proof, as `/api/model` does,
+counts the page against the allowance, and starts a `PageJob`: a Durable Object for that page,
+which runs the loop on its alarm and keeps its events in its own storage (`src/compose/`).
+
+- **The loop** (`loop.ts`) is Composer's: Auto once, the gap check beside the writing with its
+  hold, lookup, search and read, the check and repair loop, and the stall, runaway and padding
+  guards. It calls the model, Auto, search and read in-process, through the same checks as their
+  routes (`askModel`, `routePage`, `searchFor`, `readFor`). Its prompts, schemas and tools come
+  from `src/generated/generation.json`, which `Tools/export-generation.sh` writes from the app.
+- **Questions** stop the loop: the job waits for `POST …/answers`, and after ten minutes goes on
+  as if every answer were "You choose".
+- **Watching** catches up from the log after `after`, then streams events as they happen, with a
+  `: keep-alive` comment every 15 seconds, and ends after `done` or `failed`. Only the latest
+  page shown is kept in the log. Only the account the page is for may watch it or answer it.
+- **Finished** pages go into the account's sync as `surface` items under the request's `pageID`
+  (`payload.ts`), with the photo they started from, and the job is forgotten a day later.
+- **A restart** mid-page (a deploy) runs the alarm again, and the page starts over, keeping Auto's
+  pick and any answers; after three starts it fails.
+
+Locally, `MODEL_FAKE=1` with `DEV_LOGIN=1` answers the page loop's model requests with a
+stand-in (`src/compose/fake.ts`) and skips Clef, so `wrangler dev` makes whole pages without a
+provider's key; `/api/model` never uses it. `npm test` runs the loop on scripted streams
+(`test/compose.mjs`) and the routes on the stand-in (`test/compose-http.mjs`).
 
 ## Plans and limits
 
