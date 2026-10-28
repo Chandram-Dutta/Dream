@@ -93,8 +93,10 @@ export const CATALOG: Model[] = [
     price: { input: 0.95, cached: 0.16, output: 4 },
     efforts: ["none", "high"],
   },
-  // Sarvam's open models (POST /v2/chat/completions), not yet tried on pages. Sarvam prices in
-  // rupees and hasn't been measured here: guesses on the high side, so limits err toward caution.
+  // Sarvam's open models (POST /v2/chat/completions). Sarvam prices in rupees per million tokens,
+  // the same on every plan, reasoning billed as output (docs.sarvam.ai/api/getting-started/pricing,
+  // October 2026), here at 88 rupees to the dollar. It doesn't say what a request cost, so these are
+  // what's counted.
   {
     id: "sarvam-105b",
     name: "Sarvam 105B",
@@ -102,7 +104,8 @@ export const CATALOG: Model[] = [
     provider: "sarvam",
     upstream: "sarvam-105b",
     plus: true,
-    price: { input: 1, cached: 1, output: 4 },
+    // ₹15, ₹5 cached, ₹60.
+    price: { input: 0.17, cached: 0.057, output: 0.682 },
     efforts: [],
   },
   {
@@ -112,7 +115,8 @@ export const CATALOG: Model[] = [
     provider: "sarvam",
     upstream: "glm5.3",
     plus: true,
-    price: { input: 1.4, cached: 1.4, output: 4.4 },
+    // ₹126, ₹20 cached, ₹390.
+    price: { input: 1.432, cached: 0.227, output: 4.432 },
     // Sarvam thinks at max when no level is sent; one always is.
     efforts: ["low", "high", "max"],
   },
@@ -123,7 +127,8 @@ export const CATALOG: Model[] = [
     provider: "sarvam",
     upstream: "deepseekv4.1-flash",
     plus: true,
-    price: { input: 0.5, cached: 0.5, output: 2 },
+    // ₹25, ₹0.50 cached, ₹105.
+    price: { input: 0.284, cached: 0.0057, output: 1.193 },
     efforts: ["low", "high", "max"],
   },
   {
@@ -133,7 +138,8 @@ export const CATALOG: Model[] = [
     provider: "sarvam",
     upstream: "gemma4",
     plus: true,
-    price: { input: 0.5, cached: 0.5, output: 1.5 },
+    // ₹35, ₹10 cached, ₹90.
+    price: { input: 0.398, cached: 0.114, output: 1.023 },
     efforts: [],
   },
   {
@@ -182,6 +188,14 @@ export function fitEffort(asked: string | undefined, model: Model): Effort | nul
     if (distance < bestDistance || (distance === bestDistance && EFFORTS.indexOf(level) > EFFORTS.indexOf(best))) best = level;
   }
   return best;
+}
+
+/** The thinking level an account may ask for, before it's fitted to the model: testers any,
+ * Dream Plus low to high, everyone else low. */
+export function allowedEffort(asked: string | undefined, plan: string, tester: boolean): string | undefined {
+  if (tester) return asked;
+  if (plan === "plus") return asked === "none" ? "low" : asked === "max" ? "high" : asked;
+  return "low";
 }
 
 /** The model a request runs on: the one asked for, if this server offers it and the account may
