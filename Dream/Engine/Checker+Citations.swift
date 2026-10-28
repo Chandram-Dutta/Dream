@@ -11,6 +11,18 @@ extension Checker {
     /// is dropped, and one it read is credited with the page's own title, site and address. If it
     /// read pages but named none, every page it read is credited, since its facts came from them.
     /// With `read` nil, as for a surface from elsewhere, only the addresses are checked.
+    /// A page that tells the reader about the world rests on something looked up: the core rule,
+    /// which a cheap model sometimes skips, writing a travel guide from memory. A tool for the
+    /// user's own numbers states nothing about the world, and needs nothing.
+    static func checkSourcing(_ surface: Surface, read: ReadingList) -> [Issue] {
+        guard read.pages.isEmpty, surface.reference == nil, !surface.showsLiveValues, (surface.services ?? []).isEmpty else { return [] }
+        func statesFacts(_ blocks: [Block]) -> Bool {
+            blocks.contains { [.facts, .stat, .timeline].contains($0.kind) || ($0.kind == .data && $0.ref.isEmpty) || statesFacts($0.children) }
+        }
+        guard surface.mode == .learn || surface.mode == .read || statesFacts(surface.blocks) else { return [] }
+        return [Issue(kind: .needsModel, message: "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say.")]
+    }
+
     static func checkCitations(_ surface: inout Surface, read: ReadingList? = nil) -> [Issue] {
         var issues: [Issue] = []
         func fixed(_ message: String) { issues.append(Issue(kind: .fixed, message: message)) }

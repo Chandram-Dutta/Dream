@@ -56,6 +56,8 @@ enum Analytics {
         var usedWeb = false
         var usedConnections = false
         var asked = false
+        /// What the user came for (Mode), or "unknown" on a page made before it was asked.
+        var mode = "unknown"
 
         init(_ surface: Surface) {
             func walk(_ blocks: [Block]) -> [Block] { blocks.flatMap { [$0] + walk($0.children) } }
@@ -69,11 +71,12 @@ enum Analytics {
             usedWeb = (surface.citations ?? []).contains { !$0.isWikipedia }
             usedConnections = !(surface.services ?? []).isEmpty
             asked = !(surface.answers ?? []).isEmpty
+            mode = surface.mode?.rawValue ?? "unknown"
         }
 
         var properties: [String: any Sendable] {
             ["blocks": blocks, "block_kinds": kinds, "inputs": inputs, "outputs": outputs, "lists": lists,
-             "live_sources": liveSources, "used_web": usedWeb, "used_connections": usedConnections, "asked_questions": asked]
+             "live_sources": liveSources, "used_web": usedWeb, "used_connections": usedConnections, "asked_questions": asked, "mode": mode]
         }
     }
 

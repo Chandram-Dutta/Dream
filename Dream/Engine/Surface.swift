@@ -53,6 +53,8 @@ struct Surface: Codable, Hashable {
     /// The connected services whose data was read into it, like Linear, by name. What a service
     /// returned is written into the page, so sharing says so first (Live+Connections.swift).
     var services: [String]? = nil
+    /// What the user came for, which shaped the page. Nil in pages made before it was asked.
+    var mode: Mode? = nil
 
     static let empty = Surface(title: "", summary: "", symbol: "sparkles", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
 
@@ -61,6 +63,32 @@ struct Surface: Codable, Hashable {
     /// Inputs the reader sets with a control.
     var adjustableInputs: [Input] { inputs.filter { $0.role == .adjustable } }
     var hasInformation: Bool { blocks.contains { $0.kind.isInformation || $0.children.contains { $0.kind.isInformation } } }
+
+    /// The looked-up article's picture, when the article is what the page is about: a page about
+    /// Hampi shows Hampi. Not on a tool or a choice, and not when the first thing looked up was a
+    /// side issue, like tipping on a bill split, which once put a cow at the top.
+    var pictureURL: URL? {
+        guard let reference, let address = reference.imageURL, let url = URL(string: address) else { return nil }
+        switch mode {
+        case .use?, .decide?: return nil
+        case .learn?, .read?: break
+        case nil: guard hasInformation else { return nil }
+        }
+        return Self.nameSameThing(reference.title, title) ? url : nil
+    }
+
+    /// Whether two titles name the same thing: a word of four letters or more in common, or one
+    /// the start of the other, so "Vaccines" matches "Vaccine".
+    static func nameSameThing(_ a: String, _ b: String) -> Bool {
+        let common: Set<String> = ["with", "your", "from", "what", "when", "does", "that", "this", "into", "about", "their", "there"]
+        func words(_ text: String) -> [String] {
+            text.lowercased().split { $0.isWhitespace || $0.isPunctuation || $0.isSymbol }.map(String.init).filter { $0.count >= 4 && !common.contains($0) }
+        }
+        let theirs = words(b)
+        return words(a).contains { word in
+            theirs.contains { $0 == word || (min($0.count, word.count) >= 5 && ($0.hasPrefix(word) || word.hasPrefix($0))) }
+        }
+    }
 
     func input(_ name: String) -> Input? { inputs.first { $0.name == name } }
     func output(_ name: String) -> Output? { outputs.first { $0.name == name } }
@@ -206,6 +234,20 @@ struct Reference: Codable, Hashable {
 
 enum Accent: String, Codable, CaseIterable {
     case blue, teal, green, mint, orange, pink, purple, indigo, red, yellow, cyan, brown
+}
+
+/// What the user came for, from a tool to use to a page to read. Every request sits somewhere on
+/// that spectrum, and where shapes the whole page (Prompts.shapeRules): a tool leads with its
+/// answer and keeps words to a minimum; a page to read goes deep.
+enum Mode: String, Codable, CaseIterable {
+    /// Working something out with their own numbers, like a bill split.
+    case use
+    /// Weighing options to choose between, like rent or buy.
+    case decide
+    /// Understanding how something works, like how vaccines train the immune system.
+    case learn
+    /// Knowing about something: a place, a person, an event, a field.
+    case read
 }
 
 /// What a page is about, which picks its ink, so pages about the same kind of thing look alike:

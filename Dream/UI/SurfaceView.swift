@@ -58,7 +58,7 @@ struct SurfaceView: View {
                 TranslationNote(translation: translation, palette: surface.palette)
                     .padding(.top, -14)
             }
-            SurfaceImage(photo: photo, url: surface.hasInformation ? surface.reference?.imageURL.flatMap { URL(string: $0) } : nil, palette: surface.palette)
+            SurfaceImage(photo: photo, url: surface.pictureURL, palette: surface.palette)
             ForEach(blocks) { block in
                 BlockView(block: block, context: context, depth: 0)
                     .transition(.blurReplace)

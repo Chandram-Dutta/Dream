@@ -11,6 +11,9 @@ import FoundationModels
 enum WireFormat { case number, integer, currency, percent, toggle, choice }
 
 @Generable
+enum WireMode { case use, decide, learn, read }
+
+@Generable
 enum WireSubject { case money, health, food, places, nature, science, tech, home, learning, sport }
 
 @Generable
@@ -101,6 +104,9 @@ struct WireSurface {
     // First, so the page has its colors from its first words.
     @Guide(description: "What it's about, which picks the page's colors: money (prices, budgets, bills, tax), health (body, medicine, sleep), food (cooking, nutrition, eating out), places (travel, maps, weather, cities), nature (animals, plants, earth, climate), science (physics, maths, space, chemistry), tech (computers, phones, the internet), home (house, chores, shopping, plans, everyday life), learning (history, language, arts, culture), sport (sport, fitness, games)")
     var subject: WireSubject
+    // Second, so the whole screen is written for what the user came for.
+    @Guide(description: "What the user came for: use (a tool to work something out with their own numbers), decide (weighing options to choose), learn (understanding how something works), read (knowing about something: a place, a person, an event, a field)")
+    var mode: WireMode
     @Guide(description: "1 to 4 words")
     var title: String
     @Guide(description: "One sentence that answers the request directly")
@@ -127,7 +133,7 @@ struct WireSurface {
     var actions: [WireAction]
     @Guide(description: "3D scenes, only where depth teaches, each shown by a scene block", .count(0...2))
     var scenes: [WireScene]
-    @Guide(.count(1...12))
+    @Guide(.count(1...16))
     var blocks: [WireBlock]
     // No minimum: a model that has run out of ideas would otherwise stall, writing whitespace.
     @Guide(description: "3 to 6 nearby topics the user might explore next, as short titles", .maximumCount(6))
@@ -158,6 +164,7 @@ extension Surface {
         actions = Action.list(wire.actions)
         takeScenes(wire.scenes.map(Scene3D.init))
         citations = wire.citations.isEmpty ? nil : wire.citations.map(Citation.named)
+        mode = Mode(wire.mode)
     }
 
     /// While the model is still writing: show whatever has arrived.
@@ -175,6 +182,7 @@ extension Surface {
             question: wire.question.flatMap { $0.isEmpty ? nil : $0 },
             collections: Surface.collections(partial: wire.collections))
         sounds = Sound.list(partial: wire.sounds)
+        mode = wire.mode.map(Mode.init)
         takeVisuals(figures: (wire.figures ?? []).compactMap(Figure.init(partial:)), diagrams: (wire.diagrams ?? []).compactMap(Diagram.init(partial:)))
         actions = Action.list(partial: wire.actions)
         takeScenes((wire.scenes ?? []).compactMap(Scene3D.init(partial:)))
@@ -214,6 +222,12 @@ extension Block {
             over: wire.over ?? "",
             items: (wire.items ?? []).map { Item(label: $0.label ?? "", value: $0.value ?? "") },
             children: Block.list(partial: wire.children ?? [], prefix: id))
+    }
+}
+
+extension Mode {
+    init(_ wire: WireMode) {
+        self = Mode(rawValue: String(describing: wire)) ?? .use
     }
 }
 

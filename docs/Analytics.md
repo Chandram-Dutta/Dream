@@ -18,7 +18,7 @@ this table mirrors it.
 | `signed_in` | | After sign-in, once `ProductAnalytics.signedIn(userID:)` is called | Account (workstream A) |
 | `signed_out` | | When the session ends | `Session.didChange` |
 | `page_requested` | `with_photo` | A new page is asked for | `Composer.compose` |
-| `page_built` | `seconds`, `model`, `blocks`, `block_kinds`, `inputs`, `outputs`, `lists`, `live_sources`, `used_web`, `used_connections`, `asked_questions` | A page finished | `Composer.compose` |
+| `page_built` | `seconds`, `model`, `blocks`, `block_kinds`, `inputs`, `outputs`, `lists`, `live_sources`, `used_web`, `used_connections`, `asked_questions`, `mode` | A page finished | `Composer.compose` |
 | `page_failed` | `reason`, `changing`, `seconds` | Making or changing a page failed | `Composer` |
 | `page_changed` | as `page_built`, plus `pointed_at_block`; no `model` | A change to a page finished | `Composer.edit` |
 | `controls_used` | `changes`, `controls` | A page closes after its controls were used | `SurfaceScreen` (ControlUses.swift) |
@@ -39,6 +39,8 @@ Property meanings:
 - `model`: the provider and model, like "Grok (grok-4.7)".
 - `block_kinds`: the kinds of block on the page, like `chart`, `slider`, `list` (Surface.swift's
   `BlockKind`), never their content.
+- `mode`: what the user came for, from a tool to a page to read: `use`, `decide`, `learn`, `read`
+  (Surface.swift's `Mode`), or `unknown` on a page made before it was asked.
 - `used_web`: the page cites a web page other than Wikipedia. `used_connections`: a connected
   service's data is on it. `asked_questions`: Dream asked before building.
 - `reason`: `no_model`, `safety_filter`, `too_big`, `rate_limited`, `network`, `empty`, `model`,

@@ -331,7 +331,9 @@ final class Composer {
         }
         surface = surface.fetched(live).connected(connected)
         for round in 0...2 {
-            let issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
+            var issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
+            // Once: a page about the world that looked nothing up goes back to look it up.
+            if round == 0 { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
             if problems.isEmpty || round == 2 { break }
@@ -339,8 +341,14 @@ final class Composer {
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
-            surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false)
-                .fetched(live).connected(connected)
+            do {
+                surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false)
+                    .fetched(live).connected(connected)
+            } catch where !(error is CancellationError) && !Task.isCancelled {
+                // A repair that fails leaves the page as it was, which beats no page.
+                note("Kept the screen as it was: repair \(round + 1) didn't finish (\(describe(error))).")
+                break
+            }
         }
         await surface.findRecordings()
         await surface.findMolecules()
@@ -435,14 +443,18 @@ final class Composer {
             }
         }
         // A model can stall: nothing new arrives, or tokens keep coming but nothing changes.
-        // Models report activity while they think, so only real silence counts.
+        // Models report activity while they think, so only real silence counts. The server's
+        // heartbeat says the line is open, not that the model is working: it buys a long think,
+        // up to `ceiling`, never a hang. A repair once waited on one for over three minutes.
         let patience: TimeInterval = 45
+        let ceiling: TimeInterval = 150
         let watchdog = Task { @MainActor in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
                 if !self.isThinking, Date.now.timeIntervalSince(watch.lastChange) > 1.5 { self.isThinking = true }
                 let latest = max(watch.lastChange, ModelActivity.lastSeen)
-                if Date.now.timeIntervalSince(latest) > patience {
+                let heard = max(watch.lastChange, ModelActivity.lastHeard)
+                if Date.now.timeIntervalSince(latest) > patience || Date.now.timeIntervalSince(heard) > ceiling {
                     watch.stop = .stalled
                     reading.cancel()
                     return
@@ -549,17 +561,31 @@ final class Composer {
     }
 }
 
-/// When a remote model last sent anything, reasoning included, so a long think isn't taken for a stall.
+/// When a remote model last sent anything, reasoning included, so a long think isn't taken for a
+/// stall; and when it last did anything but keep the line open.
 enum ModelActivity {
     private static let lock = NSLock()
-    nonisolated(unsafe) private static var last = Date.distantPast
+    nonisolated(unsafe) private static var heard = Date.distantPast
+    nonisolated(unsafe) private static var beat = Date.distantPast
 
+    /// The model, a tool or the user did something.
     static func touch() {
-        lock.withLock { last = .now }
+        lock.withLock { heard = .now }
     }
 
+    /// Dream's server says the line is still open while the model is quiet (Server/src/stream.ts).
+    static func heartbeat() {
+        lock.withLock { beat = .now }
+    }
+
+    /// When anything last arrived, heartbeats included.
     static var lastSeen: Date {
-        lock.withLock { last }
+        lock.withLock { max(heard, beat) }
+    }
+
+    /// When the model, a tool or the user last did something. Heartbeats don't count.
+    static var lastHeard: Date {
+        lock.withLock { heard }
     }
 }
 

@@ -92,7 +92,7 @@ enum PictureMaker {
     /// The image the page shows above its information, fetched before drawing. Nil if there's
     /// none, or it doesn't arrive in a few seconds.
     private static func articleImage(_ surface: Surface) async -> UIImage? {
-        guard surface.hasInformation, let url = surface.reference?.imageURL.flatMap(URL.init(string:)), url.scheme == "https" else { return nil }
+        guard let url = surface.pictureURL, url.scheme == "https" else { return nil }
         var request = URLRequest(url: url)
         request.timeoutInterval = 6
         guard let (data, response) = try? await URLSession.shared.data(for: request),

@@ -116,7 +116,7 @@ enum ChatCompletions {
             if !answer.isEmpty, answer.count < 400 { trace(label, "the whole answer: \(answer)") }
         }
         for try await line in bytes.lines {
-            ModelActivity.touch()
+            if line == ": thinking" { ModelActivity.heartbeat() } else { ModelActivity.touch() }
             guard line.hasPrefix("data:") else { continue }
             let payload = line.dropFirst(5).trimmingCharacters(in: .whitespaces)
             if payload == "[DONE]" { break }

@@ -53,13 +53,15 @@ enum Checker {
             return output
         }
 
-        // The model often calls money a plain number.
+        // The model often calls money a plain number. Not one it gave a unit of its own, like %
+        // or years: that says what it measures.
+        func unmeasured(_ unit: String) -> Bool { unit.isEmpty || Currency.isCode(unit.uppercased()) || "$€£¥₹".contains(unit) }
         var madeCurrency: [String] = []
-        for index in surface.inputs.indices where surface.inputs[index].format == .number && looksLikeMoney(surface.inputs[index].name + " " + surface.inputs[index].label) {
+        for index in surface.inputs.indices where surface.inputs[index].format == .number && unmeasured(surface.inputs[index].unit) && looksLikeMoney(surface.inputs[index].name + " " + surface.inputs[index].label) {
             surface.inputs[index].format = .currency
             madeCurrency.append(surface.inputs[index].name)
         }
-        for index in surface.outputs.indices where surface.outputs[index].format == .number && looksLikeMoney(surface.outputs[index].name + " " + surface.outputs[index].label) {
+        for index in surface.outputs.indices where surface.outputs[index].format == .number && unmeasured(surface.outputs[index].unit) && looksLikeMoney(surface.outputs[index].name + " " + surface.outputs[index].label) {
             surface.outputs[index].format = .currency
             madeCurrency.append(surface.outputs[index].name)
         }
@@ -162,9 +164,15 @@ enum Checker {
             }
         }
 
-        let used = surface.outputs.reduce(into: Set<String>()) { $0.formUnion(surface.inputs(feeding: $1.name)) }
+        // A control that changes nothing is a broken tool: usually one side of a comparison the
+        // results forgot, like the rent in rent or buy. A given that's unused is only clutter.
+        let used = surface.outputs.reduce(into: inputsUsedElsewhere(in: surface)) { $0.formUnion(surface.inputs(feeding: $1.name)) }
         for input in surface.inputs where !used.contains(input.name) && input.role != .live {
-            warning("'\(input.name)' doesn't affect any result.")
+            if input.role == .adjustable {
+                problem("'\(input.name)' is a control that changes no result. Use it in the results it should change (both sides of a comparison), or remove it.")
+            } else {
+                warning("'\(input.name)' doesn't affect any result.")
+            }
         }
         return issues
     }
@@ -438,9 +446,18 @@ enum Checker {
                 surface.blocks.insert(hero, at: position)
                 missingOutputs.removeFirst()
             }
-            if !missingOutputs.isEmpty {
-                let metrics = missingOutputs.map { Block(id: uniqueID("\($0.name)-metric"), kind: .metric, ref: $0.name) }
+            // A step on the way to another result, like a monthly rate, shows how it's worked out
+            // rather than standing as a result of its own.
+            let feeding = Set(surface.outputs.flatMap { (try? FormulaCache.parse($0.formula))?.names ?? [] })
+            let steps = missingOutputs.filter { feeding.contains($0.name) }
+            let results = missingOutputs.filter { !feeding.contains($0.name) }
+            if !results.isEmpty {
+                let metrics = results.map { Block(id: uniqueID("\($0.name)-metric"), kind: .metric, ref: $0.name) }
                 surface.blocks.append(Block(id: uniqueID("more-results"), kind: .section, children: metrics))
+            }
+            if !steps.isEmpty {
+                let equations = steps.map { Block(id: uniqueID("\($0.name)-working"), kind: .equation, ref: $0.name) }
+                surface.blocks.append(Block(id: uniqueID("working"), kind: .section, children: equations))
             }
         }
         issues += placeCharts(&surface)
@@ -599,11 +616,41 @@ enum Checker {
 
     /// Whole words only, so "billions" isn't a bill. Words split at camel case, keeping
     /// acronyms like EMI whole.
-    static func looksLikeMoney(_ text: String) -> Bool {
-        text.matches(of: #/[A-Z]+(?![a-z])|[A-Z]?[a-z]+/#).map { $0.output.lowercased() }.contains { word in
-            moneyWords.contains(word) || (word.hasSuffix("s") && moneyWords.contains(String(word.dropLast())))
+    /// Inputs something other than a result uses: a figure, a scene, a sound, a button, a chart
+    /// running along it, or a live value in the text.
+    private static func inputsUsedElsewhere(in surface: Surface) -> Set<String> {
+        var formulas = (surface.figures ?? []).flatMap(\.formulas) + (surface.scenes ?? []).flatMap(\.formulas)
+        formulas += (surface.sounds ?? []).flatMap { $0.tones.flatMap { [$0.frequency, $0.amplitude] } }
+        formulas += (surface.actions ?? []).flatMap { $0.fields.values }
+        func axes(_ blocks: [Block]) -> [String] {
+            blocks.flatMap { ($0.kind == .chart && !$0.over.isEmpty ? [$0.over] : []) + axes($0.children) }
         }
+        // Not the blocks' own refs: a slider refers to the very input it sets.
+        var names = Set(axes(surface.blocks))
+        for formula in formulas {
+            names.formUnion((try? FormulaCache.parse(formula))?.names ?? [])
+        }
+        func texts(_ blocks: [Block]) -> [String] {
+            blocks.flatMap { [$0.text, $0.title] + $0.items.flatMap { [$0.label, $0.value] } + texts($0.children) }
+        }
+        let written = (texts(surface.blocks) + [surface.summary] + (surface.actions ?? []).flatMap { $0.fields.values }).joined(separator: " ")
+        for match in written.matches(of: #/\{(\w+)\}/#) { names.insert(String(match.output.1)) }
+        return names.reduce(into: Set<String>()) { $0.formUnion(surface.inputs(feeding: $1)) }
     }
+
+    static func looksLikeMoney(_ text: String) -> Bool {
+        let words = text.matches(of: #/[A-Z]+(?![a-z])|[A-Z]?[a-z]+/#).map { $0.output.lowercased() }
+        func any(of list: Set<String>) -> Bool {
+            words.contains { list.contains($0) || ($0.hasSuffix("s") && list.contains(String($0.dropLast()))) }
+        }
+        return any(of: moneyWords) && !any(of: notMoneyWords)
+    }
+
+    /// What a quantity is, even beside a money word: a loan's rate or term, how fast rent grows.
+    private static let notMoneyWords: Set<String> = [
+        "rate", "growth", "percent", "percentage", "pct", "ratio", "yield", "inflation", "appreciation",
+        "tenure", "term", "month", "year", "day", "week", "period", "duration", "count", "people", "person",
+    ]
 
     /// "Tip percent" → "tipPercent". Names that are already identifiers are left alone.
     static func identifier(_ raw: String) -> String {

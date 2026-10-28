@@ -226,6 +226,8 @@ extension SharedSurface {
 
         var surface = shared.surface.bounded.forgettingConnections
         surface.answers = nil
+        // A picture the page itself wouldn't show stays off the shared page too.
+        if surface.pictureURL == nil { surface.reference?.imageURL = nil }
         surface.reference = surface.reference?.trusted
         surface.sounds = surface.sounds?.map { sound in
             var sound = sound

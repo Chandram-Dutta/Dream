@@ -24,9 +24,20 @@ enum Prompts {
         """
     }
 
+    /// Where a request sits between a tool to use and a page to read decides the page's shape.
+    /// The model names it first (`mode`), so everything after is written for it.
+    private static let shapeRules = """
+        First decide what the user came for, as mode. It's a spectrum from a tool to use to a page to read, and it shapes everything:
+        - use: they want to work something out with their own numbers, like a bill split, an EMI or a conversion. The tool is the page: the answer first, large, then the controls, each with a plain label and a starting value from the request. A sentence or two on how it's worked out, nothing more. Show the results they care about as results; a step on the way, like a monthly rate, is still an output, shown in an equation block (ref) where they can see how it's worked out, not as a result of its own.
+        - decide: they're weighing options, like rent or buy, or which plan to take. Say which wins for them and why in the summary. Then the options side by side, every option in the calculation, with a control for each assumption that could tip it, so they can test their own. Then the few things that matter most, briefly.
+        - learn: they want to understand how something works. Build it up in order: what it is in plain words, how it works, an example worked with live numbers, then something to explore. Draw it wherever seeing helps: a diagram, a figure, a chart.
+        - read: they want to know about something: a place, a person, an event, a field. Give them a page to get lost in, dense with information. Open with the answer, then go deep in sections, each with a heading: the key facts, the history on a timeline, real figures as data, what's surprising, how it connects to other things. 8 to 14 blocks, and paragraphs of 3 to 5 sentences, each carrying specific names, numbers and dates. No filler and no generalities.
+        Most requests sit between two of these. Give each part what it needs, like a trip that's mostly reading with a cost to work out.
+        """
+
     private static let informationRules = """
         Information blocks:
-        - paragraph: 2 or 3 plain sentences. {name} shows a live value from the calculation.
+        - paragraph: plain sentences: 2 or 3 beside a tool, 3 to 5 on a page to read. {name} shows a live value from the calculation.
         - equation: one displayed equation, in LaTeX in text, with items saying what each symbol means (label: the symbol in LaTeX; value: its meaning). Or set ref to an output instead: it shows that output's formula typeset, worked through with the user's live numbers. Use ref whenever the screen calculates the equation.
         - facts: label and value pairs, like Height and 330 m.
         - bullets: short points. steps: how to do something, or the steps of a derivation or proof, in order.
@@ -34,7 +45,7 @@ enum Prompts {
         - stat: one number that's striking on its own; the label is the number and the value says what it means.
         - data: real figures as a chart, to compare or follow over time. Label: the year or category. Value: a plain number. Title: what's measured, with its unit, like Population (millions). Use figures from the lookup.
         Maths is always LaTeX: inline between $ signs in any text, like $a^2 + b^2 = c^2$, and displayed in equation blocks. Never write maths as plain text like x^2 or sqrt(x).
-        Use the kinds the subject calls for, usually 3 to 5 blocks: facts for key details, timeline for history, steps for how-tos, data for real figures. Never add a block just for variety.
+        Use the kinds the subject calls for: facts for key details, timeline for history, steps for how-tos, data for real figures. Never add a block just for variety.
         For maths and science, build understanding in order: what it is in words, the equation, what each symbol means, an example worked with live numbers, then the user exploring it, ideally on a chart.
         """
 
@@ -47,7 +58,7 @@ enum Prompts {
         Every adjustable input gets one control, and every given and output is shown once.
         """
 
-    private static let closingRules = "Lead with what answers the request. Keep text short. Then list related: 3 to 6 nearby topics to explore next."
+    private static let closingRules = "Lead with what answers the request. Every sentence earns its place. Then list related: 3 to 6 things someone who enjoyed this page would open next, each a specific question or subject, like 'Why Vijayanagara fell in 1565', not a broad category like 'History'."
 
     /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
     private static var featureRules: [String] {
@@ -59,6 +70,8 @@ enum Prompts {
     static var surface: String {
         """
         You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Before you write, look up the facts, numbers, dates and names the screen will state about the world, with the lookup tool, or search and read for the web, and take them only from what they return. A calculation with the user's own numbers, like splitting a bill, states no such facts and needs no tools.
+
+        \(shapeRules)
 
         \(whenToCalculate)
         If there's something worth changing, write the question it answers, then the calculation. Otherwise leave question, inputs and outputs empty.
@@ -96,7 +109,7 @@ enum Prompts {
         let list = problems.map { "- \($0.message)" }.joined(separator: "\n")
         guard let asked, let current else {
             return """
-                The calculation in that screen has problems:
+                That screen has problems:
                 \(list)
 
                 Return the whole screen again with these problems fixed. Keep everything else the same.
@@ -108,7 +121,7 @@ enum Prompts {
             You began this screen, but it stopped before it was finished. What it has so far:
             \(screen(current))
 
-            Its calculation has problems:
+            It has problems:
             \(list)
 
             Return the whole screen, finished, with these problems fixed. Keep what's already there.
