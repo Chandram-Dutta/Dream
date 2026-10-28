@@ -115,6 +115,8 @@ export default {
         const answer = await directory(request, url);
         if (answer) return answer;
       }
+      // "/" is the landing page in public/ (scripts/copy-website.mjs); this is only reached if a
+      // build left it out.
       if (path === "/" && reading) {
         return html(messagePage("Dream", "Screens shared from Dream open here. Ask for something on your iPhone, and Dream makes a screen that explains it, works it out, or both."), 200, "public, max-age=3600");
       }

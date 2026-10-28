@@ -1,8 +1,8 @@
 # Dream's website
 
 The landing page for Dream: a static [Astro](https://astro.build) site that builds to `dist/`.
-It isn't deployed anywhere yet. The proposal for serving it at `https://dream.onlychan.xyz/` is
-at the end.
+It's served at `https://dream.onlychan.xyz/` by the Worker (`Server/`), and ships with it: see
+the end.
 
 ## Build and preview
 
@@ -77,41 +77,22 @@ Keep these in step when the product changes:
 - **Share image.** `public/share.jpg` is the app icon. A proper 1200 × 630 card would look better
   in link previews.
 
-## Proposal: serving it at dream.onlychan.xyz "/" (not done)
+## How it's served
 
-**Recommended: build it into the Worker's static assets.** The Worker already serves
-`Server/public/` as static assets (`"assets": { "directory": "./public" }` in
-`wrangler.jsonc`). Cloudflare answers a request from a file when one matches, before the
-Worker runs. Anything without a file still reaches the Worker as it does now. That includes
-`/api/*`, `/s/:id`, `/privacy`, `/terms`, `/support`, `/admin` and `/.well-known/*`. So:
+The Worker (`Server/`) serves the site from its static assets, so the landing page and the API
+ship in the same deploy (`npx wrangler deploy` from `Server/`):
 
-1. Copy `Website/dist/` into `Server/public/` as part of the Worker's build. For example, a
-   `Server/scripts/copy-website.mjs` that runs `npm ci && npm run build` in `../Website`, then
-   copies `dist/*` across. Chain it after `copy-katex.mjs` in `wrangler.jsonc`'s
-   `build.command`. Add the copied files to `Server/.gitignore`.
-2. Nothing collides. The site writes `index.html`, `/_astro/*` (hashed), `favicon.png`,
-   `apple-touch-icon.png`, `icon*.png` and `share.jpg`. The Worker's own files are `/katex/*`
-   and `robots.txt`; the site has no `robots.txt`, so the Worker's stays.
-3. `/` then serves `index.html`, using the default `html_handling`. The Worker's own "/"
-   message page in `src/index.ts` is never reached and can go. Keep `not_found_handling` at its
-   default, `none`, so unknown paths still fall through to the Worker's 404. If
-   `run_worker_first` is ever turned on, the Worker has to hand `/` to the `ASSETS` binding.
-4. Static assets don't get the Worker's security headers. Add a `Server/public/_headers` file
-   (Workers Static Assets read it). For `/` and `/index.html`:
-   `Content-Security-Policy: default-src 'none'; script-src 'self' 'sha256-…'; style-src 'self' 'unsafe-inline'; font-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'`,
-   plus `X-Content-Type-Options: nosniff` and `Referrer-Policy: no-referrer`. For
-   `/_astro/*`: `Cache-Control: public, max-age=31536000, immutable`. The page has one inline
-   script, which sets the time-of-day color and marks that scripts run. Recompute its hash after any change to it:
-
-   ```sh
-   node -e 'const s=require("fs").readFileSync("dist/index.html","utf8").match(/<script>([\s\S]*?)<\/script>/)[1];console.log("sha256-"+require("crypto").createHash("sha256").update(s).digest("base64"))'
-   ```
-
-5. Deploy as usual (`npx wrangler deploy` from `Server/`). The landing page and the API ship
-   together, so the site's numbers and the server's limits change in the same deploy.
-
-**Alternative: a Cloudflare Pages project** for `Website/` on the same custom domain, with the
-Worker on routes for `/api/*`, `/s/*`, `/privacy`, `/terms`, `/support`, `/admin*`,
-`/reader` and `/.well-known/*`. That means two deployments and a list of routes to keep
-complete, where a missing route breaks a live path. It's only worth it if the site starts to
-change much more often than the server.
+- **`Server/scripts/copy-website.mjs`** runs in the Worker's build (`wrangler.jsonc`, after
+  `copy-katex.mjs`), before every `wrangler dev` and deploy. It builds this site (installing
+  its packages first if they're missing), then copies `dist/` into `Server/public/`, removing
+  what the last build copied. The copies are in `Server/.gitignore`. It refuses to replace the
+  Worker's own `robots.txt`, `katex/` or `_headers`.
+- **Cloudflare answers a request from a file when one matches, before the Worker runs.** `/` is
+  `index.html`. Anything without a file still reaches the Worker as before: `/api/*`, `/s/:id`,
+  `/privacy`, `/terms`, `/support`, `/admin` and `/.well-known/*`. The Worker's own `/` page in
+  `src/index.ts` is only reached if a build ever leaves the site out.
+- **Headers.** Static files don't get the Worker's headers, so the script also writes
+  `Server/public/_headers`. For `/` and `/index.html`, it sends the same security headers as the
+  Worker's own pages. That includes a Content Security Policy with the hash of each inline
+  script it finds in the built page, so changing the time-of-day script needs nothing by hand.
+  For `/_astro/*`, which are hashed files, it sets a year's immutable caching.
