@@ -48,7 +48,10 @@ struct XAIExecutor: LanguageModelExecutor {
     func prewarm(model: XAILanguageModel, transcript: Transcript) {}
 
     func respond(to request: LanguageModelExecutorGenerationRequest, model: XAILanguageModel, streamingInto channel: LanguageModelExecutorGenerationChannel) async throws {
-        let (body, summary) = try ChatCompletions.body(for: request, modelID: configuration.modelID)
+        // Grok thinks low to high; a level picked for Dream's other models moves to the nearest,
+        // as the server moves it (Server/src/models.ts), instead of xAI turning the request away.
+        let effort = ThinkingChoice.shown(ThinkingChoice.level, among: ["low", "medium", "high"])
+        let (body, summary) = try ChatCompletions.body(for: request, modelID: configuration.modelID, effort: effort)
         var urlRequest = URLRequest(url: URL(string: "https://api.x.ai/v1/chat/completions")!, timeoutInterval: 120)
         urlRequest.httpMethod = "POST"
         urlRequest.setValue("Bearer \(configuration.apiKey)", forHTTPHeaderField: "Authorization")

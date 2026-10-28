@@ -3,7 +3,7 @@ import SwiftData
 import SwiftUI
 
 /// Where everything starts. Ask at the bottom, or tap an idea; what you've made glows above,
-/// each in its own colors. Every surface opens out of what you touched.
+/// each in its own colors.
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \SavedSurface.updatedAt, order: .reverse) private var surfaces: [SavedSurface]
@@ -17,7 +17,6 @@ struct HomeView: View {
     @State private var listener = Listener()
     @State private var sharedLinks = SharedLinks()
     @FocusState private var focused: Bool
-    @Namespace private var zoom
     @MainActor private static var startedAutomatically = false
 
     private let palette = Palette.now
@@ -58,16 +57,13 @@ struct HomeView: View {
                     .frame(height: 620)
             }
             .background(Color(.systemBackground))
+            .background { EdgeSwipeBack() }
             .safeAreaInset(edge: .bottom) { composer }
             .toolbar(.hidden, for: .navigationBar)
-            .navigationDestination(item: $request) { request in
-                SurfaceScreen(request: request)
-                    .navigationTransition(.zoom(sourceID: "composer", in: zoom))
-            }
-            .navigationDestination(for: SavedSurface.self) { saved in
-                SurfaceScreen(saved: saved)
-                    .navigationTransition(.zoom(sourceID: saved.id, in: zoom))
-            }
+            // A plain push, not a zoom out of the tile: going back from a zoom lets a drag carry the
+            // whole page off in any direction, and pages are full of things a finger drags sideways.
+            .navigationDestination(item: $request) { SurfaceScreen(request: $0) }
+            .navigationDestination(for: SavedSurface.self) { SurfaceScreen(saved: $0) }
             // Shared with the user, from a link (SharedLinks.swift).
             .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
@@ -128,7 +124,6 @@ struct HomeView: View {
             ForEach(surfaces) { saved in
                 NavigationLink(value: saved) {
                     SurfaceTile(saved: saved)
-                        .matchedTransitionSource(id: saved.id, in: zoom)
                 }
                 .buttonStyle(.plain)
                 .contextMenu {
@@ -203,7 +198,6 @@ struct HomeView: View {
             .padding(6)
             .glassEffect(.regular.interactive(), in: .rect(cornerRadius: 26))
             .listeningGlow(listener, palette: palette, in: .rect(cornerRadius: 26))
-            .matchedTransitionSource(id: "composer", in: zoom)
             .padding(.horizontal, 16)
         }
         .padding(.bottom, 8)
@@ -318,6 +312,21 @@ struct SurfaceTile: View {
         .clipShape(.rect(cornerRadius: 26))
         .overlay(RoundedRectangle(cornerRadius: 26).strokeBorder(palette.edge, lineWidth: 0.5))
         .contentShape(.rect(cornerRadius: 26))
+    }
+}
+
+/// Back is the swipe from the screen's edge, or the back button; a swipe from anywhere on the
+/// page is the page's own. A page is full of things a finger drags sideways (sliders, charts,
+/// an entry swiped away, a scene turned), and a swipe from anywhere took the page with them.
+private struct EdgeSwipeBack: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> Finder { Finder() }
+    func updateUIViewController(_ controller: Finder, context: Context) {}
+
+    final class Finder: UIViewController {
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            navigationController?.interactiveContentPopGestureRecognizer?.isEnabled = false
+        }
     }
 }
 

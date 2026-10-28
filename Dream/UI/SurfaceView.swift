@@ -53,7 +53,7 @@ struct SurfaceView: View {
         let surface = translation.shown(self.surface)
         let context = RenderContext(surface: surface, evaluation: surface.evaluate(state.values, records: state.records), state: state, focusedID: focusedID, onChange: onChange, readingID: readingID)
         let blocks = surface.displayBlocks
-        VStack(alignment: .leading, spacing: 26) {
+        PageColumn(spacing: 26) {
             SurfaceHeader(surface: surface, stage: stage, onAnswer: onAnswer)
                 .readingMark(readingID == Narration.headerID, palette: surface.palette)
             if translation.status != .none {
@@ -246,7 +246,9 @@ private struct RelatedTopics: View {
     }
 }
 
-/// Lays out views left to right, wrapping onto new lines.
+/// Lays out views left to right, wrapping onto new lines. One too wide for a whole line (a long
+/// topic, a long answer) gets a line to itself and wraps inside it, so the flow is never wider
+/// than it was offered.
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 
@@ -257,29 +259,52 @@ struct FlowLayout: Layout {
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         let arrangement = arrange(width: bounds.width, subviews: subviews)
-        for (index, origin) in arrangement.origins.enumerated() {
-            subviews[index].place(at: CGPoint(x: bounds.minX + origin.x, y: bounds.minY + origin.y), proposal: .unspecified)
+        for (index, frame) in arrangement.frames.enumerated() {
+            subviews[index].place(at: CGPoint(x: bounds.minX + frame.minX, y: bounds.minY + frame.minY), proposal: ProposedViewSize(frame.size))
         }
     }
 
-    private func arrange(width: CGFloat, subviews: Subviews) -> (origins: [CGPoint], width: CGFloat, height: CGFloat) {
-        var origins: [CGPoint] = []
+    private func arrange(width: CGFloat, subviews: Subviews) -> (frames: [CGRect], width: CGFloat, height: CGFloat) {
+        var frames: [CGRect] = []
         var x: CGFloat = 0
         var y: CGFloat = 0
         var rowHeight: CGFloat = 0
         var widest: CGFloat = 0
         for subview in subviews {
-            let size = subview.sizeThatFits(.unspecified)
+            var size = subview.sizeThatFits(.unspecified)
+            if size.width > width { size = subview.sizeThatFits(ProposedViewSize(width: width, height: nil)) }
             if x > 0, x + size.width > width {
                 x = 0
                 y += rowHeight + spacing
                 rowHeight = 0
             }
-            origins.append(CGPoint(x: x, y: y))
+            frames.append(CGRect(origin: CGPoint(x: x, y: y), size: size))
             x += size.width + spacing
             rowHeight = max(rowHeight, size.height)
             widest = max(widest, x - spacing)
         }
-        return (origins, widest, y + rowHeight)
+        return (frames, widest, y + rowHeight)
+    }
+}
+
+/// A page's blocks, top to bottom, each offered the page's width. The page itself is never wider
+/// than that: a block that insists on more runs off to the right on its own, instead of widening
+/// the whole page past the screen's edges, where it slid sideways under a finger.
+struct PageColumn: Layout {
+    var spacing: CGFloat
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let width = proposal.width ?? subviews.map { $0.sizeThatFits(.unspecified).width }.max() ?? 0
+        let heights = subviews.map { $0.sizeThatFits(ProposedViewSize(width: width, height: nil)).height }
+        return CGSize(width: width, height: heights.reduce(0, +) + spacing * CGFloat(max(0, subviews.count - 1)))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for subview in subviews {
+            let height = subview.sizeThatFits(ProposedViewSize(width: bounds.width, height: nil)).height
+            subview.place(at: CGPoint(x: bounds.minX, y: y), proposal: ProposedViewSize(width: bounds.width, height: height))
+            y += height + spacing
+        }
     }
 }

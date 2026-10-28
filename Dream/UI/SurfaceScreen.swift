@@ -149,6 +149,9 @@ struct SurfaceScreen: View {
         .sensoryFeedback(trigger: composer.phase) { _, new in new == .done ? .success : nil }
         .onChange(of: mainValue) { if !busy { pulse += 1 } }
         .navigationBarTitleDisplayMode(.inline)
+        // Home hides its bar; said outright here, so a back swipe let go halfway can't leave the
+        // page without its own.
+        .toolbarVisibility(.visible, for: .navigationBar)
         .navigationDestination(item: $exploring) { SurfaceScreen(request: $0) }
         .toolbar {
             ToolbarItemGroup(placement: .topBarTrailing) {
