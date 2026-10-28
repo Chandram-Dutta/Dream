@@ -137,9 +137,10 @@ export async function route(request: Request, env: RouteEnv, ctx: ExecutionConte
 
   const row = where ? TABLE[where.category][where.difficulty] : null;
   const { model, effort } = pickFor(row, account, env);
+  // The row's reason is about its first pick, the model at that level; anything else is the plan's.
   const why = !row || !where
     ? "Couldn't tell what kind of page this is, so Dream's default"
-    : model.id === row.picks[0].model
+    : model.id === row.picks[0].model && effort === row.picks[0].effort
       ? row.why
       : `${model.name}: the best your plan has for ${NAMES[where.category]}`;
   // `name` too, so the app can say what Auto picked without a list of models. In local

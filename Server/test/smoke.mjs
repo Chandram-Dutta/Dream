@@ -707,8 +707,10 @@ async function runRoute(base, clef, xai) {
   const sent = clef.calls.at(-1);
   expect(response.status === 200 && picked.category === "science" && picked.difficulty === "hard" && picked.why?.length > 0, `Clef's reading picks the row (${picked.category}, ${picked.difficulty}): ${picked.why}`);
   expect(sent?.model === CLEF.selector && sent.state.includes('"derive the quadratic formula"') && sent.questions?.topic?.type === "choice" && !("images" in sent), "Clef was asked about the request, with typed questions and no photo");
-  // The row starts on DeepSeek thinking none, which the free plan, held to low, can't run as benched.
-  expect(TABLE.science.hard.picks[0].effort === "none" && picked.model === DEFAULT_PICK.model && picked.name === byID(DEFAULT_PICK.model)?.name && /best your plan has/.test(picked.why), "on the free plan, a pick that thinks none gives way to the row's next, named, and said why");
+  // The row starts on DeepSeek thinking none, which the free plan, held to low, can't run as
+  // benched; with DEV_LOGIN it may use any model, so it gets the row's first pick at low.
+  const atLow = TABLE.science.hard.picks.find((each) => (fitEffort("low", byID(each.model)) ?? "none") === each.effort);
+  expect(TABLE.science.hard.picks[0].effort === "none" && picked.model === atLow.model && picked.effort === atLow.effort && picked.name === byID(atLow.model)?.name && /best your plan has/.test(picked.why), `on the free plan, a pick that thinks none gives way to the row's next it can run, named, and said why (${picked.model} · ${picked.effort})`);
   expect(picked.effort === (fitEffort("low", byID(picked.model)) ?? "none"), `the free plan thinks low (${picked.effort})`);
   response = await ask({ request: "derive the quadratic formula" }, { session: tester.token });
   picked = await response.json();
