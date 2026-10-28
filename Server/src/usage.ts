@@ -147,7 +147,10 @@ export async function admitModel(env: UsageEnv, userID: string, page: string | n
     console.error("Model daily budget reached");
     return { status: 503, message: "Dream is very busy today. Try again later.", upgrade: false, resetsAt: ends.day };
   }
-  if (day.cost_micros >= allowance.dailyCost) {
+  // Testers (PLUS_ACCOUNTS) are the developer and the people trying Dream for them: they pay for
+  // what they make, and run many pages a day testing, so no daily or monthly allowance stops
+  // them. Dream's own daily budget above and the most one page may cost still do.
+  if (!account.tester && day.cost_micros >= allowance.dailyCost) {
     return account.plan === "free"
       ? { status: 402, message: "You've used today's free allowance. You can make more tomorrow, or now with Dream Plus.", upgrade: true, resetsAt: ends.day }
       : { status: 429, message: "You've used today's allowance. You can make more tomorrow.", upgrade: false, resetsAt: ends.day };
@@ -159,8 +162,8 @@ export async function admitModel(env: UsageEnv, userID: string, page: string | n
       ? { status: 429, message: "This page has used all the work one page can. Try asking for something smaller.", upgrade: false }
       : null;
   }
-  if (day.pages >= allowance.pagesPerDay) return usedUp(account.plan, allowance.pagesPerDay, "day", ends.day);
-  if (month.pages >= allowance.pagesPerMonth) return usedUp(account.plan, allowance.pagesPerMonth, "month", ends.month);
+  if (!account.tester && day.pages >= allowance.pagesPerDay) return usedUp(account.plan, allowance.pagesPerDay, "day", ends.day);
+  if (!account.tester && month.pages >= allowance.pagesPerMonth) return usedUp(account.plan, allowance.pagesPerMonth, "month", ends.month);
   // The gap check and the writing start together; only the first of them counts the page.
   const started = await env.DB.prepare("INSERT OR IGNORE INTO usage_pages (user_id, page, day, cost_micros) VALUES (?, ?, ?, 0)").bind(userID, page, dayOf(at)).run();
   if (started.meta.changes === 1) await add(env, userID, { pages: 1 }, at);
