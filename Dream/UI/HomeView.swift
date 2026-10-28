@@ -380,12 +380,15 @@ struct FormingTile: View {
         .padding(16)
         .frame(maxWidth: .infinity, minHeight: 170, alignment: .topLeading)
         .background {
-            // Moving while it's Dream's turn, still while it's the user's; each step of the
-            // work and each block landing surges it, as on the page's own screen.
-            Aura(palette: palette, energy: failure != nil ? 0 : waiting ? 0.04 : 0.8, flood: failure != nil ? 0 : 1,
-                 pulse: (composer?.trail.count ?? 0) + (composer?.surface?.blocks.count ?? 0))
-                .animation(.easeInOut(duration: 1.4), value: waiting)
-                .animation(.easeInOut(duration: 1.2), value: failure != nil)
+            ZStack {
+                palette.wash
+                // Moving while it's Dream's turn, still while it's the user's; each step of the
+                // work and each block landing surges it, as on the page's own screen.
+                Aura(palette: palette, energy: failure != nil ? 0 : waiting ? 0.04 : 0.8, flood: failure != nil ? 0 : 1,
+                     pulse: (composer?.trail.count ?? 0) + (composer?.surface?.blocks.count ?? 0))
+                    .animation(.easeInOut(duration: 1.4), value: waiting)
+                    .animation(.easeInOut(duration: 1.2), value: failure != nil)
+            }
         }
         .clipShape(.rect(cornerRadius: 26))
         .overlay(RoundedRectangle(cornerRadius: 26).strokeBorder(palette.edge, lineWidth: 0.5))
