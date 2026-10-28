@@ -1,0 +1,19 @@
+---
+// Getting the app. Until it's on the App Store (APP_STORE_URL still has its placeholder), this
+// says so instead of linking somewhere that doesn't open.
+import { APP_STORE_URL } from "../config";
+
+const live = !APP_STORE_URL.includes("TODO");
+---
+
+{
+  live ? (
+    <a class="get" href={APP_STORE_URL}>
+      Get Dream on the App Store
+    </a>
+  ) : (
+    <span class="get" aria-disabled="true">
+      Coming soon to the App Store
+    </span>
+  )
+}

@@ -1,0 +1,55 @@
+---
+import "@fontsource-variable/mona-sans/standard.css";
+import "../styles/global.css";
+import fontURL from "@fontsource-variable/mona-sans/files/mona-sans-latin-standard-normal.woff2?url";
+import { DESCRIPTION, HOST, STORE_NAME } from "../config";
+import { paletteCSS } from "../lib/palette";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const { title = STORE_NAME, description = DESCRIPTION } = Astro.props;
+const canonical = new URL(Astro.url.pathname, HOST).href;
+---
+
+<!doctype html>
+<html lang="en" data-accent="blue">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="referrer" content="no-referrer" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Dream" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL("/share.jpg", HOST).href} />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" href="/favicon.png" type="image/png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="preload" href={fontURL} as="font" type="font/woff2" crossorigin />
+    <!--
+      Before anything's been asked, the page takes the color of the time of day, as the app's home
+      screen does (Palette.now in Dream/UI/Theme.swift). This runs before the first paint, as does
+      marking that scripts run, so the opening can start from an empty composer without a flash.
+    -->
+    <script is:inline>
+      (function () {
+        var h = new Date().getHours();
+        var d = document.documentElement;
+        d.setAttribute("data-accent", h >= 5 && h < 11 ? "mint" : h >= 11 && h < 17 ? "blue" : h >= 17 && h < 21 ? "orange" : "indigo");
+        d.classList.add("js");
+      })();
+    </script>
+    <style is:inline set:html={paletteCSS()}></style>
+  </head>
+  <body>
+    <slot />
+  </body>
+</html>
