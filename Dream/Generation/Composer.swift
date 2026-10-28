@@ -120,8 +120,15 @@ final class Composer {
     /// What the user asked for, which picks the connected services' tools worth offering.
     private var request = ""
 
-    func compose(intent: String, image: CGImage? = nil) async {
+    /// Makes a new page: on Dream's server when that's switched on (Composer+Server.swift),
+    /// otherwise here.
+    func compose(intent: String, image: CGImage? = nil, onServer: Bool = ServerCompose.isOn) async {
+        if onServer {
+            await composeOnServer(intent: intent, image: image)
+            return
+        }
         let started = Date()
+        job = nil
         log = []
         trail = []
         surface = nil
@@ -158,6 +165,7 @@ final class Composer {
     /// Changes a surface. `focus` is the block the user pointed at, if any.
     func edit(_ current: Surface, intent: String, instruction: String, focus: Block?) async {
         let started = Date()
+        job = nil
         log = []
         trail = []
         surface = current
@@ -188,6 +196,32 @@ final class Composer {
             fail(error)
             countFailure(error, changing: true, since: started)
         }
+    }
+
+    // MARK: - On Dream's server
+
+    /// The job on Dream's server making what this shows, while a new page is made there.
+    private(set) var job: ServerJob?
+    /// What reads the job's events, while something does.
+    @ObservationIgnored var watch: ServerWatch?
+    /// Told as soon as a page has started on Dream's server, so the app can keep the job and find
+    /// it again if it leaves the page mid-way.
+    @ObservationIgnored var onJob: ((ServerJob) -> Void)?
+
+    /// Shows a page being made on Dream's server as far as its events have got, in the same state
+    /// a page made here fills, so the screen can't tell the two apart. Everything on that path
+    /// reaches the screen through here.
+    func show(_ progress: PageProgress, job: ServerJob?) {
+        if self.job != job { self.job = job }
+        if phase != progress.phase { phase = progress.phase }
+        if surface != progress.surface { surface = progress.surface }
+        if trail != progress.trail { trail = progress.trail }
+        if log != progress.log {
+            for line in progress.log.dropFirst(log.count) { Build.trace("[Dream] \(line)") }
+            log = progress.log
+        }
+        if isThinking != progress.isThinking { isThinking = progress.isThinking }
+        if modelName != progress.model { modelName = progress.model }
     }
 
     // MARK: - Model
