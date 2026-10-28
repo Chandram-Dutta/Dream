@@ -132,16 +132,20 @@ struct HomeView: View {
     private var shelf: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
             ForEach(forming) { started in
-                NavigationLink(value: FormingPage(started)) {
-                    FormingTile(started: started)
+                // As values: the record goes the moment the page is saved, and the tile can be
+                // drawn once more before the shelf hears.
+                let page = FormingPage(started)
+                let failure = started.failure
+                NavigationLink(value: page) {
+                    FormingTile(page: page, failure: failure)
                 }
                 .buttonStyle(.plain)
                 .transition(.blurReplace)
                 .contextMenu {
                     // Nothing on the server stops a page part way, so only one that failed can go.
-                    if started.failure != nil {
+                    if failure != nil {
                         Button("Delete", systemImage: "trash", role: .destructive) {
-                            ServerPages.shared.discard(started.pageID)
+                            ServerPages.shared.discard(page.job.page)
                         }
                     }
                 }
@@ -345,13 +349,20 @@ struct SurfaceTile: View {
 /// for the user, and it turns to the page's colors once the page knows its subject, with its
 /// title as it's written, or the request until there is one.
 struct FormingTile: View {
-    let started: StartedPage
+    let started: FormingPage
+    /// Why the server couldn't make it, once it couldn't.
+    let failed: String?
     private let pages = ServerPages.shared
 
+    init(page: FormingPage, failure: String?) {
+        started = page
+        failed = failure
+    }
+
     var body: some View {
-        let composer = pages.following[started.pageID]
+        let composer = pages.following[started.job.page]
         let page = composer?.surface.flatMap { $0.title.isEmpty ? nil : $0 }
-        let failure = started.failure ?? composer.flatMap(Self.failure)
+        let failure = failed ?? composer.flatMap(Self.failure)
         let waiting = composer?.asking.isWaiting ?? false
         let palette = page?.palette ?? .dream
         VStack(alignment: .leading, spacing: 6) {
