@@ -44,7 +44,9 @@ the export, deploy. When the on-device loop is gone, the generated files become 
 The checker and the formula engine are ported to TypeScript (`Server/src/engine/`), and kept equal
 to Swift's by golden tests: a Swift tool runs Swift's checker over a corpus of model outputs and
 writes what it produced; the TypeScript checker must produce the same. The app keeps the Swift
-engine, because it runs every page's formulas on the phone.
+engine, because it runs every page's formulas on the phone. The corpus is
+`Server/test/golden/cases`; `Tools/engine-golden.sh` writes what Swift makes of it, and `npm test`
+compares (`Server/test/engine.mjs`). Change the Swift engine, run the script, port the change.
 
 ## The contract
 

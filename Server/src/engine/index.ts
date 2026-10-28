@@ -9,10 +9,16 @@
 // The checker reads the user's currency and units, which the app takes from the phone's locale:
 // pass the request's `locale` (ComposeRequest.locale fits) to checkLogic. Without one it checks
 // for a reader in the US, as the golden cases do by default.
+//
+// Reading the model's answer as it streams, as the app does: parsePartial(text so far), then, if
+// wireIsReadable, surfaceFromPartial; a moment it can't read (a choice half written) keeps the
+// page as it was. The finished answer is surfaceFromWire when wireIsWhole, and otherwise an
+// answer cut short, read with surfaceFromPartial.
 
 import { checkBlocks as checkBlocksIn, checkLogic as checkLogicIn, isRepeatingItself as repeating } from "./checker.ts";
 import { checkCitations as checkCitationsIn, checkSourcing as checkSourcingIn, citationOf, ReadingList, type ReadPage } from "./citations.ts";
 import { logicSummary as summaryOf, outline as outlineOf } from "./outline.ts";
+import { parsePartial } from "./partial.ts";
 import { hasLogic as logicIn, isEmpty as emptyIn } from "./surface.ts";
 import type { Citation, EngineLocale, Issue, MoleculeStructure, Recording, Reference, Surface } from "./types.ts";
 import { asReader } from "./units.ts";
@@ -20,7 +26,7 @@ import { fromPartial, fromWire, wireIsReadable, wireIsWhole } from "./wire.ts";
 
 export type { Citation, EngineLocale, Issue, MoleculeStructure, ReadPage, Recording, Reference, Surface };
 export type * from "./types.ts";
-export { citationOf, wireIsReadable, wireIsWhole };
+export { citationOf, parsePartial, wireIsReadable, wireIsWhole };
 
 /** A finished answer (WireSurface JSON) as a page: Surface.init(_ wire:reference:). Use it when
  * `wireIsWhole(wire)`; an answer that isn't whole is read with surfaceFromPartial, as the app does. */

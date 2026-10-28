@@ -11,9 +11,8 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   addMolecules, addRecordings, checkBlocks, checkCitations, checkLogic, checkSourcing, hasLogic, isEmpty, isRepeatingItself, logicSummary, outline,
-  surfaceFromPartial, surfaceFromWire, wireIsReadable, wireIsWhole,
+  parsePartial, surfaceFromPartial, surfaceFromWire, wireIsReadable, wireIsWhole,
 } from "../src/engine/index.ts";
-import { parsePartial } from "../src/engine/partial.ts";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "golden");
 const filter = process.argv[2] ?? "";

@@ -1,0 +1,225 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'grams'."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "grams-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "grams",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 18,
+          "label" : "Grams",
+          "max" : 18,
+          "min" : 1,
+          "name" : "grams",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.20000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A \"mole\"\tis a count.",
+      "symbol" : "sparkles",
+      "title" : "Moles"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 18,
+          "label" : "Grams",
+          "max" : 18,
+          "min" : 1,
+          "name" : "grams",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.20000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A \"mole\"\tis a count.",
+      "symbol" : "sparkles",
+      "title" : "Moles"
+    }
+  },
+  "content" : {
+    "inputs" : [
+      {
+        "initial" : 18,
+        "label" : "Grams",
+        "max" : 6.0199999999999996,
+        "min" : 1,
+        "name" : "grams"
+      }
+    ],
+    "summary" : "A \"mole\"\tis a count.",
+    "title" : "Moles"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 18,
+        "label" : "Grams",
+        "max" : 6.0199999999999996,
+        "min" : 1,
+        "name" : "grams",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "A \"mole\"\tis a count.",
+    "symbol" : "sparkles",
+    "title" : "Moles"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- grams: \"Grams\", number, starts at 18, 1 to 6.02, step 0\nOutputs:",
+    "outline" : "Moles: A \"mole\"\tis a count.\n- section #auto-inputs\n  - slider #auto-input-0 ref grams"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- grams: \"Grams\", number, starts at 18, 1 to 18, step 0.2\nOutputs:",
+    "outline" : "Moles: A \"mole\"\tis a count.\n- section #more-inputs\n  - slider #grams-control ref grams"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "The calculation has inputs but no results calculated from them."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Widened the range of 'grams' to include its starting value."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'grams'."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 18,
+          "label" : "Grams",
+          "max" : 18,
+          "min" : 1,
+          "name" : "grams",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.20000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "A \"mole\"\tis a count.",
+      "symbol" : "sparkles",
+      "title" : "Moles"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

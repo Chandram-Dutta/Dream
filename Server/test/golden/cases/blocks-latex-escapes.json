@@ -1,0 +1,18 @@
+{
+  "about": "LaTeX that JSON read as control characters (\\f, \\t, \\r, \\n, \\b): repaired in the middle of an equation, and in symbols, but an equation or a symbol starting with one loses it to the trim before it's repaired, so \\frac becomes rac (a Swift quirk the port keeps).",
+  "fill": true,
+  "wire": {
+    "title": "Escapes",
+    "subject": "science",
+    "mode": "learn",
+    "inputs": [{"name": "m", "label": "Mass", "symbol": "\theta_m", "initial": 2, "min": 1, "max": 10}],
+    "outputs": [{"name": "k", "label": "Energy", "symbol": "E \times 2", "formula": "m * 2"}],
+    "blocks": [
+      {"kind": "equation", "text": "\frac{1}{2} m v^2"},
+      {"kind": "equation", "text": "E = \frac{1}{2} m v^2 + \rho g h \nabla \beta"},
+      {"kind": "equation", "text": "\theta = 30^\\circ", "items": [{"label": "\theta", "value": "the angle"}, {"label": "$\rho$", "value": "density"}]},
+      {"kind": "paragraph", "text": "Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line."},
+      {"kind": "hero", "ref": "k"}
+    ]
+  }
+}

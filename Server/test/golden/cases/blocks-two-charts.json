@@ -1,0 +1,23 @@
+{
+  "about": "A section with two charts after its first control: placeCharts moves each before the controls, but it walks the section's indices while moving them, so the first of the two stays after the control (a Swift quirk the port keeps).",
+  "fill": true,
+  "wire": {
+    "title": "Two charts",
+    "inputs": [
+      {"name": "x", "label": "x", "initial": 1, "min": 0, "max": 10, "step": 0.5},
+      {"name": "t", "label": "t", "role": "variable", "initial": 0, "min": 0, "max": 10, "step": 0.5}
+    ],
+    "outputs": [
+      {"name": "a", "label": "A", "formula": "x * t"},
+      {"name": "b", "label": "B", "formula": "x + t"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "a"},
+      {"kind": "section", "children": [
+        {"kind": "slider", "ref": "x"},
+        {"kind": "chart", "ref": "a", "over": "t"},
+        {"kind": "chart", "ref": "b", "over": "t"}
+      ]}
+    ]
+  }
+}

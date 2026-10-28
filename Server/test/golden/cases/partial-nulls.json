@@ -1,0 +1,9 @@
+{
+  "about": "Nulls where the schema has a list's elements: a related topic and a block written as null.",
+  "partial": true,
+  "wire": {
+    "title": "Nulls",
+    "related": ["One", null],
+    "blocks": [null, {"kind": "paragraph", "text": "After a null."}]
+  }
+}

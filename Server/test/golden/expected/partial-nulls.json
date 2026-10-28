@@ -1,0 +1,22 @@
+{
+  "content" : {
+    "blocks" : [
+      null,
+      {
+        "kind" : "paragraph",
+        "text" : "After a null."
+      }
+    ],
+    "related" : [
+      "One",
+      null
+    ],
+    "title" : "Nulls"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : false,
+    "whole" : false
+  },
+  "locale" : "en_US"
+}

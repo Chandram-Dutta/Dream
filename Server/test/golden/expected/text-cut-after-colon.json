@@ -1,0 +1,229 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'celsius'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "celsius-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "celsius",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 21.5,
+          "label" : "Celsius",
+          "max" : 43,
+          "min" : 0,
+          "name" : "celsius",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "°C"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Temperature"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 21.5,
+          "label" : "Celsius",
+          "max" : 43,
+          "min" : 0,
+          "name" : "celsius",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "°C"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Temperature"
+    }
+  },
+  "content" : {
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 21.5,
+        "label" : "Celsius",
+        "name" : "celsius",
+        "unit" : "°C"
+      }
+    ],
+    "mode" : "learn",
+    "subject" : "science",
+    "title" : "Temperature"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 21.5,
+        "label" : "Celsius",
+        "max" : 43,
+        "min" : 0,
+        "name" : "celsius",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : "°C"
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "sparkles",
+    "title" : "Temperature"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- celsius: \"Celsius\", number, starts at 21.5, 0 to 43, step 0, in °C\nOutputs:",
+    "outline" : "Temperature: \n- section #auto-inputs\n  - slider #auto-input-0 ref celsius"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- celsius: \"Celsius\", number, starts at 21.5, 0 to 43, step 0.5, in °C\nOutputs:",
+    "outline" : "Temperature: \n- section #more-inputs\n  - slider #celsius-control ref celsius"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "The calculation has inputs but no results calculated from them."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'celsius'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 21.5,
+          "label" : "Celsius",
+          "max" : 43,
+          "min" : 0,
+          "name" : "celsius",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : "°C"
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Temperature"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "about": "Choices compared by name whose options hold what patterns treat specially (C++, a slash, brackets, a dollar), in either order and either case; a name only near two others (not repaired); a unit written after a live value that's also a word (in), and one after a value in maths.",
+  "fill": true,
+  "wire": {
+    "title": "Patterns",
+    "inputs": [
+      {"name": "language", "label": "Language", "format": "choice", "initial": 0, "options": ["C++", "1/2 cup", "(none)", "$5 plan"]},
+      {"name": "height", "label": "Height", "unit": "in", "initial": 60, "min": 40, "max": 90},
+      {"name": "width", "label": "Width", "unit": "cm", "initial": 30, "min": 10, "max": 90},
+      {"name": "widths", "label": "Widths", "unit": "cm", "initial": 30, "min": 10, "max": 90},
+      {"name": "depth", "label": "Depth", "unit": "km", "initial": 3, "min": 1, "max": 9}
+    ],
+    "outputs": [
+      {"name": "score", "label": "Score", "formula": "(language == 'c++' ? 1 : 0) + ('1/2 cup' == language ? 2 : 0) + (language != \"(none)\" ? 4 : 0) + (language == '$5 plan' ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0"},
+      {"name": "near", "label": "Near", "formula": "widthz + 1"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "score"},
+      {"kind": "paragraph", "text": "You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm."}
+    ]
+  }
+}

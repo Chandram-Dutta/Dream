@@ -1,0 +1,675 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'm'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "rac{1}{2} m v^2",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "E = \\frac{1}{2} m v^2 + \\rho g h \\nabla \\beta",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "heta",
+              "value" : "the angle"
+            },
+            {
+              "label" : "\\rho",
+              "value" : "density"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "heta = 30^\\circ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Kinetic energy is $\\frac{1}{2} m v^2$, at $\\theta$ to the ground.\nNext line.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "k",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "m-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "m",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 1,
+          "name" : "m",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta_m",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "m * 2",
+          "label" : "Energy",
+          "name" : "k",
+          "symbol" : "E \\times 2",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Escapes"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\frac{1}{2} m v^2",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "E = \frac{1}{2} m v^2 + \rho g h \nabla \beta",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "\theta",
+              "value" : "the angle"
+            },
+            {
+              "label" : "$\rho$",
+              "value" : "density"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\theta = 30^\\circ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "k",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 1,
+          "name" : "m",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta_m",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "m * 2",
+          "label" : "Energy",
+          "name" : "k",
+          "symbol" : "E \\times 2",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Escapes"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\frac{1}{2} m v^2",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "E = \frac{1}{2} m v^2 + \rho g h \nabla \beta",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "\theta",
+            "value" : "the angle"
+          },
+          {
+            "label" : "$\rho$",
+            "value" : "density"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\theta = 30^\\circ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "k",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Mass",
+        "max" : 10,
+        "min" : 1,
+        "name" : "m",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "\theta_m",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "m * 2",
+        "label" : "Energy",
+        "name" : "k",
+        "symbol" : "E \times 2",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Escapes"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\frac{1}{2} m v^2",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "E = \frac{1}{2} m v^2 + \rho g h \nabla \beta",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+          {
+            "label" : "\theta",
+            "value" : "the angle"
+          },
+          {
+            "label" : "$\rho$",
+            "value" : "density"
+          }
+        ],
+        "kind" : "equation",
+        "over" : "",
+        "ref" : "",
+        "text" : "\theta = 30^\\circ",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "k",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Mass",
+        "max" : 10,
+        "min" : 1,
+        "name" : "m",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "\theta_m",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "m * 2",
+        "label" : "Energy",
+        "name" : "k",
+        "symbol" : "E \times 2",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Escapes"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- m: \"Mass\", number, starts at 2, 1 to 10, step 1, written \theta_m\nOutputs:\n- k: \"Energy\", number, written E \times 2 = m * 2",
+    "outline" : "Escapes: \n- equation #block-0\n  \frac{1}{2} m v^2\n- equation #block-1\n  E = \frac{1}{2} m v^2 + \rho g h \nabla \beta\n- equation #block-2\n  \theta = 30^\\circ\n  • \theta: the angle\n  • $\rho$: density\n- paragraph #block-3\n  Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line.\n- hero #block-4 ref k\n- section #auto-inputs\n  - slider #auto-input-0 ref m"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- m: \"Mass\", number, starts at 2, 1 to 10, step 1, written \\theta_m\nOutputs:\n- k: \"Energy\", number, written E \\times 2 = m * 2",
+    "outline" : "Escapes: \n- equation #block-0\n  rac{1}{2} m v^2\n- equation #block-1\n  E = \\frac{1}{2} m v^2 + \\rho g h \\nabla \\beta\n- equation #block-2\n  heta = 30^\\circ\n  • heta: the angle\n  • \\rho: density\n- paragraph #block-3\n  Kinetic energy is $\\frac{1}{2} m v^2$, at $\\theta$ to the ground.\nNext line.\n- hero #block-4 ref k\n- section #more-inputs\n  - slider #m-control ref m"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\frac{1}{2} m v^2",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "E = \frac{1}{2} m v^2 + \rho g h \nabla \beta",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "\theta",
+              "value" : "the angle"
+            },
+            {
+              "label" : "$\rho$",
+              "value" : "density"
+            }
+          ],
+          "kind" : "equation",
+          "over" : "",
+          "ref" : "",
+          "text" : "\theta = 30^\\circ",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Kinetic energy is $\frac{1}{2} m v^2$, at $\theta$ to the ground.\nNext line.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "k",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Mass",
+          "max" : 10,
+          "min" : 1,
+          "name" : "m",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "\\theta_m",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "m * 2",
+          "label" : "Energy",
+          "name" : "k",
+          "symbol" : "E \\times 2",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Escapes"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off just after an input's name and colon, inside a list of inputs, after a lone minus sign: the value that hasn't begun is left out, and so is the minus.",
+  "text": "{\"title\": \"Temperature\", \"subject\": \"science\", \"mode\": \"learn\", \"inputs\": [{\"name\": \"celsius\", \"label\": \"Celsius\", \"format\": \"number\", \"unit\": \"°C\", \"initial\": 21.5, \"min\": -"
+}
