@@ -14,6 +14,9 @@ struct DeviceToolDefinition: Encodable, Equatable {
     var description: String
     /// JSON Schema for its arguments, as the phone sends a model its tools (ChatCompletions).
     var parameters: JSONValue
+    /// The connected service it's from, like Linear, so the server can say which one couldn't
+    /// answer. Nil for travel times.
+    var service: String? = nil
 }
 
 /// The model called one of the phone's tools, and the server waits on what it returns.
@@ -29,9 +32,11 @@ struct DeviceToolOutput: Encodable, Equatable {
     var id: String
     var output: String
     /// The live source the call read, as the page keeps it, so the server can bind the page's
-    /// live values to it as the phone's checker would (Checker+Live.swift). The contract doesn't
-    /// have it yet; a server that doesn't read it passes over it.
+    /// live values to it as the phone's checker would (Checker+Live.swift).
     var source: Source?
+    /// The connected service whose data it holds, so the page lists it among its services
+    /// (Surface.services) and sharing says so first, as for a page made here.
+    var service: String? = nil
 }
 
 /// The phone's part of the live tool, for pages made on Dream's server: how far it is between
@@ -74,8 +79,8 @@ final class DeviceTools {
         let definition: DeviceToolDefinition
         let run: @Sendable (GeneratedContent) async throws -> String
 
-        init<T: Tool>(_ tool: T) where T.Output == String {
-            definition = DeviceToolDefinition(name: tool.name, description: tool.description, parameters: Self.json(tool.parameters))
+        init<T: Tool>(_ tool: T, service: String? = nil) where T.Output == String {
+            definition = DeviceToolDefinition(name: tool.name, description: tool.description, parameters: Self.json(tool.parameters), service: service)
             run = { arguments in try await tool.call(arguments: try T.Arguments(arguments)) }
         }
 
@@ -125,7 +130,7 @@ final class DeviceTools {
         let note: @Sendable (String) -> Void = { [weak devices] line in Task { @MainActor in devices?.note(line) } }
         let connections = ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: log, onUse: note)
             .compactMap { $0 as? ConnectionTool }
-        devices.entries = connections.map(Entry.init) + [Entry(TravelTool(log: live, onFetch: note))]
+        devices.entries = connections.map { Entry($0, service: $0.connection.name) } + [Entry(TravelTool(log: live, onFetch: note))]
         return devices
     }
 
@@ -149,13 +154,15 @@ final class DeviceTools {
         }
         let before = live.sources
         let output: String
+        var read: String?
         do {
             output = try await entry.run(arguments)
+            read = entry.definition.service
         } catch {
             note("\(call.name) couldn't run: \(error.localizedDescription)")
             output = "\(call.name) couldn't run with those arguments (\(error.localizedDescription)). Call it again with arguments that match its schema, or build the screen without it."
         }
-        return DeviceToolOutput(id: call.id, output: output, source: live.sources.first { !before.contains($0) })
+        return DeviceToolOutput(id: call.id, output: output, source: live.sources.first { !before.contains($0) }, service: read)
     }
 
     func note(_ line: String) {
