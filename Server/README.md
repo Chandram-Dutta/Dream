@@ -28,6 +28,7 @@ their own account instead, for their devices only: see [Sync](#sync).
 | `POST /api/compose` | Starts a page made on the server; answers `{ id }`. See [Pages made on the server](#pages-made-on-the-server). |
 | `GET /api/compose/:id/events?after=<seq>` | The page's events as server-sent events: from the log after `seq`, then live. |
 | `POST /api/compose/:id/answers` | The answers to the page's questions. |
+| `POST /api/push/devices`, `DELETE /api/push/devices/:token` | This iPhone, for notifications about its pages, and forgetting it. See [Notifications](#notifications). |
 | `GET /api/usage` | The account's plan, and pages used and left. See [Plans and limits](#plans-and-limits). |
 | `POST /api/appstore/transactions` | Dream Plus purchases the app made or restored. See [Dream Plus](#dream-plus). |
 | `POST /api/appstore/notifications` | App Store Server Notifications v2. |
@@ -868,6 +869,58 @@ Locally, `MODEL_FAKE=1` with `DEV_LOGIN=1` answers the page loop's model request
 stand-in (`src/compose/fake.ts`) and skips Clef, so `wrangler dev` makes whole pages without a
 provider's key; `/api/model` never uses it. `npm test` runs the loop on scripted streams
 (`test/compose.mjs`) and the routes on the stand-in (`test/compose-http.mjs`).
+
+## Notifications
+
+A page made with nobody watching tells the account's iPhones when it's ready, and when Dream has
+a question about it (docs/ServerGeneration.md, Stage 3; `src/push.ts`). The job counts the event
+streams open on it; a page that finishes, or asks, while none are open asks `push.ts` for a
+notification. The app drops its streams when it goes to the background, so leaving the app is
+what makes a page notify.
+
+- **Devices.** After signing in, the app sends `POST /api/push/devices` with
+  `{ token, environment }` (`contract.ts`'s `PushDevice`): the APNs token, hex, and `sandbox`
+  for a development build or `production` for TestFlight and the App Store. It's kept in
+  `push_devices` (`migrations/0010_push.sql`) with the session that sent it, so a session that
+  ends, signed out here or from another iPhone, takes it along. At most five per account; a token
+  registered again by someone else moves to their account. `DELETE /api/push/devices/:token` at
+  sign-out. Both need the session, and share `CREATE_LIMIT` per account.
+- **What a notification says.** "Your page is ready" with the page's title, or "Dream has a
+  question about “the request's first six words”". Nothing else from the page or the request:
+  it shows on a lock screen and passes through Apple. Beside `aps`, it carries `PushPayload`
+  (`page`, `job`, `kind`), which the app opens. `apns-collapse-id` is the page, so a question's
+  notification is replaced by the page's; a question's expires when the question would be left to
+  Dream, a page's after a day.
+- **Sending.** Token-based: an ES256 JWT signed with the APNs key through WebCrypto, issued at the
+  start of each half hour so every copy of the Worker uses the same moment, and reused until the
+  next (APNs wants a token kept 20 to 60 minutes). Development builds' tokens go to
+  `api.sandbox.push.apple.com`, the rest to `api.push.apple.com`. A token APNs answers with 410
+  or `BadDeviceToken` is forgotten; after a 403 the next notification signs a new JWT.
+
+### Setting it up
+
+Off until the three secrets are set; without them the job logs once that notifications are off
+and sends nothing. In the developer portal, under Certificates, Identifiers & Profiles:
+
+1. **Identifiers** › `xyz.onlychan.Dream`: tick Push Notifications and save. (Xcode's automatic
+   signing does this too, the first time it builds with the `aps-environment` entitlement.)
+2. **Keys** › add a key, tick Apple Push Notifications service (APNs), and choose Sandbox &
+   Production for its environment. Download the .p8 (Apple only lets you do this once) and note
+   its Key ID.
+
+```sh
+cd Server
+npx wrangler d1 migrations apply dream-share --remote     # adds push_devices
+npx wrangler secret put APNS_KEY < AuthKey_ABC123DEFG.p8
+printf %s "ABC123DEFG" | npx wrangler secret put APNS_KEY_ID
+printf %s "DR99P625RR" | npx wrangler secret put APNS_TEAM_ID
+npx wrangler deploy
+```
+
+Locally, `npm test` runs `test/push.mjs`: the sender in Node with a key made for the test and a
+stand-in for fetch, the job in memory on the stand-in model, then the routes and whole pages under
+`wrangler dev` against a stand-in for APNs on this Mac (`test/stub-apns.mjs`, reached through
+`APNS_BASE_URL`, which only counts with `DEV_LOGIN`).
 
 ## Plans and limits
 

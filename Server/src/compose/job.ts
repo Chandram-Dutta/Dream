@@ -2,7 +2,8 @@
 // The runner (runner.ts) decides what happens; this keeps it in the object's SQLite storage, runs
 // it on the object's alarm, and gives the loop what it calls in-process: the model through
 // model.ts's checks, routing, metering and translation, Auto's pick (route.ts), web search and
-// reading (web.ts), Wikipedia, the engine, and the finished page kept in sync (sync.ts).
+// reading (web.ts), Wikipedia, the engine, the finished page kept in sync (sync.ts), and the
+// notifications for a page nobody is watching (push.ts).
 //
 // The Worker talks to it over fetch, only ever for a signed-in user, whose id it sends:
 //
@@ -14,6 +15,7 @@ import { capture, type AnalyticsEnv } from "../analytics";
 import * as engine from "../engine";
 import generation from "../generated/generation.json";
 import { askModel } from "../model";
+import { notify, type PushEnv } from "../push";
 import { routePage, type RouteEnv } from "../route";
 import { keepItems, keepPhoto, type SyncEnv } from "../sync";
 import { SyncRejection } from "../syncdata";
@@ -26,7 +28,7 @@ import type { Generation } from "./prompts";
 import { Runner, type EventBody, type JobRecord, type JobStore } from "./runner";
 import type { WebAnswer } from "./tools";
 
-export interface ComposeEnv extends RouteEnv, WebEnv, SyncEnv, AnalyticsEnv {
+export interface ComposeEnv extends RouteEnv, WebEnv, SyncEnv, AnalyticsEnv, PushEnv {
   /** The PageJob Durable Objects (wrangler.jsonc). */
   PAGE_JOBS?: DurableObjectNamespace;
 }
@@ -108,6 +110,7 @@ export class PageJob implements DurableObject {
       analytics: (job, event, properties) => {
         if (job.counted) capture(this.env, this.context, job.owner, event, properties);
       },
+      notify: (job, notice) => this.context.waitUntil(notify(this.env, job.owner, notice)),
       now: Date.now,
     });
   }

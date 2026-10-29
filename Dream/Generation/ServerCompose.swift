@@ -391,6 +391,8 @@ final class ServerWatch {
     private var reading: Task<Void, Error>?
     private var asking: Task<Void, Never>?
     private var nudged = false
+    /// The app is in the background (`leave`): no line is open until it's back.
+    private var away = false
 
     init(job: ServerJob, progress: PageProgress, transport: any ComposeTransport) {
         self.job = job
@@ -428,7 +430,9 @@ final class ServerWatch {
             }
             if progress.isOver || Task.isCancelled { break }
             drops = progress.seq == before ? drops + 1 : 1
-            progress.note("The line to Dream's server dropped after event \(progress.after); reading again.")
+            progress.note(away
+                ? "Let go of the line after event \(progress.after) while the app is away."
+                : "The line to Dream's server dropped after event \(progress.after); reading again.")
             onChange(progress)
             await pause(delay(drops))
         }
@@ -442,7 +446,16 @@ final class ServerWatch {
     /// Drops the line and reads again right away, as after coming back to the app, when a line
     /// that looks open may have died while the app was away.
     func reconnect() {
+        away = false
         nudged = true
+        reading?.cancel()
+    }
+
+    /// Lets go of the line until `reconnect`, as the app goes to the background. A line open
+    /// tells the server someone is watching; with none, a page that finishes or asks notifies
+    /// this iPhone instead (Push.swift).
+    func leave() {
+        away = true
         reading?.cancel()
     }
 
@@ -488,11 +501,12 @@ final class ServerWatch {
         }
     }
 
-    /// Waits before reading again, unless stopped, or nudged since the line was last opened.
+    /// Waits before reading again, unless stopped, or nudged since the line was last opened; while
+    /// the app is away, until it's back.
     private func pause(_ duration: Duration) async {
         let until = ContinuousClock.now + duration
         defer { nudged = false }
-        while !Task.isCancelled, !nudged, ContinuousClock.now < until {
+        while !Task.isCancelled, !nudged, away || ContinuousClock.now < until {
             try? await Task.sleep(for: .milliseconds(100))
         }
     }

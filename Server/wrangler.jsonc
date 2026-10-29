@@ -80,7 +80,8 @@
     "POSTHOG_KEY": "phc_tPZv7XGN6GCg95kK4HKDTMRyVTFzmEpSDfXgFF3LHrGT",
     "POSTHOG_HOST": "https://us.i.posthog.com"
     // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS,
-    // XAI_API_KEY, APPLE_KEY_ID and APPLE_PRIVATE_KEY, and ADMIN_KEY (reviewing reported pages, src/safety.ts).
+    // XAI_API_KEY, APPLE_KEY_ID and APPLE_PRIVATE_KEY, ADMIN_KEY (reviewing reported pages, src/safety.ts),
+    // and APNS_KEY, APNS_KEY_ID and APNS_TEAM_ID (notifications, src/push.ts; off until they're set).
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.

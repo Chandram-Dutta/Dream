@@ -84,6 +84,10 @@ Events, one JSON object per `data:` line, each with `seq`:
 | `done` | `surface`, `model` | finished; the page is synced too |
 | `failed` | `message` | it couldn't make the page |
 
+`POST /api/push/devices` (`PushDevice`: the APNs token and `sandbox` or `production`) registers
+the phone for notifications, and `DELETE /api/push/devices/:token` forgets it at sign-out. A
+notification carries `PushPayload` (`page`, `job`, `kind`: `done` or `asking`) beside `aps`.
+
 ## Stages
 
 1. **A page survives the app closing.** Done 2026-10-29, and the default since: new pages are made
@@ -94,7 +98,11 @@ Events, one JSON object per `data:` line, each with `seq`:
    providers give, so the phone refreshes them as its own); recordings and molecules.
 3. **Come back to it.** Push notifications for a finished page and for a question (APNs, with an
    auth key from the developer account set as secrets; off until they're set). The shelf shows
-   pages still being made (done in Stage 1).
+   pages still being made (done in Stage 1). Built 2026-10-29 (`Server/src/push.ts`, the app's
+   `Dream/Account/Notifications.swift`): a page that finishes, or asks, while no event stream is
+   open on it notifies the account's iPhones, and the app drops its streams when it goes to the
+   background. The app asks to notify the first time a page is still being made when it's left.
+   Tapping one opens the page, finished or forming. Setting up: Server/README.md, Notifications.
 4. **Server by default, phone where only the phone can.** Tools only the phone can run go
    through it (`deviceTools`): connected services, whose sign-ins never leave the phone, and
    travel times from Apple Maps. While the app is open the phone runs them; when it isn't, the
