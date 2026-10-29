@@ -261,16 +261,25 @@ struct HomeView: View {
     }
 
     /// A tapped notification (Notifications.swift): its page, finished or still being made, alone
-    /// over the shelf; or the shelf, when neither is here.
+    /// over the shelf; or the shelf, when neither is here. Back to the shelf first, and the page
+    /// once that's settled: replacing a page opened another way (a request, a shared link, a
+    /// topic explored from a page) in the same moment left a blank screen with a back button.
     private func open(_ opened: Notifications.Opened?) {
         guard let opened else { return }
         notifications.opened = nil
+        let wasOpen = request != nil || sharedLinks.opened != nil || !path.isEmpty
         request = nil
         sharedLinks.opened = nil
+        path = NavigationPath()
+        let next: NavigationPath
         switch opened.destination {
-        case .page(let saved): path = NavigationPath([saved])
-        case .forming(let page): path = NavigationPath([page])
-        case .shelf: path = NavigationPath()
+        case .page(let saved): next = NavigationPath([saved])
+        case .forming(let page): next = NavigationPath([page])
+        case .shelf: return
+        }
+        Task { @MainActor in
+            if wasOpen { try? await Task.sleep(for: .milliseconds(450)) }
+            path = next
         }
     }
 
@@ -289,6 +298,16 @@ struct HomeView: View {
         }
         if let key = Build.argument("DreamWebKey") {
             Keychain.save(key, for: "web")
+        }
+        // `-DreamOpenPage <page id>`: as if its "ready" notification were tapped; with
+        // `-DreamOpenAfter <seconds>`, tapped that long after the request below has opened its page.
+        if let page = Build.argument("DreamOpenPage").flatMap(UUID.init(uuidString:)) {
+            let after = Build.argument("DreamOpenAfter").flatMap(Double.init) ?? 0
+            Task {
+                try? await Task.sleep(for: .seconds(after))
+                await Notifications.shared.open(PushPayload(page: page, job: "testing", kind: .done))
+            }
+            if after == 0 { return }
         }
         guard !Self.startedAutomatically, let auto = Build.argument("DreamAutoIntent") else { return }
         Self.startedAutomatically = true
