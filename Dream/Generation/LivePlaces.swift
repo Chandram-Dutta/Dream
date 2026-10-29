@@ -3,7 +3,8 @@ import Foundation
 import MapKit
 
 // Places for sources and actions (ROADMAP.md, workstream 7): a place Maps can find, or where
-// the user is, from CoreLocation with when-in-use permission.
+// the user is, from CoreLocation with when-in-use permission. A page made on Dream's server is
+// told where the user is only once they've allowed it (`hereIfAllowed`).
 
 /// A place, found.
 struct LivePlace: Sendable {
@@ -16,6 +17,9 @@ struct LivePlace: Sendable {
     var isHere = false
     /// On the bench, where "current location" is stood in.
     var isStandIn = false
+    /// Where the user is, as town, region and country, like Bengaluru, Karnataka, India: what a
+    /// page made on Dream's server is told. Empty for other places, and when Maps can't name it.
+    var area = ""
 
     var location: CLLocation { CLLocation(latitude: latitude, longitude: longitude) }
     var mapItem: MKMapItem {
@@ -92,14 +96,41 @@ enum Places {
                              timeZone: TimeZone(identifier: "Asia/Kolkata") ?? .current, isHere: true, isStandIn: true)
         }
         let location = try await locate()
-        var name = "your location"
-        if let request = MKReverseGeocodingRequest(location: location), let item = try? await request.mapItems.first,
-           let city = item.addressRepresentations?.cityName ?? item.name {
-            name = city
+        var place = LivePlace(name: "your location", latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, timeZone: .current, isHere: true)
+        if let request = MKReverseGeocodingRequest(location: location), let item = try? await request.mapItems.first {
+            if let city = item.addressRepresentations?.cityName ?? item.name { place.name = city }
+            place.area = item.addressRepresentations?.cityWithContext(.full) ?? ""
         }
-        let place = LivePlace(name: name, latitude: location.coordinate.latitude, longitude: location.coordinate.longitude, timeZone: .current, isHere: true)
         lock.withLock { lastHere = (place, .now) }
         return place
+    }
+
+    /// Where the user is, for a page made on Dream's server, only when they've already let Dream
+    /// use their location: it never asks, and gives up after `patience` rather than hold the page
+    /// up waiting on a fix. Nil when location isn't allowed or doesn't come in time, and on the
+    /// bench, whose stand-in is nowhere.
+    static func hereIfAllowed(waiting patience: Duration = .seconds(2)) async -> LivePlace? {
+        if let last = lock.withLock({ lastHere }), Date.now.timeIntervalSince(last.at) < 300 { return last.place.isStandIn ? nil : last.place }
+        guard !LiveSources.standIns, isAllowed else { return nil }
+        return await withTaskGroup(of: LivePlace?.self) { group in
+            group.addTask { try? await here() }
+            group.addTask {
+                try? await Task.sleep(for: patience)
+                return nil
+            }
+            defer { group.cancelAll() }
+            return await group.next() ?? nil
+        }
+    }
+
+    /// Whether the user has already let Dream use their location. Reading it never asks.
+    private static var isAllowed: Bool {
+        let status = CLLocationManager().authorizationStatus
+        #if os(iOS)
+        return status == .authorizedWhenInUse || status == .authorizedAlways
+        #else
+        return status == .authorizedAlways
+        #endif
     }
 
     /// One fix from CoreLocation. Its first use asks for permission; while the user decides,

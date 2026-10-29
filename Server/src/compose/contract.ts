@@ -34,8 +34,11 @@ export interface ComposeRequest {
   deviceTools?: DeviceToolDefinition[];
   /** Where the user is, when they've let the phone know: rounded to about a kilometre, with the
    * place's name (town, region, country). The name goes to the model among the user's details;
-   * the coordinates stay on the server, for the weather "here". */
-  here?: { latitude: number; longitude: number; name: string };
+   * the coordinates stay on the server, for the weather "here". `timeZone` is the phone's, like
+   * Asia/Kolkata, where days start and end for the weather there, as the phone's own reading has
+   * them; without it, the time zone Cloudflare places the request in. Without `here`, the
+   * weather "here" is where Cloudflare places the request. */
+  here?: { latitude: number; longitude: number; name: string; timeZone?: string };
 }
 
 export interface ComposeEditing {

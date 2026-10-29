@@ -228,13 +228,9 @@ export type Revocation = "revoked" | "no key" | "no code" | "someone else" | "fa
 export async function clientSecret(env: AppleEnv, now = Math.floor(Date.now() / 1000)): Promise<string | null> {
   const clientID = audiences(env)[0];
   if (!env.APPLE_PRIVATE_KEY || !env.APPLE_KEY_ID || !env.APPLE_TEAM_ID || !clientID) return null;
-  const key = await crypto.subtle.importKey("pkcs8", pemBytes(env.APPLE_PRIVATE_KEY), { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
   const header = { alg: "ES256", kid: env.APPLE_KEY_ID.trim() };
   const claims = { iss: env.APPLE_TEAM_ID.trim(), iat: now, exp: now + 300, aud: APPLE, sub: clientID };
-  const input = `${encodeBase64URL(JSON.stringify(header))}.${encodeBase64URL(JSON.stringify(claims))}`;
-  // WebCrypto signs ECDSA as r ‖ s, which is what JWS expects.
-  const signature = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(input));
-  return `${input}.${encodeBase64URL(new Uint8Array(signature))}`;
+  return signES256(env.APPLE_PRIVATE_KEY, header, claims);
 }
 
 /** Asks Apple to forget Dream for the person who just confirmed with `code`, a fresh authorization
@@ -314,6 +310,17 @@ function decodeJSON(part: string): Record<string, unknown> | null {
   } catch {
     return null;
   }
+}
+
+/** A JWT signed (ES256) with one of Dream's keys from the developer portal, given as the text of
+ * its .p8 file: Sign in with Apple's client secret, the APNs provider token (push.ts) and
+ * WeatherKit's token (compose/weatherkit.ts). */
+export async function signES256(pem: string, header: Record<string, unknown>, claims: Record<string, unknown>): Promise<string> {
+  const key = await crypto.subtle.importKey("pkcs8", pemBytes(pem), { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
+  const input = `${encodeBase64URL(JSON.stringify(header))}.${encodeBase64URL(JSON.stringify(claims))}`;
+  // WebCrypto signs ECDSA as r ‖ s, which is what JWS expects.
+  const signature = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(input));
+  return `${input}.${encodeBase64URL(new Uint8Array(signature))}`;
 }
 
 /** A .p8 file's key as bytes. Its text may arrive with real line breaks or with "\n" written out.
