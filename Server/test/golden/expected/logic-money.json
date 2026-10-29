@@ -1,0 +1,1245 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'rate', 'rent', 'loanFee', 'rentGrowth', 'tenure', 'evCostPerKm', 'fare', 'tips', 'billions'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'savings', 'debtRatio' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "monthlyEMI",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "rate-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "rent-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "loanFee-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "loanFee",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "rentGrowth-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "rentGrowth",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "tenure-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tenure",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "evCostPerKm-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "evCostPerKm",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "fare-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "fare",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "tips-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tips",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "billions-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "billions",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "savings-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "savings",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "debtRatio-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "debtRatio",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Home loan rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Monthly rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 500,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Loan fee",
+          "max" : 5,
+          "min" : 0,
+          "name" : "loanFee",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "%"
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Rent rise each year",
+          "max" : 10,
+          "min" : 0,
+          "name" : "rentGrowth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Loan tenure",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 2,
+          "label" : "Electric cost per km",
+          "max" : 10,
+          "min" : 0,
+          "name" : "evCostPerKm",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3,
+          "label" : "Fare",
+          "max" : 10,
+          "min" : 0,
+          "name" : "fare",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Tips",
+          "max" : 500,
+          "min" : 0,
+          "name" : "tips",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Billions of people",
+          "max" : 10,
+          "min" : 0,
+          "name" : "billions",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions",
+          "label" : "EMI",
+          "name" : "monthlyEMI",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "rent * 12",
+          "label" : "Total savings",
+          "name" : "savings",
+          "symbol" : "",
+          "unit" : "INR"
+        },
+        {
+          "format" : "number",
+          "formula" : "rent / 1000",
+          "label" : "Debt ratio",
+          "name" : "debtRatio",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Money words"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "monthlyEMI",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Home loan rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Monthly rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 500,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Loan fee",
+          "max" : 5,
+          "min" : 0,
+          "name" : "loanFee",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "%"
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Rent rise each year",
+          "max" : 10,
+          "min" : 0,
+          "name" : "rentGrowth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Loan tenure",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 2,
+          "label" : "Electric cost per km",
+          "max" : 10,
+          "min" : 0,
+          "name" : "evCostPerKm",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3,
+          "label" : "Fare",
+          "max" : 10,
+          "min" : 0,
+          "name" : "fare",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Tips",
+          "max" : 500,
+          "min" : 0,
+          "name" : "tips",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Billions of people",
+          "max" : 10,
+          "min" : 0,
+          "name" : "billions",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions",
+          "label" : "EMI",
+          "name" : "monthlyEMI",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "rent * 12",
+          "label" : "Total savings",
+          "name" : "savings",
+          "symbol" : "",
+          "unit" : "INR"
+        },
+        {
+          "format" : "number",
+          "formula" : "rent / 1000",
+          "label" : "Debt ratio",
+          "name" : "debtRatio",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Money words"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "monthlyEMI",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 8,
+        "label" : "Home loan rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 20000,
+        "label" : "Monthly rent",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "rent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 500,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Loan fee",
+        "max" : 5,
+        "min" : 0,
+        "name" : "loanFee",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Rent rise each year",
+        "max" : 10,
+        "min" : 0,
+        "name" : "rentGrowth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Loan tenure",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tenure",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Electric cost per km",
+        "max" : 10,
+        "min" : 0,
+        "name" : "evCostPerKm",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Fare",
+        "max" : 10,
+        "min" : 0,
+        "name" : "fare",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "USD"
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Tips",
+        "max" : 500,
+        "min" : 0,
+        "name" : "tips",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "₹"
+      },
+      {
+        "format" : "number",
+        "initial" : 8,
+        "label" : "Billions of people",
+        "max" : 10,
+        "min" : 0,
+        "name" : "billions",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions",
+        "label" : "EMI",
+        "name" : "monthlyEMI",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "rent * 12",
+        "label" : "Total savings",
+        "name" : "savings",
+        "symbol" : "",
+        "unit" : "inr"
+      },
+      {
+        "format" : "number",
+        "formula" : "rent / 1000",
+        "label" : "Debt ratio",
+        "name" : "debtRatio",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Money words"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "monthlyEMI",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 8,
+        "label" : "Home loan rate",
+        "max" : 20,
+        "min" : 0,
+        "name" : "rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 20000,
+        "label" : "Monthly rent",
+        "max" : 100000,
+        "min" : 0,
+        "name" : "rent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 500,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Loan fee",
+        "max" : 5,
+        "min" : 0,
+        "name" : "loanFee",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "%"
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Rent rise each year",
+        "max" : 10,
+        "min" : 0,
+        "name" : "rentGrowth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 20,
+        "label" : "Loan tenure",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tenure",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Electric cost per km",
+        "max" : 10,
+        "min" : 0,
+        "name" : "evCostPerKm",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Fare",
+        "max" : 10,
+        "min" : 0,
+        "name" : "fare",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "USD"
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Tips",
+        "max" : 500,
+        "min" : 0,
+        "name" : "tips",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "₹"
+      },
+      {
+        "format" : "number",
+        "initial" : 8,
+        "label" : "Billions of people",
+        "max" : 10,
+        "min" : 0,
+        "name" : "billions",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions",
+        "label" : "EMI",
+        "name" : "monthlyEMI",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "rent * 12",
+        "label" : "Total savings",
+        "name" : "savings",
+        "symbol" : "",
+        "unit" : "inr"
+      },
+      {
+        "format" : "number",
+        "formula" : "rent / 1000",
+        "label" : "Debt ratio",
+        "name" : "debtRatio",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Money words"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Home loan rate\", number, starts at 8, 0 to 20, step 1\n- rent: \"Monthly rent\", number, starts at 20000, 0 to 100000, step 500\n- loanFee: \"Loan fee\", number, starts at 1, 0 to 5, step 1, in %\n- rentGrowth: \"Rent rise each year\", number, starts at 5, 0 to 10, step 1\n- tenure: \"Loan tenure\", number, starts at 20, 0 to 30, step 1\n- evCostPerKm: \"Electric cost per km\", number, starts at 2, 0 to 10, step 1\n- fare: \"Fare\", number, starts at 3, 0 to 10, step 1, in USD\n- tips: \"Tips\", number, starts at 50, 0 to 500, step 1, in ₹\n- billions: \"Billions of people\", number, starts at 8, 0 to 10, step 1\nOutputs:\n- monthlyEMI: \"EMI\", number = rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions\n- savings: \"Total savings\", number, in inr = rent * 12\n- debtRatio: \"Debt ratio\", number = rent / 1000",
+    "outline" : "Money words: \n- hero #block-0 ref monthlyEMI\n- section #auto-inputs\n  - slider #auto-input-0 ref rate\n  - slider #auto-input-1 ref rent\n  - slider #auto-input-2 ref loanFee\n  - slider #auto-input-3 ref rentGrowth\n  - slider #auto-input-4 ref tenure\n  - slider #auto-input-5 ref evCostPerKm\n  - slider #auto-input-6 ref fare\n  - slider #auto-input-7 ref tips\n  - slider #auto-input-8 ref billions\n- section #auto-outputs\n  - metric #auto-output-1 ref savings\n  - metric #auto-output-2 ref debtRatio"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rate: \"Home loan rate\", number, starts at 8, 0 to 20, step 1\n- rent: \"Monthly rent\", currency, starts at 20000, 0 to 100000, step 500\n- loanFee: \"Loan fee\", number, starts at 1, 0 to 5, step 1, in %\n- rentGrowth: \"Rent rise each year\", number, starts at 5, 0 to 10, step 1\n- tenure: \"Loan tenure\", number, starts at 20, 0 to 30, step 1\n- evCostPerKm: \"Electric cost per km\", currency, starts at 2, 0 to 10, step 1\n- fare: \"Fare\", currency, starts at 3, 0 to 10, step 1, in USD\n- tips: \"Tips\", currency, starts at 50, 0 to 500, step 1\n- billions: \"Billions of people\", number, starts at 8, 0 to 10, step 1\nOutputs:\n- monthlyEMI: \"EMI\", currency = rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions\n- savings: \"Total savings\", currency, in INR = rent * 12\n- debtRatio: \"Debt ratio\", number = rent / 1000",
+    "outline" : "Money words: \n- hero #block-0 ref monthlyEMI\n- section #more-inputs\n  - slider #rate-control ref rate\n  - slider #rent-control ref rent\n  - slider #loanFee-control ref loanFee\n  - slider #rentGrowth-control ref rentGrowth\n  - slider #tenure-control ref tenure\n  - slider #evCostPerKm-control ref evCostPerKm\n  - slider #fare-control ref fare\n  - slider #tips-control ref tips\n  - slider #billions-control ref billions\n- section #more-results\n  - metric #savings-metric ref savings\n  - metric #debtRatio-metric ref debtRatio"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'rent', 'evCostPerKm', 'fare', 'tips', 'monthlyEMI', 'savings' as money."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'tips', 'savings'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "monthlyEMI",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Home loan rate",
+          "max" : 20,
+          "min" : 0,
+          "name" : "rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 20000,
+          "label" : "Monthly rent",
+          "max" : 100000,
+          "min" : 0,
+          "name" : "rent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 500,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Loan fee",
+          "max" : 5,
+          "min" : 0,
+          "name" : "loanFee",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "%"
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Rent rise each year",
+          "max" : 10,
+          "min" : 0,
+          "name" : "rentGrowth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 20,
+          "label" : "Loan tenure",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tenure",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 2,
+          "label" : "Electric cost per km",
+          "max" : 10,
+          "min" : 0,
+          "name" : "evCostPerKm",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3,
+          "label" : "Fare",
+          "max" : 10,
+          "min" : 0,
+          "name" : "fare",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "USD"
+        },
+        {
+          "format" : "currency",
+          "initial" : 50,
+          "label" : "Tips",
+          "max" : 500,
+          "min" : 0,
+          "name" : "tips",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 8,
+          "label" : "Billions of people",
+          "max" : 10,
+          "min" : 0,
+          "name" : "billions",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions",
+          "label" : "EMI",
+          "name" : "monthlyEMI",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "rent * 12",
+          "label" : "Total savings",
+          "name" : "savings",
+          "symbol" : "",
+          "unit" : "INR"
+        },
+        {
+          "format" : "number",
+          "formula" : "rent / 1000",
+          "label" : "Debt ratio",
+          "name" : "debtRatio",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Money words"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "about": "Totals over entries with nothing wrong: counted, summed and averaged over one sample entry each, so the checker can tell they work, then placed on the page with the lists.",
+  "fill": true,
+  "wire": {
+    "title": "Habit tracker",
+    "subject": "health",
+    "collections": [
+      {"name": "habits", "label": "Habits", "entry": "habit", "fields": [{"name": "name", "label": "Habit"}, {"name": "done", "label": "Done today", "type": "done"}, {"name": "streak", "label": "Streak", "type": "number"}]}
+    ],
+    "inputs": [{"name": "goal", "label": "Goal", "format": "integer", "initial": 5, "min": 1, "max": 10}],
+    "outputs": [
+      {"name": "doneToday", "label": "Done today", "formula": "count(habits.done)", "format": "integer"},
+      {"name": "progress", "label": "Progress", "formula": "doneToday / goal * 100", "format": "percent"},
+      {"name": "bestStreak", "label": "Best streak", "formula": "max(habits.streak)", "format": "integer"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "progress"}, {"kind": "stepper", "ref": "goal"}]
+  }
+}

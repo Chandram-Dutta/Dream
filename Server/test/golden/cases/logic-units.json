@@ -1,0 +1,27 @@
+{
+  "about": "Units tidied and taken out of labels: Distance (km), Speed [m/s], Tip (%), Bill ($), Price (USD), units written as words or LaTeX, a percentage's unit cleared, and a money unit kept as its code.",
+  "fill": true,
+  "wire": {
+    "title": "Units",
+    "inputs": [
+      {"name": "distance", "label": "Distance (km)", "initial": 10, "max": 100},
+      {"name": "speed", "label": "Speed [m/s]", "unit": "meters per second", "initial": 3, "max": 10},
+      {"name": "speedTwo", "label": "Speed (m/s)", "unit": "m/s", "initial": 3, "max": 10},
+      {"name": "tip", "label": "Tip (%)", "format": "percent", "unit": "%", "initial": 10, "max": 30},
+      {"name": "bill", "label": "Bill ($)", "format": "currency", "initial": 50, "max": 500},
+      {"name": "price", "label": "Price (USD)", "format": "currency", "initial": 5, "max": 50},
+      {"name": "time", "label": "Time", "unit": "seconds", "initial": 2, "max": 10},
+      {"name": "accel", "label": "Acceleration", "unit": "m/s^2", "initial": 9.8, "max": 20},
+      {"name": "mass", "label": "Mass", "unit": "\\mathrm{kg}", "initial": 2, "max": 10},
+      {"name": "temperature", "label": "Temperature (°C)", "initial": 20, "max": 40},
+      {"name": "angle", "label": "Angle", "unit": "^\\circ", "initial": 45, "max": 90},
+      {"name": "weird", "label": "Count (widgets)", "format": "integer", "initial": 3, "max": 10},
+      {"name": "share", "label": "Share", "format": "percent", "unit": "percent", "initial": 50, "max": 100}
+    ],
+    "outputs": [
+      {"name": "total", "label": "Total (EUR)", "formula": "distance + speed + speedTwo + tip + bill + price + time + accel + mass + temperature + angle + weird + share", "format": "currency", "unit": "eur"},
+      {"name": "energy", "label": "Energy (kWh)", "formula": "mass * accel", "unit": ""}
+    ],
+    "blocks": [{"kind": "hero", "ref": "total"}, {"kind": "metric", "ref": "energy"}]
+  }
+}

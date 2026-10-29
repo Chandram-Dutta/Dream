@@ -1,0 +1,720 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'nights'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'logged', 'latest', 'listName' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "average",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "nights-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "nights",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "nights-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "nights",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "nights.date",
+          "ref" : "nights.hours",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "logged-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "logged",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "latest-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "latest",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "listName-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "listName",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "night",
+          "fields" : [
+            {
+              "label" : "Date",
+              "name" : "date",
+              "options" : [
+
+              ],
+              "type" : "date"
+            },
+            {
+              "label" : "Hours",
+              "name" : "hours",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Note",
+              "name" : "note",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Nights",
+          "name" : "nights",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "avg(nights.hours)",
+          "label" : "Average",
+          "name" : "average",
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(nights)",
+          "label" : "Nights logged",
+          "name" : "logged",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "last(nights.hours)",
+          "label" : "Last night",
+          "name" : "latest",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "nights + 1",
+          "label" : "Bare list",
+          "name" : "listName",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Sleep log"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "average",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "nights.date",
+          "ref" : "nights.hours",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "night",
+          "fields" : [
+            {
+              "label" : "Date",
+              "name" : "date",
+              "options" : [
+
+              ],
+              "type" : "date"
+            },
+            {
+              "label" : "Hours",
+              "name" : "hours",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Note",
+              "name" : "note",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Nights",
+          "name" : "nights",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "avg(nights.hours)",
+          "label" : "Average",
+          "name" : "average",
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(nights)",
+          "label" : "Nights logged",
+          "name" : "logged",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "last(nights.hours)",
+          "label" : "Last night",
+          "name" : "latest",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "nights + 1",
+          "label" : "Bare list",
+          "name" : "listName",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Sleep log"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "average",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "nights.date",
+        "ref" : "nights.hours",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "night",
+        "fields" : [
+          {
+            "label" : "Date",
+            "name" : "date",
+            "options" : [
+
+            ],
+            "type" : "date"
+          },
+          {
+            "label" : "Hours",
+            "name" : "hours",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Note",
+            "name" : "note",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Nights",
+        "name" : "nights",
+        "source" : "",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "avg(nights.hours)",
+        "label" : "Average",
+        "name" : "average",
+        "symbol" : "",
+        "unit" : "hours"
+      },
+      {
+        "format" : "integer",
+        "formula" : "count(nights)",
+        "label" : "Nights logged",
+        "name" : "logged",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "last(nights.hours)",
+        "label" : "Last night",
+        "name" : "latest",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "nights + 1",
+        "label" : "Bare list",
+        "name" : "listName",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "health",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Sleep log"
+  },
+  "converted" : {
+    "accent" : "pink",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "average",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "data",
+        "over" : "nights.date",
+        "ref" : "nights.hours",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "night",
+        "fields" : [
+          {
+            "label" : "Date",
+            "name" : "date",
+            "options" : [
+
+            ],
+            "type" : "date"
+          },
+          {
+            "label" : "Hours",
+            "name" : "hours",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Note",
+            "name" : "note",
+            "options" : [
+
+            ],
+            "type" : "text"
+          }
+        ],
+        "label" : "Nights",
+        "name" : "nights",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "avg(nights.hours)",
+        "label" : "Average",
+        "name" : "average",
+        "symbol" : "",
+        "unit" : "hours"
+      },
+      {
+        "format" : "integer",
+        "formula" : "count(nights)",
+        "label" : "Nights logged",
+        "name" : "logged",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "last(nights.hours)",
+        "label" : "Last night",
+        "name" : "latest",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "nights + 1",
+        "label" : "Bare list",
+        "name" : "listName",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Sleep log"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:\n- average: \"Average\", number, in hours = avg(nights.hours)\n- logged: \"Nights logged\", integer = count(nights)\n- latest: \"Last night\", number = last(nights.hours)\n- listName: \"Bare list\", number = nights + 1",
+    "outline" : "Sleep log: \nLists:\n- nights: \"Nights\", each a night: date (date), hours (number), note (text)\n- hero #block-0 ref average\n- data #block-1 ref nights.hours over nights.date\n- section #auto-outputs\n  - metric #auto-output-1 ref logged\n  - metric #auto-output-2 ref latest\n  - metric #auto-output-3 ref listName"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:\n- average: \"Average\", number, in h = avg(nights.hours)\n- logged: \"Nights logged\", integer = count(nights)\n- latest: \"Last night\", number = last(nights.hours)\n- listName: \"Bare list\", number = nights + 1",
+    "outline" : "Sleep log: \nLists:\n- nights: \"Nights\", each a night: date (date), hours (number), note (text)\n- hero #block-0 ref average\n- add #nights-add ref nights\n- list #nights-list ref nights\n- data #block-1 ref nights.hours over nights.date\n- section #more-results\n  - metric #logged-metric ref logged\n  - metric #latest-metric ref latest\n  - metric #listName-metric ref listName"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'average'."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'listName' can't be calculated: 'nights' is a list; total it with sum(nights), avg, min, max, count or last."
+      }
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "average",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "data",
+          "over" : "nights.date",
+          "ref" : "nights.hours",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "night",
+          "fields" : [
+            {
+              "label" : "Date",
+              "name" : "date",
+              "options" : [
+
+              ],
+              "type" : "date"
+            },
+            {
+              "label" : "Hours",
+              "name" : "hours",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Note",
+              "name" : "note",
+              "options" : [
+
+              ],
+              "type" : "text"
+            }
+          ],
+          "label" : "Nights",
+          "name" : "nights",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "avg(nights.hours)",
+          "label" : "Average",
+          "name" : "average",
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "integer",
+          "formula" : "count(nights)",
+          "label" : "Nights logged",
+          "name" : "logged",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "last(nights.hours)",
+          "label" : "Last night",
+          "name" : "latest",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "nights + 1",
+          "label" : "Bare list",
+          "name" : "listName",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Sleep log"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "about": "Every placement helper, as DreamTests' blocks scene uses them: on, stack, ring, orbit, beside, between, grid with and without parity, nested places, at from another object, and placements that make too many copies or none; synonyms for helpers (around, pos, atop, midpoint, lattice), the ground and the origin by other names, sizes as many as each kind takes, a guide box, a tube and an arrow between objects. The scene is shown with the controls that change it, and its time keeps no slider.",
+  "fill": true,
+  "wire": {
+    "title": "Blocks",
+    "subject": "science",
+    "inputs": [
+      {"name": "r", "label": "Radius", "initial": 1, "min": 0.5, "max": 3, "step": 0.1},
+      {"name": "h", "label": "Height", "initial": 2, "min": 1, "max": 6, "step": 0.5},
+      {"name": "n", "label": "Count", "format": "integer", "initial": 6, "min": 0, "max": 12},
+      {"name": "t", "label": "Time", "role": "variable", "initial": 0, "min": 0, "max": 10, "step": 0.1}
+    ],
+    "outputs": [{"name": "volume", "label": "Volume", "formula": "pi * r^2 * h"}],
+    "scenes": [{"name": "blocks", "time": "T", "objects": [
+      {"name": "ground", "kind": "plane", "position": "at(0, 0, 0)", "size": "6, 6", "tone": "guide"},
+      {"name": "can", "kind": "cylinder", "position": "on(ground)", "size": "r, h", "label": "h", "tone": "main", "turn": "36 * t"},
+      {"name": "lid", "kind": "box", "position": "atop(can, 0.5)", "size": "1, 1, 0.2"},
+      {"name": "cubes", "kind": "box", "position": "stack(floor, 3)", "size": "1"},
+      {"name": "hub", "kind": "sphere", "position": "pos(5, 0, 1)", "size": "0.2"},
+      {"name": "spokes", "kind": "sphere", "position": "ring(hub, 2, n)", "size": "0.1"},
+      {"name": "moon", "kind": "sphere", "position": "around(hub, 1, 90)", "size": "0.1"},
+      {"name": "neighbour", "kind": "box", "position": "beside(cubes, 0.5)", "size": "2"},
+      {"name": "middle", "kind": "text", "position": "midpoint(hub, moon)", "label": "m"},
+      {"name": "lattice", "kind": "sphere", "position": "grid(at(-4, -4, 0), 1, 2, 3, 4)", "size": "0.1"},
+      {"name": "salt", "kind": "sphere", "position": "lattice(origin, 0.5, 3, 3, 3, 1)", "size": "0.05"},
+      {"name": "raised", "kind": "sphere", "position": "orbit(at(0, 0, 2), 1, 0)", "size": "0.1"},
+      {"name": "crowd", "kind": "sphere", "position": "ring(hub, 3, 100000)", "size": "0.01"},
+      {"name": "tooMany", "kind": "sphere", "position": "grid(centre, 1, 10, 10, 10)", "size": "0.01"},
+      {"name": "offset", "kind": "sphere", "position": "at(hub, 0, 0, 1)", "size": "0.1"},
+      {"name": "none", "kind": "sphere", "position": "row(hub, 1, 0)", "size": "0.1"},
+      {"name": "onNone", "kind": "sphere", "position": "on(none)", "size": "0.1"},
+      {"name": "cell", "kind": "box", "position": "at(0, 0, 3)", "size": "2", "tone": "guide"},
+      {"name": "rod", "kind": "tube", "position": "hub", "to": "moon", "size": "0.02, 7"},
+      {"name": "force", "kind": "arrow", "position": "at(0, 0, 0)", "to": "(1, 1, 1)"},
+      {"name": "axes", "kind": "axes", "position": "at(0, 0, 0)", "size": "3"},
+      {"name": "negative", "kind": "sphere", "position": "at(0, 0, 0)", "size": "-1"},
+      {"name": "hoop", "kind": "ring", "position": "at(0, 0, 0.5)", "size": "2", "tilt": "30"}
+    ]}],
+    "blocks": [
+      {"kind": "paragraph", "text": "A cylinder's volume is its base times its height."},
+      {"kind": "section", "title": "Try it", "children": [{"kind": "slider", "ref": "r"}, {"kind": "slider", "ref": "h"}, {"kind": "stepper", "ref": "n"}]},
+      {"kind": "hero", "ref": "volume"}
+    ]
+  }
+}

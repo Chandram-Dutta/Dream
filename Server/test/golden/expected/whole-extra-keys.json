@@ -1,0 +1,223 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Extra"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Extra"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "style" : "bold",
+        "text" : "Hello.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "colour" : "red",
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Extra"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Hello.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Extra"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Extra: \n- paragraph #block-0\n  Hello."
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Extra: \n- paragraph #block-0\n  Hello."
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Extra"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "about": "A figure with nothing that can be drawn is dropped (and only that is said), a figure named like an input or another figure gets a name of its own, a figure block for a figure that doesn't exist is removed, and a figure no block shows is placed just before the controls that move it.",
+  "fill": true,
+  "wire": {
+    "title": "Figures",
+    "inputs": [{"name": "r", "label": "Radius", "initial": 2, "min": 1, "max": 5, "step": 0.5}],
+    "outputs": [{"name": "area", "label": "Area", "formula": "pi * r^2"}],
+    "figures": [
+      {"name": "empty", "points": [{"name": "A", "x": "nope", "y": "0", "label": ""}], "shapes": [{"kind": "segment", "points": "A, B"}]},
+      {"name": "r", "points": [{"name": "O", "x": "0", "y": "0", "label": ""}], "shapes": [{"kind": "circle", "points": "O", "radius": "r", "label": "{area}"}]},
+      {"name": "", "points": [{"name": "O", "x": "0", "y": "0", "label": "O"}], "shapes": []},
+      {"name": "circle 2", "points": [{"name": "O", "x": "0", "y": "0"}], "shapes": [{"kind": "circle", "points": "O", "radius": "r * 2"}, {"kind": "text", "points": "O", "label": "centre"}]}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "area"},
+      {"kind": "figure", "ref": "missingFigure"},
+      {"kind": "section", "children": [{"kind": "paragraph", "text": "Drag the radius."}, {"kind": "slider", "ref": "r"}]}
+    ]
+  }
+}

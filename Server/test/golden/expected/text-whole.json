@@ -1,0 +1,236 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Dishes"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Laundry"
+      ],
+      "summary" : "Who does what.",
+      "symbol" : "house",
+      "title" : "Chores 🧹"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Dishes"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Laundry"
+      ],
+      "summary" : "Who does what.",
+      "symbol" : "house",
+      "title" : "Chores 🧹"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "",
+            "value" : "Dishes"
+          }
+        ],
+        "kind" : "bullets",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+      "Laundry"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "Who does what.",
+    "symbol" : "house",
+    "title" : "Chores 🧹"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+          {
+            "label" : "",
+            "value" : "Dishes"
+          }
+        ],
+        "kind" : "bullets",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "use",
+    "outputs" : [
+
+    ],
+    "related" : [
+      "Laundry"
+    ],
+    "summary" : "Who does what.",
+    "symbol" : "house",
+    "title" : "Chores 🧹"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Chores 🧹: Who does what.\n- bullets #block-0\n  • Dishes\nrelated: Laundry"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Chores 🧹: Who does what.\n- bullets #block-0\n  • Dishes\nrelated: Laundry"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "",
+              "value" : "Dishes"
+            }
+          ],
+          "kind" : "bullets",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "use",
+      "outputs" : [
+
+      ],
+      "related" : [
+        "Laundry"
+      ],
+      "summary" : "Who does what.",
+      "symbol" : "house",
+      "title" : "Chores 🧹"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

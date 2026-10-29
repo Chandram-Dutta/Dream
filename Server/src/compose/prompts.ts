@@ -38,20 +38,20 @@ export interface Generation {
 }
 
 /** A question the gap check asks, as the app's Question encodes it (Dream/Engine/Answer.swift). */
-export interface Question {
+export type Question = {
   text: string;
   topic: string;
   options: string[];
   allowsTyping: boolean;
   isPersonal: boolean;
-}
+};
 
 /** What the user said to one, as the app's Answer encodes it. An empty choice is "You choose". */
-export interface Answer {
+export type Answer = {
   question: Question;
   choice: string;
   isRemembered: boolean;
-}
+};
 
 /** Every {{slot}} at once, so words that look like a slot, in a request say, stay as written. */
 export function fill(template: string, values: Record<string, string>): string {

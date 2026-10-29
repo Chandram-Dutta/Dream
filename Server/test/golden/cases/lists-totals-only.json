@@ -1,0 +1,21 @@
+{
+  "about": "A calculation that only totals the user's entries needs no inputs: a habit log with dates, counted and averaged, whose results follow the entries.",
+  "fill": true,
+  "wire": {
+    "title": "Sleep log",
+    "subject": "health",
+    "collections": [
+      {"name": "nights", "label": "Nights", "entry": "night", "fields": [{"name": "date", "label": "Date", "type": "date"}, {"name": "hours", "label": "Hours", "type": "number"}, {"name": "note", "label": "Note", "type": "text"}]}
+    ],
+    "outputs": [
+      {"name": "average", "label": "Average", "formula": "avg(nights.hours)", "unit": "hours"},
+      {"name": "logged", "label": "Nights logged", "formula": "count(nights)", "format": "integer"},
+      {"name": "latest", "label": "Last night", "formula": "last(nights.hours)"},
+      {"name": "listName", "label": "Bare list", "formula": "nights + 1"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "average"},
+      {"kind": "data", "ref": "nights.hours", "over": "nights.date"}
+    ]
+  }
+}

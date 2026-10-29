@@ -1,0 +1,4 @@
+{
+  "about": "A whole answer that arrived as text, with an emoji written as a surrogate pair, a key written twice (the first kept) and a trailing comma: streamed text is always read as the answer so far.",
+  "text": "{\"subject\": \"home\", \"mode\": \"use\", \"title\": \"Chores \\ud83e\\uddf9\", \"title\": \"Second\", \"summary\": \"Who does what.\", \"symbol\": \"house\", \"collections\": [], \"question\": \"\", \"inputs\": [], \"outputs\": [], \"sounds\": [], \"figures\": [], \"diagrams\": [], \"actions\": [], \"scenes\": [], \"blocks\": [{\"kind\": \"bullets\", \"title\": \"\", \"text\": \"\", \"ref\": \"\", \"over\": \"\", \"items\": [{\"label\": \"\", \"value\": \"Dishes\"},], \"children\": []}], \"related\": [\"Laundry\"], \"citations\": []}"
+}

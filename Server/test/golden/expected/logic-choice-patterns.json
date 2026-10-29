@@ -1,0 +1,903 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Removed units written after the live values of 'depth', 'width', 'widths', which show their own."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'language', 'height', 'width', 'widths', 'depth'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'near' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "score",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You're {height} in total, {width} wide, {depth}. deep, and $\\val{width}$ across, {widths}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "language-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "language",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "height-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "height",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "width-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "width",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "widths-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "widths",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "depth-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "depth",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "near-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "near",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Language",
+          "max" : 3,
+          "min" : 0,
+          "name" : "language",
+          "options" : [
+            "C++",
+            "1/2 cup",
+            "(none)",
+            "$5 plan"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 60,
+          "label" : "Height",
+          "max" : 90,
+          "min" : 40,
+          "name" : "height",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "in"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Width",
+          "max" : 90,
+          "min" : 10,
+          "name" : "width",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Widths",
+          "max" : 90,
+          "min" : 10,
+          "name" : "widths",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Depth",
+          "max" : 9,
+          "min" : 1,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(language == 0 ? 1 : 0) + (language == 1 ? 2 : 0) + (language != 2 ? 4 : 0) + (language == 3 ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0",
+          "label" : "Score",
+          "name" : "score",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "widthz + 1",
+          "label" : "Near",
+          "name" : "near",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Patterns"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "score",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Language",
+          "max" : 3,
+          "min" : 0,
+          "name" : "language",
+          "options" : [
+            "C++",
+            "1/2 cup",
+            "(none)",
+            "$5 plan"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 60,
+          "label" : "Height",
+          "max" : 90,
+          "min" : 40,
+          "name" : "height",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "in"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Width",
+          "max" : 90,
+          "min" : 10,
+          "name" : "width",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Widths",
+          "max" : 90,
+          "min" : 10,
+          "name" : "widths",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Depth",
+          "max" : 9,
+          "min" : 1,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(language == 0 ? 1 : 0) + (language == 1 ? 2 : 0) + (language != 2 ? 4 : 0) + (language == 3 ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0",
+          "label" : "Score",
+          "name" : "score",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "widthz + 1",
+          "label" : "Near",
+          "name" : "near",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Patterns"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "score",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Language",
+        "max" : 100,
+        "min" : 0,
+        "name" : "language",
+        "options" : [
+          "C++",
+          "1/2 cup",
+          "(none)",
+          "$5 plan"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 60,
+        "label" : "Height",
+        "max" : 90,
+        "min" : 40,
+        "name" : "height",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "in"
+      },
+      {
+        "format" : "number",
+        "initial" : 30,
+        "label" : "Width",
+        "max" : 90,
+        "min" : 10,
+        "name" : "width",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "cm"
+      },
+      {
+        "format" : "number",
+        "initial" : 30,
+        "label" : "Widths",
+        "max" : 90,
+        "min" : 10,
+        "name" : "widths",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "cm"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Depth",
+        "max" : 9,
+        "min" : 1,
+        "name" : "depth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "km"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "(language == 'c++' ? 1 : 0) + ('1/2 cup' == language ? 2 : 0) + (language != \"(none)\" ? 4 : 0) + (language == '$5 plan' ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0",
+        "label" : "Score",
+        "name" : "score",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "widthz + 1",
+        "label" : "Near",
+        "name" : "near",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Patterns"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "score",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Language",
+        "max" : 100,
+        "min" : 0,
+        "name" : "language",
+        "options" : [
+          "C++",
+          "1/2 cup",
+          "(none)",
+          "$5 plan"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 60,
+        "label" : "Height",
+        "max" : 90,
+        "min" : 40,
+        "name" : "height",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "in"
+      },
+      {
+        "format" : "number",
+        "initial" : 30,
+        "label" : "Width",
+        "max" : 90,
+        "min" : 10,
+        "name" : "width",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "cm"
+      },
+      {
+        "format" : "number",
+        "initial" : 30,
+        "label" : "Widths",
+        "max" : 90,
+        "min" : 10,
+        "name" : "widths",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "cm"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Depth",
+        "max" : 9,
+        "min" : 1,
+        "name" : "depth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "km"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "(language == 'c++' ? 1 : 0) + ('1/2 cup' == language ? 2 : 0) + (language != \"(none)\" ? 4 : 0) + (language == '$5 plan' ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0",
+        "label" : "Score",
+        "name" : "score",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "widthz + 1",
+        "label" : "Near",
+        "name" : "near",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Patterns"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- language: \"Language\", choice of C++ / 1/2 cup / (none) / $5 plan, starts at option 0\n- height: \"Height\", number, starts at 60, 40 to 90, step 1, in in\n- width: \"Width\", number, starts at 30, 10 to 90, step 1, in cm\n- widths: \"Widths\", number, starts at 30, 10 to 90, step 1, in cm\n- depth: \"Depth\", number, starts at 3, 1 to 9, step 1, in km\nOutputs:\n- score: \"Score\", number = (language == 'c++' ? 1 : 0) + ('1/2 cup' == language ? 2 : 0) + (language != \"(none)\" ? 4 : 0) + (language == '$5 plan' ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0\n- near: \"Near\", number = widthz + 1",
+    "outline" : "Patterns: \n- hero #block-0 ref score\n- paragraph #block-1\n  You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm.\n- section #auto-inputs\n  - picker #auto-input-0 ref language\n  - slider #auto-input-1 ref height\n  - slider #auto-input-2 ref width\n  - slider #auto-input-3 ref widths\n  - slider #auto-input-4 ref depth\n- section #auto-outputs\n  - metric #auto-output-1 ref near"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- language: \"Language\", choice of C++ / 1/2 cup / (none) / $5 plan, starts at option 0\n- height: \"Height\", number, starts at 60, 40 to 90, step 1, in in\n- width: \"Width\", number, starts at 30, 10 to 90, step 1, in cm\n- widths: \"Widths\", number, starts at 30, 10 to 90, step 1, in cm\n- depth: \"Depth\", number, starts at 3, 1 to 9, step 1, in km\nOutputs:\n- score: \"Score\", number = (language == 0 ? 1 : 0) + (language == 1 ? 2 : 0) + (language != 2 ? 4 : 0) + (language == 3 ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0\n- near: \"Near\", number = widthz + 1",
+    "outline" : "Patterns: \n- hero #block-0 ref score\n- paragraph #block-1\n  You're {height} in total, {width} wide, {depth}. deep, and $\\val{width}$ across, {widths}.\n- section #more-inputs\n  - picker #language-control ref language\n  - slider #height-control ref height\n  - slider #width-control ref width\n  - slider #widths-control ref widths\n  - slider #depth-control ref depth\n- section #more-results\n  - metric #near-metric ref near"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In 'score', compared choices by position instead of by name."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The formula for 'near' uses 'widthz', which isn't an input or output. Add it as an input, or use one of: depth, height, language, near, score, width, widths."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "score",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "You're {height} in total, {width} cm wide, {depth} km. deep, and $\\val{width}\\,\\mathrm{cm}$ across, {widths} cm.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Language",
+          "max" : 3,
+          "min" : 0,
+          "name" : "language",
+          "options" : [
+            "C++",
+            "1/2 cup",
+            "(none)",
+            "$5 plan"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 60,
+          "label" : "Height",
+          "max" : 90,
+          "min" : 40,
+          "name" : "height",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "in"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Width",
+          "max" : 90,
+          "min" : 10,
+          "name" : "width",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 30,
+          "label" : "Widths",
+          "max" : 90,
+          "min" : 10,
+          "name" : "widths",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "cm"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Depth",
+          "max" : 9,
+          "min" : 1,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "km"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "(language == 0 ? 1 : 0) + (language == 1 ? 2 : 0) + (language != 2 ? 4 : 0) + (language == 3 ? 8 : 0) + height * 0 + width * 0 + widths * 0 + depth * 0",
+          "label" : "Score",
+          "name" : "score",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "widthz + 1",
+          "label" : "Near",
+          "name" : "near",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Patterns"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

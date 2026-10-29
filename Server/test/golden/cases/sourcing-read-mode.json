@@ -1,0 +1,12 @@
+{
+  "about": "A page to read that looked nothing up goes back once to look it up; its citations, with nothing read, are all dropped.",
+  "fill": true,
+  "wire": {
+    "title": "Ada Lovelace",
+    "subject": "learning",
+    "mode": "read",
+    "summary": "Ada Lovelace wrote the first published algorithm.",
+    "blocks": [{"kind": "paragraph", "text": "She worked with Charles Babbage."}],
+    "citations": ["https://en.wikipedia.org/wiki/Ada_Lovelace"]
+  }
+}

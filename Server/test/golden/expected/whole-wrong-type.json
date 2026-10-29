@@ -1,0 +1,83 @@
+{
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "double",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : "5",
+        "label" : "x",
+        "max" : 10,
+        "min" : 0,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "x * 2",
+        "label" : "Double",
+        "name" : "double",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Wrong type"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : false,
+    "whole" : false
+  },
+  "locale" : "en_US"
+}

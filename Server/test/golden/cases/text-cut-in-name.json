@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off in the middle of a property's name, inside a block inside a section: the name is left out, and the blocks so far stay.",
+  "text": "  {\"title\": \"Coffee\", \"subject\": \"food\", \"blocks\": [{\"kind\": \"section\", \"title\": \"Brew\", \"children\": [{\"kind\": \"steps\", \"items\": [{\"label\": \"\", \"value\": \"Grind\"}, {\"label\": \"\", \"value\": \"Pour\"}]}, {\"kind\": \"paragraph\", \"te"
+}

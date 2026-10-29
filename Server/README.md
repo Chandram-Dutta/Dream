@@ -198,6 +198,12 @@ DREAM_SHARE_URL=http://127.0.0.1:8787 ../Tools/sharing.sh
 owners, reports, blocks and the admin with several test users. Against a server that's already
 running, those parts are skipped, and making links needs `DREAM_SESSION`.
 
+`npm test` also checks the page engine (`src/engine`, the app's checker and formula engine in
+TypeScript) against the app's own: `test/engine.mjs` runs every model answer in
+`test/golden/cases` through it and compares what it makes with `test/golden/expected`, which
+`../Tools/engine-golden.sh` writes from the Swift engine. After changing Dream/Engine, run that
+script, port the change, and the test says where the two still differ.
+
 ## Deploy
 
 1. Log in to Cloudflare, once per Mac:

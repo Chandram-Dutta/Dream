@@ -1,0 +1,19 @@
+{
+  "about": "A list named like an input is renamed, one with no fields gets a name for each entry, an entry is named from a plural label (ies, ches, s), and a formula totals a list renamed by the checker through its old name.",
+  "fill": true,
+  "wire": {
+    "title": "Budget",
+    "subject": "money",
+    "collections": [
+      {"name": "budget", "label": "Budget lines", "entry": "", "fields": []},
+      {"name": "groceries", "label": "Groceries", "entry": "", "fields": [{"name": "name", "label": "Name"}]},
+      {"name": "watches", "label": "Watches", "entry": "", "fields": [{"name": "brand", "label": "Brand"}, {"name": "price", "label": "Price", "type": "number"}]}
+    ],
+    "inputs": [{"name": "budget", "label": "Budget", "format": "currency", "initial": 1000, "max": 10000, "step": 100}],
+    "outputs": [
+      {"name": "lines", "label": "Lines", "formula": "count(budget.name)", "format": "integer"},
+      {"name": "watchSpend", "label": "On watches", "formula": "sum(watches.price) + budget * 0", "format": "currency"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "watchSpend"}, {"kind": "list", "ref": "budgetList"}]
+  }
+}

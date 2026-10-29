@@ -156,7 +156,8 @@ export class PageJob implements DurableObject {
       if (kept === "kept") photo = id;
       else problem = kept === "full" ? "There's no room for its photo." : "Its photo isn't one Dream keeps.";
     }
-    const item = surfaceItem(job.pageID, { intent: request.request, surface, modelName: model, log, photo, at: Date.now() });
+    // The engine's Surface is the very JSON sync keeps; its interface just doesn't say so.
+    const item = surfaceItem(job.pageID, { intent: request.request, surface: surface as unknown as Record<string, unknown>, modelName: model, log, photo, at: Date.now() });
     if (!item) return "It's too big to keep.";
     try {
       const { applied, refused } = await keepItems(this.env, job.owner, [item]);

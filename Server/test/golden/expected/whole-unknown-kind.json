@@ -1,0 +1,90 @@
+{
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The Himalaya are young.",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "image",
+        "over" : "",
+        "ref" : "",
+        "text" : "A picture",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "Highest",
+            "value" : "Everest, 8,849 m"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+      "https://en.wikipedia.org/wiki/Himalayas"
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "nature",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Mountains"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : false,
+    "whole" : false
+  },
+  "locale" : "en_US"
+}

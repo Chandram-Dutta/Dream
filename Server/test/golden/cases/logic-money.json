@@ -1,0 +1,24 @@
+{
+  "about": "What reads as money: rent and a cost per km do; a loan's rate, how fast rent grows and a term don't; a unit of its own (%) says what it measures; a currency code or symbol as the unit is still money; EMI stays whole as an acronym; billions aren't a bill.",
+  "fill": true,
+  "wire": {
+    "title": "Money words",
+    "inputs": [
+      {"name": "rate", "label": "Home loan rate", "initial": 8, "max": 20},
+      {"name": "rent", "label": "Monthly rent", "initial": 20000, "max": 100000, "step": 500},
+      {"name": "loanFee", "label": "Loan fee", "unit": "%", "initial": 1, "max": 5},
+      {"name": "rentGrowth", "label": "Rent rise each year", "initial": 5, "max": 10},
+      {"name": "tenure", "label": "Loan tenure", "initial": 20, "max": 30},
+      {"name": "evCostPerKm", "label": "Electric cost per km", "initial": 2, "max": 10},
+      {"name": "fare", "label": "Fare", "unit": "USD", "initial": 3, "max": 10},
+      {"name": "tips", "label": "Tips", "unit": "₹", "initial": 50, "max": 500},
+      {"name": "billions", "label": "Billions of people", "initial": 8, "max": 10}
+    ],
+    "outputs": [
+      {"name": "monthlyEMI", "label": "EMI", "formula": "rent * (1 + rate / 100) + loanFee + rentGrowth + tenure + evCostPerKm + fare + tips + billions"},
+      {"name": "savings", "label": "Total savings", "formula": "rent * 12", "unit": "inr"},
+      {"name": "debtRatio", "label": "Debt ratio", "formula": "rent / 1000"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "monthlyEMI"}]
+  }
+}

@@ -1,0 +1,851 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'लोनराशि', 'ब्याजदर', 'saal', 'क्षेत्र'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "२०२४",
+              "value" : "9.1"
+            },
+            {
+              "label" : "2025",
+              "value" : "8.75%"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "दरें"
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "लोनराशि-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "लोनराशि",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "ब्याजदर-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "ब्याजदर",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "saal-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "saal",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "क्षेत्र-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "क्षेत्र",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "लोन राशि",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "लोनराशि",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "ब्याजदर",
+          "max" : 15,
+          "min" : 0.10000000000000001,
+          "name" : "ब्याजदर",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "अवधि",
+          "max" : 30,
+          "min" : 1,
+          "name" : "saal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "साल"
+        },
+        {
+          "format" : "number",
+          "initial" : 1200,
+          "label" : "क्षेत्रफल",
+          "max" : 5000,
+          "min" : 0,
+          "name" : "क्षेत्र",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : "वर्ग फुट"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+          "label" : "मासिक EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "ब्याज दर",
+        "प्रीपेमेंट"
+      ],
+      "summary" : "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+      "symbol" : "",
+      "title" : "होम लोन EMI"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "२०२३",
+              "value" : "८.५"
+            },
+            {
+              "label" : "२०२४",
+              "value" : "9.1"
+            },
+            {
+              "label" : "2025",
+              "value" : "8.75%"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "दरें"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "लोन राशि",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "लोनराशि",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "ब्याजदर",
+          "max" : 15,
+          "min" : 0.10000000000000001,
+          "name" : "ब्याजदर",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "अवधि",
+          "max" : 30,
+          "min" : 1,
+          "name" : "saal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "साल"
+        },
+        {
+          "format" : "number",
+          "initial" : 1200,
+          "label" : "क्षेत्रफल",
+          "max" : 5000,
+          "min" : 0,
+          "name" : "क्षेत्र",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : "वर्ग फुट"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+          "label" : "मासिक EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "ब्याज दर",
+        "प्रीपेमेंट",
+        "ब्याज दर"
+      ],
+      "summary" : "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+      "symbol" : "",
+      "title" : "होम लोन EMI"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "२०२३",
+            "value" : "८.५"
+          },
+          {
+            "label" : "२०२४",
+            "value" : "9.1"
+          },
+          {
+            "label" : "2025",
+            "value" : "8.75%"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "दरें"
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "लोन राशि (₹)",
+        "max" : 20000000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 8.5,
+        "label" : "",
+        "max" : 15,
+        "min" : 0,
+        "name" : "ब्याज दर",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "अवधि (साल)",
+        "max" : 30,
+        "min" : 1,
+        "name" : "saal",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "साल"
+      },
+      {
+        "format" : "number",
+        "initial" : 1200,
+        "label" : "क्षेत्रफल",
+        "max" : 5000,
+        "min" : 0,
+        "name" : "क्षेत्र",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 50,
+        "symbol" : "",
+        "unit" : "वर्ग फुट"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+        "label" : "मासिक EMI",
+        "name" : "emi",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+      "ब्याज दर",
+      "प्रीपेमेंट",
+      "ब्याज दर"
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+    "symbol" : "",
+    "title" : "होम लोन EMI"
+  },
+  "converted" : {
+    "accent" : "green",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "emi",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+          {
+            "label" : "२०२३",
+            "value" : "८.५"
+          },
+          {
+            "label" : "२०२४",
+            "value" : "9.1"
+          },
+          {
+            "label" : "2025",
+            "value" : "8.75%"
+          }
+        ],
+        "kind" : "data",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "दरें"
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 5000000,
+        "label" : "लोन राशि (₹)",
+        "max" : 20000000,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 100000,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 8.5,
+        "label" : "",
+        "max" : 15,
+        "min" : 0,
+        "name" : "ब्याज दर",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 20,
+        "label" : "अवधि (साल)",
+        "max" : 30,
+        "min" : 1,
+        "name" : "saal",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "साल"
+      },
+      {
+        "format" : "number",
+        "initial" : 1200,
+        "label" : "क्षेत्रफल",
+        "max" : 5000,
+        "min" : 0,
+        "name" : "क्षेत्र",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 50,
+        "symbol" : "",
+        "unit" : "वर्ग फुट"
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+        "label" : "मासिक EMI",
+        "name" : "emi",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+      "ब्याज दर",
+      "प्रीपेमेंट",
+      "ब्याज दर"
+    ],
+    "summary" : "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+    "symbol" : "",
+    "title" : "होम लोन EMI"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- : \"लोन राशि (₹)\", currency, starts at 5000000, 0 to 20000000, step 100000\n- ब्याज दर: \"\", percent, starts at 8.5, 0 to 15, step 0.1\n- saal: \"अवधि (साल)\", integer, starts at 20, 1 to 30, step 1, in साल\n- क्षेत्र: \"क्षेत्रफल\", number, starts at 1200, 0 to 5000, step 50, in वर्ग फुट\nOutputs:\n- emi: \"मासिक EMI\", currency = लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+    "outline" : "होम लोन EMI: 50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।\n- hero #block-0 ref emi\n- paragraph #block-1\n  किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।\n- data #block-2 \"दरें\"\n  • २०२३: ८.५\n  • २०२४: 9.1\n  • 2025: 8.75%\n- section #auto-inputs\n  - slider #auto-input-0\n  - slider #auto-input-1 ref ब्याज दर\n  - slider #auto-input-2 ref saal\n  - slider #auto-input-3 ref क्षेत्र\nrelated: ब्याज दर, प्रीपेमेंट, ब्याज दर"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- लोनराशि: \"लोन राशि\", currency, starts at 5000000, 0 to 20000000, step 100000\n- ब्याजदर: \"ब्याजदर\", percent, starts at 8.5, 0.1 to 15, step 0.1\n- saal: \"अवधि\", integer, starts at 20, 1 to 30, step 1, in साल\n- क्षेत्र: \"क्षेत्रफल\", number, starts at 1200, 0 to 5000, step 50, in वर्ग फुट\nOutputs:\n- emi: \"मासिक EMI\", currency = लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+    "outline" : "होम लोन EMI: 50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।\n- hero #block-0 ref emi\n- paragraph #block-1\n  किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।\n- data #block-2 \"दरें\"\n  • २०२४: 9.1\n  • 2025: 8.75%\n- section #more-inputs\n  - slider #लोनराशि-control ref लोनराशि\n  - slider #ब्याजदर-control ref ब्याजदर\n  - slider #saal-control ref saal\n  - slider #क्षेत्र-control ref क्षेत्र\nrelated: ब्याज दर, प्रीपेमेंट"
+  },
+  "locale" : "hi_IN",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'लोनराशि', 'saal'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Raised the minimum of 'ब्याजदर' to 0.1 so results never divide by zero."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "emi",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+            {
+              "label" : "२०२३",
+              "value" : "८.५"
+            },
+            {
+              "label" : "२०२४",
+              "value" : "9.1"
+            },
+            {
+              "label" : "2025",
+              "value" : "8.75%"
+            }
+          ],
+          "kind" : "data",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "दरें"
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 5000000,
+          "label" : "लोन राशि",
+          "max" : 20000000,
+          "min" : 0,
+          "name" : "लोनराशि",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 100000,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 8.5,
+          "label" : "ब्याजदर",
+          "max" : 15,
+          "min" : 0.10000000000000001,
+          "name" : "ब्याजदर",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 20,
+          "label" : "अवधि",
+          "max" : 30,
+          "min" : 1,
+          "name" : "saal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "साल"
+        },
+        {
+          "format" : "number",
+          "initial" : 1200,
+          "label" : "क्षेत्रफल",
+          "max" : 5000,
+          "min" : 0,
+          "name" : "क्षेत्र",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 50,
+          "symbol" : "",
+          "unit" : "वर्ग फुट"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0",
+          "label" : "मासिक EMI",
+          "name" : "emi",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+        "ब्याज दर",
+        "प्रीपेमेंट",
+        "ब्याज दर"
+      ],
+      "summary" : "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+      "symbol" : "",
+      "title" : "होम लोन EMI"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

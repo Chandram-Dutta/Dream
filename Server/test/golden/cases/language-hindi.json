@@ -1,0 +1,26 @@
+{
+  "about": "A Hindi home loan page (DreamTests' pageLanguage), with names made from Devanagari labels, whose letters join across a virama into one character; a Hindi word as a unit; Hindi digits in a data block; and the ₹ sign in a label.",
+  "fill": true,
+  "locale": "hi_IN",
+  "wire": {
+    "subject": "money",
+    "mode": "use",
+    "title": "होम लोन EMI",
+    "summary": "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।",
+    "inputs": [
+      {"name": "", "label": "लोन राशि (₹)", "format": "currency", "initial": 5000000, "max": 20000000, "step": 100000},
+      {"name": "ब्याज दर", "label": "", "format": "percent", "initial": 8.5, "max": 15, "step": 0.1},
+      {"name": "saal", "label": "अवधि (साल)", "format": "integer", "unit": "साल", "initial": 20, "min": 1, "max": 30},
+      {"name": "क्षेत्र", "label": "क्षेत्रफल", "unit": "वर्ग फुट", "initial": 1200, "max": 5000, "step": 50}
+    ],
+    "outputs": [
+      {"name": "emi", "label": "मासिक EMI", "formula": "लोनराशि * (ब्याजदर / 1200) * (1 + ब्याजदर / 1200) ^ (saal * 12) / ((1 + ब्याजदर / 1200) ^ (saal * 12) - 1) + क्षेत्र * 0", "format": "currency"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "emi"},
+      {"kind": "paragraph", "text": "किस्त घटते बैलेंस पर लगती है: हर महीने ब्याज बाकी मूलधन पर लगता है, और किस्त का बाकी हिस्सा मूलधन घटाता है। {emi} हर महीने।"},
+      {"kind": "data", "title": "दरें", "items": [{"label": "२०२३", "value": "८.५"}, {"label": "२०२४", "value": "9.1"}, {"label": "2025", "value": "8.75%"}]}
+    ],
+    "related": ["ब्याज दर", "प्रीपेमेंट", "ब्याज दर"]
+  }
+}

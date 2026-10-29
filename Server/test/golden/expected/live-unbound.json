@@ -1,0 +1,377 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'rain'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "umbrella",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "rain-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "rain",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "given",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Rain",
+          "max" : 50,
+          "min" : 50,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain > 40",
+          "label" : "Umbrella?",
+          "name" : "umbrella",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Live, nothing fetched"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "umbrella",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Rain",
+          "max" : 50,
+          "min" : 50,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain > 40",
+          "label" : "Umbrella?",
+          "name" : "umbrella",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Live, nothing fetched"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "umbrella",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 50,
+        "label" : "Rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "toggle",
+        "formula" : "rain > 40",
+        "label" : "Umbrella?",
+        "name" : "umbrella",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Live, nothing fetched"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "umbrella",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "percent",
+        "initial" : 50,
+        "label" : "Rain",
+        "max" : 100,
+        "min" : 0,
+        "name" : "rain",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "weather.rainChance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "toggle",
+        "formula" : "rain > 40",
+        "label" : "Umbrella?",
+        "name" : "umbrella",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Live, nothing fetched"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Rain\", live percent from weather.rainChance, now 50\nOutputs:\n- umbrella: \"Umbrella?\", toggle = rain > 40",
+    "outline" : "Live, nothing fetched: \n- hero #block-0 ref umbrella"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- rain: \"Rain\", live percent from weather.rainChance, now 50\nOutputs:\n- umbrella: \"Umbrella?\", toggle = rain > 40",
+    "outline" : "Live, nothing fetched: \n- hero #block-0 ref umbrella\n- section #given\n  - row #givens\n    - metric #rain-given ref rain"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "'rain' is live, but nothing was fetched for it. Fetch it with the live tool and set its source to a field the tool names, or make it a given if it's a fixed fact."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "umbrella",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 50,
+          "label" : "Rain",
+          "max" : 50,
+          "min" : 50,
+          "name" : "rain",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "weather.rainChance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "toggle",
+          "formula" : "rain > 40",
+          "label" : "Umbrella?",
+          "name" : "umbrella",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Live, nothing fetched"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

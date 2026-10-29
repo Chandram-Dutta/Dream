@@ -1,0 +1,9 @@
+{
+  "about": "A calculation with results and no inputs goes back to the model, as does a result that doesn't use any input once that's fixed.",
+  "fill": true,
+  "wire": {
+    "title": "Results only",
+    "outputs": [{"name": "answer", "label": "Answer", "formula": "6 * 7"}],
+    "blocks": [{"kind": "hero", "ref": "answer"}]
+  }
+}

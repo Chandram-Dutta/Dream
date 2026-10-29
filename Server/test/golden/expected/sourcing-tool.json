@@ -1,0 +1,512 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'bill'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "half",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+                {
+                  "label" : "15%",
+                  "value" : "a usual tip in the US"
+                }
+              ],
+              "kind" : "stat",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "bill-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / 2",
+          "label" : "Half",
+          "name" : "half",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Split"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "half",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+                {
+                  "label" : "15%",
+                  "value" : "a usual tip in the US"
+                }
+              ],
+              "kind" : "stat",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / 2",
+          "label" : "Half",
+          "name" : "half",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Split"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "half",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+              {
+                "label" : "15%",
+                "value" : "a usual tip in the US"
+              }
+            ],
+            "kind" : "stat",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill / 2",
+        "label" : "Half",
+        "name" : "half",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Split"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "half",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+              {
+                "label" : "15%",
+                "value" : "a usual tip in the US"
+              }
+            ],
+            "kind" : "stat",
+            "over" : "",
+            "ref" : "",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill / 2",
+        "label" : "Half",
+        "name" : "half",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Split"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- bill: \"Bill\", currency, starts at 100, 0 to 1000, step 1\nOutputs:\n- half: \"Half\", currency = bill / 2",
+    "outline" : "Split: \n- hero #block-0 ref half\n- section #block-1\n  - stat #block-1-0\n    • 15%: a usual tip in the US\n- section #auto-inputs\n  - slider #auto-input-0 ref bill"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- bill: \"Bill\", currency, starts at 100, 0 to 1000, step 1\nOutputs:\n- half: \"Half\", currency = bill / 2",
+    "outline" : "Split: \n- hero #block-0 ref half\n- section #block-1\n  - stat #block-1-0\n    • 15%: a usual tip in the US\n- section #more-inputs\n  - slider #bill-control ref bill"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "half",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+                {
+                  "label" : "15%",
+                  "value" : "a usual tip in the US"
+                }
+              ],
+              "kind" : "stat",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / 2",
+          "label" : "Half",
+          "name" : "half",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Split"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

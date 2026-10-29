@@ -1,0 +1,27 @@
+{
+  "about": "Names made usable and unique: an input with no name, one named from its label, a second of the same name, outputs likewise, a name both an input and an output, labels made from names, symbols tidied, a choice result, and a toggle that can't be a given or a chart's axis.",
+  "fill": true,
+  "wire": {
+    "title": "Names",
+    "inputs": [
+      {"name": "", "label": ""},
+      {"name": "", "label": "Tip percent", "format": "percent", "initial": 10, "max": 30},
+      {"name": "tipPercent", "label": "Again"},
+      {"name": "bill amount", "label": "", "format": "currency", "initial": 100, "max": 1000, "symbol": "$B$"},
+      {"name": "3people", "label": "People", "format": "integer", "initial": 3, "min": 1, "max": 10},
+      {"name": "isLate", "label": "Late", "format": "toggle", "role": "given", "initial": 1},
+      {"name": "useMetric", "label": "Metric", "format": "toggle", "role": "variable"},
+      {"name": "share", "label": "Share", "initial": 5}
+    ],
+    "outputs": [
+      {"name": "", "label": "", "formula": "1"},
+      {"name": "", "label": "Each pays", "formula": "billAmount * (1 + tipPercent / 100) / n3people", "format": "currency", "symbol": "  \\frac{B}{n}  "},
+      {"name": "eachPays", "label": "Second", "formula": "1"},
+      {"name": "share", "label": "", "formula": "eachPays + share"},
+      {"name": "isLateFee", "label": "Late fee", "formula": "isLate * 5 + useMetric", "format": "choice"}
+    ],
+    "blocks": [
+      {"kind": "paragraph", "text": "Each pays {eachPays}."}
+    ]
+  }
+}

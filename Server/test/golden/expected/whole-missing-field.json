@@ -1,0 +1,218 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Sleep clears the brain.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Adults need 7 to 9 hours.",
+      "symbol" : "bed.double",
+      "title" : "Sleep"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Sleep clears the brain.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Adults need 7 to 9 hours.",
+      "symbol" : "bed.double",
+      "title" : "Sleep"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Sleep clears the brain.",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "health",
+    "summary" : "Adults need 7 to 9 hours.",
+    "symbol" : "bed.double",
+    "title" : "Sleep"
+  },
+  "converted" : {
+    "accent" : "pink",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Sleep clears the brain.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "Adults need 7 to 9 hours.",
+    "symbol" : "bed.double",
+    "title" : "Sleep"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Sleep: Adults need 7 to 9 hours.\n- paragraph #block-0\n  Sleep clears the brain."
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Sleep: Adults need 7 to 9 hours.\n- paragraph #block-0\n  Sleep clears the brain."
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Sleep clears the brain.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "Adults need 7 to 9 hours.",
+      "symbol" : "bed.double",
+      "title" : "Sleep"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

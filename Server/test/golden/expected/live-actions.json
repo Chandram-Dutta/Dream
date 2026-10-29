@@ -1,0 +1,1357 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the action 'someday', whose day can't be read: the 32nd of never."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'fuzzy' last all day, since its time can't be read: after lunch."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a second action named 'remind'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the action 'nowhere', which doesn't say where to."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed an action block for 'missingOne', which isn't an action."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a second button for 'picnicAction'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a button for 'calendarEvent'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a button for 'fuzzy'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a button for 'remind'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added a button for 'go'."
+      }
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "this saturday",
+            "duration" : "hours * 60",
+            "notes" : "Bring {food} sandwiches for .",
+            "place" : "Cubbon Park",
+            "time" : "startHour",
+            "title" : "Picnic in  Cubbon Park"
+          },
+          "kind" : "calendarEvent",
+          "name" : "picnicAction"
+        },
+        {
+          "fields" : {
+            "day" : "today",
+            "duration" : "60",
+            "time" : "4:30 pm",
+            "title" : "Saturday picnic"
+          },
+          "kind" : "calendarEvent",
+          "name" : "calendarEvent"
+        },
+        {
+          "fields" : {
+            "day" : "in 3 days",
+            "title" : "Fuzzy"
+          },
+          "kind" : "calendarEvent",
+          "name" : "fuzzy"
+        },
+        {
+          "fields" : {
+            "day" : "tomorrow",
+            "time" : "noon",
+            "title" : "Buy food"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        },
+        {
+          "fields" : {
+            "place" : "Cubbon Park",
+            "title" : "Cubbon Park",
+            "travel" : "walking"
+          },
+          "kind" : "directions",
+          "name" : "go"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "hours",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "food",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "action",
+              "over" : "",
+              "ref" : "picnicAction",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "startHour",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "picnic",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "calendarEvent-action",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "calendarEvent",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "fuzzy-action",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "fuzzy",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "remind-action",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "remind",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "go-action",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "go",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 16,
+          "label" : "Start",
+          "max" : 20,
+          "min" : 6,
+          "name" : "startHour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "picnic",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "20 - startHour",
+          "label" : "Hours",
+          "name" : "hours",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "picnic * 2",
+          "label" : "Sandwiches",
+          "name" : "food",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Saturday picnic"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "this saturday",
+            "duration" : "hours * 60",
+            "notes" : "Bring {food} sandwiches for {nobody}.",
+            "place" : "Cubbon Park",
+            "time" : "startHour",
+            "title" : "Picnic in {place} Cubbon Park"
+          },
+          "kind" : "calendarEvent",
+          "name" : "picnic"
+        },
+        {
+          "fields" : {
+            "time" : "4:30 pm"
+          },
+          "kind" : "calendarEvent",
+          "name" : ""
+        },
+        {
+          "fields" : {
+            "day" : "the 32nd of never",
+            "time" : "10:00",
+            "title" : "Someday"
+          },
+          "kind" : "calendarEvent",
+          "name" : "someday"
+        },
+        {
+          "fields" : {
+            "day" : "in 3 days",
+            "duration" : "90",
+            "time" : "after lunch",
+            "title" : "Fuzzy"
+          },
+          "kind" : "calendarEvent",
+          "name" : "fuzzy"
+        },
+        {
+          "fields" : {
+            "day" : "tomorrow",
+            "time" : "noon",
+            "title" : "Buy food"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        },
+        {
+          "fields" : {
+            "day" : "2026-11-02",
+            "title" : "Second"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        },
+        {
+          "fields" : {
+            "title" : "Cubbon Park",
+            "travel" : "walking"
+          },
+          "kind" : "directions",
+          "name" : "go"
+        },
+        {
+          "fields" : {
+            "travel" : "transit"
+          },
+          "kind" : "directions",
+          "name" : "nowhere"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "hours",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "food",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "action",
+              "over" : "",
+              "ref" : "picnicActon",
+              "text" : "",
+              "title" : "Add it"
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "picnicAction",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "missingOne",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "startHour",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "picnic",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 16,
+          "label" : "Start",
+          "max" : 20,
+          "min" : 6,
+          "name" : "startHour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "picnic",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "20 - startHour",
+          "label" : "Hours",
+          "name" : "hours",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "picnic * 2",
+          "label" : "Sandwiches",
+          "name" : "food",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Saturday picnic"
+    }
+  },
+  "content" : {
+    "actions" : [
+      {
+        "day" : "this saturday",
+        "duration" : "hours * 60",
+        "from" : "",
+        "kind" : "calendarEvent",
+        "name" : "picnic",
+        "notes" : "Bring {food} sandwiches for {nobody}.",
+        "place" : "Cubbon Park",
+        "time" : "startHour",
+        "title" : "Picnic in {place} Cubbon Park",
+        "travel" : "driving"
+      },
+      {
+        "day" : "",
+        "duration" : "",
+        "from" : "",
+        "kind" : "calendarEvent",
+        "name" : "",
+        "notes" : "",
+        "place" : "",
+        "time" : "4:30 pm",
+        "title" : "",
+        "travel" : "driving"
+      },
+      {
+        "day" : "the 32nd of never",
+        "duration" : "",
+        "from" : "",
+        "kind" : "calendarEvent",
+        "name" : "someday",
+        "notes" : "",
+        "place" : "",
+        "time" : "10:00",
+        "title" : "Someday",
+        "travel" : "driving"
+      },
+      {
+        "day" : "in 3 days",
+        "duration" : "90",
+        "from" : "",
+        "kind" : "calendarEvent",
+        "name" : "fuzzy",
+        "notes" : "",
+        "place" : "",
+        "time" : "after lunch",
+        "title" : "Fuzzy",
+        "travel" : "driving"
+      },
+      {
+        "day" : "tomorrow",
+        "duration" : "30",
+        "from" : "",
+        "kind" : "reminder",
+        "name" : "remind",
+        "notes" : "  ",
+        "place" : "",
+        "time" : "noon",
+        "title" : "Buy food",
+        "travel" : "driving"
+      },
+      {
+        "day" : "2026-11-02",
+        "duration" : "",
+        "from" : "",
+        "kind" : "reminder",
+        "name" : "remind",
+        "notes" : "",
+        "place" : "",
+        "time" : "",
+        "title" : "Second",
+        "travel" : "driving"
+      },
+      {
+        "day" : "",
+        "duration" : "",
+        "from" : "",
+        "kind" : "directions",
+        "name" : "go",
+        "notes" : "",
+        "place" : "",
+        "time" : "",
+        "title" : "Cubbon Park",
+        "travel" : "walking"
+      },
+      {
+        "day" : "",
+        "duration" : "",
+        "from" : "",
+        "kind" : "directions",
+        "name" : "nowhere",
+        "notes" : "",
+        "place" : "  ",
+        "time" : "",
+        "title" : "",
+        "travel" : "transit"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "hours",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "food",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "action",
+            "over" : "",
+            "ref" : "picnicActon",
+            "text" : "",
+            "title" : "Add it"
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "picnicAction",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "missingOne",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "slider",
+        "over" : "",
+        "ref" : "startHour",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "stepper",
+        "over" : "",
+        "ref" : "picnic",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 16,
+        "label" : "Start",
+        "max" : 20,
+        "min" : 6,
+        "name" : "startHour",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "picnic",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "20 - startHour",
+        "label" : "Hours",
+        "name" : "hours",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "picnic * 2",
+        "label" : "Sandwiches",
+        "name" : "food",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "places",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Saturday picnic"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "actions" : [
+      {
+        "fields" : {
+          "day" : "this saturday",
+          "duration" : "hours * 60",
+          "notes" : "Bring {food} sandwiches for {nobody}.",
+          "place" : "Cubbon Park",
+          "time" : "startHour",
+          "title" : "Picnic in {place} Cubbon Park"
+        },
+        "kind" : "calendarEvent",
+        "name" : "picnic"
+      },
+      {
+        "fields" : {
+          "time" : "4:30 pm"
+        },
+        "kind" : "calendarEvent",
+        "name" : ""
+      },
+      {
+        "fields" : {
+          "day" : "the 32nd of never",
+          "time" : "10:00",
+          "title" : "Someday"
+        },
+        "kind" : "calendarEvent",
+        "name" : "someday"
+      },
+      {
+        "fields" : {
+          "day" : "in 3 days",
+          "duration" : "90",
+          "time" : "after lunch",
+          "title" : "Fuzzy"
+        },
+        "kind" : "calendarEvent",
+        "name" : "fuzzy"
+      },
+      {
+        "fields" : {
+          "day" : "tomorrow",
+          "time" : "noon",
+          "title" : "Buy food"
+        },
+        "kind" : "reminder",
+        "name" : "remind"
+      },
+      {
+        "fields" : {
+          "day" : "2026-11-02",
+          "title" : "Second"
+        },
+        "kind" : "reminder",
+        "name" : "remind"
+      },
+      {
+        "fields" : {
+          "title" : "Cubbon Park",
+          "travel" : "walking"
+        },
+        "kind" : "directions",
+        "name" : "go"
+      },
+      {
+        "fields" : {
+          "travel" : "transit"
+        },
+        "kind" : "directions",
+        "name" : "nowhere"
+      }
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "hours",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "metric",
+            "over" : "",
+            "ref" : "food",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "action",
+            "over" : "",
+            "ref" : "picnicActon",
+            "text" : "",
+            "title" : "Add it"
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "row",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "picnicAction",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-3",
+        "items" : [
+
+        ],
+        "kind" : "action",
+        "over" : "",
+        "ref" : "missingOne",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-4",
+        "items" : [
+
+        ],
+        "kind" : "slider",
+        "over" : "",
+        "ref" : "startHour",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-5",
+        "items" : [
+
+        ],
+        "kind" : "stepper",
+        "over" : "",
+        "ref" : "picnic",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 16,
+        "label" : "Start",
+        "max" : 20,
+        "min" : 6,
+        "name" : "startHour",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "picnic",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "20 - startHour",
+        "label" : "Hours",
+        "name" : "hours",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "picnic * 2",
+        "label" : "Sandwiches",
+        "name" : "food",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Saturday picnic"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- startHour: \"Start\", number, starts at 16, 6 to 20, step 0.5\n- picnic: \"People\", integer, starts at 4, 1 to 20, step 1\nOutputs:\n- hours: \"Hours\", number = 20 - startHour\n- food: \"Sandwiches\", integer = picnic * 2",
+    "outline" : "Saturday picnic: \n- hero #block-0 ref hours\n- row #block-1\n  - metric #block-1-0 ref food\n  - action #block-1-1 ref picnicActon \"Add it\"\n- action #block-2 ref picnicAction\n- action #block-3 ref missingOne\n- slider #block-4 ref startHour\n- stepper #block-5 ref picnic\nactions:\n- picnic: calendarEvent, day \"this saturday\", duration \"hours * 60\", notes \"Bring {food} sandwiches for {nobody}.\", place \"Cubbon Park\", time \"startHour\", title \"Picnic in {place} Cubbon Park\"\n- : calendarEvent, time \"4:30 pm\"\n- someday: calendarEvent, day \"the 32nd of never\", time \"10:00\", title \"Someday\"\n- fuzzy: calendarEvent, day \"in 3 days\", duration \"90\", time \"after lunch\", title \"Fuzzy\"\n- remind: reminder, day \"tomorrow\", time \"noon\", title \"Buy food\"\n- remind: reminder, day \"2026-11-02\", title \"Second\"\n- go: directions, title \"Cubbon Park\", travel \"walking\"\n- nowhere: directions, travel \"transit\""
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- startHour: \"Start\", number, starts at 16, 6 to 20, step 0.5\n- picnic: \"People\", integer, starts at 4, 1 to 20, step 1\nOutputs:\n- hours: \"Hours\", number = 20 - startHour\n- food: \"Sandwiches\", integer = picnic * 2",
+    "outline" : "Saturday picnic: \n- hero #block-0 ref hours\n- section #block-1\n  - metric #block-1-0 ref food\n  - action #block-1-1 ref picnicAction\n- slider #block-4 ref startHour\n- stepper #block-5 ref picnic\n- action #calendarEvent-action ref calendarEvent\n- action #fuzzy-action ref fuzzy\n- action #remind-action ref remind\n- action #go-action ref go\nactions:\n- picnicAction: calendarEvent, day \"this saturday\", duration \"hours * 60\", notes \"Bring {food} sandwiches for .\", place \"Cubbon Park\", time \"startHour\", title \"Picnic in  Cubbon Park\"\n- calendarEvent: calendarEvent, day \"today\", duration \"60\", time \"4:30 pm\", title \"Saturday picnic\"\n- fuzzy: calendarEvent, day \"in 3 days\", title \"Fuzzy\"\n- remind: reminder, day \"tomorrow\", time \"noon\", title \"Buy food\"\n- go: directions, place \"Cubbon Park\", title \"Cubbon Park\", travel \"walking\""
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "actions" : [
+        {
+          "fields" : {
+            "day" : "this saturday",
+            "duration" : "hours * 60",
+            "notes" : "Bring {food} sandwiches for {nobody}.",
+            "place" : "Cubbon Park",
+            "time" : "startHour",
+            "title" : "Picnic in {place} Cubbon Park"
+          },
+          "kind" : "calendarEvent",
+          "name" : "picnic"
+        },
+        {
+          "fields" : {
+            "time" : "4:30 pm"
+          },
+          "kind" : "calendarEvent",
+          "name" : ""
+        },
+        {
+          "fields" : {
+            "day" : "the 32nd of never",
+            "time" : "10:00",
+            "title" : "Someday"
+          },
+          "kind" : "calendarEvent",
+          "name" : "someday"
+        },
+        {
+          "fields" : {
+            "day" : "in 3 days",
+            "duration" : "90",
+            "time" : "after lunch",
+            "title" : "Fuzzy"
+          },
+          "kind" : "calendarEvent",
+          "name" : "fuzzy"
+        },
+        {
+          "fields" : {
+            "day" : "tomorrow",
+            "time" : "noon",
+            "title" : "Buy food"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        },
+        {
+          "fields" : {
+            "day" : "2026-11-02",
+            "title" : "Second"
+          },
+          "kind" : "reminder",
+          "name" : "remind"
+        },
+        {
+          "fields" : {
+            "title" : "Cubbon Park",
+            "travel" : "walking"
+          },
+          "kind" : "directions",
+          "name" : "go"
+        },
+        {
+          "fields" : {
+            "travel" : "transit"
+          },
+          "kind" : "directions",
+          "name" : "nowhere"
+        }
+      ],
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "hours",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "food",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "action",
+              "over" : "",
+              "ref" : "picnicActon",
+              "text" : "",
+              "title" : "Add it"
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "row",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "picnicAction",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-3",
+          "items" : [
+
+          ],
+          "kind" : "action",
+          "over" : "",
+          "ref" : "missingOne",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-4",
+          "items" : [
+
+          ],
+          "kind" : "slider",
+          "over" : "",
+          "ref" : "startHour",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-5",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "picnic",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 16,
+          "label" : "Start",
+          "max" : 20,
+          "min" : 6,
+          "name" : "startHour",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "picnic",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "20 - startHour",
+          "label" : "Hours",
+          "name" : "hours",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "picnic * 2",
+          "label" : "Sandwiches",
+          "name" : "food",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Saturday picnic"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

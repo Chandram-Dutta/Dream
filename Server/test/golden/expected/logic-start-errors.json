@@ -1,0 +1,868 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Removed a chart of 'y', which isn't a result."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a chart of 'x ^ 3', which isn't a result."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'x'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'loop', 'loopTwo', 'root', 'constant', 'wrongArity', 'ifWrong' to the screen."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Put the chart of 'square' with the controls that shape it."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "loop-hero",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "loop",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2",
+              "items" : [
+
+              ],
+              "kind" : "chart",
+              "over" : "x",
+              "ref" : "square",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "x-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "x",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "root-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "root",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "constant-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "constant",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "wrongArity-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "wrongArity",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "ifWrong-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "ifWrong",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "loopTwo-working",
+              "items" : [
+
+              ],
+              "kind" : "equation",
+              "over" : "",
+              "ref" : "loopTwo",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "working",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "loopTwo + x",
+          "label" : "Loop",
+          "name" : "loop",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "loop * 2",
+          "label" : "Loop two",
+          "name" : "loopTwo",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(x - 5)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pi * 2",
+          "label" : "Constant",
+          "name" : "constant",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "x ^ 2",
+          "label" : "Square",
+          "name" : "square",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pow(x) + atan2(x)",
+          "label" : "Wrong",
+          "name" : "wrongArity",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "if(x > 1, 2)",
+          "label" : "If",
+          "name" : "ifWrong",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Broken results"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "y",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "x ^ 3",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "square",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "loopTwo + x",
+          "label" : "Loop",
+          "name" : "loop",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "loop * 2",
+          "label" : "Loop two",
+          "name" : "loopTwo",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(x - 5)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pi * 2",
+          "label" : "Constant",
+          "name" : "constant",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "x ^ 2",
+          "label" : "Square",
+          "name" : "square",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pow(x) + atan2(x)",
+          "label" : "Wrong",
+          "name" : "wrongArity",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "if(x > 1, 2)",
+          "label" : "If",
+          "name" : "ifWrong",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Broken results"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "y",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "x ^ 3",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "square",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "x",
+        "max" : 10,
+        "min" : -10,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "loopTwo + x",
+        "label" : "Loop",
+        "name" : "loop",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "loop * 2",
+        "label" : "Loop two",
+        "name" : "loopTwo",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "sqrt(x - 5)",
+        "label" : "Root",
+        "name" : "root",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "pi * 2",
+        "label" : "Constant",
+        "name" : "constant",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "x ^ 2",
+        "label" : "Square",
+        "name" : "square",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "pow(x) + atan2(x)",
+        "label" : "Wrong",
+        "name" : "wrongArity",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "if(x > 1, 2)",
+        "label" : "If",
+        "name" : "ifWrong",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Broken results"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "y",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "x ^ 3",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "chart",
+        "over" : "x",
+        "ref" : "square",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "x",
+        "max" : 10,
+        "min" : -10,
+        "name" : "x",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "loopTwo + x",
+        "label" : "Loop",
+        "name" : "loop",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "loop * 2",
+        "label" : "Loop two",
+        "name" : "loopTwo",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "sqrt(x - 5)",
+        "label" : "Root",
+        "name" : "root",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "pi * 2",
+        "label" : "Constant",
+        "name" : "constant",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "x ^ 2",
+        "label" : "Square",
+        "name" : "square",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "pow(x) + atan2(x)",
+        "label" : "Wrong",
+        "name" : "wrongArity",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "if(x > 1, 2)",
+        "label" : "If",
+        "name" : "ifWrong",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Broken results"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- x: \"x\", number, starts at 2, -10 to 10, step 0.5\nOutputs:\n- loop: \"Loop\", number = loopTwo + x\n- loopTwo: \"Loop two\", number = loop * 2\n- root: \"Root\", number = sqrt(x - 5)\n- constant: \"Constant\", number = pi * 2\n- square: \"Square\", number = x ^ 2\n- wrongArity: \"Wrong\", number = pow(x) + atan2(x)\n- ifWrong: \"If\", number = if(x > 1, 2)",
+    "outline" : "Broken results: \n- chart #block-0 ref y over x\n- chart #block-1 ref x ^ 3 over x\n- chart #block-2 ref square over x\n- hero #auto-hero ref loop\n- section #auto-outputs\n  - metric #auto-output-1 ref loopTwo\n  - metric #auto-output-2 ref root\n  - metric #auto-output-3 ref constant\n  - metric #auto-output-5 ref wrongArity\n  - metric #auto-output-6 ref ifWrong"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- x: \"x\", number, starts at 2, -10 to 10, step 0.5\nOutputs:\n- loop: \"Loop\", number = loopTwo + x\n- loopTwo: \"Loop two\", number = loop * 2\n- root: \"Root\", number = sqrt(x - 5)\n- constant: \"Constant\", number = pi * 2\n- square: \"Square\", number = x ^ 2\n- wrongArity: \"Wrong\", number = pow(x) + atan2(x)\n- ifWrong: \"If\", number = if(x > 1, 2)",
+    "outline" : "Broken results: \n- hero #loop-hero ref loop\n- section #more-inputs\n  - chart #block-2 ref square over x\n  - slider #x-control ref x\n- section #more-results\n  - metric #root-metric ref root\n  - metric #constant-metric ref constant\n  - metric #wrongArity-metric ref wrongArity\n  - metric #ifWrong-metric ref ifWrong\n- section #working\n  - equation #loopTwo-working ref loopTwo"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "needsModel",
+        "message" : "'loop' can't be calculated: 'loop' depends on itself."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'loopTwo' isn't a number at the starting values (loop * 2). Avoid dividing by something that can be zero."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'root' isn't a number at the starting values (sqrt(x - 5)). Avoid dividing by something that can be zero."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'constant' doesn't use any input, so it never changes. Calculate it from the inputs, or make it an input if the user should enter it."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'wrongArity' can't be calculated: pow() needs 2 values."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'ifWrong' can't be calculated: if() needs a condition and two values."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The chart plots 'y', which isn't a result. Add what it plots as an output, calculated from the inputs, and chart that."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "The chart plots 'x ^ 3', which isn't a result. Add what it plots as an output, calculated from the inputs, and chart that."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "y",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "x ^ 3",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "chart",
+          "over" : "x",
+          "ref" : "square",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "x",
+          "max" : 10,
+          "min" : -10,
+          "name" : "x",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "loopTwo + x",
+          "label" : "Loop",
+          "name" : "loop",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "loop * 2",
+          "label" : "Loop two",
+          "name" : "loopTwo",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(x - 5)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pi * 2",
+          "label" : "Constant",
+          "name" : "constant",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "x ^ 2",
+          "label" : "Square",
+          "name" : "square",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "pow(x) + atan2(x)",
+          "label" : "Wrong",
+          "name" : "wrongArity",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "if(x > 1, 2)",
+          "label" : "If",
+          "name" : "ifWrong",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Broken results"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

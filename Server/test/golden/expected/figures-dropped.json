@@ -1,0 +1,1169 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped the figure 'empty', which had nothing that could be drawn."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Removed a figure of 'missingFigure', which isn't defined."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the figure 'r2'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the figure 'figure'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the figure 'circle2'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "area",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "figure-figure",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "figure",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Drag the radius.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "figure-r2",
+              "items" : [
+
+              ],
+              "kind" : "figure",
+              "over" : "",
+              "ref" : "r2",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "figure-circle2",
+              "items" : [
+
+              ],
+              "kind" : "figure",
+              "over" : "",
+              "ref" : "circle2",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "r2",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "{area}",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        },
+        {
+          "name" : "figure",
+          "points" : [
+            {
+              "label" : "O",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+
+          ]
+        },
+        {
+          "name" : "circle2",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r * 2",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "text",
+              "label" : "centre",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Radius",
+          "max" : 5,
+          "min" : 1,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2",
+          "label" : "Area",
+          "name" : "area",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Figures"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "area",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "missingFigure",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Drag the radius.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "empty",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "A",
+              "x" : "nope",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        },
+        {
+          "name" : "r",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "{area}",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        },
+        {
+          "name" : "",
+          "points" : [
+            {
+              "label" : "O",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+
+          ]
+        },
+        {
+          "name" : "circle 2",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r * 2",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "text",
+              "label" : "centre",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Radius",
+          "max" : 5,
+          "min" : 1,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2",
+          "label" : "Area",
+          "name" : "area",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Figures"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "area",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "figure",
+        "over" : "",
+        "ref" : "missingFigure",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Drag the radius.",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "r",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+      {
+        "name" : "empty",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "A",
+            "x" : "nope",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "",
+            "over" : "",
+            "points" : "A, B",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      },
+      {
+        "name" : "r",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "{area}",
+            "over" : "",
+            "points" : "O",
+            "radius" : "r",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      },
+      {
+        "name" : "",
+        "points" : [
+          {
+            "label" : "O",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+
+        ]
+      },
+      {
+        "name" : "circle 2",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : "O",
+            "radius" : "r * 2",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "text",
+            "label" : "centre",
+            "over" : "",
+            "points" : "O",
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Radius",
+        "max" : 5,
+        "min" : 1,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "pi * r^2",
+        "label" : "Area",
+        "name" : "area",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Figures"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "area",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "figure",
+        "over" : "",
+        "ref" : "missingFigure",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-0",
+            "items" : [
+
+            ],
+            "kind" : "paragraph",
+            "over" : "",
+            "ref" : "",
+            "text" : "Drag the radius.",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-2-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "r",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "figures" : [
+      {
+        "name" : "empty",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "A",
+            "x" : "nope",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "segment",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "A",
+              "B"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      },
+      {
+        "name" : "r",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "{area}",
+            "over" : "",
+            "points" : [
+              "O"
+            ],
+            "radius" : "r",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      },
+      {
+        "name" : "",
+        "points" : [
+          {
+            "label" : "O",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+
+        ]
+      },
+      {
+        "name" : "circle 2",
+        "points" : [
+          {
+            "label" : "",
+            "name" : "O",
+            "x" : "0",
+            "y" : "0"
+          }
+        ],
+        "shapes" : [
+          {
+            "from" : "",
+            "kind" : "circle",
+            "label" : "",
+            "over" : "",
+            "points" : [
+              "O"
+            ],
+            "radius" : "r * 2",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          },
+          {
+            "from" : "",
+            "kind" : "text",
+            "label" : "centre",
+            "over" : "",
+            "points" : [
+              "O"
+            ],
+            "radius" : "",
+            "to" : "",
+            "tone" : "plain",
+            "x" : "",
+            "y" : ""
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Radius",
+        "max" : 5,
+        "min" : 1,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "pi * r^2",
+        "label" : "Area",
+        "name" : "area",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Figures"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- r: \"Radius\", number, starts at 2, 1 to 5, step 0.5\nOutputs:\n- area: \"Area\", number = pi * r^2",
+    "outline" : "Figures: \n- hero #block-0 ref area\n- figure #block-1 ref missingFigure\n- section #block-2\n  - paragraph #block-2-0\n    Drag the radius.\n  - slider #block-2-1 ref r\nfigure empty:\n  point A = (nope, 0)\n  segment A, B plain\nfigure r:\n  point O = (0, 0)\n  circle O radius r \"{area}\" plain\nfigure :\n  point O = (0, 0) \"O\"\nfigure circle 2:\n  point O = (0, 0)\n  circle O radius r * 2 plain\n  text O \"centre\" plain"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- r: \"Radius\", number, starts at 2, 1 to 5, step 0.5\nOutputs:\n- area: \"Area\", number = pi * r^2",
+    "outline" : "Figures: \n- hero #block-0 ref area\n- figure #figure-figure ref figure\n- section #block-2\n  - paragraph #block-2-0\n    Drag the radius.\n  - figure #figure-r2 ref r2\n  - figure #figure-circle2 ref circle2\n  - slider #block-2-1 ref r\nfigure r2:\n  point O = (0, 0)\n  circle O radius r \"{area}\" plain\nfigure figure:\n  point O = (0, 0) \"O\"\nfigure circle2:\n  point O = (0, 0)\n  circle O radius r * 2 plain\n  text O \"centre\" plain"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "area",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "figure",
+          "over" : "",
+          "ref" : "missingFigure",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-0",
+              "items" : [
+
+              ],
+              "kind" : "paragraph",
+              "over" : "",
+              "ref" : "",
+              "text" : "Drag the radius.",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-2-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "figures" : [
+        {
+          "name" : "empty",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "A",
+              "x" : "nope",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "segment",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "A",
+                "B"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        },
+        {
+          "name" : "r",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "{area}",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        },
+        {
+          "name" : "",
+          "points" : [
+            {
+              "label" : "O",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+
+          ]
+        },
+        {
+          "name" : "circle 2",
+          "points" : [
+            {
+              "label" : "",
+              "name" : "O",
+              "x" : "0",
+              "y" : "0"
+            }
+          ],
+          "shapes" : [
+            {
+              "from" : "",
+              "kind" : "circle",
+              "label" : "",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "r * 2",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            },
+            {
+              "from" : "",
+              "kind" : "text",
+              "label" : "centre",
+              "over" : "",
+              "points" : [
+                "O"
+              ],
+              "radius" : "",
+              "to" : "",
+              "tone" : "plain",
+              "x" : "",
+              "y" : ""
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Radius",
+          "max" : 5,
+          "min" : 1,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2",
+          "label" : "Area",
+          "name" : "area",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Figures"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

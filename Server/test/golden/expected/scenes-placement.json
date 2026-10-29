@@ -1,0 +1,2225 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'blocks', dropped the sphere 'tooMany', which can't be placed at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'blocks', dropped the sphere 'onNone', which can't be placed at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'blocks', dropped the sphere 'negative', which can't be placed at the starting values."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'blocks'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "A cylinder's volume is its base times its height.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "scene-blocks",
+              "items" : [
+
+              ],
+              "kind" : "scene",
+              "over" : "",
+              "ref" : "blocks",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "h",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "n",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Try it"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "volume",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 3,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Height",
+          "max" : 6,
+          "min" : 1,
+          "name" : "h",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 6,
+          "label" : "Count",
+          "max" : 12,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2 * h",
+          "label" : "Volume",
+          "name" : "volume",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "blocks",
+          "objects" : [
+            {
+              "kind" : "plane",
+              "label" : "",
+              "name" : "ground",
+              "position" : "at(0, 0, 0)",
+              "size" : "6, 6",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "cylinder",
+              "label" : "h",
+              "name" : "can",
+              "position" : "on(ground)",
+              "size" : "r, h",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "main",
+              "turn" : "36 * t"
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "lid",
+              "position" : "on(can, 0.5)",
+              "size" : "1, 1, 0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cubes",
+              "position" : "stack(ground, 3)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "hub",
+              "position" : "at(5, 0, 1)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "spokes",
+              "position" : "ring(hub, 2, n)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "moon",
+              "position" : "orbit(hub, 1, 90)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "neighbour",
+              "position" : "beside(cubes, 0.5)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "text",
+              "label" : "m",
+              "name" : "middle",
+              "position" : "between(hub, moon)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "lattice",
+              "position" : "grid(at(-4, -4, 0), 1, 2, 3, 4)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "salt",
+              "position" : "grid(at(0, 0, 0), 0.5, 3, 3, 3, 1)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "raised",
+              "position" : "orbit(at(0, 0, 2), 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "crowd",
+              "position" : "ring(hub, 3, 100000)",
+              "size" : "0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "offset",
+              "position" : "at(hub, 0, 0, 1)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "none",
+              "position" : "row(hub, 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cell",
+              "position" : "at(0, 0, 3)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "tube",
+              "label" : "",
+              "name" : "rod",
+              "position" : "hub",
+              "size" : "0.02",
+              "tilt" : "",
+              "to" : "moon",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "arrow",
+              "label" : "",
+              "name" : "force",
+              "position" : "at(0, 0, 0)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "at(1, 1, 1)",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "axes",
+              "label" : "",
+              "name" : "axes",
+              "position" : "at(0, 0, 0)",
+              "size" : "3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "hoop",
+              "position" : "at(0, 0, 0.5)",
+              "size" : "2",
+              "tilt" : "30",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : "t"
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Blocks"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "A cylinder's volume is its base times its height.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "h",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "n",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Try it"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "volume",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 3,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Height",
+          "max" : 6,
+          "min" : 1,
+          "name" : "h",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 6,
+          "label" : "Count",
+          "max" : 12,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2 * h",
+          "label" : "Volume",
+          "name" : "volume",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "blocks",
+          "objects" : [
+            {
+              "kind" : "plane",
+              "label" : "",
+              "name" : "ground",
+              "position" : "at(0, 0, 0)",
+              "size" : "6, 6",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "cylinder",
+              "label" : "h",
+              "name" : "can",
+              "position" : "on(ground)",
+              "size" : "r, h",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "main",
+              "turn" : "36 * t"
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "lid",
+              "position" : "atop(can, 0.5)",
+              "size" : "1, 1, 0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cubes",
+              "position" : "stack(floor, 3)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "hub",
+              "position" : "pos(5, 0, 1)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "spokes",
+              "position" : "ring(hub, 2, n)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "moon",
+              "position" : "around(hub, 1, 90)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "neighbour",
+              "position" : "beside(cubes, 0.5)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "text",
+              "label" : "m",
+              "name" : "middle",
+              "position" : "midpoint(hub, moon)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "lattice",
+              "position" : "grid(at(-4, -4, 0), 1, 2, 3, 4)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "salt",
+              "position" : "lattice(origin, 0.5, 3, 3, 3, 1)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "raised",
+              "position" : "orbit(at(0, 0, 2), 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "crowd",
+              "position" : "ring(hub, 3, 100000)",
+              "size" : "0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "tooMany",
+              "position" : "grid(centre, 1, 10, 10, 10)",
+              "size" : "0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "offset",
+              "position" : "at(hub, 0, 0, 1)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "none",
+              "position" : "row(hub, 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "onNone",
+              "position" : "on(none)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cell",
+              "position" : "at(0, 0, 3)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "tube",
+              "label" : "",
+              "name" : "rod",
+              "position" : "hub",
+              "size" : "0.02, 7",
+              "tilt" : "",
+              "to" : "moon",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "arrow",
+              "label" : "",
+              "name" : "force",
+              "position" : "at(0, 0, 0)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "(1, 1, 1)",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "axes",
+              "label" : "",
+              "name" : "axes",
+              "position" : "at(0, 0, 0)",
+              "size" : "3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "negative",
+              "position" : "at(0, 0, 0)",
+              "size" : "-1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "hoop",
+              "position" : "at(0, 0, 0.5)",
+              "size" : "2",
+              "tilt" : "30",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : "T"
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Blocks"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "A cylinder's volume is its base times its height.",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "r",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "h",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "n",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Try it"
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "volume",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Radius",
+        "max" : 3,
+        "min" : 0.5,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Height",
+        "max" : 6,
+        "min" : 1,
+        "name" : "h",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 6,
+        "label" : "Count",
+        "max" : 12,
+        "min" : 0,
+        "name" : "n",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Time",
+        "max" : 10,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "pi * r^2 * h",
+        "label" : "Volume",
+        "name" : "volume",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "molecule" : "",
+        "name" : "blocks",
+        "objects" : [
+          {
+            "kind" : "plane",
+            "label" : "",
+            "name" : "ground",
+            "position" : "at(0, 0, 0)",
+            "size" : "6, 6",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          },
+          {
+            "kind" : "cylinder",
+            "label" : "h",
+            "name" : "can",
+            "position" : "on(ground)",
+            "size" : "r, h",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "main",
+            "turn" : "36 * t"
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "lid",
+            "position" : "atop(can, 0.5)",
+            "size" : "1, 1, 0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "cubes",
+            "position" : "stack(floor, 3)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "hub",
+            "position" : "pos(5, 0, 1)",
+            "size" : "0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "spokes",
+            "position" : "ring(hub, 2, n)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "moon",
+            "position" : "around(hub, 1, 90)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "neighbour",
+            "position" : "beside(cubes, 0.5)",
+            "size" : "2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "text",
+            "label" : "m",
+            "name" : "middle",
+            "position" : "midpoint(hub, moon)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "lattice",
+            "position" : "grid(at(-4, -4, 0), 1, 2, 3, 4)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "salt",
+            "position" : "lattice(origin, 0.5, 3, 3, 3, 1)",
+            "size" : "0.05",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "raised",
+            "position" : "orbit(at(0, 0, 2), 1, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "crowd",
+            "position" : "ring(hub, 3, 100000)",
+            "size" : "0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "tooMany",
+            "position" : "grid(centre, 1, 10, 10, 10)",
+            "size" : "0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "offset",
+            "position" : "at(hub, 0, 0, 1)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "none",
+            "position" : "row(hub, 1, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "onNone",
+            "position" : "on(none)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "cell",
+            "position" : "at(0, 0, 3)",
+            "size" : "2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          },
+          {
+            "kind" : "tube",
+            "label" : "",
+            "name" : "rod",
+            "position" : "hub",
+            "size" : "0.02, 7",
+            "tilt" : "",
+            "to" : "moon",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "arrow",
+            "label" : "",
+            "name" : "force",
+            "position" : "at(0, 0, 0)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "(1, 1, 1)",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "axes",
+            "label" : "",
+            "name" : "axes",
+            "position" : "at(0, 0, 0)",
+            "size" : "3",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "negative",
+            "position" : "at(0, 0, 0)",
+            "size" : "-1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "ring",
+            "label" : "",
+            "name" : "hoop",
+            "position" : "at(0, 0, 0.5)",
+            "size" : "2",
+            "tilt" : "30",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : "T"
+      }
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Blocks"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "A cylinder's volume is its base times its height.",
+        "title" : ""
+      },
+      {
+        "children" : [
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-0",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "r",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-1",
+            "items" : [
+
+            ],
+            "kind" : "slider",
+            "over" : "",
+            "ref" : "h",
+            "text" : "",
+            "title" : ""
+          },
+          {
+            "children" : [
+
+            ],
+            "id" : "block-1-2",
+            "items" : [
+
+            ],
+            "kind" : "stepper",
+            "over" : "",
+            "ref" : "n",
+            "text" : "",
+            "title" : ""
+          }
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "section",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : "Try it"
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-2",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "volume",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Radius",
+        "max" : 3,
+        "min" : 0.5,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 2,
+        "label" : "Height",
+        "max" : 6,
+        "min" : 1,
+        "name" : "h",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 6,
+        "label" : "Count",
+        "max" : 12,
+        "min" : 0,
+        "name" : "n",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Time",
+        "max" : 10,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "pi * r^2 * h",
+        "label" : "Volume",
+        "name" : "volume",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "name" : "blocks",
+        "objects" : [
+          {
+            "kind" : "plane",
+            "label" : "",
+            "name" : "ground",
+            "position" : "at(0, 0, 0)",
+            "size" : "6, 6",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          },
+          {
+            "kind" : "cylinder",
+            "label" : "h",
+            "name" : "can",
+            "position" : "on(ground)",
+            "size" : "r, h",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "main",
+            "turn" : "36 * t"
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "lid",
+            "position" : "atop(can, 0.5)",
+            "size" : "1, 1, 0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "cubes",
+            "position" : "stack(floor, 3)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "hub",
+            "position" : "pos(5, 0, 1)",
+            "size" : "0.2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "spokes",
+            "position" : "ring(hub, 2, n)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "moon",
+            "position" : "around(hub, 1, 90)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "neighbour",
+            "position" : "beside(cubes, 0.5)",
+            "size" : "2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "text",
+            "label" : "m",
+            "name" : "middle",
+            "position" : "midpoint(hub, moon)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "lattice",
+            "position" : "grid(at(-4, -4, 0), 1, 2, 3, 4)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "salt",
+            "position" : "lattice(origin, 0.5, 3, 3, 3, 1)",
+            "size" : "0.05",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "raised",
+            "position" : "orbit(at(0, 0, 2), 1, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "crowd",
+            "position" : "ring(hub, 3, 100000)",
+            "size" : "0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "tooMany",
+            "position" : "grid(centre, 1, 10, 10, 10)",
+            "size" : "0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "offset",
+            "position" : "at(hub, 0, 0, 1)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "none",
+            "position" : "row(hub, 1, 0)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "onNone",
+            "position" : "on(none)",
+            "size" : "0.1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "cell",
+            "position" : "at(0, 0, 3)",
+            "size" : "2",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          },
+          {
+            "kind" : "tube",
+            "label" : "",
+            "name" : "rod",
+            "position" : "hub",
+            "size" : "0.02, 7",
+            "tilt" : "",
+            "to" : "moon",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "arrow",
+            "label" : "",
+            "name" : "force",
+            "position" : "at(0, 0, 0)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "(1, 1, 1)",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "axes",
+            "label" : "",
+            "name" : "axes",
+            "position" : "at(0, 0, 0)",
+            "size" : "3",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "negative",
+            "position" : "at(0, 0, 0)",
+            "size" : "-1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "ring",
+            "label" : "",
+            "name" : "hoop",
+            "position" : "at(0, 0, 0.5)",
+            "size" : "2",
+            "tilt" : "30",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+
+        ],
+        "time" : "T"
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Blocks"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- r: \"Radius\", number, starts at 1, 0.5 to 3, step 0.1\n- h: \"Height\", number, starts at 2, 1 to 6, step 0.5\n- n: \"Count\", integer, starts at 6, 0 to 12, step 1\n- t: \"Time\", variable number, 0 to 10\nOutputs:\n- volume: \"Volume\", number = pi * r^2 * h",
+    "outline" : "Blocks: \n- paragraph #block-0\n  A cylinder's volume is its base times its height.\n- section #block-1 \"Try it\"\n  - slider #block-1-0 ref r\n  - slider #block-1-1 ref h\n  - stepper #block-1-2 ref n\n- hero #block-2 ref volume\nscene blocks, time T:\n  ground plane at(0, 0, 0) size 6, 6 guide\n  can cylinder on(ground) size r, h turn 36 * t \"h\" main\n  lid box atop(can, 0.5) size 1, 1, 0.2 plain\n  cubes box stack(floor, 3) size 1 plain\n  hub sphere pos(5, 0, 1) size 0.2 plain\n  spokes sphere ring(hub, 2, n) size 0.1 plain\n  moon sphere around(hub, 1, 90) size 0.1 plain\n  neighbour box beside(cubes, 0.5) size 2 plain\n  middle text midpoint(hub, moon) \"m\" plain\n  lattice sphere grid(at(-4, -4, 0), 1, 2, 3, 4) size 0.1 plain\n  salt sphere lattice(origin, 0.5, 3, 3, 3, 1) size 0.05 plain\n  raised sphere orbit(at(0, 0, 2), 1, 0) size 0.1 plain\n  crowd sphere ring(hub, 3, 100000) size 0.01 plain\n  tooMany sphere grid(centre, 1, 10, 10, 10) size 0.01 plain\n  offset sphere at(hub, 0, 0, 1) size 0.1 plain\n  none sphere row(hub, 1, 0) size 0.1 plain\n  onNone sphere on(none) size 0.1 plain\n  cell box at(0, 0, 3) size 2 guide\n  rod tube hub to moon size 0.02, 7 plain\n  force arrow at(0, 0, 0) to (1, 1, 1) plain\n  axes axes at(0, 0, 0) size 3 plain\n  negative sphere at(0, 0, 0) size -1 plain\n  hoop ring at(0, 0, 0.5) size 2 tilt 30 plain"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- r: \"Radius\", number, starts at 1, 0.5 to 3, step 0.1\n- h: \"Height\", number, starts at 2, 1 to 6, step 0.5\n- n: \"Count\", integer, starts at 6, 0 to 12, step 1\n- t: \"Time\", variable number, 0 to 10\nOutputs:\n- volume: \"Volume\", number = pi * r^2 * h",
+    "outline" : "Blocks: \n- paragraph #block-0\n  A cylinder's volume is its base times its height.\n- section #block-1 \"Try it\"\n  - scene #scene-blocks ref blocks\n  - slider #block-1-0 ref r\n  - slider #block-1-1 ref h\n  - stepper #block-1-2 ref n\n- hero #block-2 ref volume\nscene blocks, time t:\n  ground plane at(0, 0, 0) size 6, 6 guide\n  can cylinder on(ground) size r, h turn 36 * t \"h\" main\n  lid box on(can, 0.5) size 1, 1, 0.2 plain\n  cubes box stack(ground, 3) size 1 plain\n  hub sphere at(5, 0, 1) size 0.2 plain\n  spokes sphere ring(hub, 2, n) size 0.1 plain\n  moon sphere orbit(hub, 1, 90) size 0.1 plain\n  neighbour box beside(cubes, 0.5) size 2 plain\n  middle text between(hub, moon) \"m\" plain\n  lattice sphere grid(at(-4, -4, 0), 1, 2, 3, 4) size 0.1 plain\n  salt sphere grid(at(0, 0, 0), 0.5, 3, 3, 3, 1) size 0.05 plain\n  raised sphere orbit(at(0, 0, 2), 1, 0) size 0.1 plain\n  crowd sphere ring(hub, 3, 100000) size 0.01 plain\n  offset sphere at(hub, 0, 0, 1) size 0.1 plain\n  none sphere row(hub, 1, 0) size 0.1 plain\n  cell box at(0, 0, 3) size 2 guide\n  rod tube hub to moon size 0.02 plain\n  force arrow at(0, 0, 0) to at(1, 1, 1) plain\n  axes axes at(0, 0, 0) size 3 plain\n  hoop ring at(0, 0, 0.5) size 2 tilt 30 plain"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "A cylinder's volume is its base times its height.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-0",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-1",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "h",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "block-1-2",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "n",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : "Try it"
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-2",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "volume",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 3,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 2,
+          "label" : "Height",
+          "max" : 6,
+          "min" : 1,
+          "name" : "h",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 6,
+          "label" : "Count",
+          "max" : 12,
+          "min" : 0,
+          "name" : "n",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Time",
+          "max" : 10,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "pi * r^2 * h",
+          "label" : "Volume",
+          "name" : "volume",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "blocks",
+          "objects" : [
+            {
+              "kind" : "plane",
+              "label" : "",
+              "name" : "ground",
+              "position" : "at(0, 0, 0)",
+              "size" : "6, 6",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "cylinder",
+              "label" : "h",
+              "name" : "can",
+              "position" : "on(ground)",
+              "size" : "r, h",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "main",
+              "turn" : "36 * t"
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "lid",
+              "position" : "atop(can, 0.5)",
+              "size" : "1, 1, 0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cubes",
+              "position" : "stack(floor, 3)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "hub",
+              "position" : "pos(5, 0, 1)",
+              "size" : "0.2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "spokes",
+              "position" : "ring(hub, 2, n)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "moon",
+              "position" : "around(hub, 1, 90)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "neighbour",
+              "position" : "beside(cubes, 0.5)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "text",
+              "label" : "m",
+              "name" : "middle",
+              "position" : "midpoint(hub, moon)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "lattice",
+              "position" : "grid(at(-4, -4, 0), 1, 2, 3, 4)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "salt",
+              "position" : "lattice(origin, 0.5, 3, 3, 3, 1)",
+              "size" : "0.05",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "raised",
+              "position" : "orbit(at(0, 0, 2), 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "crowd",
+              "position" : "ring(hub, 3, 100000)",
+              "size" : "0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "tooMany",
+              "position" : "grid(centre, 1, 10, 10, 10)",
+              "size" : "0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "offset",
+              "position" : "at(hub, 0, 0, 1)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "none",
+              "position" : "row(hub, 1, 0)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "onNone",
+              "position" : "on(none)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "cell",
+              "position" : "at(0, 0, 3)",
+              "size" : "2",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            },
+            {
+              "kind" : "tube",
+              "label" : "",
+              "name" : "rod",
+              "position" : "hub",
+              "size" : "0.02, 7",
+              "tilt" : "",
+              "to" : "moon",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "arrow",
+              "label" : "",
+              "name" : "force",
+              "position" : "at(0, 0, 0)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "(1, 1, 1)",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "axes",
+              "label" : "",
+              "name" : "axes",
+              "position" : "at(0, 0, 0)",
+              "size" : "3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "negative",
+              "position" : "at(0, 0, 0)",
+              "size" : "-1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "hoop",
+              "position" : "at(0, 0, 0.5)",
+              "size" : "2",
+              "tilt" : "30",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+
+          ],
+          "time" : "T"
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Blocks"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

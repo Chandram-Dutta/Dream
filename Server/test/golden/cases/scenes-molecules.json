@@ -1,0 +1,33 @@
+{
+  "about": "Molecules: one PubChem found (methane, kept with its structure), one it didn't (dropped, and its scene with nothing else with it), a molecule named only in spaces; a scene that moves with an input is enough of a calculation, with no results; scene blocks by near miss, one for a scene that doesn't exist, and a plot over the calculation's own x and y as variables.",
+  "fill": true,
+  "molecules": {
+    "methane": {"cid": 297, "title": "Methane", "formula": "CH4", "atoms": [
+      {"element": 6, "x": 0, "y": 0, "z": 0}, {"element": 1, "x": 0.5541, "y": 0.7996, "z": 0.4965}, {"element": 1, "x": 0.6833, "y": -0.8134, "z": -0.2536},
+      {"element": 1, "x": -0.7782, "y": -0.3735, "z": 0.6692}, {"element": 1, "x": -0.4593, "y": 0.3874, "z": -0.9121}
+    ], "bonds": [{"from": 0, "to": 1, "order": 1}, {"from": 0, "to": 2, "order": 1}, {"from": 0, "to": 3, "order": 1}, {"from": 0, "to": 4, "order": 1}]}
+  },
+  "wire": {
+    "title": "Molecules and orbits",
+    "subject": "science",
+    "mode": "learn",
+    "inputs": [
+      {"name": "t", "label": "Day", "role": "variable", "initial": 0, "min": 0, "max": 365, "step": 1},
+      {"name": "x", "label": "x", "role": "variable", "initial": 0, "min": -3, "max": 3, "step": 0.1},
+      {"name": "y", "label": "y", "role": "variable", "initial": 0, "min": -1, "max": 1, "step": 0.1}
+    ],
+    "scenes": [
+      {"name": "methane", "molecule": "  methane ", "objects": [], "plots": []},
+      {"name": "unknown", "molecule": "unobtainium", "objects": [], "plots": []},
+      {"name": "blank", "molecule": "   ", "objects": [{"name": "dot", "kind": "sphere", "position": "at(0, 0, 0)", "size": "0.1"}], "plots": []},
+      {"name": "orbit", "time": "", "objects": [{"name": "sun", "kind": "sphere", "position": "at(0, 0, 0)", "size": "0.2"}, {"name": "earth", "kind": "sphere", "position": "orbit(sun, 1, 360 * t / 365)", "size": "0.05"}]},
+      {"name": "saddle", "plots": [{"z": "x^2 - y^2", "xFrom": "", "xTo": "", "yFrom": "", "yTo": "", "label": "$z = x^2 - y^2$"}, {"z": "1 / (x - x)", "xFrom": "-1", "xTo": "1", "yFrom": "-1", "yTo": "1"}, {"z": "x", "xFrom": "2", "xTo": "1", "yFrom": "-1", "yTo": "1"}]}
+    ],
+    "blocks": [
+      {"kind": "scene", "ref": "methan", "title": "Methane"},
+      {"kind": "scene", "ref": "nowhere"},
+      {"kind": "paragraph", "text": "Each hydrogen sits at a corner of a tetrahedron."}
+    ]
+  },
+  "read": [{"title": "Methane", "site": "PubChem", "url": "https://pubchem.ncbi.nlm.nih.gov/compound/297"}]
+}

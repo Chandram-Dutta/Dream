@@ -1,0 +1,1161 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'swapped', 'single', 'count', 'noStep', 'night', 'size', 'unusedControl'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'gravity', 'unusedGiven'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "swapped-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "swapped",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "single-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "single",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "count-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "count",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "noStep-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "noStep",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "night-control",
+              "items" : [
+
+              ],
+              "kind" : "toggle",
+              "over" : "",
+              "ref" : "night",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "size-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "size",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "unusedControl-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "unusedControl",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "gravity-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "gravity",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "unusedGiven-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "unusedGiven",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "row",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Unused",
+          "max" : 3,
+          "min" : 3,
+          "name" : "unusedGiven",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Nothing uses me",
+          "max" : 10,
+          "min" : 0,
+          "name" : "unusedControl",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + single + count + noStep + night + size + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges, then the rest"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Unused",
+          "max" : 3,
+          "min" : 3,
+          "name" : "unusedGiven",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Nothing uses me",
+          "max" : 10,
+          "min" : 0,
+          "name" : "unusedControl",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + single + count + noStep + night + size + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges, then the rest"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Swapped",
+        "max" : 0,
+        "min" : 10,
+        "name" : "swapped",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : -4,
+        "label" : "Single",
+        "max" : -4,
+        "min" : -4,
+        "name" : "single",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2.6000000000000001,
+        "label" : "Count",
+        "max" : 9.1999999999999993,
+        "min" : 0.40000000000000002,
+        "name" : "count",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.29999999999999999,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0.5,
+        "label" : "No step",
+        "max" : 2.3999999999999999,
+        "min" : 0,
+        "name" : "noStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 7,
+        "label" : "Night",
+        "max" : 100,
+        "min" : 0,
+        "name" : "night",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 7.5999999999999996,
+        "label" : "Size",
+        "max" : 100,
+        "min" : 0,
+        "name" : "size",
+        "options" : [
+          "  Small ",
+          "",
+          "Medium",
+          "Large  "
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 20,
+        "min" : 0,
+        "name" : "gravity",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s²"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Unused",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unusedGiven",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Nothing uses me",
+        "max" : 10,
+        "min" : 0,
+        "name" : "unusedControl",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "swapped + single + count + noStep + night + size + gravity",
+        "label" : "Total",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Ranges, then the rest"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "total",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Swapped",
+        "max" : 0,
+        "min" : 10,
+        "name" : "swapped",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : -4,
+        "label" : "Single",
+        "max" : -4,
+        "min" : -4,
+        "name" : "single",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 2.6000000000000001,
+        "label" : "Count",
+        "max" : 9.1999999999999993,
+        "min" : 0.40000000000000002,
+        "name" : "count",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.29999999999999999,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0.5,
+        "label" : "No step",
+        "max" : 2.3999999999999999,
+        "min" : 0,
+        "name" : "noStep",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 7,
+        "label" : "Night",
+        "max" : 100,
+        "min" : 0,
+        "name" : "night",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 7.5999999999999996,
+        "label" : "Size",
+        "max" : 100,
+        "min" : 0,
+        "name" : "size",
+        "options" : [
+          "  Small ",
+          "",
+          "Medium",
+          "Large  "
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 9.8100000000000005,
+        "label" : "Gravity",
+        "max" : 20,
+        "min" : 0,
+        "name" : "gravity",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "m/s²"
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Unused",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unusedGiven",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 3,
+        "label" : "Nothing uses me",
+        "max" : 10,
+        "min" : 0,
+        "name" : "unusedControl",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "swapped + single + count + noStep + night + size + gravity",
+        "label" : "Total",
+        "name" : "total",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Ranges, then the rest"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- swapped: \"Swapped\", number, starts at 5, 10 to 0, step 1\n- single: \"Single\", number, starts at -4, -4 to -4, step 1\n- count: \"Count\", integer, starts at 2.6, 0.4 to 9.2, step 0.3\n- noStep: \"No step\", number, starts at 0.5, 0 to 2.4, step 0\n- night: \"Night\", toggle, starts on\n- size: \"Size\", choice of   Small  /  / Medium / Large  , starts at option 7.6\n- gravity: \"Gravity\", given number, 9.81, in m/s²\n- unusedGiven: \"Unused\", given number, 3\n- unusedControl: \"Nothing uses me\", number, starts at 3, 0 to 10, step 1\nOutputs:\n- total: \"Total\", number = swapped + single + count + noStep + night + size + gravity",
+    "outline" : "Ranges, then the rest: \n- hero #block-0 ref total\n- section #auto-inputs\n  - slider #auto-input-0 ref swapped\n  - slider #auto-input-1 ref single\n  - slider #auto-input-2 ref count\n  - slider #auto-input-3 ref noStep\n  - toggle #auto-input-4 ref night\n  - picker #auto-input-5 ref size\n  - slider #auto-input-8 ref unusedControl"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- swapped: \"Swapped\", number, starts at 5, 0 to 10, step 1\n- single: \"Single\", number, starts at -4, -4 to 0, step 1\n- count: \"Count\", integer, starts at 3, 0 to 10, step 1\n- noStep: \"No step\", number, starts at 0.5, 0 to 2.4, step 0.02\n- night: \"Night\", toggle, starts on\n- size: \"Size\", choice of Small / Medium / Large, starts at option 2\n- gravity: \"Gravity\", given number, 9.81, in m/s²\n- unusedGiven: \"Unused\", given number, 3\n- unusedControl: \"Nothing uses me\", number, starts at 3, 0 to 10, step 1\nOutputs:\n- total: \"Total\", number = swapped + single + count + noStep + night + size + gravity",
+    "outline" : "Ranges, then the rest: \n- hero #block-0 ref total\n- section #more-inputs\n  - slider #swapped-control ref swapped\n  - slider #single-control ref single\n  - stepper #count-control ref count\n  - slider #noStep-control ref noStep\n  - toggle #night-control ref night\n  - picker #size-control ref size\n  - slider #unusedControl-control ref unusedControl\n  - row #givens\n    - metric #gravity-given ref gravity\n    - metric #unusedGiven-given ref unusedGiven"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Swapped the minimum and maximum of 'swapped'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Gave 'single' a range."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Picked a step for 'noStep'."
+      },
+      {
+        "kind" : "warning",
+        "message" : "'unusedGiven' doesn't affect any result."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'unusedControl' is a control that changes no result. Use it in the results it should change (both sides of a comparison), or remove it."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "total",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Swapped",
+          "max" : 10,
+          "min" : 0,
+          "name" : "swapped",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : -4,
+          "label" : "Single",
+          "max" : 0,
+          "min" : -4,
+          "name" : "single",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "Count",
+          "max" : 10,
+          "min" : 0,
+          "name" : "count",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 0.5,
+          "label" : "No step",
+          "max" : 2.3999999999999999,
+          "min" : 0,
+          "name" : "noStep",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.02,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Night",
+          "max" : 1,
+          "min" : 0,
+          "name" : "night",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 2,
+          "label" : "Size",
+          "max" : 2,
+          "min" : 0,
+          "name" : "size",
+          "options" : [
+            "Small",
+            "Medium",
+            "Large"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 9.8100000000000005,
+          "label" : "Gravity",
+          "max" : 9.8100000000000005,
+          "min" : 9.8100000000000005,
+          "name" : "gravity",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "m/s²"
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Unused",
+          "max" : 3,
+          "min" : 3,
+          "name" : "unusedGiven",
+          "options" : [
+
+          ],
+          "role" : "given",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 3,
+          "label" : "Nothing uses me",
+          "max" : 10,
+          "min" : 0,
+          "name" : "unusedControl",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "number",
+          "formula" : "swapped + single + count + noStep + night + size + gravity",
+          "label" : "Total",
+          "name" : "total",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Ranges, then the rest"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

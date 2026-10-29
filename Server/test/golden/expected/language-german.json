@@ -1,0 +1,878 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'tankstopps'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'strecke', 'verbrauch', 'preis', 'dollarPreis'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "kosten",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "tankstopps-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "tankstopps",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "tankstopps-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "tankstopps",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "strecke-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "strecke",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "verbrauch-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "verbrauch",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "preis-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "preis",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "dollarPreis-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "dollarPreis",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "stopp",
+          "fields" : [
+            {
+              "label" : "Ort",
+              "name" : "ort",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Liter",
+              "name" : "liter",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Preis",
+              "name" : "preis",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Tankstopps",
+          "name" : "tankstopps",
+          "starters" : [
+            {
+              "liter" : 42.5,
+              "ort" : "Berlin",
+              "preis" : 1.79
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Strecke",
+          "max" : 2000,
+          "min" : 0,
+          "name" : "strecke",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Verbrauch",
+          "max" : 15,
+          "min" : 0,
+          "name" : "verbrauch",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.79,
+          "label" : "Preis",
+          "max" : 3,
+          "min" : 0,
+          "name" : "preis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3.5,
+          "label" : "Preis in Dollar",
+          "max" : 6,
+          "min" : 0,
+          "name" : "dollarPreis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "USD"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "strecke * verbrauch / 100 * preis + dollarPreis * 0",
+          "label" : "Kosten",
+          "name" : "kosten",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tankkosten"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "kosten",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "stopp",
+          "fields" : [
+            {
+              "label" : "Ort",
+              "name" : "ort",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Liter",
+              "name" : "liter",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Preis",
+              "name" : "preis",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Tankstopps",
+          "name" : "tankstopps",
+          "starters" : [
+            {
+              "liter" : 42.5,
+              "ort" : "Berlin",
+              "preis" : 1.79
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Strecke",
+          "max" : 2000,
+          "min" : 0,
+          "name" : "strecke",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Verbrauch",
+          "max" : 15,
+          "min" : 0,
+          "name" : "verbrauch",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.79,
+          "label" : "Preis",
+          "max" : 3,
+          "min" : 0,
+          "name" : "preis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3.5,
+          "label" : "Preis in Dollar",
+          "max" : 6,
+          "min" : 0,
+          "name" : "dollarPreis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "USD"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "strecke * verbrauch / 100 * preis + dollarPreis * 0",
+          "label" : "Kosten",
+          "name" : "kosten",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tankkosten"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "kosten",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "Stopp",
+        "fields" : [
+          {
+            "label" : "Ort",
+            "name" : "ort",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Liter",
+            "name" : "liter",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Preis",
+            "name" : "preis",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Tankstopps",
+        "name" : "tankstopps",
+        "source" : "",
+        "starters" : [
+          {
+            "values" : [
+              "Berlin",
+              "42,5",
+              "1,79 €"
+            ]
+          }
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 500,
+        "label" : "Strecke (km)",
+        "max" : 2000,
+        "min" : 0,
+        "name" : "strecke",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 6.5,
+        "label" : "Verbrauch (L/100km)",
+        "max" : 15,
+        "min" : 0,
+        "name" : "verbrauch",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 1.79,
+        "label" : "Preis (€)",
+        "max" : 3,
+        "min" : 0,
+        "name" : "preis",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 3.5,
+        "label" : "Preis in Dollar (USD)",
+        "max" : 6,
+        "min" : 0,
+        "name" : "dollarPreis",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "strecke * verbrauch / 100 * preis + dollarPreis * 0",
+        "label" : "Kosten",
+        "name" : "kosten",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "money",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Tankkosten"
+  },
+  "converted" : {
+    "accent" : "green",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "kosten",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "Stopp",
+        "fields" : [
+          {
+            "label" : "Ort",
+            "name" : "ort",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Liter",
+            "name" : "liter",
+            "options" : [
+
+            ],
+            "type" : "number"
+          },
+          {
+            "label" : "Preis",
+            "name" : "preis",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Tankstopps",
+        "name" : "tankstopps",
+        "starters" : [
+          {
+            "liter" : 42.5,
+            "ort" : "Berlin",
+            "preis" : 1.79
+          }
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 500,
+        "label" : "Strecke (km)",
+        "max" : 2000,
+        "min" : 0,
+        "name" : "strecke",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 6.5,
+        "label" : "Verbrauch (L/100km)",
+        "max" : 15,
+        "min" : 0,
+        "name" : "verbrauch",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 1.79,
+        "label" : "Preis (€)",
+        "max" : 3,
+        "min" : 0,
+        "name" : "preis",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.01,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 3.5,
+        "label" : "Preis in Dollar (USD)",
+        "max" : 6,
+        "min" : 0,
+        "name" : "dollarPreis",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "strecke * verbrauch / 100 * preis + dollarPreis * 0",
+        "label" : "Kosten",
+        "name" : "kosten",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Tankkosten"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- strecke: \"Strecke (km)\", number, starts at 500, 0 to 2000, step 10\n- verbrauch: \"Verbrauch (L/100km)\", number, starts at 6.5, 0 to 15, step 0.1\n- preis: \"Preis (€)\", currency, starts at 1.79, 0 to 3, step 0.01\n- dollarPreis: \"Preis in Dollar (USD)\", currency, starts at 3.5, 0 to 6, step 0.1\nOutputs:\n- kosten: \"Kosten\", currency = strecke * verbrauch / 100 * preis + dollarPreis * 0",
+    "outline" : "Tankkosten: \nLists:\n- tankstopps: \"Tankstopps\", each a Stopp: ort (text), liter (number), preis (number)\n  starters: Berlin\n- hero #block-0 ref kosten\n- section #auto-inputs\n  - slider #auto-input-0 ref strecke\n  - slider #auto-input-1 ref verbrauch\n  - slider #auto-input-2 ref preis\n  - slider #auto-input-3 ref dollarPreis"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- strecke: \"Strecke\", number, starts at 500, 0 to 2000, step 10, in km\n- verbrauch: \"Verbrauch\", number, starts at 6.5, 0 to 15, step 0.1, in L/100 km\n- preis: \"Preis\", currency, starts at 1.79, 0 to 3, step 0.01\n- dollarPreis: \"Preis in Dollar\", currency, starts at 3.5, 0 to 6, step 0.1, in USD\nOutputs:\n- kosten: \"Kosten\", currency = strecke * verbrauch / 100 * preis + dollarPreis * 0",
+    "outline" : "Tankkosten: \nLists:\n- tankstopps: \"Tankstopps\", each a stopp: ort (text), liter (number), preis (number)\n  starters: Berlin\n- hero #block-0 ref kosten\n- add #tankstopps-add ref tankstopps\n- list #tankstopps-list ref tankstopps\n- section #more-inputs\n  - slider #strecke-control ref strecke\n  - slider #verbrauch-control ref verbrauch\n  - slider #preis-control ref preis\n  - slider #dollarPreis-control ref dollarPreis"
+  },
+  "locale" : "de_DE",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Tidied the units of 'strecke', 'verbrauch', 'preis', 'dollarPreis'."
+      }
+    ],
+    "surface" : {
+      "accent" : "green",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "kosten",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "stopp",
+          "fields" : [
+            {
+              "label" : "Ort",
+              "name" : "ort",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Liter",
+              "name" : "liter",
+              "options" : [
+
+              ],
+              "type" : "number"
+            },
+            {
+              "label" : "Preis",
+              "name" : "preis",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Tankstopps",
+          "name" : "tankstopps",
+          "starters" : [
+            {
+              "liter" : 42.5,
+              "ort" : "Berlin",
+              "preis" : 1.79
+            }
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 500,
+          "label" : "Strecke",
+          "max" : 2000,
+          "min" : 0,
+          "name" : "strecke",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : "km"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Verbrauch",
+          "max" : 15,
+          "min" : 0,
+          "name" : "verbrauch",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.79,
+          "label" : "Preis",
+          "max" : 3,
+          "min" : 0,
+          "name" : "preis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.01,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 3.5,
+          "label" : "Preis in Dollar",
+          "max" : 6,
+          "min" : 0,
+          "name" : "dollarPreis",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : "USD"
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "strecke * verbrauch / 100 * preis + dollarPreis * 0",
+          "label" : "Kosten",
+          "name" : "kosten",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Tankkosten"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off in the middle of true: the app can't read it at all until more arrives.",
+  "text": "{\"title\": \"Lamp\", \"inputs\": [{\"name\": \"on\", \"format\": \"toggle\", \"initial\": 1, \"options\": []}], \"blocks\": [{\"kind\": \"toggle\", \"ref\": \"on\", \"x\": tr"
+}

@@ -1,0 +1,888 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'billAmount', 'numberOfPeople', 'tip_rate', 'unit'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'power', 'nested', 'logic', 'minus' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "billAmount-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "billAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "numberOfPeople-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "numberOfPeople",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "tip_rate-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tip_rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "unit-control",
+              "items" : [
+
+              ],
+              "kind" : "picker",
+              "over" : "",
+              "ref" : "unit",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "power-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "power",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "nested-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "nested",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "logic-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "logic",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "minus-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "minus",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 1 ? 1 : 2)",
+          "label" : "Power",
+          "name" : "power",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4",
+          "label" : "Nested",
+          "name" : "nested",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0",
+          "label" : "Logic",
+          "name" : "logic",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+          "label" : "Minus",
+          "name" : "minus",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas, repaired"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 1 ? 1 : 2)",
+          "label" : "Power",
+          "name" : "power",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4",
+          "label" : "Nested",
+          "name" : "nested",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0",
+          "label" : "Logic",
+          "name" : "logic",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+          "label" : "Minus",
+          "name" : "minus",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas, repaired"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "billAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "numberOfPeople",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip_rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Unit",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unit",
+        "options" : [
+          "grams",
+          "cups"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "BillAmount * (1 + tiprate / 100) / numberofpeople",
+        "label" : "Each",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 'Cups' ? 1 : 2)",
+        "label" : "Power",
+        "name" : "power",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4",
+        "label" : "Nested",
+        "name" : "nested",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0",
+        "label" : "Logic",
+        "name" : "logic",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+        "label" : "Minus",
+        "name" : "minus",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Formulas, repaired"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "perPerson",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "Bill",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "billAmount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 4,
+        "label" : "People",
+        "max" : 20,
+        "min" : 1,
+        "name" : "numberOfPeople",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip",
+        "max" : 30,
+        "min" : 0,
+        "name" : "tip_rate",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "initial" : 0,
+        "label" : "Unit",
+        "max" : 100,
+        "min" : 0,
+        "name" : "unit",
+        "options" : [
+          "grams",
+          "cups"
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "BillAmount * (1 + tiprate / 100) / numberofpeople",
+        "label" : "Each",
+        "name" : "perPerson",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 'Cups' ? 1 : 2)",
+        "label" : "Power",
+        "name" : "power",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4",
+        "label" : "Nested",
+        "name" : "nested",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0",
+        "label" : "Logic",
+        "name" : "logic",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+        "label" : "Minus",
+        "name" : "minus",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Formulas, repaired"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- billAmount: \"Bill\", currency, starts at 100, 0 to 1000, step 1\n- numberOfPeople: \"People\", integer, starts at 4, 1 to 20, step 1\n- tip_rate: \"Tip\", percent, starts at 10, 0 to 30, step 1\n- unit: \"Unit\", choice of grams / cups, starts at option 0\nOutputs:\n- perPerson: \"Each\", currency = BillAmount * (1 + tiprate / 100) / numberofpeople\n- power: \"Power\", number = -(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 'Cups' ? 1 : 2)\n- nested: \"Nested\", number = billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4\n- logic: \"Logic\", number = !(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0\n- minus: \"Minus\", number = billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+    "outline" : "Formulas, repaired: \n- hero #block-0 ref perPerson\n- section #auto-inputs\n  - slider #auto-input-0 ref billAmount\n  - stepper #auto-input-1 ref numberOfPeople\n  - slider #auto-input-2 ref tip_rate\n  - picker #auto-input-3 ref unit\n- section #auto-outputs\n  - metric #auto-output-1 ref power\n  - metric #auto-output-2 ref nested\n  - metric #auto-output-3 ref logic\n  - metric #auto-output-4 ref minus"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- billAmount: \"Bill\", currency, starts at 100, 0 to 1000, step 1\n- numberOfPeople: \"People\", integer, starts at 4, 1 to 20, step 1\n- tip_rate: \"Tip\", percent, starts at 10, 0 to 30, step 1\n- unit: \"Unit\", choice of grams / cups, starts at option 0\nOutputs:\n- perPerson: \"Each\", currency = billAmount * (1 + tip_rate / 100) / numberOfPeople\n- power: \"Power\", number = -(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 1 ? 1 : 2)\n- nested: \"Nested\", number = billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4\n- logic: \"Logic\", number = !(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0\n- minus: \"Minus\", number = billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+    "outline" : "Formulas, repaired: \n- hero #block-0 ref perPerson\n- section #more-inputs\n  - slider #billAmount-control ref billAmount\n  - stepper #numberOfPeople-control ref numberOfPeople\n  - slider #tip_rate-control ref tip_rate\n  - picker #unit-control ref unit\n- section #more-results\n  - metric #power-metric ref power\n  - metric #nested-metric ref nested\n  - metric #logic-metric ref logic\n  - metric #minus-metric ref minus"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In 'power', compared choices by position instead of by name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In 'perPerson', read 'BillAmount' as 'billAmount', 'numberofpeople' as 'numberOfPeople', 'tiprate' as 'tip_rate'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "perPerson",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 4,
+          "label" : "People",
+          "max" : 20,
+          "min" : 1,
+          "name" : "numberOfPeople",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tip_rate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "choice",
+          "initial" : 0,
+          "label" : "Unit",
+          "max" : 1,
+          "min" : 0,
+          "name" : "unit",
+          "options" : [
+            "grams",
+            "cups"
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tip_rate / 100) / numberOfPeople",
+          "label" : "Each",
+          "name" : "perPerson",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "-(perPerson) ^ 2 ^ 0.5 - (1 - (2 - 3)) + (unit == 1 ? 1 : 2)",
+          "label" : "Power",
+          "name" : "power",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount > 50 ? (numberOfPeople > 2 ? 1 : 2) : tip_rate < 5 ? 3 : 4",
+          "label" : "Nested",
+          "name" : "nested",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "!(billAmount > 10) || numberOfPeople >= 2 && tip_rate != 0",
+          "label" : "Logic",
+          "name" : "logic",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "billAmount - -numberOfPeople - (tip_rate + 1) * -2 % 3 / (4 * 5)",
+          "label" : "Minus",
+          "name" : "minus",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Formulas, repaired"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

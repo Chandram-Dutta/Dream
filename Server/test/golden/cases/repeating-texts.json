@@ -1,0 +1,12 @@
+{
+  "about": "Two blocks with the same text, in different cases, are a loop too; so is an item far too long.",
+  "partial": true,
+  "wire": {
+    "title": "Loop again",
+    "blocks": [
+      {"kind": "paragraph", "text": "Exactly this."},
+      {"kind": "section", "children": [{"kind": "paragraph", "text": "EXACTLY THIS."}]},
+      {"kind": "facts", "items": [{"label": "A label that is fine", "value": "short"}]}
+    ]
+  }
+}

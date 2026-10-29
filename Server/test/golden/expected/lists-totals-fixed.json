@@ -1,0 +1,747 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Showed the lists 'habits'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'doneToday', 'bestStreak' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "progress",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "habits-add",
+          "items" : [
+
+          ],
+          "kind" : "add",
+          "over" : "",
+          "ref" : "habits",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "habits-list",
+          "items" : [
+
+          ],
+          "kind" : "list",
+          "over" : "",
+          "ref" : "habits",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "goal",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "bestStreak-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "bestStreak",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "doneToday-working",
+              "items" : [
+
+              ],
+              "kind" : "equation",
+              "over" : "",
+              "ref" : "doneToday",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "working",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "habit",
+          "fields" : [
+            {
+              "label" : "Habit",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Done today",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Streak",
+              "name" : "streak",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Habits",
+          "name" : "habits",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 5,
+          "label" : "Goal",
+          "max" : 10,
+          "min" : 1,
+          "name" : "goal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(habits.done)",
+          "label" : "Done today",
+          "name" : "doneToday",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "formula" : "doneToday / goal * 100",
+          "label" : "Progress",
+          "name" : "progress",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "max(habits.streak)",
+          "label" : "Best streak",
+          "name" : "bestStreak",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Habit tracker"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "progress",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "goal",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "habit",
+          "fields" : [
+            {
+              "label" : "Habit",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Done today",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Streak",
+              "name" : "streak",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Habits",
+          "name" : "habits",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 5,
+          "label" : "Goal",
+          "max" : 10,
+          "min" : 1,
+          "name" : "goal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(habits.done)",
+          "label" : "Done today",
+          "name" : "doneToday",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "formula" : "doneToday / goal * 100",
+          "label" : "Progress",
+          "name" : "progress",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "max(habits.streak)",
+          "label" : "Best streak",
+          "name" : "bestStreak",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Habit tracker"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "progress",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "stepper",
+        "over" : "",
+        "ref" : "goal",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+      {
+        "entry" : "habit",
+        "fields" : [
+          {
+            "label" : "Habit",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Done today",
+            "name" : "done",
+            "options" : [
+
+            ],
+            "type" : "done"
+          },
+          {
+            "label" : "Streak",
+            "name" : "streak",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Habits",
+        "name" : "habits",
+        "source" : "",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 5,
+        "label" : "Goal",
+        "max" : 10,
+        "min" : 1,
+        "name" : "goal",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "integer",
+        "formula" : "count(habits.done)",
+        "label" : "Done today",
+        "name" : "doneToday",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "formula" : "doneToday / goal * 100",
+        "label" : "Progress",
+        "name" : "progress",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "max(habits.streak)",
+        "label" : "Best streak",
+        "name" : "bestStreak",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "health",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Habit tracker"
+  },
+  "converted" : {
+    "accent" : "pink",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "progress",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "stepper",
+        "over" : "",
+        "ref" : "goal",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "collections" : [
+      {
+        "entry" : "habit",
+        "fields" : [
+          {
+            "label" : "Habit",
+            "name" : "name",
+            "options" : [
+
+            ],
+            "type" : "text"
+          },
+          {
+            "label" : "Done today",
+            "name" : "done",
+            "options" : [
+
+            ],
+            "type" : "done"
+          },
+          {
+            "label" : "Streak",
+            "name" : "streak",
+            "options" : [
+
+            ],
+            "type" : "number"
+          }
+        ],
+        "label" : "Habits",
+        "name" : "habits",
+        "starters" : [
+
+        ]
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 5,
+        "label" : "Goal",
+        "max" : 10,
+        "min" : 1,
+        "name" : "goal",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "integer",
+        "formula" : "count(habits.done)",
+        "label" : "Done today",
+        "name" : "doneToday",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "formula" : "doneToday / goal * 100",
+        "label" : "Progress",
+        "name" : "progress",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "formula" : "max(habits.streak)",
+        "label" : "Best streak",
+        "name" : "bestStreak",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Habit tracker"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- goal: \"Goal\", integer, starts at 5, 1 to 10, step 1\nOutputs:\n- doneToday: \"Done today\", integer = count(habits.done)\n- progress: \"Progress\", percent = doneToday / goal * 100\n- bestStreak: \"Best streak\", integer = max(habits.streak)",
+    "outline" : "Habit tracker: \nLists:\n- habits: \"Habits\", each a habit: name (text), done (done), streak (number)\n- hero #block-0 ref progress\n- stepper #block-1 ref goal\n- hero #auto-hero ref doneToday\n- section #auto-outputs\n  - metric #auto-output-2 ref bestStreak"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- goal: \"Goal\", integer, starts at 5, 1 to 10, step 1\nOutputs:\n- doneToday: \"Done today\", integer = count(habits.done)\n- progress: \"Progress\", percent = doneToday / goal * 100\n- bestStreak: \"Best streak\", integer = max(habits.streak)",
+    "outline" : "Habit tracker: \nLists:\n- habits: \"Habits\", each a habit: name (text), done (done), streak (number)\n- hero #block-0 ref progress\n- add #habits-add ref habits\n- list #habits-list ref habits\n- stepper #block-1 ref goal\n- section #more-results\n  - metric #bestStreak-metric ref bestStreak\n- section #working\n  - equation #doneToday-working ref doneToday"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "pink",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "progress",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "stepper",
+          "over" : "",
+          "ref" : "goal",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "collections" : [
+        {
+          "entry" : "habit",
+          "fields" : [
+            {
+              "label" : "Habit",
+              "name" : "name",
+              "options" : [
+
+              ],
+              "type" : "text"
+            },
+            {
+              "label" : "Done today",
+              "name" : "done",
+              "options" : [
+
+              ],
+              "type" : "done"
+            },
+            {
+              "label" : "Streak",
+              "name" : "streak",
+              "options" : [
+
+              ],
+              "type" : "number"
+            }
+          ],
+          "label" : "Habits",
+          "name" : "habits",
+          "starters" : [
+
+          ]
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 5,
+          "label" : "Goal",
+          "max" : 10,
+          "min" : 1,
+          "name" : "goal",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "integer",
+          "formula" : "count(habits.done)",
+          "label" : "Done today",
+          "name" : "doneToday",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "percent",
+          "formula" : "doneToday / goal * 100",
+          "label" : "Progress",
+          "name" : "progress",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "formula" : "max(habits.streak)",
+          "label" : "Best streak",
+          "name" : "bestStreak",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Habit tracker"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

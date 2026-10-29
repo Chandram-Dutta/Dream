@@ -1,0 +1,4 @@
+{
+  "about": "An answer cut off in a number's exponent, in an output's formula list, with escaped quotes and a tab escape in a string before it: 6.02e reads as 6.02.",
+  "text": "{\"title\": \"Moles\", \"summary\": \"A \\\"mole\\\"\\tis a count.\", \"inputs\": [{\"name\": \"grams\", \"label\": \"Grams\", \"initial\": 18, \"min\": 1, \"max\": 6.02e"
+}

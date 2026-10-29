@@ -1,0 +1,36 @@
+{
+  "about": "Live inputs bound to what the live tool fetched: by the field's full name, a near miss, the field's name alone, or the input's own name; a given that names a field becomes live; a what-if starts at the field's value; values converted into the input's unit, or into the reader's (°F in the US); and a live input bound to nothing goes back. An unused source is dropped later, with the blocks.",
+  "fill": true,
+  "sources": [
+    {"name": "weather", "kind": "weather", "parameters": {"place": "Bengaluru", "day": "saturday"}, "fields": [
+      {"name": "rainChance", "value": 70, "unit": "", "format": "percent", "meaning": "the chance of rain"},
+      {"name": "high", "value": 28.5, "unit": "°C", "format": "number", "meaning": "the day's high"},
+      {"name": "wind", "value": 12, "unit": "km/h", "format": "number", "meaning": "wind speed"}
+    ]},
+    {"name": "route", "kind": "route", "parameters": {"from": "current location", "to": "Cubbon Park", "travel": "driving"}, "fields": [
+      {"name": "distance", "value": 7.4, "unit": "km", "format": "number", "meaning": "how far"},
+      {"name": "duration", "value": 25, "unit": "min", "format": "number", "meaning": "how long"}
+    ]},
+    {"name": "rates", "kind": "exchangeRate", "parameters": {"from": "USD", "to": "INR"}, "fields": [
+      {"name": "rate", "value": 83.2, "unit": "", "format": "number", "meaning": "rupees for a dollar"}
+    ]}
+  ],
+  "wire": {
+    "title": "Picnic weather",
+    "subject": "places",
+    "mode": "use",
+    "inputs": [
+      {"name": "rain", "label": "Chance of rain", "role": "live", "source": "weather.rainChance", "format": "number", "initial": 10},
+      {"name": "highTemp", "label": "High", "role": "live", "source": "wether.high", "initial": 0, "unit": "°F"},
+      {"name": "windSpeed", "label": "Wind", "role": "live", "source": "wind", "initial": 0, "unit": "m/s"},
+      {"name": "duration", "label": "Drive", "role": "live", "source": "", "initial": 0, "unit": "h"},
+      {"name": "distance", "label": "Distance", "role": "given", "source": "route.distance", "initial": 5},
+      {"name": "budget", "label": "Budget", "role": "adjustable", "source": "rates.rate", "format": "number", "initial": 50, "min": 60, "max": 100},
+      {"name": "missing", "label": "Missing", "role": "live", "source": "weather.uvIndex", "initial": 3}
+    ],
+    "outputs": [
+      {"name": "goodDay", "label": "Go?", "formula": "rain < 50 && highTemp < 90 ? 1 : 0 + windSpeed * 0 + duration * 0 + distance * 0 + budget * 0", "format": "toggle"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "goodDay"}]
+  }
+}

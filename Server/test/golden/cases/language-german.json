@@ -1,0 +1,19 @@
+{
+  "about": "A German reader paying in euros: Preis (€) and a currency code as the unit, a price in another currency, kilometres and litres per 100 km in a label, and decimal commas in starters.",
+  "fill": true,
+  "locale": "de_DE",
+  "wire": {
+    "subject": "money",
+    "mode": "use",
+    "title": "Tankkosten",
+    "collections": [{"name": "tankstopps", "label": "Tankstopps", "entry": "Stopp", "fields": [{"name": "ort", "label": "Ort"}, {"name": "liter", "label": "Liter", "type": "number"}, {"name": "preis", "label": "Preis", "type": "number"}], "starters": [{"values": ["Berlin", "42,5", "1,79 €"]}]}],
+    "inputs": [
+      {"name": "strecke", "label": "Strecke (km)", "initial": 500, "max": 2000, "step": 10},
+      {"name": "verbrauch", "label": "Verbrauch (L/100km)", "initial": 6.5, "max": 15, "step": 0.1},
+      {"name": "preis", "label": "Preis (€)", "format": "currency", "initial": 1.79, "max": 3, "step": 0.01},
+      {"name": "dollarPreis", "label": "Preis in Dollar (USD)", "format": "currency", "initial": 3.5, "max": 6, "step": 0.1}
+    ],
+    "outputs": [{"name": "kosten", "label": "Kosten", "formula": "strecke * verbrauch / 100 * preis + dollarPreis * 0", "format": "currency"}],
+    "blocks": [{"kind": "hero", "ref": "kosten"}]
+  }
+}

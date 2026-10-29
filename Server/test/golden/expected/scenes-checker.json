@@ -1,0 +1,1135 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', dropped the sphere 'lost', whose position can't be read: teleport(1, 2)."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', dropped the arrow 'pointer', which needs somewhere to end."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', dropped the text 'note', with nothing to say."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', dropped the sphere 'loop', whose position can't be read: on(loop)."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', the sphere 'wobbly' is drawn upright: its angle can't be read (nonsense * 2)."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "In the scene 'solarSystem', dropped a plot whose formula can't be read: u * v"
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the scene 'solarSystem'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'r'."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The Earth goes round once a year.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "scene-solarSystem",
+          "items" : [
+
+          ],
+          "kind" : "scene",
+          "over" : "",
+          "ref" : "solarSystem",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "r-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "r",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 2,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "solarSystem",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "Sun",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "glow",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "Earth on day {t}",
+              "name" : "earth",
+              "position" : "orbit(Sun, 1, 360 * t / 365)",
+              "size" : "0.08",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "table",
+              "position" : "on(ground)",
+              "size" : "r",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "wobbly",
+              "position" : "at(0, 0, 1)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "mid",
+              "position" : "at(1, 2, 3)",
+              "size" : "0.1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "cone",
+              "label" : "",
+              "name" : "cone10",
+              "position" : "at(0, 0, 0)",
+              "size" : "r, 2",
+              "tilt" : "r * 10",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : "45"
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "earth2",
+              "position" : "at(Sun)",
+              "size" : "1, 0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+            {
+              "label" : "",
+              "xFrom" : "-2",
+              "xTo" : "2",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x ^ 2 - y ^ 2"
+            }
+          ],
+          "time" : "t"
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Solar system"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The Earth goes round once a year.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 2,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "Solar system",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "Sun",
+              "position" : "(0, 0, 0)",
+              "size" : "0.3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "glow",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "Earth on day {t}",
+              "name" : "earth",
+              "position" : "orbits(sun, 1, 360 * T / 365)",
+              "size" : "0.08",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "table",
+              "position" : "on(floor)",
+              "size" : "R",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "lost",
+              "position" : "teleport(1, 2)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "arrow",
+              "label" : "",
+              "name" : "pointer",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.02",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "text",
+              "label" : "",
+              "name" : "note",
+              "position" : "at(0, 0, 1)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "loop",
+              "position" : "on(loop)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "wobbly",
+              "position" : "at(0, 0, 1)",
+              "size" : "1",
+              "tilt" : "0",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : "nonsense * 2"
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "mid",
+              "position" : "[1, 2, 3]",
+              "size" : "0.1, 9, 9",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "cone",
+              "label" : "",
+              "name" : "",
+              "position" : "",
+              "size" : "r, 2",
+              "tilt" : "r * 10",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : "45"
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "earth",
+              "position" : "at(Sun)",
+              "size" : "1, 0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+            {
+              "label" : "",
+              "xFrom" : "",
+              "xTo" : "",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x^2 - y^2"
+            },
+            {
+              "label" : "",
+              "xFrom" : "-1",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "u * v"
+            }
+          ],
+          "time" : ""
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Solar system"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The Earth goes round once a year.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Day",
+        "max" : 365,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Radius",
+        "max" : 2,
+        "min" : 0.5,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "molecule" : "",
+        "name" : "Solar system",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "Sun",
+            "position" : "(0, 0, 0)",
+            "size" : "0.3",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "glow",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "Earth on day {t}",
+            "name" : "earth",
+            "position" : "orbits(sun, 1, 360 * T / 365)",
+            "size" : "0.08",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "table",
+            "position" : "on(floor)",
+            "size" : "R",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "lost",
+            "position" : "teleport(1, 2)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "arrow",
+            "label" : "",
+            "name" : "pointer",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.02",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "text",
+            "label" : "",
+            "name" : "note",
+            "position" : "at(0, 0, 1)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "loop",
+            "position" : "on(loop)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "wobbly",
+            "position" : "at(0, 0, 1)",
+            "size" : "1",
+            "tilt" : "0",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : "nonsense * 2"
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "mid",
+            "position" : "[1, 2, 3]",
+            "size" : "0.1, 9, 9",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "cone",
+            "label" : "",
+            "name" : "",
+            "position" : "",
+            "size" : "r, 2",
+            "tilt" : "r * 10",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : "45"
+          },
+          {
+            "kind" : "ring",
+            "label" : "",
+            "name" : "earth",
+            "position" : "at(Sun)",
+            "size" : "1, 0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+          {
+            "label" : "",
+            "xFrom" : "",
+            "xTo" : "",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "x^2 - y^2"
+          },
+          {
+            "label" : "",
+            "xFrom" : "-1",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "u * v"
+          }
+        ],
+        "time" : ""
+      }
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "science",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Solar system"
+  },
+  "converted" : {
+    "accent" : "indigo",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "The Earth goes round once a year.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Day",
+        "max" : 365,
+        "min" : 0,
+        "name" : "t",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 1,
+        "label" : "Radius",
+        "max" : 2,
+        "min" : 0.5,
+        "name" : "r",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.10000000000000001,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "learn",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "scenes" : [
+      {
+        "name" : "Solar system",
+        "objects" : [
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "Sun",
+            "position" : "(0, 0, 0)",
+            "size" : "0.3",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "glow",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "Earth on day {t}",
+            "name" : "earth",
+            "position" : "orbits(sun, 1, 360 * T / 365)",
+            "size" : "0.08",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "box",
+            "label" : "",
+            "name" : "table",
+            "position" : "on(floor)",
+            "size" : "R",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "lost",
+            "position" : "teleport(1, 2)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "arrow",
+            "label" : "",
+            "name" : "pointer",
+            "position" : "at(0, 0, 0)",
+            "size" : "0.02",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "text",
+            "label" : "",
+            "name" : "note",
+            "position" : "at(0, 0, 1)",
+            "size" : "",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "loop",
+            "position" : "on(loop)",
+            "size" : "1",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "wobbly",
+            "position" : "at(0, 0, 1)",
+            "size" : "1",
+            "tilt" : "0",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : "nonsense * 2"
+          },
+          {
+            "kind" : "sphere",
+            "label" : "",
+            "name" : "mid",
+            "position" : "[1, 2, 3]",
+            "size" : "0.1, 9, 9",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : ""
+          },
+          {
+            "kind" : "cone",
+            "label" : "",
+            "name" : "",
+            "position" : "",
+            "size" : "r, 2",
+            "tilt" : "r * 10",
+            "to" : "",
+            "tone" : "plain",
+            "turn" : "45"
+          },
+          {
+            "kind" : "ring",
+            "label" : "",
+            "name" : "earth",
+            "position" : "at(Sun)",
+            "size" : "1, 0.01",
+            "tilt" : "",
+            "to" : "",
+            "tone" : "guide",
+            "turn" : ""
+          }
+        ],
+        "plots" : [
+          {
+            "label" : "",
+            "xFrom" : "",
+            "xTo" : "",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "x^2 - y^2"
+          },
+          {
+            "label" : "",
+            "xFrom" : "-1",
+            "xTo" : "1",
+            "yFrom" : "-1",
+            "yTo" : "1",
+            "z" : "u * v"
+          }
+        ],
+        "time" : ""
+      }
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Solar system"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- t: \"Day\", variable number, 0 to 365\n- r: \"Radius\", number, starts at 1, 0.5 to 2, step 0.1\nOutputs:",
+    "outline" : "Solar system: \n- paragraph #block-0\n  The Earth goes round once a year.\n- section #auto-inputs\n  - slider #auto-input-1 ref r\nscene Solar system:\n  Sun sphere (0, 0, 0) size 0.3 glow\n  earth sphere orbits(sun, 1, 360 * T / 365) size 0.08 \"Earth on day {t}\" plain\n  table box on(floor) size R plain\n  lost sphere teleport(1, 2) size 1 plain\n  pointer arrow at(0, 0, 0) size 0.02 plain\n  note text at(0, 0, 1) plain\n  loop sphere on(loop) size 1 plain\n  wobbly sphere at(0, 0, 1) size 1 turn nonsense * 2 tilt 0 plain\n  mid sphere [1, 2, 3] size 0.1, 9, 9 plain\n   cone  size r, 2 turn 45 tilt r * 10 plain\n  earth ring at(Sun) size 1, 0.01 guide\n  plot z = x^2 - y^2 for x  to , y -1 to 1\n  plot z = u * v for x -1 to 1, y -1 to 1"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- t: \"Day\", variable number, 0 to 365\n- r: \"Radius\", number, starts at 1, 0.5 to 2, step 0.1\nOutputs:",
+    "outline" : "Solar system: \n- paragraph #block-0\n  The Earth goes round once a year.\n- scene #scene-solarSystem ref solarSystem\n- section #more-inputs\n  - slider #r-control ref r\nscene solarSystem, time t:\n  Sun sphere at(0, 0, 0) size 0.3 glow\n  earth sphere orbit(Sun, 1, 360 * t / 365) size 0.08 \"Earth on day {t}\" plain\n  table box on(ground) size r plain\n  wobbly sphere at(0, 0, 1) size 1 plain\n  mid sphere at(1, 2, 3) size 0.1 plain\n  cone10 cone at(0, 0, 0) size r, 2 turn 45 tilt r * 10 plain\n  earth2 ring at(Sun) size 1, 0.01 guide\n  plot z = x ^ 2 - y ^ 2 for x -2 to 2, y -1 to 1"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "'t' doesn't affect any result."
+      }
+    ],
+    "surface" : {
+      "accent" : "indigo",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "The Earth goes round once a year.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 0,
+          "label" : "Day",
+          "max" : 365,
+          "min" : 0,
+          "name" : "t",
+          "options" : [
+
+          ],
+          "role" : "variable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Radius",
+          "max" : 2,
+          "min" : 0.5,
+          "name" : "r",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.10000000000000001,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "learn",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "scenes" : [
+        {
+          "name" : "Solar system",
+          "objects" : [
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "Sun",
+              "position" : "(0, 0, 0)",
+              "size" : "0.3",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "glow",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "Earth on day {t}",
+              "name" : "earth",
+              "position" : "orbits(sun, 1, 360 * T / 365)",
+              "size" : "0.08",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "box",
+              "label" : "",
+              "name" : "table",
+              "position" : "on(floor)",
+              "size" : "R",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "lost",
+              "position" : "teleport(1, 2)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "arrow",
+              "label" : "",
+              "name" : "pointer",
+              "position" : "at(0, 0, 0)",
+              "size" : "0.02",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "text",
+              "label" : "",
+              "name" : "note",
+              "position" : "at(0, 0, 1)",
+              "size" : "",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "loop",
+              "position" : "on(loop)",
+              "size" : "1",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "wobbly",
+              "position" : "at(0, 0, 1)",
+              "size" : "1",
+              "tilt" : "0",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : "nonsense * 2"
+            },
+            {
+              "kind" : "sphere",
+              "label" : "",
+              "name" : "mid",
+              "position" : "[1, 2, 3]",
+              "size" : "0.1, 9, 9",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : ""
+            },
+            {
+              "kind" : "cone",
+              "label" : "",
+              "name" : "",
+              "position" : "",
+              "size" : "r, 2",
+              "tilt" : "r * 10",
+              "to" : "",
+              "tone" : "plain",
+              "turn" : "45"
+            },
+            {
+              "kind" : "ring",
+              "label" : "",
+              "name" : "earth",
+              "position" : "at(Sun)",
+              "size" : "1, 0.01",
+              "tilt" : "",
+              "to" : "",
+              "tone" : "guide",
+              "turn" : ""
+            }
+          ],
+          "plots" : [
+            {
+              "label" : "",
+              "xFrom" : "",
+              "xTo" : "",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "x^2 - y^2"
+            },
+            {
+              "label" : "",
+              "xFrom" : "-1",
+              "xTo" : "1",
+              "yFrom" : "-1",
+              "yTo" : "1",
+              "z" : "u * v"
+            }
+          ],
+          "time" : ""
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Solar system"
+    }
+  },
+  "sourcing" : [
+    {
+      "kind" : "needsModel",
+      "message" : "It states facts about the world without looking any up. Look them up first, with lookup, or search and read for anything current, local or about prices, then return the whole screen built on what they say."
+    }
+  ]
+}

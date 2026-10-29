@@ -1,0 +1,12 @@
+{
+  "about": "With only one action, an action block that names none shows it, and its heading goes: the button says what it does.",
+  "fill": true,
+  "wire": {
+    "title": "Dentist",
+    "actions": [{"name": "dentist", "kind": "reminder", "title": "Call the dentist", "day": "monday", "time": "9"}],
+    "blocks": [
+      {"kind": "paragraph", "text": "Book a check-up every six months."},
+      {"kind": "action", "ref": "", "title": "Remind me", "text": "ignored"}
+    ]
+  }
+}

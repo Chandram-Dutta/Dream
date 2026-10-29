@@ -1,0 +1,58 @@
+{
+  "about": "A page to learn from, with a figure: a right triangle with squares on its sides, as DreamTests' Pythagoras, written with the slips models make: points written as ABC, a point named twice, coordinates as Ax and B_x, a shape through a point that isn't one, a circle whose radius can't be read, a square built on a side, an arc, angles, text with nothing to say, a point that can't be placed, and the figure block named by a near miss.",
+  "fill": true,
+  "reference": {"title": "Pythagorean theorem", "extract": "In mathematics, the Pythagorean theorem is a fundamental relation in Euclidean geometry between the three sides of a right triangle.", "url": "https://en.wikipedia.org/wiki/Pythagorean_theorem", "imageURL": "https://upload.wikimedia.org/pythagoras.png"},
+  "wire": {
+    "subject": "science",
+    "mode": "learn",
+    "title": "Pythagoras' theorem",
+    "summary": "The square on the long side equals the squares on the other two: $a^2 + b^2 = c^2$.",
+    "symbol": "triangle",
+    "question": "How does the long side change with the other two?",
+    "inputs": [
+      {"name": "a", "label": "Side a", "symbol": "a", "initial": 3, "min": 1, "max": 8, "step": 0.1},
+      {"name": "b", "label": "Side b", "symbol": "b", "initial": 4, "min": 1, "max": 8, "step": 0.1}
+    ],
+    "outputs": [{"name": "c", "label": "Hypotenuse", "symbol": "c", "formula": "sqrt(a^2 + b^2)"}],
+    "figures": [{"name": "triangle", "points": [
+      {"name": "C", "x": "0", "y": "0", "label": "C"},
+      {"name": "B", "x": "a", "y": "0", "label": "B"},
+      {"name": "A", "x": "0", "y": "b", "label": "A"},
+      {"name": "A", "x": "1", "y": "1", "label": "again"},
+      {"name": "P", "x": "Bx", "y": "-a", "label": ""},
+      {"name": "Q", "x": "0", "y": "-a", "label": ""},
+      {"name": "R", "x": "-b", "y": "A.y", "label": ""},
+      {"name": "S", "x": "-b", "y": "", "label": ""},
+      {"name": "T", "x": "B_x + A.Y", "y": "B.x", "label": ""},
+      {"name": "U", "x": "A.y", "y": "A.y + B.x", "label": ""},
+      {"name": "Far", "x": "sqrt(-a)", "y": "0", "label": "nowhere"},
+      {"name": "Loop", "x": "Loop.x + 1", "y": "0", "label": ""},
+      {"name": "Bad", "x": "zebra", "y": "0", "label": ""}
+    ], "shapes": [
+      {"kind": "polygon", "points": "ABC", "tone": "main"},
+      {"kind": "polygon", "points": "C, B, P, Q", "label": "$a^2$", "tone": "contrast"},
+      {"kind": "polygon", "points": "C A R S", "label": "$b^2$", "tone": "contrast"},
+      {"kind": "square", "points": "B, A, C", "label": "$c^2$", "tone": "main"},
+      {"kind": "rightAngle", "points": "B, C, A"},
+      {"kind": "segment", "points": "B, A", "label": "c = {c} {nothing}", "tone": "main"},
+      {"kind": "segment", "points": "B, Z", "label": "broken"},
+      {"kind": "circle", "points": "C", "radius": "radius of it"},
+      {"kind": "circle", "points": "C", "radius": "c - 10"},
+      {"kind": "arc", "points": "C", "radius": "1", "from": "0", "to": "atan2(b, a) * 180 / pi", "label": "θ"},
+      {"kind": "arc", "points": "C", "radius": "1", "from": "45", "to": "45"},
+      {"kind": "angle", "points": "A, B, C", "label": "β"},
+      {"kind": "text", "points": "C", "label": "  "},
+      {"kind": "arrow", "points": "C, Far"},
+      {"kind": "angle", "points": "A, B"}
+    ]}],
+    "blocks": [
+      {"kind": "figure", "ref": "triangel", "title": "The squares on the sides"},
+      {"kind": "equation", "ref": "c", "text": "c = \\sqrt{a^2 + b^2}"},
+      {"kind": "section", "title": "Change the sides", "children": [{"kind": "slider", "ref": "a"}, {"kind": "slider", "ref": "b"}]},
+      {"kind": "hero", "ref": "c"},
+      {"kind": "paragraph", "text": "The long side is {c} when the others are {a} and {b}."}
+    ],
+    "related": ["Euclid", "Right triangle", "Pythagorean triple"],
+    "citations": ["https://en.wikipedia.org/wiki/Pythagorean_theorem"]
+  }
+}

@@ -1,0 +1,24 @@
+{
+  "about": "Results that can't be worked out at the starting values go back: one that depends on itself, one that isn't a number there, one that never changes, and a chart of something the calculation doesn't have.",
+  "fill": true,
+  "wire": {
+    "title": "Broken results",
+    "inputs": [
+      {"name": "x", "label": "x", "initial": 2, "min": -10, "max": 10, "step": 0.5}
+    ],
+    "outputs": [
+      {"name": "loop", "label": "Loop", "formula": "loopTwo + x"},
+      {"name": "loopTwo", "label": "Loop two", "formula": "loop * 2"},
+      {"name": "root", "label": "Root", "formula": "sqrt(x - 5)"},
+      {"name": "constant", "label": "Constant", "formula": "pi * 2"},
+      {"name": "square", "label": "Square", "formula": "x ^ 2"},
+      {"name": "wrongArity", "label": "Wrong", "formula": "pow(x) + atan2(x)"},
+      {"name": "ifWrong", "label": "If", "formula": "if(x > 1, 2)"}
+    ],
+    "blocks": [
+      {"kind": "chart", "ref": "y", "over": "x"},
+      {"kind": "chart", "ref": "x ^ 3", "over": "x"},
+      {"kind": "chart", "ref": "square", "over": "x"}
+    ]
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "about": "Lists a connected service fills: one naming a list a source read by a near miss, one naming a list nobody returned (sent back), one with an empty source (a list the user keeps). A service's list keeps no starters and has no bar for adding to it.",
+  "fill": true,
+  "services": ["Linear"],
+  "sources": [
+    {"name": "issues", "kind": "connection", "parameters": {"service": "Linear", "tool": "list_issues"}, "fields": [{"name": "open", "value": 4, "unit": "", "format": "integer", "meaning": "open issues"}],
+     "lists": [{"name": "items", "keys": ["id", "title", "state"], "count": 4}]}
+  ],
+  "wire": {
+    "title": "My issues",
+    "subject": "tech",
+    "collections": [
+      {"name": "work", "label": "Work", "entry": "issue", "fields": [{"name": "title", "label": "Title", "type": "text"}, {"name": "state", "label": "State", "type": "text"}],
+       "starters": [{"values": ["Fix login", "open"]}], "source": "issues.itmes"},
+      {"name": "other", "label": "Other", "fields": [{"name": "title", "label": "Title"}], "source": "notes.pages"},
+      {"name": "mine", "label": "Mine", "fields": [{"name": "title", "label": "Title"}], "source": "  "}
+    ],
+    "inputs": [{"name": "open", "label": "Open", "role": "live", "source": "issues.open", "format": "integer"}],
+    "blocks": [
+      {"kind": "metric", "ref": "open"},
+      {"kind": "add", "ref": "work"},
+      {"kind": "list", "ref": "work"},
+      {"kind": "section", "title": "Mine", "children": [{"kind": "list", "ref": "mine"}]}
+    ]
+  }
+}

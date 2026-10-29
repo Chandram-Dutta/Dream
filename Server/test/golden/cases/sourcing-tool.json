@@ -1,0 +1,14 @@
+{
+  "about": "A tool for the user's own numbers states nothing about the world and needs nothing looked up; but a tool with facts, a stat, a timeline or a data block of figures on it does; a data block charting the user's entries doesn't.",
+  "fill": true,
+  "wire": {
+    "title": "Split",
+    "mode": "use",
+    "inputs": [{"name": "bill", "label": "Bill", "format": "currency", "initial": 100, "max": 1000}],
+    "outputs": [{"name": "half", "label": "Half", "formula": "bill / 2", "format": "currency"}],
+    "blocks": [
+      {"kind": "hero", "ref": "half"},
+      {"kind": "section", "children": [{"kind": "stat", "items": [{"label": "15%", "value": "a usual tip in the US"}]}]}
+    ]
+  }
+}

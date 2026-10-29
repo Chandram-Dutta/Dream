@@ -1,0 +1,176 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Extra"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Extra"
+    }
+  },
+  "content" : {
+    "blocks" : [
+      {
+        "kind" : "paragraph",
+        "style" : "bold",
+        "text" : "Hello."
+      }
+    ],
+    "colour" : "red",
+    "summary" : null,
+    "title" : "Extra"
+  },
+  "converted" : {
+    "accent" : "blue",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Hello.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "sparkles",
+    "title" : "Extra"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Extra: \n- paragraph #block-0\n  Hello."
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : false
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Extra: \n- paragraph #block-0\n  Hello."
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "blue",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Hello.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "sparkles",
+      "title" : "Extra"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

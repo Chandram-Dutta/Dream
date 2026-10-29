@@ -1,0 +1,273 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Oldest",
+              "value" : "Café Frauenhuber, 1824"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "Example",
+          "title" : "Café culture",
+          "url" : "https://example.com/café guide?q=a b"
+        },
+        {
+          "site" : "Example",
+          "title" : "Odd",
+          "url" : "https://example.com/100%25/x%zz"
+        },
+        {
+          "site" : "Example",
+          "title" : "Short",
+          "url" : "https://example.com"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Cafés of Vienna"
+    }
+  },
+  "citations" : {
+    "issues" : [
+      {
+        "kind" : "warning",
+        "message" : "Named no sources, so every page read is credited."
+      }
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Oldest",
+              "value" : "Café Frauenhuber, 1824"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "citations" : [
+        {
+          "site" : "Example",
+          "title" : "Café culture",
+          "url" : "https://example.com/café guide?q=a b"
+        },
+        {
+          "site" : "Example",
+          "title" : "Odd",
+          "url" : "https://example.com/100%25/x%zz"
+        },
+        {
+          "site" : "Example",
+          "title" : "Short",
+          "url" : "https://example.com"
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Cafés of Vienna"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "Oldest",
+            "value" : "Café Frauenhuber, 1824"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "food",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Cafés of Vienna"
+  },
+  "converted" : {
+    "accent" : "orange",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+          {
+            "label" : "Oldest",
+            "value" : "Café Frauenhuber, 1824"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Cafés of Vienna"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Cafés of Vienna: \n- facts #block-0\n  • Oldest: Café Frauenhuber, 1824"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "Cafés of Vienna: \n- facts #block-0\n  • Oldest: Café Frauenhuber, 1824\ncitations (pages already read; list again the ones the screen still uses): https://example.com/café guide?q=a b, https://example.com/100%25/x%zz, https://example.com"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "orange",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Oldest",
+              "value" : "Café Frauenhuber, 1824"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Cafés of Vienna"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

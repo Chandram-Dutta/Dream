@@ -1,0 +1,22 @@
+{
+  "about": "Once ranges are right, the rest of the checks run: starting values and minimums that break results, unused controls and givens.",
+  "fill": true,
+  "wire": {
+    "title": "Ranges, then the rest",
+    "inputs": [
+      {"name": "swapped", "label": "Swapped", "initial": 5, "min": 10, "max": 0, "step": 1},
+      {"name": "single", "label": "Single", "initial": -4, "min": -4, "max": -4, "step": 1},
+      {"name": "count", "label": "Count", "format": "integer", "initial": 2.6, "min": 0.4, "max": 9.2, "step": 0.3},
+      {"name": "noStep", "label": "No step", "initial": 0.5, "min": 0, "max": 2.4, "step": 0},
+      {"name": "night", "label": "Night", "format": "toggle", "initial": 7},
+      {"name": "size", "label": "Size", "format": "choice", "initial": 7.6, "options": ["  Small ", "", "Medium", "Large  "]},
+      {"name": "gravity", "label": "Gravity", "role": "given", "initial": 9.81, "min": 0, "max": 20, "unit": "m/s²"},
+      {"name": "unusedGiven", "label": "Unused", "role": "given", "initial": 3},
+      {"name": "unusedControl", "label": "Nothing uses me", "initial": 3, "max": 10}
+    ],
+    "outputs": [
+      {"name": "total", "label": "Total", "formula": "swapped + single + count + noStep + night + size + gravity"}
+    ],
+    "blocks": [{"kind": "hero", "ref": "total"}]
+  }
+}

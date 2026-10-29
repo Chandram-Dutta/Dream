@@ -1,0 +1,245 @@
+{
+  "blocks" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Pages",
+              "value" : "12"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Notion"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My notes"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Pages",
+              "value" : "12"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Notion"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My notes"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+          {
+            "label" : "Pages",
+            "value" : "12"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "My notes"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+          {
+            "label" : "Pages",
+            "value" : "12"
+          }
+        ],
+        "kind" : "facts",
+        "over" : "",
+        "ref" : "",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+
+    ],
+    "mode" : "read",
+    "outputs" : [
+
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "My notes"
+  },
+  "convertedFacts" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "My notes: \n- facts #block-0\n  • Pages: 12"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : false,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\nOutputs:",
+    "outline" : "My notes: \n- facts #block-0\n  • Pages: 12"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+            {
+              "label" : "Pages",
+              "value" : "12"
+            }
+          ],
+          "kind" : "facts",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+
+      ],
+      "mode" : "read",
+      "outputs" : [
+
+      ],
+      "related" : [
+
+      ],
+      "services" : [
+        "Notion"
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "My notes"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

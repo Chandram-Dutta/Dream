@@ -1,0 +1,36 @@
+{
+  "about": "Diagrams as Grok writes them: the water cycle (DreamTests' writtenDiagrams) with a part named twice, parts named from their labels, edges by label or near miss, an edge to itself and one written twice, an edge between parts that don't exist; a diagram with one part dropped; a diagram block by near miss, and one no block shows placed after the opening block.",
+  "fill": true,
+  "wire": {
+    "subject": "nature",
+    "mode": "learn",
+    "title": "The water cycle",
+    "summary": "Water goes round from the sea to the sky and back.",
+    "diagrams": [
+      {"name": "water", "shape": "cycle", "nodes": [
+        {"id": "ocean", "label": "Ocean", "detail": "Most water is here.\\nIt evaporates."},
+        {"id": "vapor", "label": " Water vapour ", "detail": ""},
+        {"id": "clouds", "label": "Clouds", "detail": "Vapour condenses."},
+        {"id": "", "label": "Land", "detail": ""},
+        {"id": "ocean", "label": "Sea again", "detail": ""},
+        {"id": "ground water", "label": "", "detail": ""}
+      ], "edges": [
+        {"from": "ocean", "to": "vapor", "label": " evaporation "},
+        {"from": "vapour", "to": "Clouds", "label": "condensation"},
+        {"from": "clouds", "to": "Land", "label": "precipitation"},
+        {"from": "land", "to": "groundWater", "label": "infiltration"},
+        {"from": "ocean", "to": "ocean", "label": "self"},
+        {"from": "ocean", "to": "vapor", "label": "again"},
+        {"from": "space", "to": "ocean", "label": "comets"}
+      ]},
+      {"name": "lonely", "shape": "hub", "nodes": [{"id": "one", "label": "One", "detail": ""}], "edges": []},
+      {"name": "steps", "shape": "flow", "nodes": [{"id": "a", "label": "First", "detail": ""}, {"id": "b", "label": "Second", "detail": ""}], "edges": []}
+    ],
+    "blocks": [
+      {"kind": "paragraph", "text": "The sun drives it."},
+      {"kind": "diagram", "ref": "watr", "title": "The cycle"},
+      {"kind": "steps", "items": [{"label": "", "value": "Evaporation"}, {"label": "", "value": "Condensation"}], "text": "These repeat."}
+    ]
+  },
+  "read": [{"title": "Water cycle", "site": "", "url": "https://en.wikipedia.org/wiki/Water_cycle"}]
+}

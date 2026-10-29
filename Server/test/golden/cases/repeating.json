@@ -1,0 +1,12 @@
+{
+  "about": "A model looping: the same long sentence again and again in a paragraph, and items that repeat. The page is repeating itself, which the loop stops; after the checks it still is.",
+  "partial": true,
+  "wire": {
+    "title": "Loop",
+    "summary": "A page that loops.",
+    "blocks": [
+      {"kind": "paragraph", "text": "This sentence is long enough to count as one. This sentence is long enough to count as one. Short."},
+      {"kind": "bullets", "items": [{"value": "Same"}, {"value": "same"}, {"value": "Same"}, {"value": "Other"}]}
+    ]
+  }
+}

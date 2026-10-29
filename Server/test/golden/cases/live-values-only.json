@@ -1,0 +1,26 @@
+{
+  "about": "A page that only shows live values needs no results; its values are read into the reader's units (metric here); an unused source is dropped; and a page showing live values isn't sent back to look things up.",
+  "fill": true,
+  "locale": "en_IN",
+  "sources": [
+    {"name": "weather", "kind": "weather", "parameters": {"place": "here", "day": "tomorrow"}, "fields": [
+      {"name": "rainChance", "value": 40, "format": "percent", "unit": "", "meaning": "the chance of rain"},
+      {"name": "high", "value": 31, "unit": "°C", "format": "number", "meaning": "the high"}
+    ]},
+    {"name": "unused", "kind": "exchangeRate", "parameters": {"from": "EUR", "to": "INR"}, "fields": [{"name": "rate", "value": 90, "unit": "", "format": "number", "meaning": ""}]}
+  ],
+  "wire": {
+    "title": "Tomorrow",
+    "subject": "places",
+    "mode": "read",
+    "inputs": [
+      {"name": "rain", "label": "Rain", "role": "live", "source": "weather.rainChance"},
+      {"name": "high", "label": "High (°F)", "role": "live", "source": "weather.high", "unit": "°F"}
+    ],
+    "blocks": [
+      {"kind": "row", "children": [{"kind": "metric", "ref": "rain"}, {"kind": "slider", "ref": "high"}]},
+      {"kind": "paragraph", "text": "It'll be {high} °F at most, with a {rain} chance of rain."},
+      {"kind": "facts", "items": [{"label": "Rain", "value": "{rain}"}]}
+    ]
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "about": "Text that isn't JSON at all, like a model starting with a code fence, can't be read.",
+  "text": "```json\n{\"title\": \"Fenced\"}"
+}

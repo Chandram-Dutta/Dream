@@ -1,0 +1,12 @@
+{
+  "about": "A live input when nothing was fetched goes back to the model.",
+  "fill": true,
+  "wire": {
+    "title": "Live, nothing fetched",
+    "inputs": [
+      {"name": "rain", "label": "Rain", "role": "live", "source": "weather.rainChance", "initial": 50, "format": "percent"}
+    ],
+    "outputs": [{"name": "umbrella", "label": "Umbrella?", "formula": "rain > 40", "format": "toggle"}],
+    "blocks": [{"kind": "hero", "ref": "umbrella"}]
+  }
+}

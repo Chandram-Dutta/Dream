@@ -1,0 +1,26 @@
+{
+  "about": "The formula engine's functions worked out, and their numbers shown exactly: each tone's frequency is a formula, and one people can't hear is reported with its value, as Swift prints it.",
+  "fill": true,
+  "wire": {
+    "title": "Every function",
+    "inputs": [
+      {"name": "x", "label": "x", "initial": 2.5, "min": -10, "max": 10, "step": 0.5},
+      {"name": "n", "label": "n", "format": "integer", "initial": 10, "min": 0, "max": 20}
+    ],
+    "outputs": [
+      {"name": "all", "label": "All", "formula": "x + n"}
+    ],
+    "sounds": [
+      {"name": "a", "label": "Rounding", "tones": [{"frequency": "round(x)", "amplitude": "0.4"}, {"frequency": "round(-x)", "amplitude": "0.4"}, {"frequency": "round(1234.5678, 2) * 100", "amplitude": "0.4"}, {"frequency": "floor(x) + ceil(x) + abs(-x)", "amplitude": "0.4"}]},
+      {"name": "b", "label": "Powers", "tones": [{"frequency": "sqrt(2)", "amplitude": "0.4"}, {"frequency": "cbrt(27)", "amplitude": "0.4"}, {"frequency": "pow(2, 30)", "amplitude": "0.4"}, {"frequency": "2 ^ 3 ^ 2", "amplitude": "0.4"}]},
+      {"name": "c", "label": "Logs", "tones": [{"frequency": "exp(1)", "amplitude": "0.4"}, {"frequency": "log(8, 2)", "amplitude": "0.4"}, {"frequency": "log10(1000) + log2(1024) + ln(e)", "amplitude": "0.4"}, {"frequency": "log(100)", "amplitude": "0.4"}]},
+      {"name": "d", "label": "Trigonometry", "tones": [{"frequency": "sin(pi / 6)", "amplitude": "0.4"}, {"frequency": "cos(0) + tan(0)", "amplitude": "0.4"}, {"frequency": "atan2(1, 1) * 4", "amplitude": "0.4"}, {"frequency": "hypot(3, 4)", "amplitude": "0.4"}]},
+      {"name": "e2", "label": "Counting", "tones": [{"frequency": "fact(n)", "amplitude": "0.4"}, {"frequency": "choose(n, 3)", "amplitude": "0.4"}, {"frequency": "fact(3.5)", "amplitude": "0.4"}, {"frequency": "choose(5, 7) + choose(2, -1)", "amplitude": "0.4"}]},
+      {"name": "f", "label": "Lists", "tones": [{"frequency": "min(3, 1, 2) + max(3, 1, 2)", "amplitude": "0.4"}, {"frequency": "sum(1, 2, 3) + avg(2, 4) + count(0, 1, 2)", "amplitude": "0.4"}, {"frequency": "first(7, 8) + last(7, 8)", "amplitude": "0.4"}, {"frequency": "clamp(x, 3, 4)", "amplitude": "0.4"}]},
+      {"name": "g", "label": "Signs", "tones": [{"frequency": "sign(-x) + sign(0) + sign(x)", "amplitude": "0.4"}, {"frequency": "mod(-7, 3) + -7 % 3", "amplitude": "0.4"}, {"frequency": "if(x > 2, 1, 0) + (x < 2 ? 10 : 20)", "amplitude": "0.4"}, {"frequency": "1 / 3", "amplitude": "0.4"}]},
+      {"name": "h", "label": "Hyperbolic", "tones": [{"frequency": "sinh(1) + cosh(1) + tanh(1)", "amplitude": "0.4"}, {"frequency": "asin(1) + acos(0) + atan(1)", "amplitude": "0.4"}, {"frequency": "1e-5 * 3", "amplitude": "0.4"}, {"frequency": "1_000_000 * 1e3", "amplitude": "0.4"}]},
+      {"name": "i", "label": "Big", "tones": [{"frequency": "10 ^ 16", "amplitude": "0.4"}, {"frequency": "2 ^ 53 + 0.5", "amplitude": "0.4"}, {"frequency": "123456789.25 * 1000", "amplitude": "0.4"}, {"frequency": "0.1 + 0.2", "amplitude": "0.4"}]}
+    ],
+    "blocks": [{"kind": "hero", "ref": "all"}]
+  }
+}

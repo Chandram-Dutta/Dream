@@ -1,0 +1,1087 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'people', 'hours', 'bill', 'speed', 'offset', 'depth'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'rate', 'eta', 'inverse', 'root' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "share",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "people-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "people",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "hours-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "hours",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "bill-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "bill",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "speed-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "speed",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "offset-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "offset",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "depth-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "depth",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "rate-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "rate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "eta-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "eta",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "inverse-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "inverse",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "root-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "root",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 1,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Hours",
+          "max" : 12,
+          "min" : 0.5,
+          "name" : "hours",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 120,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 50,
+          "label" : "Speed",
+          "max" : 120,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Offset",
+          "max" : 5,
+          "min" : -5,
+          "name" : "offset",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Depth",
+          "max" : 10,
+          "min" : -5,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / people",
+          "label" : "Each pays",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill / hours",
+          "label" : "Per hour",
+          "name" : "rate",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "100 / speed",
+          "label" : "Time",
+          "name" : "eta",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1 / offset",
+          "label" : "Inverse",
+          "name" : "inverse",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(depth - 1)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Starting values"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "share",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 1,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Hours",
+          "max" : 12,
+          "min" : 0.5,
+          "name" : "hours",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 120,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 50,
+          "label" : "Speed",
+          "max" : 120,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Offset",
+          "max" : 5,
+          "min" : -5,
+          "name" : "offset",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Depth",
+          "max" : 10,
+          "min" : -5,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / people",
+          "label" : "Each pays",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill / hours",
+          "label" : "Per hour",
+          "name" : "rate",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "100 / speed",
+          "label" : "Time",
+          "name" : "eta",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1 / offset",
+          "label" : "Inverse",
+          "name" : "inverse",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(depth - 1)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Starting values"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "share",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "People",
+        "max" : 10,
+        "min" : 0,
+        "name" : "people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Hours",
+        "max" : 12,
+        "min" : 0,
+        "name" : "hours",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 120,
+        "label" : "Bill",
+        "max" : 500,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Speed",
+        "max" : 120,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Offset",
+        "max" : 5,
+        "min" : -5,
+        "name" : "offset",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Depth",
+        "max" : 10,
+        "min" : -5,
+        "name" : "depth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill / people",
+        "label" : "Each pays",
+        "name" : "share",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "bill / hours",
+        "label" : "Per hour",
+        "name" : "rate",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "100 / speed",
+        "label" : "Time",
+        "name" : "eta",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1 / offset",
+        "label" : "Inverse",
+        "name" : "inverse",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "sqrt(depth - 1)",
+        "label" : "Root",
+        "name" : "root",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Starting values"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "share",
+        "text" : "",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "integer",
+        "initial" : 0,
+        "label" : "People",
+        "max" : 10,
+        "min" : 0,
+        "name" : "people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Hours",
+        "max" : 12,
+        "min" : 0,
+        "name" : "hours",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 120,
+        "label" : "Bill",
+        "max" : 500,
+        "min" : 0,
+        "name" : "bill",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 10,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 50,
+        "label" : "Speed",
+        "max" : 120,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 5,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Offset",
+        "max" : 5,
+        "min" : -5,
+        "name" : "offset",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Depth",
+        "max" : 10,
+        "min" : -5,
+        "name" : "depth",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.5,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "bill / people",
+        "label" : "Each pays",
+        "name" : "share",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "bill / hours",
+        "label" : "Per hour",
+        "name" : "rate",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "100 / speed",
+        "label" : "Time",
+        "name" : "eta",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1 / offset",
+        "label" : "Inverse",
+        "name" : "inverse",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "sqrt(depth - 1)",
+        "label" : "Root",
+        "name" : "root",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Starting values"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- people: \"People\", integer, starts at 0, 0 to 10, step 1\n- hours: \"Hours\", number, starts at 0, 0 to 12, step 0.5\n- bill: \"Bill\", currency, starts at 120, 0 to 500, step 10\n- speed: \"Speed\", number, starts at 50, 0 to 120, step 5\n- offset: \"Offset\", number, starts at 5, -5 to 5, step 1\n- depth: \"Depth\", number, starts at 5, -5 to 10, step 0.5\nOutputs:\n- share: \"Each pays\", currency = bill / people\n- rate: \"Per hour\", currency = bill / hours\n- eta: \"Time\", number = 100 / speed\n- inverse: \"Inverse\", number = 1 / offset\n- root: \"Root\", number = sqrt(depth - 1)",
+    "outline" : "Starting values: \n- hero #block-0 ref share\n- section #auto-inputs\n  - stepper #auto-input-0 ref people\n  - slider #auto-input-1 ref hours\n  - slider #auto-input-2 ref bill\n  - slider #auto-input-3 ref speed\n  - slider #auto-input-4 ref offset\n  - slider #auto-input-5 ref depth\n- section #auto-outputs\n  - metric #auto-output-1 ref rate\n  - metric #auto-output-2 ref eta\n  - metric #auto-output-3 ref inverse\n  - metric #auto-output-4 ref root"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- people: \"People\", integer, starts at 1, 1 to 10, step 1\n- hours: \"Hours\", number, starts at 1, 0.5 to 12, step 0.5\n- bill: \"Bill\", currency, starts at 120, 0 to 500, step 10\n- speed: \"Speed\", number, starts at 50, 5 to 120, step 5\n- offset: \"Offset\", number, starts at 5, -5 to 5, step 1\n- depth: \"Depth\", number, starts at 5, -5 to 10, step 0.5\nOutputs:\n- share: \"Each pays\", currency = bill / people\n- rate: \"Per hour\", currency = bill / hours\n- eta: \"Time\", number = 100 / speed\n- inverse: \"Inverse\", number = 1 / offset\n- root: \"Root\", number = sqrt(depth - 1)",
+    "outline" : "Starting values: \n- hero #block-0 ref share\n- section #more-inputs\n  - stepper #people-control ref people\n  - slider #hours-control ref hours\n  - slider #bill-control ref bill\n  - slider #speed-control ref speed\n  - slider #offset-control ref offset\n  - slider #depth-control ref depth\n- section #more-results\n  - metric #rate-metric ref rate\n  - metric #eta-metric ref eta\n  - metric #inverse-metric ref inverse\n  - metric #root-metric ref root"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Started 'people' at 1 instead of 0, which broke the results."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Started 'hours' at 1 instead of 0, which broke the results."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Raised the minimum of 'people' to 1 so results never divide by zero."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Raised the minimum of 'hours' to 0.5 so results never divide by zero."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Raised the minimum of 'speed' to 5 so results never divide by zero."
+      },
+      {
+        "kind" : "warning",
+        "message" : "Some results break when 'depth' is at its minimum."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "share",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "integer",
+          "initial" : 1,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 1,
+          "label" : "Hours",
+          "max" : 12,
+          "min" : 0.5,
+          "name" : "hours",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 120,
+          "label" : "Bill",
+          "max" : 500,
+          "min" : 0,
+          "name" : "bill",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 10,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 50,
+          "label" : "Speed",
+          "max" : 120,
+          "min" : 5,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 5,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Offset",
+          "max" : 5,
+          "min" : -5,
+          "name" : "offset",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Depth",
+          "max" : 10,
+          "min" : -5,
+          "name" : "depth",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.5,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "bill / people",
+          "label" : "Each pays",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "bill / hours",
+          "label" : "Per hour",
+          "name" : "rate",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "100 / speed",
+          "label" : "Time",
+          "name" : "eta",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "1 / offset",
+          "label" : "Inverse",
+          "name" : "inverse",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "sqrt(depth - 1)",
+          "label" : "Root",
+          "name" : "root",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Starting values"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

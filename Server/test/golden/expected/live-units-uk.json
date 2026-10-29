@@ -1,0 +1,1062 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Removed units written after the live values of 'distance', which show their own."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'fuelPrice'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed the givens 'distance', 'speed', 'economy', 'temperature', 'days'."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "cost",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It's {distance} each way, at {speed} m/s on average.",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "fuelPrice-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "fuelPrice",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "distance-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "distance",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "speed-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "speed",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "economy-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "economy",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "temperature-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "temperature",
+                  "text" : "",
+                  "title" : ""
+                },
+                {
+                  "children" : [
+
+                  ],
+                  "id" : "days-given",
+                  "items" : [
+
+                  ],
+                  "kind" : "metric",
+                  "over" : "",
+                  "ref" : "days",
+                  "text" : "",
+                  "title" : ""
+                }
+              ],
+              "id" : "givens",
+              "items" : [
+
+              ],
+              "kind" : "section",
+              "over" : "",
+              "ref" : "",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 24.854847689493358,
+          "label" : "Distance",
+          "max" : 24.854847689493358,
+          "min" : 24.854847689493358,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "number",
+          "initial" : 44.738725841088048,
+          "label" : "Speed",
+          "max" : 44.738725841088048,
+          "min" : 44.738725841088048,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.speed",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mph"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Economy",
+          "max" : 6.5,
+          "min" : 6.5,
+          "name" : "economy",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.economy",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "number",
+          "initial" : 14,
+          "label" : "Temperature",
+          "max" : 14,
+          "min" : 14,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.temperature",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 48,
+          "label" : "Days",
+          "max" : 48,
+          "min" : 48,
+          "name" : "days",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.days",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.5,
+          "label" : "Fuel price",
+          "max" : 3,
+          "min" : 0,
+          "name" : "fuelPrice",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+          "label" : "Fuel cost",
+          "name" : "cost",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "average speed",
+              "name" : "speed",
+              "unit" : "m/s",
+              "value" : 20
+            },
+            {
+              "format" : "number",
+              "meaning" : "fuel use",
+              "name" : "economy",
+              "unit" : "L/100 km",
+              "value" : 6.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "outside",
+              "name" : "temperature",
+              "unit" : "°C",
+              "value" : 14
+            },
+            {
+              "format" : "integer",
+              "meaning" : "days away",
+              "name" : "days",
+              "unit" : "days",
+              "value" : 2
+            }
+          ],
+          "kind" : "route",
+          "name" : "trip",
+          "parameters" : {
+            "from" : "Leeds",
+            "to" : "York"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Trip"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "cost",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It's {distance} miles each way, at {speed} m/s on average.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 24.854847689493358,
+          "label" : "Distance",
+          "max" : 24.854847689493358,
+          "min" : 24.854847689493358,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "number",
+          "initial" : 44.738725841088048,
+          "label" : "Speed",
+          "max" : 44.738725841088048,
+          "min" : 44.738725841088048,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.speed",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mph"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Economy",
+          "max" : 6.5,
+          "min" : 6.5,
+          "name" : "economy",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.economy",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "number",
+          "initial" : 14,
+          "label" : "Temperature",
+          "max" : 14,
+          "min" : 14,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.temperature",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 48,
+          "label" : "Days",
+          "max" : 48,
+          "min" : 48,
+          "name" : "days",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.days",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.5,
+          "label" : "Fuel price",
+          "max" : 3,
+          "min" : 0,
+          "name" : "fuelPrice",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+          "label" : "Fuel cost",
+          "name" : "cost",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "average speed",
+              "name" : "speed",
+              "unit" : "m/s",
+              "value" : 20
+            },
+            {
+              "format" : "number",
+              "meaning" : "fuel use",
+              "name" : "economy",
+              "unit" : "L/100 km",
+              "value" : 6.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "outside",
+              "name" : "temperature",
+              "unit" : "°C",
+              "value" : 14
+            },
+            {
+              "format" : "integer",
+              "meaning" : "days away",
+              "name" : "days",
+              "unit" : "days",
+              "value" : 2
+            }
+          ],
+          "kind" : "route",
+          "name" : "trip",
+          "parameters" : {
+            "from" : "Leeds",
+            "to" : "York"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Trip"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "cost",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It's {distance} miles each way, at {speed} m/s on average.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Distance",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.distance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Speed",
+        "max" : 100,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.speed",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "ft/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Economy",
+        "max" : 100,
+        "min" : 0,
+        "name" : "economy",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.economy",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Temperature",
+        "max" : 100,
+        "min" : 0,
+        "name" : "temperature",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.temperature",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Days",
+        "max" : 100,
+        "min" : 0,
+        "name" : "days",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.days",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "h"
+      },
+      {
+        "format" : "currency",
+        "initial" : 1.5,
+        "label" : "Fuel price",
+        "max" : 3,
+        "min" : 0,
+        "name" : "fuelPrice",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.050000000000000003,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+        "label" : "Fuel cost",
+        "name" : "cost",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Trip"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "hero",
+        "over" : "",
+        "ref" : "cost",
+        "text" : "",
+        "title" : ""
+      },
+      {
+        "children" : [
+
+        ],
+        "id" : "block-1",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "It's {distance} miles each way, at {speed} m/s on average.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Distance",
+        "max" : 100,
+        "min" : 0,
+        "name" : "distance",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.distance",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Speed",
+        "max" : 100,
+        "min" : 0,
+        "name" : "speed",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.speed",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "ft/s"
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Economy",
+        "max" : 100,
+        "min" : 0,
+        "name" : "economy",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.economy",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Temperature",
+        "max" : 100,
+        "min" : 0,
+        "name" : "temperature",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.temperature",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Days",
+        "max" : 100,
+        "min" : 0,
+        "name" : "days",
+        "options" : [
+
+        ],
+        "role" : "live",
+        "source" : "trip.days",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : "h"
+      },
+      {
+        "format" : "currency",
+        "initial" : 1.5,
+        "label" : "Fuel price",
+        "max" : 3,
+        "min" : 0,
+        "name" : "fuelPrice",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 0.050000000000000003,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "currency",
+        "formula" : "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+        "label" : "Fuel cost",
+        "name" : "cost",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Trip"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- distance: \"Distance\", live number from trip.distance, now 0\n- speed: \"Speed\", live number from trip.speed, now 0, in ft/s\n- economy: \"Economy\", live number from trip.economy, now 0\n- temperature: \"Temperature\", live number from trip.temperature, now 0\n- days: \"Days\", live number from trip.days, now 0, in h\n- fuelPrice: \"Fuel price\", currency, starts at 1.5, 0 to 3, step 0.05\nOutputs:\n- cost: \"Fuel cost\", currency = distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+    "outline" : "Trip: \n- hero #block-0 ref cost\n- paragraph #block-1\n  It's {distance} miles each way, at {speed} m/s on average.\n- section #auto-inputs\n  - slider #auto-input-5 ref fuelPrice"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- distance: \"Distance\", live number from trip.distance, now 24.854847689493358, in mi\n- speed: \"Speed\", live number from trip.speed, now 44.73872584108805, in mph\n- economy: \"Economy\", live number from trip.economy, now 6.5, in L/100 km\n- temperature: \"Temperature\", live number from trip.temperature, now 14, in °C\n- days: \"Days\", live number from trip.days, now 48, in h\n- fuelPrice: \"Fuel price\", currency, starts at 1.5, 0 to 3, step 0.05\nOutputs:\n- cost: \"Fuel cost\", currency = distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+    "outline" : "Trip: \n- hero #block-0 ref cost\n- paragraph #block-1\n  It's {distance} each way, at {speed} m/s on average.\n- section #more-inputs\n  - slider #fuelPrice-control ref fuelPrice\n  - section #givens\n    - metric #distance-given ref distance\n    - metric #speed-given ref speed\n    - metric #economy-given ref economy\n    - metric #temperature-given ref temperature\n    - metric #days-given ref days\nsources (fetched with the live tool; fetch again to change one):\n- trip: route, from Leeds, to York; fields trip.distance, trip.speed, trip.economy, trip.temperature, trip.days"
+  },
+  "locale" : "en_GB",
+  "logic" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "cost",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "block-1",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "It's {distance} miles each way, at {speed} m/s on average.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "number",
+          "initial" : 24.854847689493358,
+          "label" : "Distance",
+          "max" : 24.854847689493358,
+          "min" : 24.854847689493358,
+          "name" : "distance",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.distance",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mi"
+        },
+        {
+          "format" : "number",
+          "initial" : 44.738725841088048,
+          "label" : "Speed",
+          "max" : 44.738725841088048,
+          "min" : 44.738725841088048,
+          "name" : "speed",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.speed",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "mph"
+        },
+        {
+          "format" : "number",
+          "initial" : 6.5,
+          "label" : "Economy",
+          "max" : 6.5,
+          "min" : 6.5,
+          "name" : "economy",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.economy",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "L/100 km"
+        },
+        {
+          "format" : "number",
+          "initial" : 14,
+          "label" : "Temperature",
+          "max" : 14,
+          "min" : 14,
+          "name" : "temperature",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.temperature",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "°C"
+        },
+        {
+          "format" : "number",
+          "initial" : 48,
+          "label" : "Days",
+          "max" : 48,
+          "min" : 48,
+          "name" : "days",
+          "options" : [
+
+          ],
+          "role" : "live",
+          "source" : "trip.days",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : "h"
+        },
+        {
+          "format" : "currency",
+          "initial" : 1.5,
+          "label" : "Fuel price",
+          "max" : 3,
+          "min" : 0,
+          "name" : "fuelPrice",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 0.050000000000000003,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "distance * economy / 100 * fuelPrice + speed * 0 + temperature * 0 + days * 0",
+          "label" : "Fuel cost",
+          "name" : "cost",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "sources" : [
+        {
+          "fields" : [
+            {
+              "format" : "number",
+              "meaning" : "how far",
+              "name" : "distance",
+              "unit" : "km",
+              "value" : 40
+            },
+            {
+              "format" : "number",
+              "meaning" : "average speed",
+              "name" : "speed",
+              "unit" : "m/s",
+              "value" : 20
+            },
+            {
+              "format" : "number",
+              "meaning" : "fuel use",
+              "name" : "economy",
+              "unit" : "L/100 km",
+              "value" : 6.5
+            },
+            {
+              "format" : "number",
+              "meaning" : "outside",
+              "name" : "temperature",
+              "unit" : "°C",
+              "value" : 14
+            },
+            {
+              "format" : "integer",
+              "meaning" : "days away",
+              "name" : "days",
+              "unit" : "days",
+              "value" : 2
+            }
+          ],
+          "kind" : "route",
+          "name" : "trip",
+          "parameters" : {
+            "from" : "Leeds",
+            "to" : "York"
+          }
+        }
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Trip"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}

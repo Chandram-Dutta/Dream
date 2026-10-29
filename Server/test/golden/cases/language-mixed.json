@@ -1,0 +1,26 @@
+{
+  "about": "Names and text in other scripts: a Japanese label that starts with a Han numeral (which Swift counts as a number, so its name gets an n), Greek capitals that lower-case without a final sigma, an Arabic label, German umlauts and ß, emoji and a flag in labels and related topics, and a person's name in Spanish with an accent written as a separate mark.",
+  "fill": true,
+  "locale": "ja_JP",
+  "wire": {
+    "subject": "learning",
+    "mode": "use",
+    "title": "ΣΑΣ Übung",
+    "inputs": [
+      {"name": "", "label": "一日の歩数", "format": "integer", "initial": 8000, "min": 0, "max": 30000, "step": 100},
+      {"name": "", "label": "ΣΑΣ τιμή", "initial": 3, "max": 10},
+      {"name": "", "label": "السعر", "format": "currency", "initial": 100, "max": 1000},
+      {"name": "", "label": "Größe straße", "initial": 1.8, "max": 2.5, "step": 0.01},
+      {"name": "", "label": "🍣 count 🇯🇵", "format": "integer", "initial": 2, "min": 0, "max": 10},
+      {"name": "", "label": "Jose\u0301", "initial": 1, "max": 5}
+    ],
+    "outputs": [
+      {"name": "total", "label": "合計", "formula": "n一日の歩数 / 1000 + ΣΑΣτιμή + السعر + größeStraße + count + Jose\u0301", "format": "number"}
+    ],
+    "blocks": [
+      {"kind": "hero", "ref": "total"},
+      {"kind": "paragraph", "text": "歩くのは良い。{total} 🍣"}
+    ],
+    "related": ["ΣΑΣ übung", "σας Übung", "🇯🇵 Japan", "🇯🇵 japan"]
+  }
+}

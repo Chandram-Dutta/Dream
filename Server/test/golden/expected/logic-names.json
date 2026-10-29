@@ -1,0 +1,1110 @@
+{
+  "blocks" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Added controls for 'tipPercent', 'billAmount', 'n3people', 'isLate', 'useMetric', 'share'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Added 'eachPays', 'share', 'isLateFee' to the screen."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each pays {eachPays}.",
+          "title" : ""
+        },
+        {
+          "children" : [
+
+          ],
+          "id" : "eachPays-hero",
+          "items" : [
+
+          ],
+          "kind" : "hero",
+          "over" : "",
+          "ref" : "eachPays",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "tipPercent-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "tipPercent",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "billAmount-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "billAmount",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "n3people-control",
+              "items" : [
+
+              ],
+              "kind" : "stepper",
+              "over" : "",
+              "ref" : "n3people",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "isLate-control",
+              "items" : [
+
+              ],
+              "kind" : "toggle",
+              "over" : "",
+              "ref" : "isLate",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "useMetric-control",
+              "items" : [
+
+              ],
+              "kind" : "toggle",
+              "over" : "",
+              "ref" : "useMetric",
+              "text" : "",
+              "title" : ""
+            },
+            {
+              "children" : [
+
+              ],
+              "id" : "share-control",
+              "items" : [
+
+              ],
+              "kind" : "slider",
+              "over" : "",
+              "ref" : "share",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-inputs",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "isLateFee-metric",
+              "items" : [
+
+              ],
+              "kind" : "metric",
+              "over" : "",
+              "ref" : "isLateFee",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "more-results",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        },
+        {
+          "children" : [
+            {
+              "children" : [
+
+              ],
+              "id" : "share-working",
+              "items" : [
+
+              ],
+              "kind" : "equation",
+              "over" : "",
+              "ref" : "share",
+              "text" : "",
+              "title" : ""
+            }
+          ],
+          "id" : "working",
+          "items" : [
+
+          ],
+          "kind" : "section",
+          "over" : "",
+          "ref" : "",
+          "text" : "",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip percent",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill amount",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "B",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "n3people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Late",
+          "max" : 1,
+          "min" : 0,
+          "name" : "isLate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 0,
+          "label" : "Metric",
+          "max" : 1,
+          "min" : 0,
+          "name" : "useMetric",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tipPercent / 100) / n3people",
+          "label" : "Each pays",
+          "name" : "eachPays",
+          "symbol" : "\\frac{B}{n}",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "eachPays + share",
+          "label" : "Share",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "isLate * 5 + useMetric",
+          "label" : "Late fee",
+          "name" : "isLateFee",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Names"
+    }
+  },
+  "citations" : {
+    "issues" : [
+
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each pays {eachPays}.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip percent",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill amount",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "B",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "n3people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Late",
+          "max" : 1,
+          "min" : 0,
+          "name" : "isLate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 0,
+          "label" : "Metric",
+          "max" : 1,
+          "min" : 0,
+          "name" : "useMetric",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tipPercent / 100) / n3people",
+          "label" : "Each pays",
+          "name" : "eachPays",
+          "symbol" : "\\frac{B}{n}",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "eachPays + share",
+          "label" : "Share",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "isLate * 5 + useMetric",
+          "label" : "Late fee",
+          "name" : "isLateFee",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Names"
+    }
+  },
+  "content" : {
+    "actions" : [
+
+    ],
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Each pays {eachPays}.",
+        "title" : ""
+      }
+    ],
+    "citations" : [
+
+    ],
+    "collections" : [
+
+    ],
+    "diagrams" : [
+
+    ],
+    "figures" : [
+
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "",
+        "max" : 100,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip percent",
+        "max" : 30,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Again",
+        "max" : 100,
+        "min" : 0,
+        "name" : "tipPercent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bill amount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "$B$",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "People",
+        "max" : 10,
+        "min" : 1,
+        "name" : "3people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 1,
+        "label" : "Late",
+        "max" : 100,
+        "min" : 0,
+        "name" : "isLate",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 0,
+        "label" : "Metric",
+        "max" : 100,
+        "min" : 0,
+        "name" : "useMetric",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Share",
+        "max" : 100,
+        "min" : 0,
+        "name" : "share",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "1",
+        "label" : "",
+        "name" : "",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "billAmount * (1 + tipPercent / 100) / n3people",
+        "label" : "Each pays",
+        "name" : "",
+        "symbol" : "  \\frac{B}{n}  ",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1",
+        "label" : "Second",
+        "name" : "eachPays",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "eachPays + share",
+        "label" : "",
+        "name" : "share",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "formula" : "isLate * 5 + useMetric",
+        "label" : "Late fee",
+        "name" : "isLateFee",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "question" : "",
+    "related" : [
+
+    ],
+    "scenes" : [
+
+    ],
+    "sounds" : [
+
+    ],
+    "subject" : "home",
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Names"
+  },
+  "converted" : {
+    "accent" : "yellow",
+    "blocks" : [
+      {
+        "children" : [
+
+        ],
+        "id" : "block-0",
+        "items" : [
+
+        ],
+        "kind" : "paragraph",
+        "over" : "",
+        "ref" : "",
+        "text" : "Each pays {eachPays}.",
+        "title" : ""
+      }
+    ],
+    "inputs" : [
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "",
+        "max" : 100,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "percent",
+        "initial" : 10,
+        "label" : "Tip percent",
+        "max" : 30,
+        "min" : 0,
+        "name" : "",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 0,
+        "label" : "Again",
+        "max" : 100,
+        "min" : 0,
+        "name" : "tipPercent",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "initial" : 100,
+        "label" : "",
+        "max" : 1000,
+        "min" : 0,
+        "name" : "bill amount",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "$B$",
+        "unit" : ""
+      },
+      {
+        "format" : "integer",
+        "initial" : 3,
+        "label" : "People",
+        "max" : 10,
+        "min" : 1,
+        "name" : "3people",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 1,
+        "label" : "Late",
+        "max" : 100,
+        "min" : 0,
+        "name" : "isLate",
+        "options" : [
+
+        ],
+        "role" : "given",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "toggle",
+        "initial" : 0,
+        "label" : "Metric",
+        "max" : 100,
+        "min" : 0,
+        "name" : "useMetric",
+        "options" : [
+
+        ],
+        "role" : "variable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "initial" : 5,
+        "label" : "Share",
+        "max" : 100,
+        "min" : 0,
+        "name" : "share",
+        "options" : [
+
+        ],
+        "role" : "adjustable",
+        "source" : "",
+        "step" : 1,
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "mode" : "use",
+    "outputs" : [
+      {
+        "format" : "number",
+        "formula" : "1",
+        "label" : "",
+        "name" : "",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "currency",
+        "formula" : "billAmount * (1 + tipPercent / 100) / n3people",
+        "label" : "Each pays",
+        "name" : "",
+        "symbol" : "  \\frac{B}{n}  ",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "1",
+        "label" : "Second",
+        "name" : "eachPays",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "number",
+        "formula" : "eachPays + share",
+        "label" : "",
+        "name" : "share",
+        "symbol" : "",
+        "unit" : ""
+      },
+      {
+        "format" : "choice",
+        "formula" : "isLate * 5 + useMetric",
+        "label" : "Late fee",
+        "name" : "isLateFee",
+        "symbol" : "",
+        "unit" : ""
+      }
+    ],
+    "related" : [
+
+    ],
+    "summary" : "",
+    "symbol" : "",
+    "title" : "Names"
+  },
+  "convertedFacts" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- : \"\", number, starts at 0, 0 to 100, step 1\n- : \"Tip percent\", percent, starts at 10, 0 to 30, step 1\n- tipPercent: \"Again\", number, starts at 0, 0 to 100, step 1\n- bill amount: \"\", currency, starts at 100, 0 to 1000, step 1, written $B$\n- 3people: \"People\", integer, starts at 3, 1 to 10, step 1\n- isLate: \"Late\", toggle, starts on\n- useMetric: \"Metric\", toggle, starts off\n- share: \"Share\", number, starts at 5, 0 to 100, step 1\nOutputs:\n- : \"\", number = 1\n- : \"Each pays\", currency, written   \\frac{B}{n}   = billAmount * (1 + tipPercent / 100) / n3people\n- eachPays: \"Second\", number = 1\n- share: \"\", number = eachPays + share\n- isLateFee: \"Late fee\", choice = isLate * 5 + useMetric",
+    "outline" : "Names: \n- paragraph #block-0\n  Each pays {eachPays}.\n- hero #auto-hero\n- section #auto-inputs\n  - slider #auto-input-0\n  - slider #auto-input-1\n  - slider #auto-input-2 ref tipPercent\n  - slider #auto-input-3 ref bill amount\n  - stepper #auto-input-4 ref 3people\n  - slider #auto-input-7 ref share\n- section #auto-outputs\n  - metric #auto-output-1\n  - metric #auto-output-2 ref eachPays\n  - metric #auto-output-3 ref share\n  - metric #auto-output-4 ref isLateFee"
+  },
+  "decodes" : {
+    "json" : true,
+    "partial" : true,
+    "whole" : true
+  },
+  "final" : {
+    "hasLogic" : true,
+    "isEmpty" : false,
+    "isRepeatingItself" : false,
+    "logicSummary" : "Inputs:\n- tipPercent: \"Tip percent\", percent, starts at 10, 0 to 30, step 1\n- billAmount: \"Bill amount\", currency, starts at 100, 0 to 1000, step 1, written B\n- n3people: \"People\", integer, starts at 3, 1 to 10, step 1\n- isLate: \"Late\", toggle, starts on\n- useMetric: \"Metric\", toggle, starts off\n- share: \"Share\", number, starts at 5, 0 to 100, step 1\nOutputs:\n- eachPays: \"Each pays\", currency, written \\frac{B}{n} = billAmount * (1 + tipPercent / 100) / n3people\n- share: \"Share\", number = eachPays + share\n- isLateFee: \"Late fee\", currency = isLate * 5 + useMetric",
+    "outline" : "Names: \n- paragraph #block-0\n  Each pays {eachPays}.\n- hero #eachPays-hero ref eachPays\n- section #more-inputs\n  - slider #tipPercent-control ref tipPercent\n  - slider #billAmount-control ref billAmount\n  - stepper #n3people-control ref n3people\n  - toggle #isLate-control ref isLate\n  - toggle #useMetric-control ref useMetric\n  - slider #share-control ref share\n- section #more-results\n  - metric #isLateFee-metric ref isLateFee\n- section #working\n  - equation #share-working ref share"
+  },
+  "locale" : "en_US",
+  "logic" : {
+    "issues" : [
+      {
+        "kind" : "fixed",
+        "message" : "Dropped an input with no name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a second input named 'tipPercent'."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'isLate' adjustable, since a toggle can't be a given."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Made 'useMetric' adjustable, since a toggle can't be a chart's axis."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped an output with no name."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Dropped a second output named 'eachPays'."
+      },
+      {
+        "kind" : "needsModel",
+        "message" : "'share' is both an input and an output. If the user enters it, keep only the input; otherwise rename the output."
+      },
+      {
+        "kind" : "fixed",
+        "message" : "Showed 'isLateFee' as money."
+      }
+    ],
+    "surface" : {
+      "accent" : "yellow",
+      "blocks" : [
+        {
+          "children" : [
+
+          ],
+          "id" : "block-0",
+          "items" : [
+
+          ],
+          "kind" : "paragraph",
+          "over" : "",
+          "ref" : "",
+          "text" : "Each pays {eachPays}.",
+          "title" : ""
+        }
+      ],
+      "inputs" : [
+        {
+          "format" : "percent",
+          "initial" : 10,
+          "label" : "Tip percent",
+          "max" : 30,
+          "min" : 0,
+          "name" : "tipPercent",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "initial" : 100,
+          "label" : "Bill amount",
+          "max" : 1000,
+          "min" : 0,
+          "name" : "billAmount",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "B",
+          "unit" : ""
+        },
+        {
+          "format" : "integer",
+          "initial" : 3,
+          "label" : "People",
+          "max" : 10,
+          "min" : 1,
+          "name" : "n3people",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 1,
+          "label" : "Late",
+          "max" : 1,
+          "min" : 0,
+          "name" : "isLate",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "toggle",
+          "initial" : 0,
+          "label" : "Metric",
+          "max" : 1,
+          "min" : 0,
+          "name" : "useMetric",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "initial" : 5,
+          "label" : "Share",
+          "max" : 100,
+          "min" : 0,
+          "name" : "share",
+          "options" : [
+
+          ],
+          "role" : "adjustable",
+          "source" : "",
+          "step" : 1,
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "mode" : "use",
+      "outputs" : [
+        {
+          "format" : "currency",
+          "formula" : "billAmount * (1 + tipPercent / 100) / n3people",
+          "label" : "Each pays",
+          "name" : "eachPays",
+          "symbol" : "\\frac{B}{n}",
+          "unit" : ""
+        },
+        {
+          "format" : "number",
+          "formula" : "eachPays + share",
+          "label" : "Share",
+          "name" : "share",
+          "symbol" : "",
+          "unit" : ""
+        },
+        {
+          "format" : "currency",
+          "formula" : "isLate * 5 + useMetric",
+          "label" : "Late fee",
+          "name" : "isLateFee",
+          "symbol" : "",
+          "unit" : ""
+        }
+      ],
+      "related" : [
+
+      ],
+      "summary" : "",
+      "symbol" : "",
+      "title" : "Names"
+    }
+  },
+  "sourcing" : [
+
+  ]
+}
