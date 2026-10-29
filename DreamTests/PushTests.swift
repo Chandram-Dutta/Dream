@@ -57,6 +57,8 @@ private final class QuietLine: ComposeTransport, @unchecked Sendable {
     }
 
     func answer(_ job: String, _ answers: [Answer]) async throws {}
+
+    func output(_ job: String, _ output: DeviceToolOutput) async throws {}
 }
 
 /// Waits for `ready`, for a second at most.
