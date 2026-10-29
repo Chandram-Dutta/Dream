@@ -81,7 +81,9 @@
     "POSTHOG_HOST": "https://us.i.posthog.com"
     // Secrets, set with `wrangler secret put` (README.md), never here: PARALLEL_API_KEY, DREAM_APP_KEYS,
     // XAI_API_KEY, APPLE_KEY_ID and APPLE_PRIVATE_KEY, ADMIN_KEY (reviewing reported pages, src/safety.ts),
-    // and APNS_KEY, APNS_KEY_ID and APNS_TEAM_ID (notifications, src/push.ts; off until they're set).
+    // APNS_KEY, APNS_KEY_ID and APNS_TEAM_ID (notifications, src/push.ts; off until they're set), and
+    // WEATHERKIT_KEY, WEATHERKIT_KEY_ID and WEATHERKIT_TEAM_ID (the weather from Apple Weather,
+    // src/compose/weatherkit.ts; from Open-Meteo until they're set).
   },
 
   // Only what the Worker itself logs, which never includes addresses or surface content.

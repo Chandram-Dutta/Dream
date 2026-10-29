@@ -9,9 +9,10 @@
 //
 // Starting a page is like asking /api/model: the user's session, proof that it's the app
 // (attest.ts), and the account's allowance, which counts the page then. Watching and answering
-// need the session of the account the page is for, and nobody else's. Where the request came
-// from, as Cloudflare places it, goes with the page, for the weather "here"; it's never kept on
-// the page, which says "current location".
+// need the session of the account the page is for, and nobody else's. Where the user is goes
+// with the page, for the weather "here": where the phone says, when they've let it (the
+// request's `here`), or else where Cloudflare places the request. Its coordinates are never kept
+// on the page, which says "current location", nor told to the model.
 
 import { countsAllowed } from "../analytics";
 import { proveApp } from "../attest";
@@ -20,7 +21,7 @@ import { allowed, bodyBytes, isJSON, json, object, problem } from "../reply";
 import { accountOf, admitModel, refusalResponse } from "../usage";
 import type { ComposeStarted } from "./contract";
 import type { ComposeEnv } from "./job";
-import type { Here } from "./live";
+import { hereFor, type Here } from "./live";
 import { readComposeRequest } from "./request";
 
 /** A page's request is a few KB, with a photo up to about 1.5 MB more as base64. */
@@ -105,10 +106,12 @@ async function start(request: Request, env: ComposeEnv, url: URL): Promise<Respo
   // request would count it; the job's own requests then count toward the same page.
   const refusal = await admitModel(env, user.id, jobID, await accountOf(env, user.id));
   if (refusal) return refusalResponse(refusal);
+  // Where the user is goes with the job beside the request, not in it.
+  const { here, ...asked } = checked.request;
   const started = await env.PAGE_JOBS.get(id).fetch("https://page-job/start", {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-Dream-User": user.id },
-    body: JSON.stringify({ counted: countsAllowed(request), origin: url.origin, here: hereOf(request), request: checked.request }),
+    body: JSON.stringify({ counted: countsAllowed(request), origin: url.origin, here: hereFor(here, hereOf(request)), request: asked }),
   });
   if (!started.ok) {
     console.error("Page job didn't start", started.status);

@@ -5,11 +5,20 @@
 // app's providers write: the same field names, metric units, formats and meanings
 // (Dream/Engine/Live.swift's Source and SourceField).
 //
-//   weather       Open-Meteo, forecast and geocoding, no key: the fields WeatherProvider reads
-//                 from WeatherKit (LiveWeather.swift). "current location" is where the request
-//                 came from, as Cloudflare places it; a place's day is the place's own.
+//   weather       Apple Weather (WeatherKit, weatherkit.ts), as WeatherProvider reads it
+//                 (LiveWeather.swift), with the same fields made from the same values. Open-Meteo
+//                 stands in, with the fields made the same way, until WeatherKit's secrets are
+//                 set and whenever it fails; the log says which it was. Places by name come from
+//                 Open-Meteo's geocoding, no key. "current location" is where the phone says the
+//                 user is, when they've let it (ComposeRequest.here), or else where Cloudflare
+//                 places the request. A place's day is the place's own.
 //   exchangeRate  open.er-api.com, as LiveRates.swift reads it, each base kept until the service
 //                 says its next update is due.
+//
+// A reading carries the credit its provider's terms ask for, as the phone's does (LiveCredit):
+// the Apple Weather mark and its legal link, or a link. The page keeps only the source, which has
+// no credit, as the app's hasn't: the phone reads it again and shows its own reading's credit
+// beside the values (LiveStamp.swift).
 //
 // A travel time is the phone's to read (Apple Maps), with a tool of its own (`travel`, in its
 // deviceTools): the server's live tool doesn't offer routes, and says it can't read one.
@@ -25,7 +34,9 @@ import type { Source, SourceField } from "../engine/index";
 import { identifier } from "../engine/names";
 import { plain, round } from "../engine/swift";
 import { asReader, LiveUnits } from "../engine/units";
+import type { ComposeRequest } from "./contract";
 import { fill, type Generation } from "./prompts";
+import { WeatherKitFailure, weatherKitForecast, type WeatherKitConfig } from "./weatherkit";
 
 type JSONObject = Record<string, unknown>;
 type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
@@ -46,13 +57,27 @@ export class LiveError extends Error {
   }
 }
 
-/** What a source read (SourceReading): its fields, and a summary for the model. */
+/** Credit a provider's terms ask for, wherever its values appear (LiveCredit). */
+export type LiveCredit = { kind: "appleWeather"; legal: string } | { kind: "link"; text: string; url: string };
+
+/** The Apple Weather mark and a link to its legal attribution, which WeatherKit requires: the
+ * page WeatherCredit links to when WeatherKit doesn't name one. */
+export const APPLE_WEATHER: LiveCredit = { kind: "appleWeather", legal: "https://weatherkit.apple.com/legal-attribution.html" };
+/** Open-Meteo's data is CC BY 4.0, credited with a link. */
+export const OPEN_METEO: LiveCredit = { kind: "link", text: "Weather data by Open-Meteo.com", url: "https://open-meteo.com/" };
+const EXCHANGE_RATE_API: LiveCredit = { kind: "link", text: "Rates by Exchange Rate API", url: "https://www.exchangerate-api.com" };
+
+/** What a source read (SourceReading): its fields, a summary for the model, who it's from, and a
+ * line for the log saying where it came from, if there's more to say than the source. */
 export interface Reading {
   fields: SourceField[];
   summary: string;
+  credit?: LiveCredit;
+  note?: string;
 }
 
-/** Where the request came from, as Cloudflare places it: the weather "here" (Places.here). */
+/** Where the user is, for the weather "here" (Places.here): where the phone says, or where
+ * Cloudflare places the request (`hereFor`). */
 export interface Here {
   latitude: number;
   longitude: number;
@@ -60,6 +85,19 @@ export interface Here {
   city?: string;
   /** Where days start and end there, like Asia/Kolkata. */
   timeZone?: string;
+  /** Who said so: the phone, or the network the request came over. */
+  from?: "phone" | "network";
+}
+
+/** Where the user is, for the weather "here": where the phone says they are, when they've let it
+ * (ComposeRequest.here), or else where Cloudflare places the request; null when neither knows.
+ * It's called by its town, as the phone calls where it is. Its days are the phone's, or failing
+ * that the network's. */
+export function hereFor(phone: ComposeRequest["here"], network: Here | null): Here | null {
+  if (!phone) return network ? { ...network, from: "network" } : null;
+  const town = phone.name.split(",")[0]?.trim();
+  const timeZone = phone.timeZone ?? network?.timeZone;
+  return { latitude: phone.latitude, longitude: phone.longitude, ...(town ? { city: town } : {}), ...(timeZone ? { timeZone } : {}), from: "phone" };
 }
 
 /** The request's locale, as ComposeRequest has it: whose words and units the values are in. */
@@ -91,6 +129,19 @@ export function today(now: number, timeZone: string): number {
   const parts = new Intl.DateTimeFormat("en-CA", { timeZone: zone(timeZone), year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(now);
   const part = (type: string) => Number(parts.find((item) => item.type === type)?.value);
   return Date.UTC(part("year"), part("month") - 1, part("day"));
+}
+
+/** How far a time zone's clocks are ahead of UTC at an instant, in milliseconds. */
+function offsetAt(time: number, timeZone: string): number {
+  const parts = new Intl.DateTimeFormat("en-US", { timeZone: zone(timeZone), hourCycle: "h23", year: "numeric", month: "numeric", day: "numeric", hour: "numeric", minute: "numeric", second: "numeric" }).formatToParts(time);
+  const part = (type: string) => Number(parts.find((item) => item.type === type)?.value);
+  return Date.UTC(part("year"), part("month") - 1, part("day"), part("hour"), part("minute"), part("second")) - Math.floor(time / 1000) * 1000;
+}
+
+/** The instant a day (as `today` gives one) starts in a time zone: Calendar.startOfDay, in the
+ * place's calendar. */
+export function startOfDay(day: number, timeZone: string): number {
+  return day - offsetAt(day - offsetAt(day, timeZone), timeZone);
 }
 
 const isoDay = (day: number) => new Date(day).toISOString().slice(0, 10);
@@ -150,6 +201,8 @@ interface Place {
   latitude: number;
   longitude: number;
   timeZone: string;
+  /** Where the user is, and who said so. */
+  here?: Here["from"];
 }
 
 /** Places found by name, kept a while, since several sources on one screen often share one. */
@@ -162,7 +215,7 @@ async function findPlace(text: string, here: Here | null, fetcher: Fetch, langua
   const name = text.trim();
   if (isHere(name)) {
     if (!here) throw new LiveError("unavailable", "Dream couldn't find where you are.");
-    return { name: here.city || "your location", latitude: here.latitude, longitude: here.longitude, timeZone: zone(here.timeZone) };
+    return { name: here.city || "your location", latitude: here.latitude, longitude: here.longitude, timeZone: zone(here.timeZone), here: here.from ?? "network" };
   }
   const key = name.toLowerCase();
   const known = placesFound.get(key);
@@ -230,22 +283,139 @@ const HOURLY = ["temperature_2m", "apparent_temperature", "precipitation_probabi
 const CURRENT = ["temperature_2m", "apparent_temperature", "relative_humidity_2m", "wind_speed_10m", "uv_index", "cloud_cover", "weather_code"];
 const DAILY = ["temperature_2m_max", "temperature_2m_min", "precipitation_probability_max", "precipitation_sum", "wind_speed_10m_max", "uv_index_max", "weather_code"];
 
+/** A moment's weather, as the phone's Forecast.reading reads WeatherKit's CurrentWeather or
+ * HourWeather: temperatures in °C, the wind in km/h, chances, humidity and cloud cover as
+ * percentages. Each is missing where the provider gave none. */
+export interface MomentConditions {
+  temperature?: number;
+  feelsLike?: number;
+  /** An hour's; the weather now has none. */
+  rainChance?: number;
+  humidity?: number;
+  windSpeed?: number;
+  uvIndex?: number;
+  cloudCover?: number;
+  /** As WeatherCondition describes itself, like Mostly Cloudy. */
+  condition: string;
+}
+
+/** A day's weather, as Forecast.reading reads WeatherKit's DayWeather: °C, km/h, a percentage, and
+ * the day's precipitation in mm. */
+export interface DayConditions {
+  high?: number;
+  low?: number;
+  rainChance?: number;
+  windSpeed?: number;
+  uvIndex?: number;
+  rainAmount?: number;
+  condition: string;
+}
+
+/** One request's forecast (LiveWeather.swift's Forecast): the place, the day, the minute of it
+ * asked for if one was, and whose way of writing times it's said in. */
+interface Asked {
+  place: Place;
+  /** The day, as `today` gives one. */
+  day: number;
+  /** Minutes into the day. */
+  at: number | null;
+  isToday: boolean;
+  locale: string;
+}
+
+/** Forecast.reading: the fields the phone makes from WeatherKit's weather now, the hour asked for
+ * and the day, in its order, with its units, formats and meanings. */
+function forecastReading(asked: Asked, current: MomentConditions | null, hour: MomentConditions | null, day: DayConditions, credit: LiveCredit, from: string): Reading {
+  const { place, at, isToday } = asked;
+  const clock = (offset: number) => new Intl.DateTimeFormat(asked.locale, { timeZone: "UTC", hour: "numeric", minute: "2-digit" }).format(asked.day + offset * 60_000);
+  const moment = at !== null ? `at ${clock(at)}` : isToday ? "now" : "during the day";
+  const date = new Intl.DateTimeFormat(asked.locale, { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(asked.day);
+  const named = isToday ? "today" : date;
+  const when = at !== null ? `${named} at ${clock(at)}` : isToday ? "now and today" : date;
+
+  const fields: SourceField[] = [];
+  const add = (name: string, value: number | undefined, unit: string, format: SourceField["format"], meaning: string) => {
+    if (value === undefined || !Number.isFinite(value)) return;
+    fields.push({ name, value, unit, format, meaning });
+  };
+  // A whole number, as WeatherKit's UVIndex has it.
+  const uv = (value: number | undefined) => (value === undefined ? undefined : round(value));
+  add("high", day.high, "°C", "number", "the day's highest temperature");
+  add("low", day.low, "°C", "number", "the day's lowest temperature");
+  if (hour) {
+    add("temperature", hour.temperature, "°C", "number", `the temperature ${moment}`);
+    add("feelsLike", hour.feelsLike, "°C", "number", `what it feels like ${moment}`);
+    add("rainChance", hour.rainChance, "", "percent", `the chance of rain ${moment}`);
+    add("humidity", hour.humidity, "", "percent", `humidity ${moment}`);
+    add("windSpeed", hour.windSpeed, "km/h", "number", `wind speed ${moment}`);
+    add("uvIndex", uv(hour.uvIndex), "", "integer", `the UV index ${moment}`);
+    add("cloudCover", hour.cloudCover, "", "percent", `cloud cover ${moment}`);
+  } else if (isToday) {
+    add("temperature", current?.temperature, "°C", "number", "the temperature now");
+    add("feelsLike", current?.feelsLike, "°C", "number", "what it feels like now");
+    add("rainChance", day.rainChance, "", "percent", "the chance of rain today");
+    add("humidity", current?.humidity, "", "percent", "humidity now");
+    add("windSpeed", current?.windSpeed, "km/h", "number", "wind speed now");
+    add("uvIndex", uv(current?.uvIndex), "", "integer", "the UV index now");
+    add("cloudCover", current?.cloudCover, "", "percent", "cloud cover now");
+  } else {
+    add("rainChance", day.rainChance, "", "percent", "the chance of rain during the day");
+    add("windSpeed", day.windSpeed, "km/h", "number", "wind speed during the day");
+    add("uvIndex", uv(day.uvIndex), "", "integer", "the day's highest UV index");
+  }
+  add("rainAmount", day.rainAmount, "mm", "number", "how much rain is expected during the day");
+  const condition = hour?.condition ?? (isToday ? current?.condition : day.condition) ?? "Mixed";
+  const where = place.here === "phone" ? ", where the phone is" : place.here === "network" ? ", where the request came from" : "";
+  return { fields, summary: `${place.name}, ${when}: ${condition}`, credit, note: `Weather from ${from}${where}` };
+}
+
+let unconfigured = false;
+
 /** WeatherProvider: the weather for a place and a day, now, at an hour, or for the whole day, up
- * to ten days ahead. Temperatures in °C, speeds in km/h, rain in mm, chances, humidity and cloud
- * as percentages, the UV index as a whole number: the fields and meanings WeatherKit's reading
- * gives on the phone. */
+ * to ten days ahead, from Apple Weather as the phone reads it, or from Open-Meteo when WeatherKit
+ * isn't set up or fails. */
 async function readWeather(source: Source, context: LiveContext): Promise<Reading> {
   const parameter = (name: string) => source.parameters[name] ?? "";
   const place = await findPlace(parameter("place"), context.here, context.fetch, context.reader.language);
-  const now = context.now();
-  const start = today(now, place.timeZone);
+  const start = today(context.now(), place.timeZone);
   const day = liveDay(parameter("day"), start);
   if (day === null) throw new LiveError("notFound", `Dream can't tell which day "${parameter("day")}" is.`);
   const ahead = Math.round((day - start) / DAY);
   if (ahead < 0 || ahead > 9) throw new LiveError("notFound", "Forecasts only reach 10 days ahead.");
-  const at = minutes(parameter("time"));
-  const isToday = ahead === 0;
+  const asked: Asked = { place, day, at: minutes(parameter("time")), isToday: ahead === 0, locale: localeOf(context.reader) };
 
+  let why = "Apple Weather isn't set up";
+  if (context.weatherKit) {
+    try {
+      return await fromAppleWeather(asked, context.weatherKit, context);
+    } catch (error) {
+      if (error instanceof LiveError) throw error;
+      why = error instanceof WeatherKitFailure ? `Apple Weather ${error.message}` : `Apple Weather failed (${error instanceof Error ? error.name : typeof error})`;
+      console.warn(`The weather is from Open-Meteo: ${why}.`);
+    }
+  } else if (!unconfigured) {
+    unconfigured = true;
+    console.log("The weather is from Open-Meteo: WEATHERKIT_KEY, WEATHERKIT_KEY_ID and WEATHERKIT_TEAM_ID aren't set.");
+  }
+  return fromOpenMeteo(asked, context, `Open-Meteo, since ${why}`);
+}
+
+/** The forecast from WeatherKit, asked for as the phone asks WeatherService: the day from its
+ * start to the next day's where the place is, its hours when an hour was asked for, and the
+ * weather now for today. */
+async function fromAppleWeather(asked: Asked, config: WeatherKitConfig, context: LiveContext): Promise<Reading> {
+  const { place } = asked;
+  const start = startOfDay(asked.day, place.timeZone);
+  const end = startOfDay(asked.day + DAY, place.timeZone);
+  const at = asked.at === null ? null : start + asked.at * 60_000;
+  const forecast = await weatherKitForecast(config, { latitude: place.latitude, longitude: place.longitude, timeZone: place.timeZone, start, end, at, current: asked.isToday }, context.fetch, context.now());
+  if (!forecast.day) throw new LiveError("unavailable", "There's no forecast for that day yet.");
+  return forecastReading(asked, forecast.current, forecast.hour, forecast.day, APPLE_WEATHER, "Apple Weather");
+}
+
+/** The forecast from Open-Meteo, read as WeatherKit's would be. `from` says why it's Open-Meteo's. */
+async function fromOpenMeteo(asked: Asked, context: LiveContext, from: string): Promise<Reading> {
+  const { place, day, at, isToday } = asked;
   const url = new URL("https://api.open-meteo.com/v1/forecast");
   const query: Record<string, string> = {
     latitude: String(place.latitude),
@@ -283,46 +453,41 @@ async function readWeather(source: Source, context: LiveContext): Promise<Readin
   }
   const hoursValue = (name: string) => (hour !== null && Array.isArray(hourly[name]) ? (hourly[name] as unknown[])[hour] : undefined);
 
-  const locale = localeOf(context.reader);
-  const clock = (offset: number) => new Intl.DateTimeFormat(locale, { timeZone: "UTC", hour: "numeric", minute: "2-digit" }).format(day + offset * 60_000);
-  const moment = at !== null ? `at ${clock(at)}` : isToday ? "now" : "during the day";
-  const date = new Intl.DateTimeFormat(locale, { timeZone: "UTC", weekday: "long", day: "numeric", month: "long" }).format(day);
-  const named = isToday ? "today" : date;
-  const when = at !== null ? `${named} at ${clock(at)}` : isToday ? "now and today" : date;
-
-  const fields: SourceField[] = [];
-  const add = (name: string, value: unknown, unit: string, format: SourceField["format"], meaning: string) => {
-    if (typeof value !== "number" || !Number.isFinite(value)) return;
-    fields.push({ name, value, unit, format, meaning });
+  const number = (value: unknown) => (typeof value === "number" && Number.isFinite(value) ? value : undefined);
+  const condition = (code: unknown) => (typeof code === "number" ? (CONDITIONS[code] ?? "Mixed") : "Mixed");
+  const now: MomentConditions | null = isToday
+    ? {
+        temperature: number(current.temperature_2m),
+        feelsLike: number(current.apparent_temperature),
+        humidity: number(current.relative_humidity_2m),
+        windSpeed: number(current.wind_speed_10m),
+        uvIndex: number(current.uv_index),
+        cloudCover: number(current.cloud_cover),
+        condition: condition(current.weather_code),
+      }
+    : null;
+  const atHour: MomentConditions | null = hour !== null
+    ? {
+        temperature: number(hoursValue("temperature_2m")),
+        feelsLike: number(hoursValue("apparent_temperature")),
+        rainChance: number(hoursValue("precipitation_probability")),
+        humidity: number(hoursValue("relative_humidity_2m")),
+        windSpeed: number(hoursValue("wind_speed_10m")),
+        uvIndex: number(hoursValue("uv_index")),
+        cloudCover: number(hoursValue("cloud_cover")),
+        condition: condition(hoursValue("weather_code")),
+      }
+    : null;
+  const whole: DayConditions = {
+    high: number(daysValue("temperature_2m_max")),
+    low: number(daysValue("temperature_2m_min")),
+    rainChance: number(daysValue("precipitation_probability_max")),
+    windSpeed: number(daysValue("wind_speed_10m_max")),
+    uvIndex: number(daysValue("uv_index_max")),
+    rainAmount: number(daysValue("precipitation_sum")),
+    condition: condition(daysValue("weather_code")),
   };
-  const uv = (value: unknown) => (typeof value === "number" ? round(value) : value);
-  add("high", daysValue("temperature_2m_max"), "°C", "number", "the day's highest temperature");
-  add("low", daysValue("temperature_2m_min"), "°C", "number", "the day's lowest temperature");
-  if (hour !== null) {
-    add("temperature", hoursValue("temperature_2m"), "°C", "number", `the temperature ${moment}`);
-    add("feelsLike", hoursValue("apparent_temperature"), "°C", "number", `what it feels like ${moment}`);
-    add("rainChance", hoursValue("precipitation_probability"), "", "percent", `the chance of rain ${moment}`);
-    add("humidity", hoursValue("relative_humidity_2m"), "", "percent", `humidity ${moment}`);
-    add("windSpeed", hoursValue("wind_speed_10m"), "km/h", "number", `wind speed ${moment}`);
-    add("uvIndex", uv(hoursValue("uv_index")), "", "integer", `the UV index ${moment}`);
-    add("cloudCover", hoursValue("cloud_cover"), "", "percent", `cloud cover ${moment}`);
-  } else if (isToday) {
-    add("temperature", current.temperature_2m, "°C", "number", "the temperature now");
-    add("feelsLike", current.apparent_temperature, "°C", "number", "what it feels like now");
-    add("rainChance", daysValue("precipitation_probability_max"), "", "percent", "the chance of rain today");
-    add("humidity", current.relative_humidity_2m, "", "percent", "humidity now");
-    add("windSpeed", current.wind_speed_10m, "km/h", "number", "wind speed now");
-    add("uvIndex", uv(current.uv_index), "", "integer", "the UV index now");
-    add("cloudCover", current.cloud_cover, "", "percent", "cloud cover now");
-  } else {
-    add("rainChance", daysValue("precipitation_probability_max"), "", "percent", "the chance of rain during the day");
-    add("windSpeed", daysValue("wind_speed_10m_max"), "km/h", "number", "wind speed during the day");
-    add("uvIndex", uv(daysValue("uv_index_max")), "", "integer", "the day's highest UV index");
-  }
-  add("rainAmount", daysValue("precipitation_sum"), "mm", "number", "how much rain is expected during the day");
-  const code = hour !== null ? hoursValue("weather_code") : isToday ? current.weather_code : daysValue("weather_code");
-  const condition = typeof code === "number" ? (CONDITIONS[code] ?? "Mixed") : "Mixed";
-  return { fields, summary: `${place.name}, ${when}: ${condition}` };
+  return forecastReading(asked, now, atHour, whole, OPEN_METEO, from);
 }
 
 // MARK: - Exchange rates
@@ -396,6 +561,7 @@ async function readRate(source: Source, context: LiveContext): Promise<Reading> 
   return {
     fields: [{ name: "rate", value: rate, unit: "", format: "number", meaning: `how many ${to} one ${from} buys` }],
     summary: `1 ${name(from)} is ${shown} ${name(to)}`,
+    credit: EXCHANGE_RATE_API,
   };
 }
 
@@ -410,7 +576,8 @@ const PROVIDERS: Record<string, (source: Source, context: LiveContext) => Promis
 const readings = new Map<string, { reading: Reading; at: number }>();
 const inFlight = new Map<string, Promise<Reading>>();
 
-async function read(source: Source, context: LiveContext): Promise<Reading> {
+/** LiveSources.read: what a source reads now, or what it read moments ago. */
+export async function readSource(source: Source, context: LiveContext): Promise<Reading> {
   const provider = PROVIDERS[source.kind];
   if (!provider) throw new LiveError("unavailable", `Dream can't read ${source.kind} here.`);
   const here = Object.values(source.parameters).some(isHere) && context.here ? `@${context.here.latitude},${context.here.longitude}` : "";
@@ -431,11 +598,13 @@ async function read(source: Source, context: LiveContext): Promise<Reading> {
   }
 }
 
-/** Forgets every reading, place and rate kept, for tests. */
+/** Forgets every reading, place and rate kept, and that the weather's provider was logged, for
+ * tests. */
 export function forgetLiveReadings(): void {
   readings.clear();
   placesFound.clear();
   rateTables.clear();
+  unconfigured = false;
 }
 
 /** The sources fetched while writing a page: what it may bind live inputs to (LiveLog). A change
@@ -471,6 +640,8 @@ export interface LiveContext {
   now(): number;
   here: Here | null;
   reader: Reader;
+  /** How to reach Apple Weather; without it, the weather is Open-Meteo's. */
+  weatherKit?: WeatherKitConfig | null;
 }
 
 /** SourceReading.described(as:): each field by its full name, in the reader's units, with what it
@@ -536,9 +707,10 @@ export async function liveCall(generation: Generation, args: JSONObject, log: Li
   const source: Source = { name, kind, parameters, fields: [] };
   const asked = Object.entries(parameters).sort(([a], [b]) => (a < b ? -1 : 1)).map(([key, value]) => `${key} ${value}`).join(", ");
   try {
-    const reading = await read(source, context);
+    const reading = await readSource(source, context);
     log.declare(source, reading.fields);
     note(`Live: ${name}, ${kind} (${asked})`);
+    if (reading.note) note(reading.note);
     return `${described(generation, name, reading, context.reader)}`;
   } catch (error) {
     const message = error instanceof LiveError ? error.message : "It couldn't be read.";

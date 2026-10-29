@@ -21,6 +21,7 @@ import { liveCall, type DeviceAnswer, type Here, type LiveLog, type Reader } fro
 import type { Memory, Remembered } from "./memory";
 import { fill, type Generation, type ToolDefinition } from "./prompts";
 import type { Reference } from "./lookup";
+import type { WeatherKitConfig } from "./weatherkit";
 
 type Fetch = (url: string, init?: RequestInit) => Promise<Response>;
 
@@ -169,8 +170,10 @@ export interface ToolServices {
   memory(): Promise<Remembered[]>;
   /** The network, for live data, recordings and molecules. Tests stand something in. */
   fetch: Fetch;
-  /** Where the request came from, for the weather "here"; null when that isn't known. */
+  /** Where the user is, for the weather "here" (live.ts's hereFor); null when that isn't known. */
   here: Here | null;
+  /** How to reach Apple Weather, while its secrets are set; the weather is Open-Meteo's without. */
+  weatherKit?: WeatherKitConfig | null;
 }
 
 /** What the page loop hears from the tools: each step as it starts (for the glimpses), and lines
@@ -374,7 +377,7 @@ export function toolBox(generation: Generation, services: ToolServices, notes: T
   };
 
   const live = (args: JSONObject): Promise<string> =>
-    liveCall(generation, args, session.live, { fetch: services.fetch, now: session.now, here: services.here, reader: session.reader }, (line) => notes.note(line));
+    liveCall(generation, args, session.live, { fetch: services.fetch, now: session.now, here: services.here, reader: session.reader, weatherKit: services.weatherKit }, (line) => notes.note(line));
 
   /** One of the phone's tools: what it returned, with the live source it declared (a travel
    * time, or a connected service's look-up kept current) and the service it read. When the phone
