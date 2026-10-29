@@ -2,8 +2,10 @@
 # Follows pages made on a scripted stand-in for the server's page loop (Tools/compose-mock.py)
 # through the app's own client, over the network on this Mac: a page to its end, a dropped line,
 # a question, a failure, a page picked up again after the app left it, a job the server no longer
-# has, and a photo. The events themselves are checked without the network by Tools/tests.sh
-# (DreamTests/ServerComposeTests.swift). No model, no Cloudflare.
+# has, and a photo; then a change of each kind, and the phone's own tools run for the server (one
+# answered, one the server stopped waiting for, one the loop went past). The events themselves are
+# checked without the network by Tools/tests.sh (DreamTests/ServerComposeTests.swift). No model,
+# no Cloudflare.
 # Usage: Tools/compose-check.sh       (COMPOSE_MOCK_PORT picks the mock's port; 8790 otherwise)
 set -e
 cd "$(dirname "$0")/.."
