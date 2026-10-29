@@ -37,25 +37,45 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
         case drop
         /// Nothing more until the answers come.
         case awaitAnswers
+        /// Nothing more until a tool's output comes, or this long.
+        case awaitOutput(Duration)
     }
 
     private let lock = NSLock()
     private var connections: [[Step]]
     private var asked: [Int] = []
     private var sent: [[Answer]] = []
+    private var tools: [DeviceToolOutput] = []
+    private var started: [ComposeStart] = []
     private var gone = false
+    /// The job has gone on: what a tool returns is refused, as the server answers 409.
+    private let movedOn: Bool
     private let answers = AsyncStream<Void>.makeStream()
+    private let outputs = AsyncStream<Void>.makeStream()
 
-    init(_ connections: [[Step]], gone: Bool = false) {
+    init(_ connections: [[Step]], gone: Bool = false, movedOn: Bool = false) {
         self.connections = connections
         self.gone = gone
+        self.movedOn = movedOn
     }
 
     /// The `after` each reading asked for, in order.
     var afters: [Int] { lock.withLock { asked } }
     var answered: [[Answer]] { lock.withLock { sent } }
+    /// What the phone's tools returned, as it was sent.
+    var returned: [DeviceToolOutput] { lock.withLock { tools } }
+    var starts: [ComposeStart] { lock.withLock { started } }
 
-    func start(_ start: ComposeStart) async throws -> String { "job-1" }
+    func start(_ start: ComposeStart) async throws -> String {
+        lock.withLock { started.append(start) }
+        return "job-1"
+    }
+
+    func output(_ job: String, _ output: DeviceToolOutput) async throws {
+        lock.withLock { tools.append(output) }
+        if movedOn { throw ComposeFailure.movedOn }
+        outputs.continuation.yield()
+    }
 
     func events(_ job: String, after seq: Int) -> AsyncThrowingStream<ComposeEvent, Error> {
         let (steps, isGone): ([Step], Bool) = lock.withLock {
@@ -63,6 +83,7 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
             return (connections.isEmpty ? [] : connections.removeFirst(), gone)
         }
         let answers = self.answers.stream
+        let outputs = self.outputs.stream
         return AsyncThrowingStream { continuation in
             Task {
                 if isGone { return continuation.finish(throwing: ComposeFailure.gone) }
@@ -71,6 +92,11 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
                     case .event(let event): continuation.yield(event)
                     case .drop: return continuation.finish(throwing: URLError(.networkConnectionLost))
                     case .awaitAnswers: for await _ in answers { break }
+                    case .awaitOutput(let longest):
+                        let waiting = Task { for await _ in outputs { break } }
+                        let timer = Task { try? await Task.sleep(for: longest); waiting.cancel() }
+                        await waiting.value
+                        timer.cancel()
                     }
                 }
                 continuation.finish()

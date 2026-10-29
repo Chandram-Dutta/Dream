@@ -363,7 +363,8 @@ struct FormingTile: View {
         let composer = pages.following[started.job.page]
         let page = composer?.surface.flatMap { $0.title.isEmpty ? nil : $0 }
         let failure = failed ?? composer.flatMap(Self.failure)
-        let waiting = composer?.asking.isWaiting ?? false
+        // A question, or a connected service's tool to allow.
+        let waiting = composer.map { $0.asking.isWaiting || $0.consent.isWaiting } ?? false
         let palette = page?.palette ?? .dream
         VStack(alignment: .leading, spacing: 6) {
             if failure != nil {

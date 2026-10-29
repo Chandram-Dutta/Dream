@@ -89,7 +89,7 @@ let steps = ["Tipping", "tipping at restaurants in India", "livemint.com"]
     check(await leaving.value == .stopped, "stopped with the page still being made")
     guard let job = left.job else { return check(false, "it had a job") }
     let back = Composer()
-    check(await back.watch(job, intent: "slow: split a 2400 rupee dinner between 3 friends", since: .now) == .done, "done")
+    check(await back.watch(job, intent: "slow: split a 2400 rupee dinner between 3 friends") == .done, "done")
     check(back.trail.map(\.text) == steps, "every step once: \(back.trail.map(\.text))")
     check(back.surface?.blocks.count == 3, "the finished page")
     check(back.job?.page == job.page, "under the same id")
@@ -98,7 +98,7 @@ let steps = ["Tipping", "tipping at restaurants in India", "livemint.com"]
 
     print("A job the server doesn't have")
     let gone = Composer()
-    check(await gone.watch(ServerJob(id: "no-such-job", page: UUID()), intent: "anything", since: .now) == .gone, "gone, so its page comes by sync")
+    check(await gone.watch(ServerJob(id: "no-such-job", page: UUID()), intent: "anything") == .gone, "gone, so its page comes by sync")
     check(gone.phase.isBusy, "and nothing says it failed")
 
     print("A page from a photo")
