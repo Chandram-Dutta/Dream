@@ -142,6 +142,7 @@ final class Consent {
                   + (request.always.map { " [Allow once / \($0) / Don't allow]" } ?? " [Allow once / Don't allow]") + " → \(named[answer] ?? "")")
             return answer
         }
+        let id = request.id
         return await withTaskCancellationHandler {
             await withCheckedContinuation { continuation in
                 if pending == nil {
@@ -152,7 +153,17 @@ final class Consent {
                 }
             }
         } onCancel: {
-            Task { @MainActor in self.cancel() }
+            Task { @MainActor in self.withdraw(id) }
+        }
+    }
+
+    /// The call that asked was stopped, as when a page on Dream's server went on without it: its
+    /// question comes off the screen, refused, and any others stay.
+    func withdraw(_ id: ConsentRequest.ID) {
+        if let index = queue.firstIndex(where: { $0.request.id == id }) {
+            queue.remove(at: index).continuation.resume(returning: .deny)
+        } else if pending?.id == id {
+            answer(.deny)
         }
     }
 

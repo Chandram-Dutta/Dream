@@ -127,10 +127,10 @@ struct HomeView: View {
     // MARK: - Shelf
 
     /// Started pages that aren't saved yet. One that came by sync before its record went is
-    /// shown once, as the page.
+    /// shown once, as the page. A change shows on its page's own screen, never as a tile.
     private var forming: [StartedPage] {
         let saved = Set(surfaces.map(\.id))
-        return started.filter { !saved.contains($0.pageID) }
+        return started.filter { $0.changeData == nil && !saved.contains($0.pageID) }
     }
 
     private var shelf: some View {
@@ -381,7 +381,8 @@ struct FormingTile: View {
         let composer = pages.following[started.job.page]
         let page = composer?.surface.flatMap { $0.title.isEmpty ? nil : $0 }
         let failure = failed ?? composer.flatMap(Self.failure)
-        let waiting = composer?.asking.isWaiting ?? false
+        // A question, or a connected service's tool to allow.
+        let waiting = composer.map { $0.asking.isWaiting || $0.consent.isWaiting } ?? false
         let palette = page?.palette ?? .dream
         VStack(alignment: .leading, spacing: 6) {
             if failure != nil {

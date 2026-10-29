@@ -132,6 +132,7 @@ final class Composer {
         }
         let started = Date()
         job = nil
+        change = nil
         log = []
         trail = []
         surface = nil
@@ -165,10 +166,12 @@ final class Composer {
         }
     }
 
-    /// Changes a surface. `focus` is the block the user pointed at, if any.
+    /// Changes a surface, here. `focus` is the block the user pointed at, if any. When pages are
+    /// made on Dream's server, so are changes (`changeOnServer`, Composer+Server.swift).
     func edit(_ current: Surface, intent: String, instruction: String, focus: Block?) async {
         let started = Date()
         job = nil
+        change = nil
         log = []
         trail = []
         surface = current
@@ -203,13 +206,39 @@ final class Composer {
 
     // MARK: - On Dream's server
 
-    /// The job on Dream's server making what this shows, while a new page is made there.
+    /// The job on Dream's server making what this shows, while a page or a change is made there.
     private(set) var job: ServerJob?
+    /// The change being made there, when it's a change to a page on the shelf. The page screen
+    /// keeps its numbers current while it's made, so it lands with the latest.
+    @ObservationIgnored var change: PageChange?
     /// What reads the job's events, while something does.
     @ObservationIgnored var watch: ServerWatch?
+    /// The tools only this iPhone can run, which the job's model may call.
+    @ObservationIgnored private(set) var devices: DeviceTools?
     /// Told as soon as a page has started on Dream's server, so the app can keep the job and find
     /// it again if it leaves the page mid-way.
     @ObservationIgnored var onJob: ((ServerJob) -> Void)?
+    /// Told of each call to this iPhone's tools as it starts to run, so the app can keep it and
+    /// never run it twice.
+    @ObservationIgnored var onDeviceCall: ((String) -> Void)?
+
+    /// The tools this iPhone would give the model for a request if it made the page here
+    /// (`tools(found:)`), less those the server has of its own: what a page on the server may ask
+    /// the phone to run. A change starts from what its page already reads and shows.
+    func offerDeviceTools(for request: String, changing page: Surface?, ran: Set<String> = []) -> DeviceTools {
+        live.start(keeping: page?.sources)
+        connected.start(keeping: page)
+        let devices = DeviceTools.offered(for: request, asking: asking, consent: consent, live: live, log: connected, ran: ran)
+        devices.onRun = { [weak self] id in self?.onDeviceCall?(id) }
+        self.devices = devices
+        return devices
+    }
+
+    /// Services the request names that the user hasn't connected, which the screen offers to
+    /// connect, as for a page made here.
+    func suggestConnections(for intent: String) {
+        suggestions = Connections.unconnected(in: intent)
+    }
 
     /// Shows a page being made on Dream's server as far as its events have got, in the same state
     /// a page made here fills, so the screen can't tell the two apart. Everything on that path

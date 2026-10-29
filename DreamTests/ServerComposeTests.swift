@@ -37,25 +37,45 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
         case drop
         /// Nothing more until the answers come.
         case awaitAnswers
+        /// Nothing more until a tool's output comes, or this long.
+        case awaitOutput(Duration)
     }
 
     private let lock = NSLock()
     private var connections: [[Step]]
     private var asked: [Int] = []
     private var sent: [[Answer]] = []
+    private var tools: [DeviceToolOutput] = []
+    private var started: [ComposeStart] = []
     private var gone = false
+    /// The job has gone on: what a tool returns is refused, as the server answers 409.
+    private let movedOn: Bool
     private let answers = AsyncStream<Void>.makeStream()
+    private let outputs = AsyncStream<Void>.makeStream()
 
-    init(_ connections: [[Step]], gone: Bool = false) {
+    init(_ connections: [[Step]], gone: Bool = false, movedOn: Bool = false) {
         self.connections = connections
         self.gone = gone
+        self.movedOn = movedOn
     }
 
     /// The `after` each reading asked for, in order.
     var afters: [Int] { lock.withLock { asked } }
     var answered: [[Answer]] { lock.withLock { sent } }
+    /// What the phone's tools returned, as it was sent.
+    var returned: [DeviceToolOutput] { lock.withLock { tools } }
+    var starts: [ComposeStart] { lock.withLock { started } }
 
-    func start(_ start: ComposeStart) async throws -> String { "job-1" }
+    func start(_ start: ComposeStart) async throws -> String {
+        lock.withLock { started.append(start) }
+        return "job-1"
+    }
+
+    func output(_ job: String, _ output: DeviceToolOutput) async throws {
+        lock.withLock { tools.append(output) }
+        outputs.continuation.yield()
+        if movedOn { throw ComposeFailure.movedOn }
+    }
 
     func events(_ job: String, after seq: Int) -> AsyncThrowingStream<ComposeEvent, Error> {
         let (steps, isGone): ([Step], Bool) = lock.withLock {
@@ -63,6 +83,7 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
             return (connections.isEmpty ? [] : connections.removeFirst(), gone)
         }
         let answers = self.answers.stream
+        let outputs = self.outputs.stream
         return AsyncThrowingStream { continuation in
             Task {
                 if isGone { return continuation.finish(throwing: ComposeFailure.gone) }
@@ -71,6 +92,11 @@ private final class ScriptedServer: ComposeTransport, @unchecked Sendable {
                     case .event(let event): continuation.yield(event)
                     case .drop: return continuation.finish(throwing: URLError(.networkConnectionLost))
                     case .awaitAnswers: for await _ in answers { break }
+                    case .awaitOutput(let longest):
+                        let waiting = Task { for await _ in outputs { break } }
+                        let timer = Task { try? await Task.sleep(for: longest); waiting.cancel() }
+                        await waiting.value
+                        timer.cancel()
                     }
                 }
                 continuation.finish()
@@ -306,5 +332,260 @@ struct ServerComposeTests {
         let fields = try JSONSerialization.jsonObject(with: JSONEncoder().encode(plain)) as? [String: Any]
         #expect(fields?["image"] == nil, "no photo, no field")
         #expect((fields?["model"] as? String) == Composer.dreamModelID)
+    }
+}
+
+// MARK: - Changes, and the phone's own tools
+
+/// The bill split with how many share it, which a change can be about.
+private func sharedSplit(people: Double = 3) -> Surface {
+    var surface = billSplit()
+    surface.inputs.append(Input(name: "people", label: "People", format: .integer, initial: people, min: 1, max: 20, step: 1, options: []))
+    surface.outputs = [Output(name: "share", label: "Each pays", formula: "bill / people", format: .currency)]
+    return surface
+}
+
+private func photo(width: Int = 400, height: Int = 300) -> CGImage {
+    let context = CGContext(data: nil, width: width, height: height, bitsPerComponent: 8, bytesPerRow: 0,
+                            space: CGColorSpaceCreateDeviceRGB(), bitmapInfo: CGImageAlphaInfo.noneSkipLast.rawValue)!
+    context.setFillColor(CGColor(red: 0.2, green: 0.6, blue: 0.4, alpha: 1))
+    context.fill(CGRect(x: 0, y: 0, width: width, height: height))
+    return context.makeImage()!
+}
+
+/// A tool the phone runs, counting its calls and what they were sent.
+private final class Counting: @unchecked Sendable {
+    private let lock = NSLock()
+    private var sent: [String] = []
+    var calls: [String] { lock.withLock { sent } }
+
+    func entry(name: String = "count", answer: String = "3 tasks", taking: Duration = .zero) -> DeviceTools.Entry {
+        DeviceTools.Entry(definition: DeviceToolDefinition(name: name, description: "Counts things.", parameters: .object(["type": .string("object")]))) { arguments in
+            self.lock.withLock { self.sent.append(arguments.jsonString) }
+            if taking > .zero { try await Task.sleep(for: taking) }
+            return answer
+        }
+    }
+}
+
+private let counting = DeviceToolCall(id: "call-1", name: "count", arguments: #"{"what":"tasks"}"#)
+
+@Suite("Changes and the phone's tools on the server")
+struct ServerChangeTests {
+    @Test("A change asks with the page as it is and what's changing, for each kind")
+    func bodies() throws {
+        let page = UUID()
+        var current = sharedSplit()
+        current.answers = [Answer(question: destination, choice: "Goa")]
+        func body(_ change: PageChange, image: CGImage? = nil) throws -> [String: Any] {
+            let start = ComposeStart(changing: change, intent: "split a 2400 rupee dinner", image: image, page: page, context: ["The user's region: India."])
+            return try #require(try JSONSerialization.jsonObject(with: start.body()) as? [String: Any])
+        }
+
+        let typed = try body(.instruction("make it 4 people", focus: "hero", on: current, values: ["bill": 3000]), image: photo())
+        let editing = try #require(typed["editing"] as? [String: Any])
+        #expect(typed["request"] as? String == "split a 2400 rupee dinner", "the request is still what the page was first asked for")
+        #expect(typed["pageID"] as? String == page.uuidString, "under the page's own id")
+        #expect(typed["context"] as? [String] == ["The user's region: India."])
+        #expect(typed["image"] == nil, "a change works from the page, not the photo")
+        #expect(editing["instruction"] as? String == "make it 4 people" && editing["focus"] as? String == "hero")
+        #expect(editing["answer"] == nil && editing["again"] == nil, "nothing it isn't")
+        let surface = try #require(editing["surface"])
+        let read = ComposeEvent.surface(try JSONDecoder().decode(JSONValue.self, from: JSONSerialization.data(withJSONObject: surface)))
+        #expect(read == current, "the page as the app's Surface encodes it, which reads back as the same page")
+
+        let answered = try body(.answer(current.answers![0], to: "Pune", on: current, values: [:]))
+        let answer = try #require((answered["editing"] as? [String: Any])?["answer"] as? [String: Any])
+        #expect((answer["question"] as? [String: Any])?["text"] as? String == destination.text && answer["choice"] as? String == "Pune",
+                "a different answer: the question as the app's Question encodes it, and the new choice")
+        #expect((answered["editing"] as? [String: Any])?["instruction"] == nil)
+
+        let again = try body(.again("split a 2400 rupee dinner", on: current, values: [:]), image: photo())
+        #expect((again["editing"] as? [String: Any])?["again"] as? Bool == true)
+        #expect(again["image"] is String, "made again, the photo goes again")
+
+        let fresh = ComposeStart(intent: "split a 2400 rupee dinner", image: nil, page: page, context: [])
+        let plain = try #require(try JSONSerialization.jsonObject(with: fresh.body()) as? [String: Any])
+        #expect(plain["editing"] == nil && plain["deviceTools"] == nil, "a new page has no change, and no tools unless it's given them")
+    }
+
+    @Test("The phone's tools go with the request as the phone gives a model its tools")
+    @MainActor func toolsInRequest() throws {
+        let tool = TravelTool(log: LiveLog())
+        let devices = DeviceTools([DeviceTools.Entry(tool)])
+        var start = ComposeStart(intent: "how long to drive to the airport", image: nil, page: UUID(), context: [])
+        start.deviceTools = devices.definitions
+        let text = String(decoding: try start.body(), as: UTF8.self)
+        let body = try #require(try JSONSerialization.jsonObject(with: start.body()) as? [String: Any])
+        let tools = try #require(body["deviceTools"] as? [[String: Any]])
+        #expect(tools.map { $0["name"] as? String } == ["travel"] && (tools[0]["description"] as? String)?.contains("Apple Maps") == true)
+        // What ChatCompletions sends a model for the same tool: properties in the order declared.
+        let schema = String(decoding: try ChatCompletions.ordered(JSONSerialization.jsonObject(with: JSONEncoder().encode(tool.parameters))), as: UTF8.self)
+        #expect(text.contains("\"parameters\":" + schema), "its arguments' schema, byte for byte as a model request carries it")
+        #expect(!text.contains("x-order"))
+        let order = ["\"name\":{", "\"from\":{", "\"to\":{", "\"travel\":{"].compactMap { schema.range(of: $0)?.lowerBound }
+        #expect(order.count == 4 && order == order.sorted(), "name, from, to, travel, as declared")
+    }
+
+    @Test("A deviceTool event reads as a call to run")
+    func deviceToolEvents() {
+        let call = DeviceToolCall(id: "call-1", name: "travel", arguments: #"{"to":"the airport"}"#)
+        #expect(event(#"{"seq":1,"type":"deviceTool","call":{"id":"call-1","name":"travel","arguments":"{\"to\":\"the airport\"}"}}"#)?.kind == .deviceTool(call))
+        #expect(event(#"{"seq":2,"type":"deviceTool","call":{"id":"call-1","name":"travel","arguments":{"to":"the airport"}}}"#)?.kind == .deviceTool(call),
+                "arguments already read are written back as JSON")
+        #expect(event(#"{"seq":3,"type":"deviceTool","call":{"id":"call-2","name":"travel"}}"#)?.kind == .deviceTool(DeviceToolCall(id: "call-2", name: "travel", arguments: "{}")))
+        #expect(event(#"{"seq":4,"type":"deviceTool","call":{"name":"travel","arguments":"{}"}}"#)?.kind == .other("deviceTool"), "a call without its id can't be answered")
+        #expect(event(#"{"seq":5,"type":"deviceTool"}"#)?.kind == .other("deviceTool"))
+        #expect(EventLine.event(#"data: {"seq":6,"type":"deviceTool","call":{"id":"c","name":"travel","arguments":"{}"}}"#)?.seq == 6)
+    }
+
+    @Test("A change keeps the page on screen until the changed one is done")
+    func changeProgress() {
+        var current = sharedSplit()
+        current.locale = SurfaceLocale(language: "en", measurementSystem: "uksystem")
+        current.answers = [Answer(question: destination, choice: "Goa")]
+        let typed = PageChange.instruction("add a tip", focus: "hero", on: current, values: [:])
+
+        var progress = PageProgress(change: typed, intent: "split a dinner")
+        #expect(progress.surface == current && progress.phase.isBusy, "the page as it was, working from the first moment")
+        progress.apply(ComposeEvent(seq: 1, kind: .phase(.composing)))
+        progress.apply(ComposeEvent(seq: 2, kind: .surface(billSplit(blocks: 1))))
+        #expect(progress.surface == current && !progress.isThinking, "not the change half written")
+        progress.apply(ComposeEvent(seq: 3, kind: .done(sharedSplit(people: 4), model: "grok-4.7")))
+        #expect(progress.phase == .done && progress.surface?.input("people")?.initial == 4)
+        #expect(progress.surface?.answers == current.answers, "carrying the answers the page was built from")
+        #expect(progress.surface?.locale?.measurementSystem == "uksystem", "in the units of the page it changed")
+
+        var unreadable = PageProgress(change: typed, intent: "split a dinner")
+        unreadable.apply(ComposeEvent(seq: 1, kind: .surface(billSplit(blocks: 1))))
+        unreadable.apply(ComposeEvent(seq: 2, kind: .done(nil, model: "grok-4.7")))
+        #expect(unreadable.phase == .done && unreadable.surface?.blocks.count == 1, "a finished change this version can't read is the latest it sent")
+
+        var nothing = PageProgress(change: typed, intent: "split a dinner")
+        nothing.apply(ComposeEvent(seq: 1, kind: .done(nil, model: "")))
+        #expect(nothing.phase == .failed("Nothing came out of this. Try asking another way.") && nothing.surface == current, "and with none, the page stays as it was")
+
+        var failing = PageProgress(change: typed, intent: "split a dinner")
+        failing.apply(ComposeEvent(seq: 1, kind: .surface(billSplit(blocks: 1))))
+        failing.apply(ComposeEvent(seq: 2, kind: .failed("The model stopped making progress.")))
+        #expect(failing.surface == current, "so does a change that fails")
+
+        var answering = PageProgress(change: .answer(current.answers![0], to: "Pune", on: current, values: [:]), intent: "split a dinner")
+        answering.apply(ComposeEvent(seq: 1, kind: .done(current, model: "grok-4.7")))
+        #expect(answering.surface?.answers == [Answer(question: destination, choice: "Pune")], "a different answer is the one the page carries")
+
+        var again = PageProgress(change: .again("split a dinner", on: current, values: [:]), intent: "split a dinner")
+        #expect(again.surface == nil, "made again, it forms as a new page does")
+        again.apply(ComposeEvent(seq: 1, kind: .surface(billSplit(blocks: 1))))
+        #expect(again.surface?.blocks.count == 1)
+    }
+
+    @Test("A change keeps the user's numbers where it left their input alone")
+    func keptValues() {
+        let values = ["bill": 3000.0, "people": 5, "tip": 10]
+        let typed = PageChange.instruction("make it 4 people", focus: nil, on: sharedSplit(), values: values)
+        #expect(typed.kept(after: sharedSplit(people: 4)) == ["bill": 3000], "the bill stays theirs; people starts where the change put it; tip has no input")
+        #expect(typed.kept(after: sharedSplit()) == ["bill": 3000, "people": 5])
+        #expect(PageChange.again("split", on: sharedSplit(), values: values).kept(after: sharedSplit(people: 4)) == values, "made again, they stay as they were, as here")
+        #expect(PageChange.decoded(typed.encoded()) == typed, "kept while it's made, and read back the same")
+    }
+
+    @Test("A call to the phone's tools runs here, and what it returned goes back to the job")
+    @MainActor func toolRoundTrip() async {
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .phase(.researching))),
+            .event(ComposeEvent(seq: 2, kind: .deviceTool(counting))),
+            // Looking things up goes on beside it.
+            .event(ComposeEvent(seq: 3, kind: .trace(.search, "open tasks"))),
+            .awaitOutput(.seconds(5)),
+            .event(ComposeEvent(seq: 4, kind: .surface(billSplit(blocks: 1)))),
+            .event(ComposeEvent(seq: 5, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        let devices = DeviceTools([tool.entry()])
+        var kept: [String] = []
+        devices.onRun = { kept.append($0) }
+        let follow = watch(server)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.count == 1 && tool.calls.first.flatMap { try? JSONValue(json: $0) } == .object(["what": .string("tasks")]), "run once, with what the model sent")
+        #expect(server.returned == [DeviceToolOutput(id: "call-1", output: "3 tasks")], "and what it returned went back")
+        #expect(kept == ["call-1"], "kept as it started")
+        #expect(follow.progress.calls.isEmpty)
+    }
+
+    @Test("What a tool returned after the job went on without it is let go")
+    @MainActor func movedOn() async {
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(counting))),
+            .awaitOutput(.seconds(5)),
+            .event(ComposeEvent(seq: 2, kind: .surface(billSplit(blocks: 1)))),
+            .event(ComposeEvent(seq: 3, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]], movedOn: true)
+        let devices = DeviceTools([Counting().entry()])
+        let follow = watch(server)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done, "the page goes on")
+        #expect(server.returned.count == 1, "sent once, and not again after a 409")
+        #expect(follow.progress.log.contains("Dream's server had gone on without count, so what it returned wasn't needed."))
+    }
+
+    @Test("A call the loop went past, read again from the first event, is never run")
+    @MainActor func wentPast() async {
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(counting))),
+            .event(ComposeEvent(seq: 2, kind: .log("count couldn't be read: no answer in time"))),
+            .event(ComposeEvent(seq: 3, kind: .surface(billSplit(blocks: 1)))),
+            .awaitOutput(.milliseconds(400)),
+            .event(ComposeEvent(seq: 4, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        let devices = DeviceTools([tool.entry()])
+        let follow = watch(server)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.isEmpty && server.returned.isEmpty, "the page was written after it, so nothing ran, and nothing was sent")
+    }
+
+    @Test("A call run before the app last closed isn't run again")
+    @MainActor func ranBefore() async {
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(counting))),
+            .awaitOutput(.milliseconds(400)),
+            .event(ComposeEvent(seq: 2, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        let devices = DeviceTools([tool.entry()], ran: ["call-1"])
+        let follow = watch(server)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.isEmpty && server.returned.isEmpty)
+    }
+
+    @Test("A call still waiting when the server stops waiting is given up on, and nothing is sent")
+    @MainActor func patience() async {
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(counting))),
+            .awaitOutput(.seconds(1)),
+            .event(ComposeEvent(seq: 2, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        // Like a question about it waiting on the user.
+        let devices = DeviceTools([tool.entry(taking: .seconds(30))])
+        let follow = watch(server)
+        follow.patience = .milliseconds(200)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.count == 1 && server.returned.isEmpty, "it began, was stopped, and nothing went back")
+        #expect(follow.progress.log.contains("Dream's server went on without count, so what it returned wasn't sent."))
+    }
+
+    @Test("A call to a tool this iPhone doesn't offer, or with arguments that aren't JSON, says so")
+    @MainActor func unknownTools() async throws {
+        let devices = DeviceTools([Counting().entry()])
+        let unknown = try #require(await devices.run(DeviceToolCall(id: "a", name: "linear_issues", arguments: "{}")))
+        #expect(unknown.output.contains("isn't available on the user's iPhone"))
+        let broken = try #require(await devices.run(DeviceToolCall(id: "b", name: "count", arguments: "{not json")))
+        #expect(broken.output.contains("weren't JSON"))
     }
 }

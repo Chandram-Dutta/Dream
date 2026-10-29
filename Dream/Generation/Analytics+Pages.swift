@@ -2,8 +2,8 @@ import Foundation
 import FoundationModels
 
 extension Composer {
-    /// Counts a finished page or change (Analytics.swift): its shape, the model and how long it
-    /// took, never its words.
+    /// Counts a finished page or change made here (Analytics.swift): its shape, the model and how
+    /// long it took, never its words. Dream's server counts the pages and changes it makes itself.
     func countFinished(changing: Bool, pointed: Bool = false, since started: Date) {
         guard let surface else { return }
         let seconds = Date().timeIntervalSince(started)

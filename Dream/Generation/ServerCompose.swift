@@ -52,8 +52,34 @@ struct ComposeStart: Encodable, Equatable {
     var locale: Place
     /// The lines this iPhone adds below the request, like what it remembers about the user.
     var context: [String]
-    /// The id the finished page is kept under, as sync writes ids: `UUID.uuidString`.
+    /// The id the finished page is kept under, as sync writes ids: `UUID.uuidString`. For a
+    /// change, the page's own.
     var pageID: String
+    /// A change to a page the user has, instead of a new page. `request` is still what the page
+    /// was first asked for.
+    var editing: Editing?
+    /// The tools only this iPhone can run, which the server offers the model and asks the phone
+    /// to run (DeviceTools.swift).
+    var deviceTools: [DeviceToolDefinition]?
+
+    /// What's changing, and the page as it is now (PageChange).
+    struct Editing: Encodable, Equatable {
+        struct ChangedAnswer: Encodable, Equatable {
+            var question: Question
+            var choice: String
+        }
+
+        /// The page as it is now, as the app's Surface encodes it.
+        var surface: JSONValue
+        /// What the user asked to change, in their words.
+        var instruction: String?
+        /// The id of the block they pointed at.
+        var focus: String?
+        /// A different answer to one of the questions the page was built from.
+        var answer: ChangedAnswer?
+        /// Made again from the request, as it was.
+        var again: Bool?
+    }
 }
 
 extension ComposeStart {
@@ -73,6 +99,19 @@ extension ComposeStart {
                 measurementSystem: Locale.current.measurementSystem.identifier),
             context: context,
             pageID: page.uuidString)
+    }
+
+    /// A change to the page kept under `page`, which goes on from what it was first asked for. A
+    /// photo goes again only when the page is made again; a change works from the page.
+    init(changing change: PageChange, intent: String, image: CGImage?, page: UUID, context: [String]) {
+        self.init(intent: intent, image: change.kind == .again ? image : nil, page: page, context: context)
+        editing = change.editing
+    }
+
+    /// The body as it's sent: keys in one order, and each tool's arguments in the order they were
+    /// declared, as the phone sends a model its tools (ChatCompletions.ordered).
+    func body() throws -> Data {
+        try ChatCompletions.ordered(JSONSerialization.jsonObject(with: JSONEncoder().encode(self)))
     }
 }
 
@@ -114,6 +153,8 @@ struct ComposeEvent: Equatable {
         case asking([Question])
         /// A line for Under the hood.
         case log(String)
+        /// One of this iPhone's tools to run, which the loop waits on (DeviceTools.swift).
+        case deviceTool(DeviceToolCall)
         /// Finished, and kept in sync. The page is nil when this version can't read it.
         case done(Surface?, model: String)
         case failed(String)
@@ -127,7 +168,27 @@ struct ComposeEvent: Equatable {
 
 extension ComposeEvent: Decodable {
     private enum Keys: String, CodingKey {
-        case seq, type, phase, kind, text, surface, questions, line, model, message
+        case seq, type, phase, kind, text, surface, questions, line, model, message, call
+    }
+
+    /// A call as the server sends it. Its arguments are the JSON the model wrote, as a string, or
+    /// already read.
+    private struct Call: Decodable {
+        let call: DeviceToolCall?
+
+        private enum Keys: String, CodingKey {
+            case id, name, arguments
+        }
+
+        init(from decoder: Decoder) throws {
+            let c = try decoder.container(keyedBy: Keys.self)
+            let id = (try? c.decode(String.self, forKey: .id)) ?? ""
+            let name = (try? c.decode(String.self, forKey: .name)) ?? ""
+            let arguments = (try? c.decodeIfPresent(String.self, forKey: .arguments))
+                ?? (try? c.decodeIfPresent(JSONValue.self, forKey: .arguments))?.jsonString
+                ?? "{}"
+            call = id.isEmpty || name.isEmpty ? nil : DeviceToolCall(id: id, name: name, arguments: arguments)
+        }
     }
 
     /// Only `seq` and `type` must be there. Anything else that's missing or can't be read makes
@@ -155,6 +216,8 @@ extension ComposeEvent: Decodable {
             kind = questions.map { Kind.asking($0.compactMap(\.question)) } ?? .other(type)
         case "log":
             kind = string(.line).map(Kind.log) ?? .other(type)
+        case "deviceTool":
+            kind = (try? c.decodeIfPresent(Call.self, forKey: .call))?.call.map(Kind.deviceTool) ?? .other(type)
         case "done":
             kind = .done(Self.surface(try? c.decodeIfPresent(JSONValue.self, forKey: .surface)), model: string(.model) ?? "")
         case "failed":
@@ -253,14 +316,39 @@ struct PageProgress: Equatable {
     private(set) var asked: Asked?
     /// The answers sent, which the finished page carries if the server left them off.
     private(set) var answers: [Answer] = []
+    /// Calls to this iPhone's tools the loop is waiting on, oldest first. One goes once it's
+    /// answered, or once the loop shows it went on without it.
+    private(set) var calls: [DeviceToolCall] = []
     /// The request's language, if it's clear, and the reader's otherwise: what a finished page
     /// is labelled with if the server didn't say (Language.swift).
     private var likely: String?
     private var fallback = Languages.primary
+    /// A change keeps the page as it was on screen until the changed one is done, as a change
+    /// made here does; the latest the server sent waits here.
+    private var holding = false
+    private var latest: Surface?
+    /// A change keeps the units of the page it changes.
+    private var earlier: SurfaceLocale?
+    /// A different answer is the page's to carry, whatever the server wrote.
+    private var answering = false
 
     init(intent: String = "") {
         likely = Languages.guess(intent)?.rawValue
         fallback = Languages.of(request: intent)?.rawValue ?? Languages.primary
+    }
+
+    /// A change to a page: the page stays as it was while the change is written, unless it's
+    /// made again, which starts over as a new page does.
+    init(change: PageChange, intent: String) {
+        self.init(intent: intent)
+        answers = change.answers
+        answering = change.kind == .answer
+        guard change.kind != .again else { return }
+        surface = change.base
+        holding = true
+        earlier = change.base.locale
+        likely = change.base.locale?.language ?? likely
+        fallback = change.base.locale?.language ?? fallback
     }
 
     /// Where reading the events again picks up: after the last one counted.
@@ -288,29 +376,41 @@ struct PageProgress: Equatable {
             }
             isThinking = true
             asked = nil
+            // Looking things up goes on beside a call; writing or fixing comes after it.
+            if next != .researching { calls = [] }
         case .trace(let kind, let text):
             trail.append(Trace(kind, text))
             if phase == .composing { phase = .researching }
             isThinking = true
             asked = nil
         case .surface(let page):
-            surface = page
+            if holding { latest = page } else { surface = page }
             if phase == .researching { phase = .composing }
             isThinking = false
             asked = nil
+            calls = []
         case .asking(let questions):
             asked = questions.isEmpty ? nil : Asked(seq: event.seq, questions: questions)
             isThinking = false
+            calls = []
         case .log(let line):
             log.append(line)
+        case .deviceTool(let call):
+            if !calls.contains(where: { $0.id == call.id }) { calls.append(call) }
+            isThinking = true
         case .done(let page, let model):
-            finish(page ?? surface, model: model)
+            finish(page ?? latest ?? (holding ? nil : surface), model: model)
         case .failed(let message):
             end(message)
         case .other:
             break
         }
         return true
+    }
+
+    /// A call was answered from here, or given up on.
+    mutating func settled(_ call: DeviceToolCall) {
+        calls.removeAll { $0.id == call.id }
     }
 
     /// The questions were answered here, and the answers sent.
@@ -331,28 +431,31 @@ struct PageProgress: Equatable {
         guard !isOver else { return }
         phase = .failed(message)
         asked = nil
+        calls = []
         isThinking = false
     }
 
-    /// Finished with a page that came another way, like sync.
+    /// Finished with a page that came another way, like sync. A change that can't be read leaves
+    /// the page as it was.
     mutating func finish(_ page: Surface?, model: String) {
         guard !isOver else { return }
         asked = nil
+        calls = []
         isThinking = false
         guard var page, !page.isEmpty else {
             phase = .failed("Nothing came out of this. Try asking another way.")
             return
         }
-        if page.answers == nil, !answers.isEmpty { page = page.answered(answers) }
-        if page.locale == nil { page.locale = SurfaceLocale(written: page, likely: likely, fallback: fallback) }
+        if page.answers == nil || answering, !answers.isEmpty { page = page.answered(answers) }
+        if page.locale == nil { page.locale = SurfaceLocale(written: page, likely: likely, fallback: fallback, editing: earlier) }
         surface = page
         self.model = model
         phase = .done
     }
 }
 
-/// The three routes a page on the server is made through, so following one can be checked
-/// without the network.
+/// The routes a page on the server is made through, so following one can be checked without the
+/// network.
 protocol ComposeTransport: Sendable {
     /// Starts a page; its job's id.
     func start(_ start: ComposeStart) async throws -> String
@@ -360,10 +463,14 @@ protocol ComposeTransport: Sendable {
     func events(_ job: String, after seq: Int) -> AsyncThrowingStream<ComposeEvent, Error>
     /// The user's answers to the questions the job waits on.
     func answer(_ job: String, _ answers: [Answer]) async throws
+    /// What one of this iPhone's tools returned. `ComposeFailure.movedOn` when the job no longer
+    /// waits on it.
+    func output(_ job: String, _ output: DeviceToolOutput) async throws
 }
 
 /// Follows one page on Dream's server to its end: reads its events, reads again from the last one
-/// counted whenever the line drops, and puts its questions to the user.
+/// counted whenever the line drops, puts its questions to the user, and runs the tools only this
+/// iPhone can (DeviceTools.swift).
 @MainActor
 final class ServerWatch {
     enum Ending: Equatable {
@@ -386,10 +493,21 @@ final class ServerWatch {
     var delay: (Int) -> Duration = { drops in .milliseconds(min(15_000, 500 * (1 << min(drops - 1, 5)))) }
     /// Read again from the first event, questions come before what came of them, all at once. They
     /// go on screen once events stop coming for this long, if nothing has answered them by then.
+    /// So do calls to this iPhone's tools: one runs only if the loop still waits on it then.
     var settle: Duration = .milliseconds(400)
+    /// Runs one of this iPhone's tools for the loop, and what it returned; nil when nothing is to
+    /// be sent, as for a call run already. Stopping it (its task cancelled) takes a question about
+    /// it back off the screen, and refuses it.
+    var runTool: (DeviceToolCall) async -> DeviceToolOutput? = { _ in nil }
+    /// The server waits a minute on a call before it tells the model it couldn't be read. One
+    /// still waiting on the user after this long is given up on here first, so nothing the user
+    /// allows then runs for a page that's gone on without it.
+    var patience: Duration = .seconds(55)
 
     private var reading: Task<Void, Error>?
     private var asking: Task<Void, Never>?
+    /// The calls being run, by their ids.
+    private var running: [String: Task<Void, Never>] = [:]
     private var nudged = false
     /// The app is in the background (`leave`): no line is open until it's back.
     private var away = false
@@ -406,6 +524,7 @@ final class ServerWatch {
         defer {
             asking?.cancel()
             reading?.cancel()
+            running.values.forEach { $0.cancel() }
         }
         while !Task.isCancelled, !progress.isOver {
             let before = progress.seq
@@ -470,6 +589,73 @@ final class ServerWatch {
             // off the screen, and nothing is sent.
             asking?.cancel()
         }
+        for call in progress.calls where running[call.id] == nil { run(call) }
+        for (id, task) in running where !progress.calls.contains(where: { $0.id == id }) {
+            // The loop went on without it: a question about it comes off the screen, and nothing
+            // is sent. One already running finishes, since a service can't be stopped mid-way.
+            task.cancel()
+            running[id] = nil
+        }
+    }
+
+    /// A line of the phone's own, among the server's.
+    func note(_ line: String) {
+        progress.note(line)
+        onChange(progress)
+    }
+
+    private func isWaiting(on call: DeviceToolCall) -> Bool {
+        progress.calls.contains { $0.id == call.id }
+    }
+
+    /// Runs a call once events settle, if the loop still waits on it, and sends what it returned,
+    /// unless the loop went on without it meanwhile or the server's patience ran out first.
+    private func run(_ call: DeviceToolCall) {
+        running[call.id] = Task {
+            try? await Task.sleep(for: settle)
+            guard !Task.isCancelled, isWaiting(on: call) else { return }
+            let begun = ContinuousClock.now
+            let work = Task { await runTool(call) }
+            let timer = Task {
+                try? await Task.sleep(for: patience)
+                if !Task.isCancelled { work.cancel() }
+            }
+            let output = await withTaskCancellationHandler { await work.value } onCancel: { work.cancel() }
+            timer.cancel()
+            guard let output else { return }
+            guard !Task.isCancelled, ContinuousClock.now - begun < patience, isWaiting(on: call) else {
+                progress.settled(call)
+                note("Dream's server went on without \(call.name), so what it returned wasn't sent.")
+                return
+            }
+            running[call.id] = nil
+            progress.settled(call)
+            onChange(progress)
+            await send(output, for: call)
+        }
+    }
+
+    /// What a tool returned, a few times if the line is down, unless the server has gone on
+    /// without it, in which case it's let go.
+    private func send(_ output: DeviceToolOutput, for call: DeviceToolCall) async {
+        for wait in [Duration.zero, .seconds(1), .seconds(4)] {
+            try? await Task.sleep(for: wait)
+            guard !Task.isCancelled else { return }
+            do {
+                try await transport.output(job.id, output)
+                return
+            } catch ComposeFailure.movedOn {
+                note("Dream's server had gone on without \(call.name), so what it returned wasn't needed.")
+                return
+            } catch ComposeFailure.gone {
+                return
+            } catch ComposeFailure.refused(let message) {
+                note("Dream's server didn't take what \(call.name) returned: \(message)")
+                return
+            } catch {
+                note("Sending what \(call.name) returned failed (\(error.localizedDescription)).")
+            }
+        }
     }
 
     private func put(_ asked: PageProgress.Asked) {
@@ -520,10 +706,13 @@ enum ComposeFailure: LocalizedError, Equatable {
     case refused(String)
     /// It didn't answer properly. Worth asking again.
     case unavailable(String)
+    /// It no longer waits on what was sent: a tool's answer after the loop went on without it.
+    case movedOn
 
     var errorDescription: String? {
         switch self {
         case .gone: "Dream's server no longer has this page."
+        case .movedOn: "Dream's server went on without it."
         case .refused(let message), .unavailable(let message): message
         }
     }
@@ -554,9 +743,7 @@ struct ComposeClient: ComposeTransport {
     }()
 
     func start(_ start: ComposeStart) async throws -> String {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .withoutEscapingSlashes
-        let body = try encoder.encode(start)
+        let body = try start.body()
         // A busy server often answers a moment later, and nothing has started yet, so asking
         // again is safe (DreamExecutor).
         for delay in DreamExecutor.retryDelays + [nil] {
@@ -612,6 +799,19 @@ struct ComposeClient: ComposeTransport {
         guard (200..<300).contains(http.statusCode) else { throw failure(http, data) }
     }
 
+    func output(_ job: String, _ output: DeviceToolOutput) async throws {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = [.sortedKeys, .withoutEscapingSlashes]
+        encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: "inf", negativeInfinity: "-inf", nan: "nan")
+        let body = try encoder.encode(output)
+        var request = try await signed("POST", "api/compose/\(job)/tools", body: body)
+        request.timeoutInterval = 20
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        let (data, response) = try await Self.session.data(for: request)
+        guard let http = response as? HTTPURLResponse else { throw ComposeFailure.unavailable("Dream's server didn't answer.") }
+        guard (200..<300).contains(http.statusCode) else { throw failure(http, data) }
+    }
+
     private struct Started: Decodable {
         let id: String
     }
@@ -636,6 +836,8 @@ struct ComposeClient: ComposeTransport {
         switch response.statusCode {
         case 404, 410:
             return .gone
+        case 409:
+            return .movedOn
         case 401:
             AppProof.serverAsks(response)
             return .refused(said ?? "Sign in to see this page.")

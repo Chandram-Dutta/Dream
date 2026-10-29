@@ -210,6 +210,7 @@ struct SurfaceScreen: View {
             if !userScrolled { scroll.scrollTo(edge: .top) }
         }
         .onChange(of: composer.phase) {
+            if !composer.phase.isBusy { changingID = nil }
             guard composer.phase == .done else { return }
             keepServerPage()
             // The last blocks can land after the final surface update; settle at the top.
@@ -264,7 +265,11 @@ struct SurfaceScreen: View {
             composer.asking.cancel()
             composer.consent.cancel()
         }
-        .onChange(of: state.values) { _, values in saved?.values = values }
+        .onChange(of: state.values) { _, values in
+            saved?.values = values
+            // A change being made on Dream's server lands with the numbers as they are now.
+            if composer.phase.isBusy, composer.change != nil { composer.change?.values = values }
+        }
         .countingControlUses(state.values, of: surface, settled: !busy)
         .keepingRecords(of: saved?.id, collections: surface?.recordCollections ?? [], in: state)
     }
@@ -360,6 +365,11 @@ struct SurfaceScreen: View {
             state.values = saved.values.merging(state.values) { _, current in current }
             saved.openCount += 1
             saved.lastOpenedAt = .now
+            // A change still being made on Dream's server shows here as it did where it was asked.
+            if composer.job == nil, let changing = ServerPages.shared.changing(saved.id) {
+                composer = changing
+                changingID = changing.change?.focus
+            }
             return
         }
         if let forming {
@@ -397,16 +407,37 @@ struct SurfaceScreen: View {
     }
 
     /// A page made on Dream's server, once it's done: kept under the id it's synced under
-    /// (ServerPages.keep), and the screen goes on with it as with a page it made itself.
+    /// (ServerPages.keep), and the screen goes on with it as with a page it made itself. A change
+    /// lands on the page it changed, and the user's numbers are those it kept.
     private func keepServerPage() {
-        guard saved == nil, composer.job != nil, let kept = ServerPages.shared.keep(composer) else { return }
+        guard composer.job != nil else { return }
+        if composer.change != nil {
+            guard let kept = ServerPages.shared.keep(composer) else { return }
+            state.values = kept.values
+            saved = kept
+            return
+        }
+        guard saved == nil, let kept = ServerPages.shared.keep(composer) else { return }
         if !state.values.isEmpty { kept.values = kept.values.merging(state.values) { _, current in current } }
         saved = kept
     }
 
+    /// A change made on Dream's server, which goes on if the screen is left and lands on this
+    /// page when it's done (keepServerPage). False when changes are made here instead.
+    private func changeOnServer(_ change: PageChange) -> Bool {
+        guard ServerCompose.isOn, let saved else { return false }
+        composer = ServerPages.shared.change(saved, change)
+        return true
+    }
+
     /// After connecting a service the request named, the request runs again, now able to read
-    /// it: here, since the server can't reach the user's services yet.
+    /// it. On Dream's server, the service is read through this iPhone (DeviceTools.swift).
     private func runAgain() async {
+        if ServerCompose.isOn {
+            guard !composer.phase.isBusy, let current = surface else { return }
+            _ = changeOnServer(.again(intent, on: current, values: state.values))
+            return
+        }
         await composer.compose(intent: intent, image: request?.image ?? photo?.cgImage, onServer: false)
         guard composer.phase == .done, let surface = composer.surface, let saved else { return }
         saved.surface = surface
@@ -436,6 +467,7 @@ struct SurfaceScreen: View {
                 saved?.note(.listed, text)
                 return
             }
+            if changeOnServer(.instruction(text, focus: target.block?.id, on: current, values: state.values)) { return }
             await composer.edit(current, intent: intent, instruction: text, focus: target.block)
             changingID = nil
             guard composer.phase == .done, let updated = composer.surface else { return }
@@ -458,6 +490,7 @@ struct SurfaceScreen: View {
     /// A different answer to one of the questions asked before building, from its tag in the header.
     private func changeAnswer(_ answer: Answer, to choice: String) {
         guard let current = surface else { return }
+        if changeOnServer(.answer(answer, to: choice, on: current, values: state.values)) { return }
         Task {
             await composer.rebuild(current, intent: intent, changing: answer, to: choice)
             guard composer.phase == .done, let updated = composer.surface else { return }

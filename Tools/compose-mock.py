@@ -1,14 +1,22 @@
-"""A stand-in for Dream's page loop on the server, for trying the app's side on this Mac: the three
-routes of Server/src/compose/contract.ts, playing scripted events instead of calling a model.
+"""A stand-in for Dream's page loop on the server, for trying the app's side on this Mac: the routes
+of Server/src/compose/contract.ts, playing scripted events instead of calling a model.
 
   POST /api/compose                   starts a job; the request picks the script (below)  → { id }
   GET  /api/compose/:id/events?after  server-sent events after `after`, then new ones as they happen
   POST /api/compose/:id/answers       the user's answers, which a job asking questions waits on
+  POST /api/compose/:id/tools         what one of the phone's tools returned; 409 once the job has
+                                      stopped waiting on that call
   GET  /mock/jobs/:id                 what the job was sent: the request (its photo's size, not the
-                                      photo), the answers, and how often its events were read
+                                      photo), the answers, the tools' outputs and how each was
+                                      answered, and how often its events were read
 
 Scripts, by a word in the request: "ask" waits on a question; "fail" fails; "drop" drops the first
-reading of its events after three; "slow" spaces its events out. Anything else makes a bill split.
+reading of its events after three; "slow" spaces its events out. With "tool" the model calls the
+first of the phone's tools (deviceTools) other than travel, and waits for what it returns;
+"impatient" stops waiting a moment after asking, without a sign to the phone, so what it returns
+gets a 409; "past" asks and goes straight on to write, as a page read again from its first event
+shows a call the loop went past. A request with `editing` is a change: the page it sends comes back
+for four, as the change, or made again. Anything else makes a bill split.
 Every request needs a session (Authorization: Bearer …), as the real routes do. An unknown job is 404.
 
 Usage: python3 Tools/compose-mock.py 8790      (Tools/compose-check.sh starts it on its own)
@@ -47,10 +55,42 @@ def page(blocks):
 QUESTION = {"text": "Is the tip in the bill?", "topic": "Tip", "options": ["Yes", "No"], "allowsTyping": False, "isPersonal": False}
 
 
-def script(request):
+def changed(editing):
+    """The page a change sent, back for four people: the change, as the model would write it."""
+    made = json.loads(json.dumps(editing.get("surface") or page(3)))
+    for field in made.get("inputs", []):
+        if field.get("name") == "people":
+            field["initial"] = 4
+    made["summary"] = "₹2,400 between 4 friends."
+    if editing.get("answer"):
+        made["answers"] = [{"question": editing["answer"]["question"], "choice": editing["answer"]["choice"]}]
+    return made
+
+
+def calling(body):
+    """The phone's tool a "tool" script calls: the first that isn't travel, as the model would
+    reach for the service the request names."""
+    tools = [tool.get("name", "") for tool in body.get("deviceTools") or []]
+    return next((name for name in tools if name != "travel"), tools[0] if tools else "travel")
+
+
+def script(body):
     """The events a job plays, in order, each with how long to wait before it."""
-    words = request.lower()
+    words = body.get("request", "").lower()
     gap = 0.4 if "slow" in words else 0.05
+    editing = body.get("editing")
+    if editing:
+        page_now = changed(editing)
+        if editing.get("again"):
+            first = page(1)
+            steps = [(gap, {"type": "phase", "phase": "composing"}), (gap, {"type": "surface", "surface": first})]
+        else:
+            # A change is written whole: its parts never show over the page it changes.
+            steps = [(gap, {"type": "phase", "phase": "composing"}), (gap, {"type": "surface", "surface": {"title": "Dinner split, 4"}})]
+        return steps + [
+            (gap, {"type": "log", "line": "Change: " + (editing.get("instruction") or "made again")}),
+            (gap * 4, {"type": "done", "surface": page_now, "model": "mock-model"}),
+        ]
     steps = [
         (gap, {"type": "phase", "phase": "researching"}),
         (gap, {"type": "trace", "kind": "lookup", "text": "Tipping"}),
@@ -62,6 +102,11 @@ def script(request):
         return steps + [(gap, {"type": "failed", "message": "The model's safety filters blocked this request."})]
     if "ask" in words:
         steps += [(gap, {"type": "asking", "questions": [QUESTION]}), ("answers", None)]
+    for word, patience, past in (("tool", 10, False), ("impatient", 0.1, False), ("past", 0, True)):
+        if word in words:
+            call = {"id": "call-" + uuid.uuid4().hex[:8], "name": calling(body), "arguments": json.dumps({"status": "open"})}
+            steps += [(gap, {"type": "deviceTool", "call": call}), ("tool", (call, patience, past))]
+            break
     steps += [
         (gap, {"type": "phase", "phase": "composing"}),
         (gap, {"type": "surface", "surface": {"title": "Dinner sp"}}),
@@ -82,10 +127,16 @@ class Job:
         self.events = []
         self.answers = []
         self.readings = []
+        # Every tool output sent, with how it was answered; the call the job waits on, if any.
+        self.tools = []
+        self.waiting = None
         self.over = False
         self.changed = threading.Condition()
         self.drops = 1 if "drop" in body.get("request", "").lower() else 0
         threading.Thread(target=self.play, daemon=True).start()
+
+    def answered(self, call):
+        return any(sent["status"] == 200 and sent["output"].get("id") == call["id"] for sent in self.tools)
 
     def add(self, event):
         with self.changed:
@@ -97,11 +148,25 @@ class Job:
             self.changed.notify_all()
 
     def play(self):
-        for wait, event in script(self.body.get("request", "")):
+        for wait, event in script(self.body):
             if wait == "answers":
                 # Nobody answering for a while means "You choose", as on the server.
                 with self.changed:
                     self.changed.wait_for(lambda: self.answers, timeout=20)
+                continue
+            if wait == "tool":
+                call, patience, past = event
+                with self.changed:
+                    self.waiting = call["id"]
+                    if patience:
+                        self.changed.wait_for(lambda: self.answered(call), timeout=patience)
+                    self.waiting = None
+                    answered = self.answered(call)
+                if not answered:
+                    # As the server tells the model, and nothing the phone reads as going on.
+                    self.add({"type": "log", "line": f"{call['name']} couldn't be read: no answer in time"})
+                    if not past:
+                        time.sleep(1.5)
                 continue
             time.sleep(wait)
             self.add(event)
@@ -158,6 +223,18 @@ class Handler(BaseHTTPRequestHandler):
                 job.answers.append(answers)
                 job.changed.notify_all()
             return self.reply(200, {"ok": True})
+        if len(parts) == 4 and parts[:2] == ["api", "compose"] and parts[3] == "tools":
+            job = JOBS.get(parts[2])
+            if not job:
+                return self.reply(404, {"error": "No such page."})
+            output = self.body()
+            with job.changed:
+                waited = job.waiting is not None and job.waiting == output.get("id")
+                job.tools.append({"output": output, "status": 200 if waited else 409})
+                job.changed.notify_all()
+            if not waited:
+                return self.reply(409, {"error": "This page went on without that."})
+            return self.reply(200, {"ok": True})
         self.reply(404, {"error": "Not found."})
 
     def do_GET(self):
@@ -169,7 +246,7 @@ class Handler(BaseHTTPRequestHandler):
             sent = dict(job.body)
             if sent.get("image"):
                 sent["image"] = f"{len(base64.b64decode(sent['image']))} bytes of JPEG"
-            return self.reply(200, {"request": sent, "answers": job.answers, "readings": job.readings, "events": len(job.events)})
+            return self.reply(200, {"request": sent, "answers": job.answers, "tools": job.tools, "readings": job.readings, "events": len(job.events)})
         if len(parts) == 4 and parts[:2] == ["api", "compose"] and parts[3] == "events":
             if not self.signed_in():
                 return
