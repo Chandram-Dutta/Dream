@@ -461,8 +461,12 @@ export class PageLoop {
     const found = new ReferenceLog();
     let session = this.session(found);
     let surface: Surface;
+    // A page Auto's router knows is about the world (an explainer, or something current) looks it
+    // up before it writes: cheap models skipped it, and sending the page back for it doubled the
+    // wait. Other pages, like a bill split, may write straight away.
+    const mustLook = this.pick?.category === "science" || this.pick?.category === "live";
     try {
-      surface = await this.generateSurface(session, "Surface", prompt, found, fallback, streaming, signal);
+      surface = await this.generateSurface(session, "Surface", prompt, found, fallback, streaming, signal, { requireTool: mustLook });
       // A title and a sentence with nothing under them is as empty as nothing at all: a cheap
       // model once answered a whole EV comparison with just that.
       if (!surface.blocks.length && !this.engine.hasLogic(surface)) throw new EmptyScreen();
@@ -478,8 +482,10 @@ export class PageLoop {
       const checked = this.engine.checkLogic(surface);
       surface = checked.surface;
       let issues = checked.issues;
-      // Once: a page about the world that looked nothing up goes back to look it up.
-      if (round === 0) issues = issues.concat(this.engine.checkSourcing(surface, session.web.reading(found.all)));
+      // Once: a page about the world that looked nothing up goes back to look it up, and this
+      // time it must: asked nicely, a model cited Wikipedia pages it never read instead.
+      const unsourced = round === 0 ? this.engine.checkSourcing(surface, session.web.reading(found.all)) : [];
+      issues = issues.concat(unsourced);
       this.report(issues);
       const problems = issues.filter((issue) => issue.kind === "needsModel");
       if (!problems.length || round === 2) break;
@@ -490,8 +496,15 @@ export class PageLoop {
       const repair = session.transcript.endsWithAnswer
         ? repairPrompt(this.generation, messages)
         : repairPrompt(this.generation, messages, { asked, outline: this.engine.outline(surface), logic: this.engine.hasLogic(surface) ? this.engine.logicSummary(surface) : null });
+      const before = surface;
       try {
-        surface = await this.generateSurface(session, `Repair ${round + 1}`, repair, found, fallback, false, signal);
+        surface = await this.generateSurface(session, `Repair ${round + 1}`, repair, found, fallback, false, signal, { repairing: true, requireTool: unsourced.length > 0 });
+        // A repair fixes the page; one that lost most of it isn't worth having.
+        if (list(surface.blocks).length * 2 < list(before.blocks).length) {
+          this.note(`Kept the screen as it was: repair ${round + 1} left ${list(surface.blocks).length} of its ${list(before.blocks).length} blocks.`);
+          surface = before;
+          break;
+        }
       } catch (error) {
         if (signal.aborted) throw signal.reason;
         // A repair that fails leaves the page as it was, which beats no page.
@@ -511,19 +524,20 @@ export class PageLoop {
     this.note(this.engine.outline(surface));
   }
 
-  /** A whole surface from one request, keeping the finished blocks if the model stops early. A
-   * repair is one too, and keeps what it finished the same way. */
-  private async generateSurface(session: Session, step: string, prompt: unknown, found: ReferenceLog, fallback: Reference | null, streaming: boolean, signal: AbortSignal): Promise<Surface> {
+  /** A whole surface from one request, keeping the finished blocks if the model stops early. Not
+   * a repair: one that stops early leaves the page it was repairing, which is whole, instead of a
+   * few blocks of its rewrite (a page about vaccines once came down to one block that way). */
+  private async generateSurface(session: Session, step: string, prompt: unknown, found: ReferenceLog, fallback: Reference | null, streaming: boolean, signal: AbortSignal, { repairing = false, requireTool = false } = {}): Promise<Surface> {
     const reference = () => found.first ?? fallback;
     const onPartial = streaming ? (partial: JSONObject) => this.show(answered(this.engine.surfaceFromPartial(partial, reference()), this.answers)) : null;
     try {
-      const wire = await this.generate(session, step, prompt, onPartial, (partial) => this.engine.isRepeatingItself(this.engine.surfaceFromPartial(partial, null)), signal);
+      const wire = await this.generate(session, step, prompt, onPartial, (partial) => this.engine.isRepeatingItself(this.engine.surfaceFromPartial(partial, null)), signal, requireTool);
       const surface = this.engine.surfaceFromWire(wire, reference());
       // The whole answer at once, not the last update before it, while the checks run.
       if (streaming) this.show(answered(surface, this.answers));
       return surface;
     } catch (error) {
-      if (!(error instanceof Unfinished)) throw error;
+      if (!(error instanceof Unfinished) || repairing) throw error;
       const kept = await this.salvaged(this.engine.surfaceFromPartial(error.partial, reference()), error.reason, "related" in error.partial);
       // Finished blocks are worth keeping, and so is a calculation with none, if it has results:
       // the checker gives it its controls and results. Inputs alone were kept once, and every
@@ -559,7 +573,7 @@ export class PageLoop {
    * keep sending without anything changing. Models report activity while they think, so only
    * real silence counts. The server's heartbeat says the line is open, not that the model is
    * working: it buys a long think, up to `ceiling`, never a hang. */
-  private async generate(session: Session, step: string, prompt: unknown, onPartial: ((partial: JSONObject) => void) | null, isRunaway: (partial: JSONObject) => boolean, signal: AbortSignal): Promise<JSONObject> {
+  private async generate(session: Session, step: string, prompt: unknown, onPartial: ((partial: JSONObject) => void) | null, isRunaway: (partial: JSONObject) => boolean, signal: AbortSignal, requireTool = false): Promise<JSONObject> {
     const started = this.now;
     const schema = this.generation.schemas.surface;
     const watch = { text: "", partial: null as JSONObject | null, lastChange: started, lastRead: -Infinity, lastChecked: -Infinity, stop: null as "repeating" | "stalled" | null };
@@ -606,7 +620,7 @@ export class PageLoop {
     }, this.timing.watch);
     let failure: unknown = null;
     try {
-      await this.respond(session, prompt, { schema, temperature: 0.4 }, onText, () => {
+      await this.respond(session, prompt, { schema, temperature: 0.4, requireTool }, onText, () => {
         watch.text = "";
       }, stopper.signal);
     } catch (error) {
@@ -618,6 +632,9 @@ export class PageLoop {
     // Stopped from outside, like writing that gives way to the gap check's questions.
     if (signal.aborted) throw signal.reason;
     if (failure !== null && watch.stop === null) {
+      // Something the loop didn't expect: where in the code, for the Worker's log. Never the
+      // message, which can quote the page.
+      if (describe(failure) === describe(null)) console.error("Step failed", step, failure instanceof Error ? `${failure.name}\n${failure.stack ?? ""}` : typeof failure);
       this.note(`${step} stopped after ${elapsed(started, this.now)} (${describe(failure)}).`);
       if (watch.partial) throw new Unfinished(watch.partial, "cutOff");
       throw failure;
@@ -654,7 +671,7 @@ export class PageLoop {
   /** One request in a session, through as many rounds of tool calls as the model makes, then its
    * answer. The transcript keeps it only when the answer is whole: a generation that failed or
    * was stopped early is taken back out, request and all. */
-  private async respond(session: Session, prompt: unknown, options: Pick<RequestOptions, "schema" | "temperature" | "maximumResponseTokens">, onText: (text: string) => void, onToolRound: () => void, signal: AbortSignal): Promise<Round> {
+  private async respond(session: Session, prompt: unknown, options: Pick<RequestOptions, "schema" | "temperature" | "maximumResponseTokens" | "requireTool">, onText: (text: string) => void, onToolRound: () => void, signal: AbortSignal): Promise<Round> {
     const { transcript, tools } = session;
     const mark = transcript.messages.length;
     let kept = false;
@@ -667,6 +684,8 @@ export class PageLoop {
           thinking: this.thinking,
           tools: tools?.definitions,
           ...options,
+          // Only the first round: once it has looked, it writes.
+          requireTool: round === 0 && options.requireTool === true,
         });
         const stream = await ask(this.services.model, body, signal, this.services.sleep, this.timing.retries);
         const result = await readRound(stream, this.activity, () => this.now, onText, signal);

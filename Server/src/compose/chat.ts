@@ -73,6 +73,8 @@ export interface RequestOptions {
   temperature?: number;
   /** The answer's own budget, before thinking (GenerationOptions.maximumResponseTokens). */
   maximumResponseTokens?: number;
+  /** The model must call a tool before it answers. */
+  requireTool?: boolean;
 }
 
 /** The request's JSON (ChatCompletions.body). */
@@ -82,6 +84,7 @@ export function requestBody(messages: Message[], options: RequestOptions): JSONO
   if (options.schema) body.response_format = { type: "json_schema", json_schema: { name: "response", schema: options.schema, strict: true } };
   if (options.tools?.length) {
     body.tools = options.tools.map((tool) => ({ type: "function", function: { name: tool.name, description: tool.description, parameters: tool.parameters } }));
+    if (options.requireTool) body.tool_choice = "required";
   }
   body.reasoning_effort = options.effort;
   if (options.temperature !== undefined) body.temperature = options.temperature;

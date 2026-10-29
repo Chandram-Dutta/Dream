@@ -380,9 +380,16 @@ final class Composer {
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
+            let before = surface
             do {
-                surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false)
+                surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false, repairing: true)
                     .fetched(live).connected(connected)
+                // A repair fixes the page; one that lost most of it isn't worth having.
+                if surface.blocks.count * 2 < before.blocks.count {
+                    note("Kept the screen as it was: repair \(round + 1) left \(surface.blocks.count) of its \(before.blocks.count) blocks.")
+                    surface = before
+                    break
+                }
             } catch where !(error is CancellationError) && !Task.isCancelled {
                 // A repair that fails leaves the page as it was, which beats no page.
                 note("Kept the screen as it was: repair \(round + 1) didn't finish (\(describe(error))).")
@@ -399,8 +406,9 @@ final class Composer {
     }
 
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
-    /// A repair is one too, and keeps what it finished the same way.
-    private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool) async throws -> Surface {
+    /// Not a repair: one that stops early leaves the page it was repairing, which is whole, instead
+    /// of a few blocks of its rewrite (a page about vaccines once came down to one block that way).
+    private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool, repairing: Bool = false) async throws -> Surface {
         // The page so far, about six times a second rather than on every token: each update lays
         // out and compares the whole page, and on every token that took the main thread whole
         // while a page streamed in, so it couldn't scroll. The runaway check keeps the same pace.
@@ -420,6 +428,7 @@ final class Composer {
             if streaming { show(surface.answered(asking.answers)) }
             return surface
         } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
+            if repairing { throw unfinished }
             let kept = await salvaged(Surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: unfinished.partial.related != nil)
             // Finished blocks are worth keeping, and so is a calculation with none, if it has
             // results: the checker gives it its controls and results (Checker.checkBlocks). Inputs

@@ -456,6 +456,28 @@ console.log("The loop: repairs");
   const kept = await runLoop(broken, { engine: engine2 });
   expect(kept.outcome.kind === "done" && kept.outcome.surface.title === "Mercury" && kept.lines().some((line) => line.startsWith("Kept the screen as it was: repair 1 didn't finish")), "a repair that breaks keeps the page as it was");
 
+  // A repair cut off partway: the page it was repairing, not the block or two of its rewrite.
+  const cut = fakeModelOf({ write: (index) => stream(pieces(index === 0 ? JSON.stringify(page()) : JSON.stringify(page({ title: "Half" })).slice(0, 80))) });
+  const halfway = await runLoop(cut, { engine: fakeEngine(() => [{ kind: "needsModel", message: "still wrong" }]) });
+  expect(halfway.outcome.kind === "done" && halfway.outcome.surface.title === "Mercury" && halfway.outcome.surface.blocks.length === 2 && halfway.lines().some((line) => line.startsWith("Kept the screen as it was: repair 1")), "a repair that stops early keeps the page it was repairing");
+
+  // A repair that loses most of the page isn't worth having.
+  const shrunk = fakeModelOf({ write: (index) => stream(pieces(JSON.stringify(index === 0 ? page() : page({ title: "Smaller", blocks: [] })))) });
+  const smaller = await runLoop(shrunk, { engine: fakeEngine(() => [{ kind: "needsModel", message: "still wrong" }]) });
+  expect(smaller.outcome.surface.title === "Mercury" && smaller.lines().includes("Kept the screen as it was: repair 1 left 0 of its 2 blocks."), "a repair that loses most of the page is undone");
+
+  // A page about the world looks something up before it writes; the sourcing repair must too.
+  const science = fakeModelOf({ write: () => stream(pieces(JSON.stringify(page()))) });
+  await runLoop(science, { route: async () => ({ ...PICK, category: "science" }) });
+  const plain = fakeModelOf({ write: () => stream(pieces(JSON.stringify(page()))) });
+  await runLoop(plain);
+  expect(science.calls.write[0].tool_choice === "required" && plain.calls.write[0].tool_choice === undefined, "an explainer's first round must call a tool; other pages may write straight away");
+  let sourced = 0;
+  const unsourced = { ...fakeEngine(), checkSourcing: () => (sourced++ === 0 ? [{ kind: "needsModel", message: "It states facts about the world without looking any up." }] : []) };
+  const looked = fakeModelOf({ write: () => stream(pieces(JSON.stringify(page()))) });
+  await runLoop(looked, { engine: unsourced });
+  expect(looked.calls.write[1]?.tool_choice === "required", "the repair for a page that looked nothing up must look something up");
+
   const stopped = JSON.stringify(page()).slice(0, JSON.stringify(page()).indexOf("related") - 3);
   let rounds = 0;
   const engine3 = fakeEngine(() => (rounds++ === 0 ? [{ kind: "needsModel", message: "a" }] : []));
