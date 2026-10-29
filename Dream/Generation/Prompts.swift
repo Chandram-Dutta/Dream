@@ -60,9 +60,16 @@ enum Prompts {
 
     private static let closingRules = "Lead with what answers the request. Every sentence earns its place. Then list related: 3 to 6 things someone who enjoyed this page would open next, each a specific question or subject, like 'Why Vijayanagara fell in 1565', not a broad category like 'History'."
 
-    /// Each feature's rules, in the order the model reads them. Empty until the feature fills them in.
+    /// Each feature's rules by name, in the order the model reads them, so the server can leave
+    /// out a feature whose tools it doesn't offer (Tools/export-generation.sh). Empty until the
+    /// feature fills them in.
+    static var features: [(name: String, rules: String)] {
+        [("memory", memoryRules), ("lists", listRules), ("figures", figureRules), ("scenes", sceneRules), ("sounds", soundRules),
+         ("connections", connectionRules), ("language", languageRules), ("sharing", sharingRules), ("live", liveRules), ("web", webRules)]
+    }
+
     private static var featureRules: [String] {
-        [memoryRules, listRules, figureRules, sceneRules, soundRules, connectionRules, languageRules, sharingRules, liveRules, webRules].filter { !$0.isEmpty }
+        features.map(\.rules).filter { !$0.isEmpty }
     }
 
     // MARK: - Writing a surface
@@ -72,6 +79,11 @@ enum Prompts {
     /// With the currency named, so the server can be given it with a placeholder for each
     /// user's own (Tools/export-generation.sh).
     static func surface(currency: String) -> String {
+        surface(currency: currency, features: featureRules)
+    }
+
+    /// With the features' rules given, which the server picks by the tools it offers.
+    static func surface(currency: String, features: [String]) -> String {
         """
         You build one screen that answers the user's request. It can explain, let the user calculate, or both: whatever the request needs. Before you write, look up the facts, numbers, dates and names the screen will state about the world, with the lookup tool, or search and read for the web, and take them only from what they return. A calculation with the user's own numbers, like splitting a bill, states no such facts and needs no tools.
 
@@ -84,7 +96,7 @@ enum Prompts {
         Then compose the screen from blocks.
         \(informationRules)
         \(calculationRules)
-        \(([closingRules] + featureRules).joined(separator: "\n\n"))
+        \(([closingRules] + features).joined(separator: "\n\n"))
         """
     }
 
