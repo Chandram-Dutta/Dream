@@ -274,6 +274,9 @@ console.log("The job: nobody watching");
   expect(away.job.status === "device" && needed.length === 1 && needed[0].body === "Dream needs your iPhone to work out a journey for “how long to drive to the…”" && needed[0].payload.kind === "device" && needed[0].payload.job === away.job.id, "a journey only the phone can work out, with nobody there to run it: one notification, and the page waits for it");
 }
 
+// A page's own notices (ready, a question) go whether or not anyone watches: the phone hides
+// them while it shows the page. Only the phone's tools wait on someone watching, which sets
+// how long they wait.
 console.log("The job: someone watching");
 {
   const notified = [];
@@ -282,7 +285,7 @@ console.log("The job: someone watching");
   const watching = read(runner.watch("user-1", 0));
   await runner.alarm();
   const events = await watching;
-  expect(events.at(-1)?.type === "done" && notified.length === 0, "a page watched to the end: none");
+  expect(events.at(-1)?.type === "done" && notified.length === 1 && notified[0].payload.kind === "done", "a page watched to the end still says it's ready, for the phone to hide");
 
   const asked = [];
   const asking = new Runner(memoryStore(), jobServices(asked), TIMING);
@@ -290,11 +293,11 @@ console.log("The job: someone watching");
   const watcher = read(asking.watch("user-1", 0), (event) => event.type === "asking");
   await asking.alarm();
   const seen = await watcher;
-  expect(seen.at(-1)?.type === "asking" && asked.length === 0, "questions someone sees: none");
+  expect(seen.at(-1)?.type === "asking" && asked.length === 1 && asked[0].payload.kind === "asking", "questions someone sees still notify, for the phone to hide");
   // The watcher has let go: the app was left.
   await asking.answer("user-1", { answers: [] });
   await asking.alarm();
-  expect(asking.job.status === "done" && asked.length === 1 && asked[0].payload.kind === "done", "but once they've gone, the page that's made notifies");
+  expect(asking.job.status === "done" && asked.length === 2 && asked[1].payload.kind === "done", "and the page that's made says it's ready");
 
   const twice = [];
   const both = new Runner(memoryStore(), jobServices(twice), TIMING);
@@ -303,7 +306,7 @@ console.log("The job: someone watching");
   const stays = read(both.watch("user-1", 0));
   await both.alarm();
   await Promise.all([left, stays]);
-  expect(both.job.status === "done" && twice.length === 0, "one of two watchers leaving still leaves someone watching");
+  expect(both.job.status === "done" && twice.length === 1, "two watchers, one notice that it's ready");
 
   const open = [];
   const watched = new Runner(memoryStore(), jobServices(open), { ...TIMING, deviceWait: 300 });
@@ -312,7 +315,7 @@ console.log("The job: someone watching");
   await watched.alarm();
   const all = await following;
   const call = all.find((event) => event.type === "deviceTool");
-  expect(all.at(-1)?.type === "done" && open.length === 0 && call?.deadline <= Date.now(), "a call to the phone's tools someone sees: none, and the minute's wait (300 ms here), after which the page goes on without it");
+  expect(all.at(-1)?.type === "done" && !open.some((notice) => notice.payload.kind === "device") && call?.deadline <= Date.now(), "a call to the phone's tools someone sees: no notice for it, and the minute's wait (300 ms here), after which the page goes on without it");
 }
 
 // MARK: - End to end
@@ -470,7 +473,7 @@ async function endToEnd(base, apns) {
   const watched = await start(gina, "a page about tea");
   const seen = await watch(gina, watched.id);
   await pause(1_500);
-  expect(seen.at(-1)?.type === "done" && sentFor(watched.id).length === 0, "a page watched as it's made sends nothing");
+  expect(seen.at(-1)?.type === "done" && (await until(() => sentFor(watched.id).length === 2)) && sentFor(watched.id).every((each) => each.body.kind === "done"), "a page watched as it's made still says it's ready, for the phone to hide");
 
   const glimpse = await start(gina, "a page about milk");
   const line = await fetch(`${base}/api/compose/${glimpse.id}/events?after=0`, { headers: { Authorization: `Bearer ${gina.token}` } });
@@ -504,7 +507,7 @@ async function endToEnd(base, apns) {
   expect(answered.status === 200, "the phone's answer is taken");
   const rest = await within(read(piece(), (event) => event.type === "done" || event.type === "failed"));  const lines = [...caught, ...rest].filter((event) => event.type === "log").map((event) => event.line);
   expect(rest.at(-1)?.type === "done" && lines.some((each) => each.startsWith("The phone answered travel: ")) && lines.filter((each) => each === "Asked the phone to run travel").length === 1, "and the page goes on from there, and is made");
-  expect(sentFor(trip.id).length === 1, "seen as it's made, it sends nothing more");
+  expect((await until(() => sentFor(trip.id).length === 2)) && sentFor(trip.id)[1].body.kind === "done", "seen as it's made, it says it's ready, for the phone to hide");
 
   const ivan = await signIn("ivan");
   const deleted = deviceToken();

@@ -738,11 +738,13 @@ final class ServerWatch {
     }
 
     /// Waits before reading again, unless stopped, or nudged since the line was last opened; while
-    /// the app is away, until it's back.
+    /// the app is away, until it's back, nudged or not. A nudge left over from before (the one at
+    /// launch) once had the line opened again the moment the app went to the background, so the
+    /// server thought someone was watching and sent no notification.
     private func pause(_ duration: Duration) async {
         let until = ContinuousClock.now + duration
         defer { nudged = false }
-        while !Task.isCancelled, !nudged, away || ContinuousClock.now < until {
+        while !Task.isCancelled, away || (!nudged && ContinuousClock.now < until) {
             try? await Task.sleep(for: .milliseconds(100))
         }
     }

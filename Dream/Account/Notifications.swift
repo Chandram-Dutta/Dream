@@ -135,8 +135,15 @@ final class Notifications: NSObject {
 
     /// While the app is open: not for a page this iPhone is following already, which shows the
     /// same thing on its screen or its tile.
+    /// Nothing while the app shows the page itself: one it follows, or one it followed to its end
+    /// in the last two minutes (the server notifies either way, and its notice comes a moment
+    /// after the page did).
     private func presents(_ payload: PushPayload?) -> UNNotificationPresentationOptions {
-        if let payload, ServerPages.shared.following[payload.page] != nil { return [] }
+        if let payload {
+            let pages = ServerPages.shared
+            if pages.following[payload.page] != nil { return [] }
+            if let released = pages.released[payload.page], Date.now.timeIntervalSince(released) < 120 { return [] }
+        }
         return [.banner, .list, .sound]
     }
 }

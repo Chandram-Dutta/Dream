@@ -67,6 +67,9 @@ final class ServerPages {
 
     /// The composers following pages and changes, by the pages' ids.
     private(set) var following: [UUID: Composer] = [:]
+    /// When each page was last let go of, so a notification that it's ready, which the server
+    /// sends whether or not anyone watched, isn't shown for a page the user just saw finish.
+    @ObservationIgnored private(set) var released: [UUID: Date] = [:]
     @ObservationIgnored private var container: ModelContainer?
     @ObservationIgnored private var tasks: [ObjectIdentifier: Task<Void, Never>] = [:]
     @ObservationIgnored private var observers: [NSObjectProtocol] = []
@@ -371,7 +374,10 @@ final class ServerPages {
     }
 
     private func release(_ page: UUID, from composer: Composer) {
-        if following[page] === composer { following[page] = nil }
+        guard following[page] === composer else { return }
+        following[page] = nil
+        released = released.filter { Date.now.timeIntervalSince($0.value) < 300 }
+        released[page] = .now
     }
 
     // MARK: - Stored

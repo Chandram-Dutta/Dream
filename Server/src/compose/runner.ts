@@ -457,7 +457,10 @@ export class Runner {
           this.save(job);
           this.emit({ type: "asking", questions: outcome.questions });
           // Push: nobody is there to answer, so the account's iPhones are told.
-          if (!this.watchers) this.services.notify?.(job, questionWaiting(job, request.request, this.now));
+          // Sent whether or not a line is open: the phone hides it while it shows the page
+          // (Notifications.presents), and a line left open by a phone in the background once
+          // swallowed every notification.
+          this.services.notify?.(job, questionWaiting(job, request.request, this.now));
           await this.store.setAlarm(job.deadline);
           return;
         }
@@ -479,7 +482,8 @@ export class Runner {
           this.save(job);
           this.emit({ type: "done", surface: outcome.surface, model: outcome.model, pageID: job.pageID });
           // Push: nobody saw it finish, so the account's iPhones are told it's ready.
-          if (!this.watchers) this.services.notify?.(job, pageReady(job, request.request, outcome.surface, this.now));
+          // Sent whether or not a line is open, as questions are.
+          this.services.notify?.(job, pageReady(job, request.request, outcome.surface, this.now));
           // As Composer.countFinished counts a page or a change.
           if (Runner.changes(request)) this.services.analytics(job, "page_changed", { ...pageShape(outcome.surface), pointed_at_block: !!request.editing?.focus, seconds: seconds(this.now - job.startedAt) });
           else this.services.analytics(job, "page_built", { ...pageShape(outcome.surface), model: outcome.model, seconds: seconds(this.now - job.startedAt) });
