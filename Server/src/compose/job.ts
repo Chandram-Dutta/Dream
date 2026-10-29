@@ -2,27 +2,32 @@
 // The runner (runner.ts) decides what happens; this keeps it in the object's SQLite storage, runs
 // it on the object's alarm, and gives the loop what it calls in-process: the model through
 // model.ts's checks, routing, metering and translation, Auto's pick (route.ts), web search and
-// reading (web.ts), Wikipedia, the engine, and the finished page kept in sync (sync.ts).
+// reading (web.ts), Wikipedia, what Dream remembers (the account's synced facts), the engine,
+// and the finished page kept in sync (sync.ts): a new page as a new item, a change onto the item
+// the account keeps.
 //
 // The Worker talks to it over fetch, only ever for a signed-in user, whose id it sends:
 //
-//   POST /start      { counted, origin, request }   keeps the request and starts the page
-//   GET  /events?after=<seq>                         the events, as server-sent events
-//   POST /answers    { answers }                     the answers to its questions
+//   POST /start      { counted, origin, here, request }   keeps the request and starts the page
+//   GET  /events?after=<seq>                               the events, as server-sent events
+//   POST /answers    { answers }                           the answers to its questions
+//   POST /tools      { id, output, source?, service? }     what one of the phone's tools returned
 
 import { capture, type AnalyticsEnv } from "../analytics";
 import * as engine from "../engine";
 import generation from "../generated/generation.json";
 import { askModel } from "../model";
 import { routePage, type RouteEnv } from "../route";
-import { keepItems, keepPhoto, type SyncEnv } from "../sync";
+import { keepItems, keepPhoto, readBodies, readItem, type SyncEnv } from "../sync";
 import { SyncRejection } from "../syncdata";
 import { readFor, searchFor, type WebEnv } from "../web";
 import type { ComposeEvent, ComposeRequest } from "./contract";
+import type { Here } from "./live";
 import type { LoopServices } from "./loop";
 import { find, related } from "./lookup";
-import { surfaceItem } from "./payload";
-import type { Generation } from "./prompts";
+import { confirmedFacts } from "./memory";
+import { changedItem, surfaceItem, type MadeChange, type SurfaceItem } from "./payload";
+import { changeOf, questionOf, sameQuestion, type Generation } from "./prompts";
 import { Runner, type EventBody, type JobRecord, type JobStore } from "./runner";
 import type { WebAnswer } from "./tools";
 
@@ -56,6 +61,9 @@ function sqlStore(state: DurableObjectState): JobStore {
     lastSeq,
     forget(type, before) {
       sql.exec("DELETE FROM events WHERE type = ? AND seq < ?", type, before);
+    },
+    drop(seq) {
+      sql.exec("DELETE FROM events WHERE seq = ?", seq);
     },
     setAlarm: (at) => state.storage.setAlarm(at),
     getAlarm: () => state.storage.getAlarm(),
@@ -132,6 +140,9 @@ export class PageJob implements DurableObject {
         related: (title, language) => related(title, language),
         search: (query) => webAnswer(searchFor(env, job.owner, query)),
         read: (query) => webAnswer(readFor(env, this.context, job.owner, query, job.origin)),
+        memory: async () => confirmedFacts(await readBodies(env, job.owner, "fact")),
+        fetch: (url, init) => fetch(url, init),
+        here: job.here ?? null,
       },
       now: Date.now,
       sleep: (ms, signal) =>
@@ -146,8 +157,12 @@ export class PageJob implements DurableObject {
     };
   }
 
-  /** The finished page into the account's sync, with its photo, as the phone would keep it. */
+  /** The finished page into the account's sync, as the phone would keep it: a new page with its
+   * photo, or a change onto the page the account keeps. */
   private async keep(job: JobRecord, request: ComposeRequest, surface: engine.Surface, log: string[], model: string): Promise<string | null> {
+    // The engine's Surface is the very JSON sync keeps; its interface just doesn't say so.
+    const page = surface as unknown as Record<string, unknown>;
+    if (request.editing) return this.keepChange(job, request, page, log, model);
     let photo: string | undefined;
     let problem: string | null = null;
     if (request.image && this.env.PHOTOS) {
@@ -156,8 +171,39 @@ export class PageJob implements DurableObject {
       if (kept === "kept") photo = id;
       else problem = kept === "full" ? "There's no room for its photo." : "Its photo isn't one Dream keeps.";
     }
-    // The engine's Surface is the very JSON sync keeps; its interface just doesn't say so.
-    const item = surfaceItem(job.pageID, { intent: request.request, surface: surface as unknown as Record<string, unknown>, modelName: model, log, photo, at: Date.now() });
+    const item = surfaceItem(job.pageID, { intent: request.request, surface: page, modelName: model, log, photo, at: Date.now() });
+    return (await this.store(job, item)) ?? problem;
+  }
+
+  /** A change onto the page as the account keeps it now, as the app's screen saves one: read just
+   * before it's written, so whatever the phone changed meanwhile, like the user's numbers, stays.
+   * A page the account doesn't keep isn't written: the phone that asked has it, and keeps the
+   * change itself; one since deleted stays deleted. */
+  private async keepChange(job: JobRecord, request: ComposeRequest, surface: Record<string, unknown>, log: string[], model: string): Promise<string | null> {
+    const editing = request.editing!;
+    const stored = await readItem(this.env, job.owner, "surface", job.pageID);
+    if (!stored) return "This page isn't in sync yet, so it's kept on the phone.";
+    if (stored.deleted || !stored.body || typeof stored.body !== "object") return "This page was deleted.";
+    const before = (editing.surface ?? {}) as Record<string, unknown>;
+    let change: Omit<MadeChange, "before" | "surface" | "modelName" | "log" | "at">;
+    if (editing.again) {
+      change = { kind: "rebuilt", text: request.request, request: null, answers: Array.isArray(surface.answers) ? surface.answers : [], narrowsValues: false };
+    } else if (editing.answer) {
+      const { instruction, question } = changeOf(generation as unknown as Generation, editing, before.answers);
+      const answers = (Array.isArray(surface.answers) ? surface.answers : []).filter((answer) => {
+        const asked = questionOf((answer as { question?: unknown }).question);
+        return asked !== null && question !== null && sameQuestion(asked, question);
+      });
+      change = { kind: "answered", text: editing.answer.choice, request: instruction, answers, narrowsValues: true };
+    } else {
+      change = { kind: "changed", text: editing.instruction ?? "", request: editing.instruction ?? "", answers: [], narrowsValues: true };
+    }
+    const item = changedItem(job.pageID, { updatedAt: stored.updatedAt, body: stored.body as Record<string, unknown> }, { ...change, before, surface, modelName: model, log, at: Date.now() });
+    return this.store(job, item);
+  }
+
+  /** Writes a page's item into the account's sync. Says what went wrong, or null. */
+  private async store(job: JobRecord, item: SurfaceItem | null): Promise<string | null> {
     if (!item) return "It's too big to keep.";
     try {
       const { applied, refused } = await keepItems(this.env, job.owner, [item]);
@@ -167,7 +213,7 @@ export class PageJob implements DurableObject {
       if (error instanceof SyncRejection) return error.message;
       throw error;
     }
-    return problem;
+    return null;
   }
 
   async fetch(request: Request): Promise<Response> {
@@ -176,9 +222,13 @@ export class PageJob implements DurableObject {
     if (!owner) return json({ error: "Sign in to continue." }, 401);
     switch (url.pathname) {
       case "/start": {
-        const body = (await request.json()) as { counted: boolean; origin: string; request: ComposeRequest };
-        await this.runner.start({ id: this.state.id.toString(), owner, counted: body.counted === true, origin: body.origin }, body.request);
+        const body = (await request.json()) as { counted: boolean; origin: string; here?: Here | null; request: ComposeRequest };
+        await this.runner.start({ id: this.state.id.toString(), owner, counted: body.counted === true, origin: body.origin, here: body.here ?? null }, body.request);
         return json({ id: this.state.id.toString() });
+      }
+      case "/tools": {
+        const answered = await this.runner.output(owner, await request.json().catch(() => null));
+        return json(answered.body, answered.status);
       }
       case "/events": {
         const after = Number(url.searchParams.get("after") ?? "0");

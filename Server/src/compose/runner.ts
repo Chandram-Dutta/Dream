@@ -6,16 +6,20 @@
 //             answered or in ten minutes, as if every answer were "You choose"
 //   watch     every event after a seq from the log, then new ones as they happen
 //   answer    the user's answers to the questions it's waiting on
+//   output    what one of the phone's tools returned, for a call the loop is waiting on
 //
 // Every event goes into the log with the next seq. A page shown so far is superseded by the next,
 // so only the latest stays in the log: a watcher catching up gets the page as it stands, not
-// every step of it. If the object is restarted mid-page, the alarm runs again and the page starts
-// over, keeping only the model Auto picked and any answers. A day after it's done, it's forgotten.
+// every step of it. A call to one of the phone's tools stays only while it waits, so the phone
+// never runs one twice. If the object is restarted mid-page, the alarm runs again and the page
+// starts over, keeping only the model Auto picked and any answers. A day after it's done, it's
+// forgotten.
 //
 // test/compose.mjs runs it in Node, with a store kept in memory.
 
 import type { Surface } from "../engine/index";
 import type { ComposeEvent, ComposeRequest } from "./contract";
+import { sourceOf, type DeviceAnswer, type Here } from "./live";
 import { Cancelled, leftToDream, PageLoop, TIMING, type LoopServices, type PagePick, type Start, type Timing } from "./loop";
 import type { Answer, Question } from "./prompts";
 
@@ -39,6 +43,8 @@ export interface JobStore {
   lastSeq(): number;
   /** Drops events of a type from before a seq: pages since superseded. */
   forget(type: ComposeEvent["type"], before: number): void;
+  /** Drops one event: a call to the phone that's no longer waiting. */
+  drop(seq: number): void;
   setAlarm(at: number): Promise<void>;
   getAlarm(): Promise<number | null>;
   /** Forgets the job and everything it kept. */
@@ -57,6 +63,8 @@ export interface JobRecord {
   counted: boolean;
   /** Where the request came to, for the reader's User-Agent (web.ts). */
   origin: string;
+  /** Where the request came from, as Cloudflare placed it, for the weather "here". */
+  here?: Here | null;
   status: JobStatus;
   /** Starts of the page: more than one only when the object restarted mid-page. */
   attempts: number;
@@ -66,7 +74,10 @@ export interface JobRecord {
   /** The seq this attempt's log begins at, for the page's generation log. */
   logFrom: number;
   pick: PagePick | null;
+  /** The questions waiting on the user: those Dream couldn't answer from what it remembers. */
   questions: Question[] | null;
+  /** The answers Dream found in what it remembers, which come first. */
+  remembered?: Answer[] | null;
   checkedAt: number | null;
   /** When questions go unanswered as "You choose". */
   deadline: number | null;
@@ -95,6 +106,9 @@ export interface JobTiming {
   attempts: number;
   /** A comment this often while nothing happens, so the line stays open. */
   keepAlive: number;
+  /** How long a call to one of the phone's tools waits for its answer before the model is told
+   * it couldn't be read: the app isn't open. */
+  deviceWait: number;
 }
 
 export const JOB_TIMING: JobTiming = {
@@ -103,7 +117,12 @@ export const JOB_TIMING: JobTiming = {
   keep: 24 * 3_600_000,
   attempts: 3,
   keepAlive: 15_000,
+  deviceWait: 60_000,
 };
+
+/** Most of what a phone's tool may answer: a connected service's answer is cut to 8,000
+ * characters on the phone (ConnectionTool.resultLimit), fenced and explained. */
+const MAX_OUTPUT = 40_000;
 
 const finished = (status: JobStatus) => status === "done" || status === "failed";
 
@@ -151,6 +170,8 @@ export class Runner {
   private readonly waiters = new Set<() => void>();
   /** The loop is running in this instance. */
   private active = false;
+  /** Calls to the phone's tools waiting on their answers, by their id. */
+  private readonly calls = new Map<string, { seq: number; settle: (answer: DeviceAnswer | null) => void }>();
 
   constructor(store: JobStore, services: JobServices, timing: JobTiming = JOB_TIMING, loopTiming: Timing = TIMING) {
     this.store = store;
@@ -179,12 +200,17 @@ export class Runner {
   }
 
   /** Keeps a new page's request and starts it on the alarm. Asking again changes nothing. */
-  async start(fields: Pick<JobRecord, "id" | "owner" | "counted" | "origin">, request: ComposeRequest): Promise<void> {
+  async start(fields: Pick<JobRecord, "id" | "owner" | "counted" | "origin"> & { here?: Here | null }, request: ComposeRequest): Promise<void> {
     if (this.job) return;
     const now = this.now;
     this.store.put("request", request);
-    this.save({ ...fields, pageID: request.pageID, status: "queued", attempts: 0, createdAt: now, startedAt: now, logFrom: 1, pick: null, questions: null, checkedAt: null, deadline: null, answers: null, finishedAt: null });
+    this.save({ ...fields, pageID: request.pageID, status: "queued", attempts: 0, createdAt: now, startedAt: now, logFrom: 1, pick: null, questions: null, remembered: null, checkedAt: null, deadline: null, answers: null, finishedAt: null });
     await this.store.setAlarm(now);
+  }
+
+  /** A change to a page the user has, rather than a new page or one made again. */
+  private static changes(request: ComposeRequest): boolean {
+    return !!request.editing && !request.editing.again;
   }
 
   /** Runs whatever the job is waiting to do. Never throws, so the alarm isn't tried again for a
@@ -211,7 +237,7 @@ export class Runner {
           return;
         }
         // Nobody answered: every question is left to Dream, so building never waits on a screen that's gone.
-        job.answers = (job.questions ?? []).map(leftToDream);
+        job.answers = [...(job.remembered ?? []), ...(job.questions ?? []).map(leftToDream)];
       }
       start = { pick: job.pick, answers: job.answers, checkedAt: job.checkedAt, startedAt: job.startedAt, first: false };
     } else {
@@ -227,7 +253,8 @@ export class Runner {
       }
       job.attempts += 1;
       job.startedAt = this.now;
-      if (job.attempts === 1) this.services.analytics(job, "page_requested", { with_photo: !!request.image });
+      // A change isn't a page asked for, as on the phone.
+      if (job.attempts === 1 && !Runner.changes(request)) this.services.analytics(job, "page_requested", { with_photo: !!request.image });
       start = { pick: job.pick, answers: job.answers, checkedAt: null, startedAt: job.startedAt, first: true };
     }
     job.status = "running";
@@ -240,9 +267,10 @@ export class Runner {
     const limit = new AbortController();
     const timer = setTimeout(() => limit.abort(new Cancelled("This page took too long to make. Try again.")), this.timing.runLimit);
     try {
+      const services: LoopServices = { ...this.services.loop(job, request), device: (call, signal) => this.ask(call, signal) };
       const loop = new PageLoop(
         request,
-        this.services.loop(job, request),
+        services,
         {
           phase: (phase) => this.emit({ type: "phase", phase }),
           trace: (kind, text) => this.emit({ type: "trace", kind, text }),
@@ -262,6 +290,7 @@ export class Runner {
         case "asking": {
           job.status = "asking";
           job.questions = outcome.questions;
+          job.remembered = outcome.remembered;
           job.checkedAt = outcome.checkedAt;
           job.answers = null;
           job.deadline = this.now + this.timing.answerWait;
@@ -287,7 +316,9 @@ export class Runner {
           job.finishedAt = this.now;
           this.save(job);
           this.emit({ type: "done", surface: outcome.surface, model: outcome.model, pageID: job.pageID });
-          this.services.analytics(job, "page_built", { ...pageShape(outcome.surface), model: outcome.model, seconds: seconds(this.now - job.startedAt) });
+          // As Composer.countFinished counts a page or a change.
+          if (Runner.changes(request)) this.services.analytics(job, "page_changed", { ...pageShape(outcome.surface), pointed_at_block: !!request.editing?.focus, seconds: seconds(this.now - job.startedAt) });
+          else this.services.analytics(job, "page_built", { ...pageShape(outcome.surface), model: outcome.model, seconds: seconds(this.now - job.startedAt) });
           await this.store.setAlarm(job.finishedAt + this.timing.keep);
           return;
         }
@@ -299,6 +330,8 @@ export class Runner {
     } finally {
       clearTimeout(timer);
       this.active = false;
+      // Nothing waits on the phone once the loop is over.
+      for (const call of [...this.calls.values()]) call.settle(null);
     }
   }
 
@@ -307,8 +340,51 @@ export class Runner {
     job.finishedAt = this.now;
     this.save(job);
     this.emit({ type: "failed", message });
-    this.services.analytics(job, "page_failed", { reason, changing: false, seconds: seconds(this.now - job.startedAt) });
+    const request = this.store.get<ComposeRequest>("request");
+    this.services.analytics(job, "page_failed", { reason, changing: !!request && Runner.changes(request), seconds: seconds(this.now - job.startedAt) });
     this.store.setAlarm(job.finishedAt + this.timing.keep).catch(() => undefined);
+  }
+
+  // MARK: The phone's tools
+
+  /** Asks the phone to run one of its tools: a `deviceTool` event, and the answer it posts, or
+   * null when none comes in `deviceWait` (the app isn't open) or the page stops. Once it's
+   * answered or given up on, the call leaves the log, so a watcher catching up never runs it. */
+  private ask(call: { name: string; arguments: string }, signal: AbortSignal): Promise<DeviceAnswer | null> {
+    const id = crypto.randomUUID();
+    return new Promise((resolve) => {
+      let timer: ReturnType<typeof setTimeout> | null = null;
+      const settle = (answer: DeviceAnswer | null) => {
+        if (!this.calls.has(id)) return;
+        const waiting = this.calls.get(id)!;
+        this.calls.delete(id);
+        if (timer !== null) clearTimeout(timer);
+        signal.removeEventListener("abort", stop);
+        this.store.drop(waiting.seq);
+        resolve(answer);
+      };
+      const stop = () => settle(null);
+      if (signal.aborted) return resolve(null);
+      const { seq } = this.emit({ type: "deviceTool", call: { id, name: call.name, arguments: call.arguments } });
+      this.calls.set(id, { seq, settle });
+      timer = setTimeout(stop, this.timing.deviceWait);
+      signal.addEventListener("abort", stop, { once: true });
+    });
+  }
+
+  /** What one of the phone's tools returned, for a call the page is waiting on. */
+  async output(owner: string, body: unknown): Promise<{ status: number; body: JSONObject }> {
+    const job = this.job;
+    if (!job || job.owner !== owner) return { status: 404, body: { error: "There's no page being made with that id." } };
+    if (!isObject(body) || typeof body.id !== "string" || typeof body.output !== "string") return { status: 400, body: { error: "Send { id, output }: the call's id, and what the tool returned." } };
+    const call = this.calls.get(body.id);
+    if (!call) return { status: 409, body: { error: "This page isn't waiting on that call." } };
+    const source = body.source === undefined || body.source === null ? null : sourceOf(body.source);
+    if (body.source !== undefined && body.source !== null && !source) return { status: 400, body: { error: "source is a live source, as the app's Source encodes it." } };
+    const service = typeof body.service === "string" && body.service.trim() ? body.service.trim().slice(0, 100) : undefined;
+    const output = [...body.output].length > MAX_OUTPUT ? `${[...body.output].slice(0, MAX_OUTPUT).join("")}\n[Cut off here.]` : body.output;
+    call.settle({ output, ...(source ? { source } : {}), ...(service ? { service } : {}) });
+    return { status: 200, body: { ok: true } };
   }
 
   /** A page that was being made when this instance began, with no alarm to start it again: one
@@ -389,13 +465,17 @@ export class Runner {
     const given = isObject(body) && Array.isArray(body.answers) ? body.answers : null;
     if (!given || given.length > 10) return { status: 400, body: { error: "Send { answers: [...] }, one for each question." } };
     const questions = job.questions;
-    job.answers = questions.map((question, index) => {
-      const match =
-        given.find((answer) => isObject(answer) && isObject(answer.question) && answer.question.text === question.text) ??
-        (given.length === questions.length ? given[index] : undefined);
-      const choice = isObject(match) && typeof match.choice === "string" ? match.choice.trim().slice(0, 300) : "";
-      return { question, choice, isRemembered: false };
-    });
+    // What Dream remembered first, then the user's, as Asking keeps them.
+    job.answers = [
+      ...(job.remembered ?? []),
+      ...questions.map((question, index) => {
+        const match =
+          given.find((answer) => isObject(answer) && isObject(answer.question) && answer.question.text === question.text) ??
+          (given.length === questions.length ? given[index] : undefined);
+        const choice = isObject(match) && typeof match.choice === "string" ? match.choice.trim().slice(0, 300) : "";
+        return { question, choice, isRemembered: false };
+      }),
+    ];
     this.save(job);
     await this.store.setAlarm(this.now);
     return { status: 200, body: { ok: true } };
@@ -428,6 +508,9 @@ export function memoryStore(clock: () => number = Date.now): JobStore & { alarm:
     lastSeq: () => seq,
     forget(type: ComposeEvent["type"], before: number) {
       events = events.filter((event) => event.type !== type || event.seq >= before);
+    },
+    drop(seq: number) {
+      events = events.filter((event) => event.seq !== seq);
     },
     async setAlarm(at: number) {
       store.alarm = Math.max(at, clock());

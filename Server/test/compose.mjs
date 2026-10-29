@@ -28,13 +28,17 @@ registerHooks({
 const { PageLoop, TIMING, questionFrom } = await import("../src/compose/loop.ts");
 const { Runner, memoryStore, pageShape } = await import("../src/compose/runner.ts");
 const { readPartial, partialObject, fitted } = await import("../src/compose/partial.ts");
-const { answersContext, repairPrompt, surfaceRequest, surfaceInstructions, gapRequest } = await import("../src/compose/prompts.ts");
+const { answersContext, repairPrompt, surfaceRequest, surfaceInstructions, gapRequest, writing, editPrompt, describeBlock, changedAnswer, memoryContext, isMemoryLine } = await import("../src/compose/prompts.ts");
 const { Padding, readRound, Activity, ModelProblem, requestBody } = await import("../src/compose/chat.ts");
-const { citationKey, fenced, toolBox, ReferenceLog, WebLog } = await import("../src/compose/tools.ts");
-const { surfaceItem, surfacePayload } = await import("../src/compose/payload.ts");
+const { citationKey, fenced, toolBox, ReferenceLog, WebLog, ServiceLog } = await import("../src/compose/tools.ts");
+const { surfaceItem, surfacePayload, changedItem, keptValues } = await import("../src/compose/payload.ts");
 const { readComposeRequest } = await import("../src/compose/request.ts");
 const { fakeModel } = await import("../src/compose/fake.ts");
 const { find, wikipedia } = await import("../src/compose/lookup.ts");
+const { Memory, confirmedFacts, recallKey } = await import("../src/compose/memory.ts");
+const { LiveLog, liveCall, liveDay, today, forgetLiveReadings } = await import("../src/compose/live.ts");
+const { findRecording, findMolecule, structureOf, cleaned, forgetMolecules } = await import("../src/compose/media.ts");
+const realEngine = await import("../src/engine/index.ts");
 
 const generation = JSON.parse(readFileSync(new URL("../src/generated/generation.json", import.meta.url), "utf8"));
 
@@ -153,7 +157,27 @@ function fakeEngine(logicIssues = () => []) {
     outline: (s) => `${s.title}: ${s.summary}`,
     logicSummary: () => "Inputs:",
     hasLogic: (s) => (s.inputs?.length ?? 0) > 0 || (s.outputs?.length ?? 0) > 0,
+    label: (s, name) => s.inputs?.find((input) => input.name === name)?.label ?? name,
+    recordingSearches: realEngine.recordingSearches,
+    addRecordings: realEngine.addRecordings,
+    moleculeNames: realEngine.moleculeNames,
+    addMolecules: realEngine.addMolecules,
   };
+}
+
+/** A stand-in for the network: each request goes to the first handler whose pattern its address
+ * matches, and is noted. Anything else is a failure, so nothing reaches the real thing. */
+function fakeFetch(routes = []) {
+  const asked = [];
+  const fetcher = async (url, init) => {
+    asked.push(String(url));
+    for (const [pattern, answer] of routes) {
+      if (pattern.test(String(url))) return answer(new URL(String(url)), init);
+    }
+    throw new Error(`No stand-in for ${url}`);
+  };
+  fetcher.asked = asked;
+  return fetcher;
 }
 
 const fakeTools = (overrides = {}) => ({
@@ -173,8 +197,28 @@ const fakeTools = (overrides = {}) => ({
     this.calls.push(["read", query]);
     return { status: 200, body: { url: "https://m.example.com/mercury", canonical: "https://example.com/mercury", title: "Mercury", site: "Example", text: "Mercury has no moons.", excerpted: true, truncated: false } };
   },
+  async memory() {
+    return [];
+  },
+  fetch: fakeFetch(),
+  here: null,
   ...overrides,
 });
+
+/** A tool session as the loop makes one, with what a test sets. */
+const toolSession = (overrides = {}) => ({
+  found: new ReferenceLog(),
+  web: new WebLog(),
+  live: new LiveLog(),
+  memory: new Memory(async () => []),
+  services: new ServiceLog(),
+  language: "en",
+  reader: { language: "en", region: "IN", currency: "INR", measurementSystem: "metric" },
+  device: null,
+  now: Date.now,
+  ...overrides,
+});
+const silent = { trace() {}, use() {}, note() {} };
 
 const REQUEST = { request: "tell me about mercury", locale: { language: "en", region: "IN", currency: "INR", measurementSystem: "metric" }, context: ["Now it's Wednesday, 28 October 2026, 9:00 PM, where the user is."], pageID: "6F9619FF-8B86-D011-B42D-00C04FC964FF" };
 const PICK = { model: "grok-4.7", effort: "low", name: "Grok 4.7", category: "other", difficulty: "easy", why: "Dream's default" };
@@ -303,8 +347,8 @@ console.log("Tools");
   const tools = fakeTools();
   const found = new ReferenceLog();
   const web = new WebLog();
-  const box = toolBox(generation, tools, { trace: (kind, text) => traces.push([kind, text]), use: (line) => uses.push(line) }, found, web, "en");
-  expect(box.definitions.map((tool) => tool.name).join() === "lookup,search,read", "only lookup, search and read are offered");
+  const box = toolBox(generation, tools, { trace: (kind, text) => traces.push([kind, text]), use: (line) => uses.push(line), note() {} }, toolSession({ found, web }));
+  expect(box.definitions.map((tool) => tool.name).join() === "lookup,recall,live,search,read", "lookup, recall, live, search and read are offered, in the app's order");
   const looked = await box.run("lookup", JSON.stringify({ subject: "Mercury", language: "xx-nonsense" }));
   expect(looked.startsWith('Wikipedia, "Mercury (planet)" (cite it as https://en.wikipedia.org/wiki/Mercury_(planet)):') && tools.calls[0][2] === "en", "lookup answers as LookupTool does, in the request's language when the model's isn't one");
   const searched = await box.run("search", JSON.stringify({ question: "q", keywords: "mercury planet", freshness: "week", country: "IN" }));
@@ -315,7 +359,7 @@ console.log("Tools");
   expect(traces.map(([kind]) => kind).join() === "lookup,search,read", "each step is traced as it starts");
   const reading = web.reading(found.all);
   expect(reading.length === 2 && reading[0].url === "https://example.com/mercury" && reading[0].addresses?.join() === "https://m.example.com/mercury" && reading[1].site === "Wikipedia", "what was read goes to the checker, under every address it was read at");
-  const failing = toolBox(generation, fakeTools({ search: async () => ({ status: 402, body: { error: "no" } }) }), { trace() {}, use() {} }, found, new WebLog(), "en");
+  const failing = toolBox(generation, fakeTools({ search: async () => ({ status: 402, body: { error: "no" } }) }), silent, toolSession({ found }));
   expect((await failing.run("search", "{}")).startsWith(generation.toolText.webErrors["402"]), "a refused search says why, in the app's words");
   for (let i = 0; i < 3; i++) await failing.run("search", "{}");
   expect((await failing.run("search", "{}")) === generation.toolText.searchEnough, "and after three, that's enough searching");
@@ -340,7 +384,7 @@ console.log("The loop: a page, held while the check decides");
   expect(gaps.every((gap) => gap >= 45), `at most one page every 50 ms here (five a second in production): ${surfaces.length} pages`);
   expect(surfaces.at(-1).surface.blocks.length === 2, "the last page shown is the whole one");
   const sent = model.calls.write[0];
-  expect(sent.messages[0].role === "system" && sent.messages[0].content.includes("in INR") && textOf(sent.messages[1].content) === `Request: tell me about mercury\n\n${REQUEST.context[0]}` && sent.model === "grok-4.7" && sent.reasoning_effort === "low" && sent.temperature === 0.4 && sent.tools.length === 3, "the writing is asked what the app asks");
+  expect(sent.messages[0].role === "system" && sent.messages[0].content === surfaceInstructions(generation, "INR") && textOf(sent.messages[1].content) === `Request: tell me about mercury\n\n${REQUEST.context[0]}` && sent.model === "grok-4.7" && sent.reasoning_effort === "low" && sent.temperature === 0.4 && sent.tools.map((tool) => tool.function.name).join() === "lookup,recall,live,search,read", "the writing is asked what the app asks: its instructions whole, with its tools");
   const gapBody = model.calls.gaps[0];
   expect(gapBody.messages[0].content === generation.prompts.gapCheck && textOf(gapBody.messages[1].content) === "Request: tell me about mercury" && gapBody.max_tokens === 4_600 && gapBody.temperature === 0.2 && !gapBody.tools, "the gap check is asked what the app asks");
   expect(events.filter((event) => event.type === "phase").map((event) => event.phase).join() === "composing", "it composes");
