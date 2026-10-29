@@ -9,7 +9,7 @@ struct DebugView: View {
     let modelName: String
     @AppStorage("provider") private var provider = Composer.Provider.dream.rawValue
     @AppStorage("xaiModel") private var xaiModel = Composer.xaiModelID
-    @AppStorage(ServerCompose.key) private var serverCompose = false
+    @AppStorage(ServerCompose.key) private var serverCompose = true
     @State private var xaiKey = ""
     @State private var hasXAIKey = XAILanguageModel.savedKey != nil
     @Environment(\.dismiss) private var dismiss

@@ -86,18 +86,20 @@ Events, one JSON object per `data:` line, each with `seq`:
 
 ## Stages
 
-1. **A page survives the app closing.** New pages only, with lookup, search and read. The loop,
-   the job object, the events, the exported prompts and schemas, the checker's core (calculation,
-   blocks, citations, sourcing) and the repair loop. The app starts a page on the server behind a
-   setting, renders the events, and picks up a page it left: by its job id while the job lasts, or
-   from sync once it's done.
-2. **Everything a page can be.** The rest of the checker (lists, figures, scenes, sounds, live,
-   units), changes to a page, memory recall from synced facts, and live data (weather, exchange
-   rates, travel times) from server-side sources.
-3. **Come back to it.** Push notifications for a finished page and for a question (APNs; needs an
-   auth key from the developer account). The shelf shows pages still being made.
-4. **Server by default.** Connected services' tools on the server, then the server makes every
-   page and the phone's loop is removed (the engine stays, to run pages).
+1. **A page survives the app closing.** Done 2026-10-29, and the default since: new pages are made
+   on the server (Under the hood can turn it off in a testing build).
+2. **Everything a page can be.** Changes to a page (`editing`: an instruction, a different answer,
+   or made again); memory, read from the account's synced facts; live data from the server (the
+   weather from Open-Meteo and exchange rates from ExchangeRate-API, with the same fields the app's
+   providers give, so the phone refreshes them as its own); recordings and molecules.
+3. **Come back to it.** Push notifications for a finished page and for a question (APNs, with an
+   auth key from the developer account set as secrets; off until they're set). The shelf shows
+   pages still being made (done in Stage 1).
+4. **Server by default, phone where only the phone can.** Tools only the phone can run go
+   through it (`deviceTools`): connected services, whose sign-ins never leave the phone, and
+   travel times from Apple Maps. While the app is open the phone runs them; when it isn't, the
+   model is told they couldn't be read. The phone's own loop stays for a testing build that turns
+   the server off, and for Private Cloud Compute.
 
 ## Who builds what
 

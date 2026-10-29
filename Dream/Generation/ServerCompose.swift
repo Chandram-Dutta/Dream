@@ -8,14 +8,17 @@ import UniformTypeIdentifiers
 // forms there. Nothing here needs an iPhone or the network, so Tools/tests.sh checks it on a Mac,
 // and Tools/compose-check.sh runs it against a scripted server.
 
-/// Whether new pages are made on Dream's server instead of on this iPhone. Off for now: a testing
-/// switch, in Under the hood or at launch with `-DreamServerCompose 1`. Changes to a page are
-/// made here either way.
+/// Whether new pages are made on Dream's server instead of on this iPhone, so a page goes on when
+/// the app is left. On for everyone; a testing build can turn it off in Under the hood, or at
+/// launch with `-DreamServerCompose 0`.
 enum ServerCompose {
     /// The UserDefaults key the switch in Under the hood and the launch argument share.
     static let key = "DreamServerCompose"
 
-    static var isOn: Bool { Build.flag(key) }
+    static var isOn: Bool {
+        guard Build.hasTestingHooks, UserDefaults.standard.object(forKey: key) != nil else { return true }
+        return UserDefaults.standard.bool(forKey: key)
+    }
 }
 
 /// A page started on Dream's server: the job that makes it, and the id it's kept under.
