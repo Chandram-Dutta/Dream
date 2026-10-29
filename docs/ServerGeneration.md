@@ -81,8 +81,13 @@ Events, one JSON object per `data:` line, each with `seq`:
 | `surface` | `surface`: a Surface, as the app's Codable reads it | the page so far, at most 5 a second |
 | `asking` | `questions`, as the app's `Asking` reads them | the loop waits on answers |
 | `log` | `line` | what Under the hood shows |
+| `deviceTool` | `call` (`id`, `name`, `arguments`), `deadline` | the phone should run one of its tools; kept in the log only while it waits |
 | `done` | `surface`, `model` | finished; the page is synced too |
 | `failed` | `message` | it couldn't make the page |
+
+The phone answers a `deviceTool` call at `POST /api/compose/:id/tools` with `{ id, output }`, and
+the live `source` it read, if any. After `deadline` (a minute) the model is told it couldn't be
+read and the page goes on.
 
 ## Stages
 
@@ -91,7 +96,10 @@ Events, one JSON object per `data:` line, each with `seq`:
 2. **Everything a page can be.** Changes to a page (`editing`: an instruction, a different answer,
    or made again); memory, read from the account's synced facts; live data from the server (the
    weather from Open-Meteo and exchange rates from ExchangeRate-API, with the same fields the app's
-   providers give, so the phone refreshes them as its own); recordings and molecules.
+   providers give, so the phone refreshes them as its own); recordings and molecules. Server side
+   done 2026-10-29, with the phone's tools (Stage 4's `deviceTools`): the instructions are put
+   together from the features whose tools are offered, so they never describe a tool that isn't
+   offered, nor offer one they don't describe.
 3. **Come back to it.** Push notifications for a finished page and for a question (APNs, with an
    auth key from the developer account set as secrets; off until they're set). The shelf shows
    pages still being made (done in Stage 1).

@@ -95,21 +95,30 @@ export function fill(template: string, values: Record<string, string>): string {
 /** Whether text names a tool, as a word of its own. */
 const names = (text: string, tool: string) => new RegExp(`(^|[^\\p{L}\\p{N}_])${tool.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}($|[^\\p{L}\\p{N}_])`, "u").test(text);
 
+/** The phone's tools among those a session could offer: a connected service's, and its tool for
+ * travel times, which the live rules describe with the server's live tool. */
+export interface PhoneTools {
+  connections: string[];
+  live: string[];
+}
+
 /** The instructions for writing a page in the user's currency, and the tools to offer with them,
  * from those the session could offer. A feature's rules go in when every tool they describe is
- * offered; connected services' when `connections` holds a service's tools. Then a tool is kept
- * only if what goes in describes it: a feature's own, one the core names (lookup, search, read),
- * or a connected service's beside its rules. With every tool the app has, and no connected
- * service, the instructions are the app's own (Prompts.surface). */
-export function writing(generation: Generation, currency: string, available: ToolDefinition[], connections: string[] = []): { instructions: string; tools: ToolDefinition[] } {
+ * offered; connected services' when one of a service's tools is. Then a tool is kept only if
+ * what goes in describes it: a feature's own (the phone's travel tool goes with live), one the
+ * core names (lookup, search, read), or a connected service's beside its rules. With every tool
+ * the app has, and no connected service, the instructions are the app's own (Prompts.surface). */
+export function writing(generation: Generation, currency: string, available: ToolDefinition[], phone: PhoneTools = { connections: [], live: [] }): { instructions: string; tools: ToolDefinition[] } {
   const offered = new Set(available.map((tool) => tool.name));
-  const services = new Set(connections.filter((name) => offered.has(name)));
-  const features = generation.prompts.features.filter((feature) => feature.rules && feature.tools.every((tool) => offered.has(tool)) && (!feature.connections || services.size > 0));
+  const services = new Set(phone.connections.filter((name) => offered.has(name)));
+  const theirs = new Set([...services, ...phone.live]);
+  const features = generation.prompts.features.filter((feature) => feature.rules && feature.tools.every((tool) => offered.has(tool) && !theirs.has(tool)) && (!feature.connections || services.size > 0));
   const instructions = fill(generation.prompts.surfaceCore, { currency, features: features.map((feature) => feature.rules).join(generation.prompts.featureSeparator) });
   const described = new Set(features.flatMap((feature) => feature.tools));
+  if (described.has("live")) for (const tool of phone.live) described.add(tool);
   const core = fill(generation.prompts.surfaceCore, { currency, features: "" });
   const connected = features.some((feature) => feature.connections);
-  const tools = available.filter((tool) => described.has(tool.name) || (connected && services.has(tool.name)) || (!services.has(tool.name) && names(core, tool.name)));
+  const tools = available.filter((tool) => described.has(tool.name) || (connected && services.has(tool.name)) || (!theirs.has(tool.name) && names(core, tool.name)));
   return { instructions, tools };
 }
 

@@ -365,7 +365,7 @@ export class Runner {
       };
       const stop = () => settle(null);
       if (signal.aborted) return resolve(null);
-      const { seq } = this.emit({ type: "deviceTool", call: { id, name: call.name, arguments: call.arguments } });
+      const { seq } = this.emit({ type: "deviceTool", call: { id, name: call.name, arguments: call.arguments }, deadline: this.now + this.timing.deviceWait });
       this.calls.set(id, { seq, settle });
       timer = setTimeout(stop, this.timing.deviceWait);
       signal.addEventListener("abort", stop, { once: true });

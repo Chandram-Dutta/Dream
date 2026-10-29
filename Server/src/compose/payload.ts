@@ -2,7 +2,8 @@
 // app's SurfacePayload (Dream/Sync/SyncPayloads.swift), written as the app's SyncCoding writes it
 // (Dream/Sync/SyncItem.swift): keys sorted at every level, dates as ISO 8601 with milliseconds,
 // nothing for a field that's nil. So the phone reads it the next time it syncs as if another
-// iPhone had made the page, and the item it saves for a page it watched has the same id.
+// iPhone had made the page, and the item it saves for a page it watched has the same id. A
+// change is written onto the item the account keeps, as the app's screen saves one.
 //
 // No imports, so test/compose.mjs runs it in Node.
 

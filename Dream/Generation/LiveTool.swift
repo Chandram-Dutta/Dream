@@ -11,7 +11,15 @@ struct LiveTool: Tool {
     /// Told what was fetched, for the log.
     var onFetch: @Sendable (String) -> Void = { _ in }
     let name = "live"
-    let description = "Fetches live data that Dream keeps current on the screen: the weather for a place and day, an exchange rate, or the distance and travel time between places. Returns the values now and the name of each field. Use it whenever the screen shows any of these, before building."
+    let description = LiveTool.describing(routes: true)
+
+    /// What it fetches. Dream's server reads the weather and rates itself, and asks the phone for
+    /// routes with a tool of their own, so its live tool says nothing of them
+    /// (Tools/export-generation).
+    static func describing(routes: Bool) -> String {
+        let kinds = ["the weather for a place and day", "an exchange rate"] + (routes ? ["the distance and travel time between places"] : [])
+        return "Fetches live data that Dream keeps current on the screen: \(kinds.dropLast().joined(separator: ", ")), or \(kinds.last ?? ""). Returns the values now and the name of each field. Use it whenever the screen shows any of these, before building."
+    }
 
     @Generable
     enum Kind { case weather, exchangeRate, route }

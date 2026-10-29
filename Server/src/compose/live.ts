@@ -10,8 +10,9 @@
 //                 came from, as Cloudflare places it; a place's day is the place's own.
 //   exchangeRate  open.er-api.com, as LiveRates.swift reads it, each base kept until the service
 //                 says its next update is due.
-//   route         a travel time, which only the phone can read (Apple Maps): sent to it as its
-//                 own live tool when it offers one, and otherwise said to be unreadable.
+//
+// A travel time is the phone's to read (Apple Maps), with a tool of its own (`travel`, in its
+// deviceTools): the server's live tool doesn't offer routes, and says it can't read one.
 //
 // What a provider returns is data from outside, never instructions: only its numbers and a short
 // summary reach the model. The words the tool answers with are the app's, from generation.json
@@ -470,9 +471,6 @@ export interface LiveContext {
   now(): number;
   here: Here | null;
   reader: Reader;
-  /** Asks the phone to run its own live tool, for a route; null when it didn't offer one. The
-   * answer is null when it didn't answer in time. */
-  phone: ((argumentsJSON: string) => Promise<DeviceAnswer | null>) | null;
 }
 
 /** SourceReading.described(as:): each field by its full name, in the reader's units, with what it
@@ -509,9 +507,9 @@ export function sourceOf(value: unknown): Source | null {
   return source;
 }
 
-/** LiveTool.call: reads the weather, an exchange rate or a route while a page is written, and
- * declares it as a source the page keeps current. `note` hears a line for the log. */
-export async function liveCall(generation: Generation, args: JSONObject, argumentsJSON: string, log: LiveLog, context: LiveContext, note: (line: string) => void): Promise<string> {
+/** LiveTool.call: reads the weather or an exchange rate while a page is written, and declares it
+ * as a source the page keeps current. `note` hears a line for the log. */
+export async function liveCall(generation: Generation, args: JSONObject, log: LiveLog, context: LiveContext, note: (line: string) => void): Promise<string> {
   const text = generation.toolText.live;
   const field = (name: string) => (typeof args[name] === "string" ? (args[name] as string) : "");
   const kind = field("kind");
@@ -537,18 +535,6 @@ export async function liveCall(generation: Generation, args: JSONObject, argumen
   if (kind === "route" && !("from" in parameters)) parameters.from = "current location";
   const source: Source = { name, kind, parameters, fields: [] };
   const asked = Object.entries(parameters).sort(([a], [b]) => (a < b ? -1 : 1)).map(([key, value]) => `${key} ${value}`).join(", ");
-
-  // A travel time is the phone's: its own live tool reads it from Apple Maps.
-  if (kind === "route" && context.phone) {
-    const answer = await context.phone(argumentsJSON);
-    if (!answer) {
-      note(`Live: ${name}, ${kind} (${asked}) failed: the phone didn't answer`);
-      return fill(text.failed, { message: "Dream couldn't reach the phone to read this." });
-    }
-    if (answer.source) log.declare(answer.source, answer.source.fields);
-    note(`Live: ${name}, ${kind} (${asked}), on the phone${answer.source ? "" : ", which said what it read but not as a source"}`);
-    return answer.output;
-  }
   try {
     const reading = await read(source, context);
     log.declare(source, reading.fields);

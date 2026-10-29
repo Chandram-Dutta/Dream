@@ -259,11 +259,13 @@ function knownLanguage(code: string): boolean {
   }
 }
 
-/** The tools for one session of writing a page, and how to run a call to one. `connections`
- * names the connected services' tools among them, whose rules go with them (prompts.ts). */
+/** The tools for one session of writing a page, and how to run a call to one. Of the phone's,
+ * `connections` names the connected services' tools, whose rules go with them, and `live` its
+ * travel tool, which the live rules describe (prompts.ts, `writing`). */
 export interface ToolBox {
   definitions: ToolDefinition[];
   connections: string[];
+  live: string[];
   run(name: string, argumentsJSON: string): Promise<string>;
 }
 
@@ -271,6 +273,8 @@ export interface ToolBox {
  * go after live, and the web's last. */
 const OWN = ["lookup", "recall", "live"];
 const WEB = ["search", "read"];
+/** The phone's tool for travel times (contract.ts); any other of its tools is a connected service's. */
+export const TRAVEL = "travel";
 
 export function toolBox(generation: Generation, services: ToolServices, notes: ToolNotes, session: ToolSession): ToolBox {
   const { found, web, language } = session;
@@ -369,23 +373,19 @@ export function toolBox(generation: Generation, services: ToolServices, notes: T
     return answer;
   };
 
-  // A travel time goes to the phone, as its own live tool, when it offers one.
-  const live = (args: JSONObject, argumentsJSON: string): Promise<string> =>
-    liveCall(
-      generation,
-      args,
-      argumentsJSON,
-      session.live,
-      { fetch: services.fetch, now: session.now, here: services.here, reader: session.reader, phone: phoneTools.has("live") ? (json) => ask("live", json) : null },
-      (line) => notes.note(line),
-    );
+  const live = (args: JSONObject): Promise<string> =>
+    liveCall(generation, args, session.live, { fetch: services.fetch, now: session.now, here: services.here, reader: session.reader }, (line) => notes.note(line));
 
-  /** A connected service's tool, run on the phone: what it returned, with the live source it
-   * declared and the service it read; or, when the phone didn't answer, that it couldn't, in the
-   * words the app uses when a service fails (ConnectionTool.run). */
-  const connection = (definition: DeviceToolDefinition) => async (_args: JSONObject, argumentsJSON: string): Promise<string> => {
+  /** One of the phone's tools: what it returned, with the live source it declared (a travel
+   * time, or a connected service's look-up kept current) and the service it read. When the phone
+   * didn't answer, the model is told it couldn't be read, in the words the app uses when a source
+   * or a service fails (LiveTool, ConnectionTool.run). */
+  const phone = (definition: DeviceToolDefinition) => async (_args: JSONObject, argumentsJSON: string): Promise<string> => {
     const answer = await ask(definition.name, argumentsJSON);
-    if (!answer) return `${definition.service || definition.name} couldn't answer this time. Build the screen without it, and don't claim anything about what it holds.`;
+    if (!answer) {
+      if (definition.name === TRAVEL) return fill(text.live.failed, { message: "Dream couldn't reach the phone to read this." });
+      return `${definition.service || definition.name} couldn't answer this time. Build the screen without it, and don't claim anything about what it holds.`;
+    }
     if (answer.source) session.live.declare(answer.source, answer.source.fields);
     if (answer.service) session.services.use(answer.service);
     return answer.output;
@@ -393,13 +393,13 @@ export function toolBox(generation: Generation, services: ToolServices, notes: T
 
   const tools: Record<string, (args: JSONObject, argumentsJSON: string) => Promise<string>> = { lookup, recall, live, search, read };
   const own = (names: string[]) => names.flatMap((name) => generation.tools.filter((tool) => tool.name === name));
-  // A phone's tool named like one of the server's own isn't offered twice: the server's is, and
-  // a travel time reaches the phone's through it.
-  const connections = [...phoneTools.values()].filter((tool) => !(tool.name in tools));
-  for (const tool of connections) tools[tool.name] = connection(tool);
+  // A phone's tool named like one of the server's own isn't offered: the server's is.
+  const theirs = [...phoneTools.values()].filter((tool) => !(tool.name in tools));
+  for (const tool of theirs) tools[tool.name] = phone(tool);
   return {
-    definitions: [...own(OWN), ...connections.map((tool) => ({ name: tool.name, description: tool.description, parameters: tool.parameters as JSONObject })), ...own(WEB)],
-    connections: connections.map((tool) => tool.name),
+    definitions: [...own(OWN), ...theirs.map((tool) => ({ name: tool.name, description: tool.description, parameters: tool.parameters as JSONObject })), ...own(WEB)],
+    connections: theirs.filter((tool) => tool.name !== TRAVEL).map((tool) => tool.name),
+    live: theirs.filter((tool) => tool.name === TRAVEL).map((tool) => tool.name),
     async run(name, argumentsJSON) {
       const tool = Object.hasOwn(tools, name) ? tools[name] : undefined;
       // Foundation Models would stop the page on a call it can't decode; the model is told instead.

@@ -29,11 +29,40 @@ func string(_ text: String) -> String {
     String(decoding: try! JSONEncoder().encode(text), as: UTF8.self)
 }
 
+/// The live tool's arguments as the server offers it: the weather and exchange rates, which it
+/// reads itself. Routes are the phone's, read with a tool of its own, so they go from the kinds,
+/// and so does each argument only a route has, and what one says of routes.
+func withoutRoutes(_ value: GenerationSchema) throws -> String {
+    guard var object = try JSONSerialization.jsonObject(with: JSONEncoder().encode(value)) as? [String: Any],
+          var properties = object["properties"] as? [String: Any] else { preconditionFailure("The live tool's arguments aren't an object") }
+    for (name, value) in properties {
+        guard var property = value as? [String: Any] else { continue }
+        if let kinds = property["enum"] as? [String] { property["enum"] = kinds.filter { $0 != "route" } }
+        if let text = property["description"] as? String {
+            if text.hasPrefix("route: ") {
+                properties[name] = nil
+                for key in ["required", "x-order"] { object[key] = (object[key] as? [String])?.filter { $0 != name } }
+                continue
+            }
+            if let cut = text.range(of: ". route: ") { property["description"] = String(text[..<cut.lowerBound]) }
+        }
+        properties[name] = property
+    }
+    object["properties"] = properties
+    let written = String(decoding: try ChatCompletions.ordered(object), as: UTF8.self)
+    precondition(!written.contains("route"), "The server's live tool still says something of routes: \(written)")
+    return written
+}
+
 let log = WebLog()
 // In the order a page is written with them (Composer.tools); a connected service's go after live.
+// The live tool is the server's, which leaves routes to the phone (`withoutRoutes`).
 let tools: [any Tool] = [LookupTool(found: ReferenceLog()), RecallTool(), LiveTool(log: LiveLog()), SearchTool(log: log), ReadTool(log: log)]
 let toolLines = try tools.map { tool in
-    "{\"name\":\(string(tool.name)),\"description\":\(string(tool.description)),\"parameters\":\(try schema(tool.parameters))}"
+    if tool is LiveTool {
+        return "{\"name\":\(string(tool.name)),\"description\":\(string(LiveTool.describing(routes: false))),\"parameters\":\(try withoutRoutes(tool.parameters))}"
+    }
+    return "{\"name\":\(string(tool.name)),\"description\":\(string(tool.description)),\"parameters\":\(try schema(tool.parameters))}"
 }
 
 /// Anything made of dictionaries, arrays and strings, as JSON with its keys sorted.

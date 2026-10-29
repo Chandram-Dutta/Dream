@@ -1220,7 +1220,7 @@
   },
   {
    "name": "live",
-   "description": "Fetches live data that Dream keeps current on the screen: the weather for a place and day, an exchange rate, or the distance and travel time between places. Returns the values now and the name of each field. Use it whenever the screen shows any of these, before building.",
+   "description": "Fetches live data that Dream keeps current on the screen: the weather for a place and day, or an exchange rate. Returns the values now and the name of each field. Use it whenever the screen shows any of these, before building.",
    "parameters": {
     "additionalProperties": false,
     "properties": {
@@ -1231,8 +1231,7 @@
      "kind": {
       "enum": [
        "weather",
-       "exchangeRate",
-       "route"
+       "exchangeRate"
       ],
       "type": "string"
      },
@@ -1249,15 +1248,11 @@
       "type": "string"
      },
      "from": {
-      "description": "exchangeRate: the currency's ISO code, like USD. route: where from, or current location",
+      "description": "exchangeRate: the currency's ISO code, like USD",
       "type": "string"
      },
      "to": {
-      "description": "exchangeRate: the other currency's ISO code, like INR. route: where to",
-      "type": "string"
-     },
-     "travel": {
-      "description": "route: driving, walking or transit. Otherwise empty",
+      "description": "exchangeRate: the other currency's ISO code, like INR",
       "type": "string"
      }
     },
@@ -1268,8 +1263,7 @@
      "day",
      "time",
      "from",
-     "to",
-     "travel"
+     "to"
     ],
     "title": "Arguments",
     "type": "object"

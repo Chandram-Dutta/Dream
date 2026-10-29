@@ -621,7 +621,7 @@ export class PageLoop {
         now: () => this.now,
       },
     );
-    const { instructions, tools } = writing(this.generation, this.request.locale.currency, box.definitions, box.connections);
+    const { instructions, tools } = writing(this.generation, this.request.locale.currency, box.definitions, box);
     return { transcript: new Transcript(instructions), tools: { ...box, definitions: tools }, web };
   }
 

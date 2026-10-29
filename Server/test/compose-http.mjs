@@ -118,6 +118,42 @@ export async function runCompose(base, expect, { appKey, signIn, query }) {
   const finished = after.events.at(-1);
   expect(finished?.type === "done" && finished.surface.answers?.[0]?.choice === "The planet" && finished.surface.blocks?.[1]?.items?.some((item) => item.value === "Which Mercury? The planet"), "and the page is made for the answer");
 
+  console.log("Pages on the server: the phone's tools");
+  const output = (who, body) =>
+    fetch(`${base}/api/compose/${second.id}/tools`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${who.token}` }, body: JSON.stringify(body) });
+  expect((await output(alice, { id: "call", output: "x" })).status === 404, "only the page's owner may answer one of its calls");
+  expect((await output(bob, { id: "call", output: "x" })).status === 409, "and only a call it's waiting on");
+  response = await fetch(`${base}/api/compose/${second.id}/tools`, { headers: { Authorization: `Bearer ${bob.token}` } });
+  expect(response.status === 405, "answered with POST");
+
+  console.log("Pages on the server: a change to a page");
+  const change = { ...ada, editing: { surface: done.surface, instruction: "make it shorter" } };
+  const changed = await (await start(alice, change)).json();
+  const changing = await watch(base, alice.token, changed.id);
+  const landed = changing.events.at(-1);
+  const changeLines = changing.events.filter((event) => event.type === "log").map((event) => event.line);
+  expect(landed?.type === "done" && landed.pageID === ada.pageID && changeLines[0] === "Change: make it shorter" && !changing.events.some((event) => event.type === "asking"), "a change is made from the page as it is, under the page's id, with nothing asked");
+  const after2 = (await (await fetch(`${base}/api/sync`, { headers: { Authorization: `Bearer ${alice.token}` } })).json()).items?.find((each) => each.kind === "surface" && each.id === ada.pageID)?.body ?? {};
+  expect(
+    after2.history?.length === 2 && after2.history[0].kind === "asked" && after2.history[1].kind === "changed" && after2.history[1].text === "make it shorter" &&
+      after2.editRequests?.join() === "make it shorter" && after2.generationLog?.[0] === lines[0] && after2.generationLog.includes("Change: make it shorter") && after2.createdAt === body.createdAt,
+    "and kept in sync onto the page the account keeps: its turn after the page's own, the change asked for, its log after the page's",
+  );
+
+  console.log("Pages on the server: what Dream remembers, from the account's facts");
+  const dave = await signIn("compose-dave");
+  if (dave) {
+    const at = new Date().toISOString();
+    const fact = { kind: "fact", id: uuid(), parent: null, format: 1, updatedAt: Date.now(), deleted: false, body: { topic: "Subject", text: "The planet", source: "answered", confirmed: true, request: "", createdAt: at, updatedAt: at } };
+    response = await fetch(`${base}/api/sync`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${dave.token}` }, body: JSON.stringify({ items: [fact] }) });
+    expect(response.status === 200, "a fact in the account's sync");
+    const remembered = await (await start(dave, { ...mercury, pageID: uuid() })).json();
+    const known = await watch(base, dave.token, remembered.id);
+    const knownLines = known.events.filter((event) => event.type === "log").map((event) => event.line);
+    expect(known.events.at(-1)?.type === "done" && !known.events.some((event) => event.type === "asking") && knownLines.includes("Remembered: Subject"), "answers the gap check's question about it, and nobody is asked");
+    expect(known.events.at(-1).surface.answers?.[0]?.isRemembered === true && known.events.at(-1).surface.blocks?.[1]?.items?.some((item) => item.value === "Which Mercury? The planet (from what Dream remembers)"), "and the page is made for what Dream remembers");
+  }
+
   console.log("Pages on the server: from a photo");
   const photo = { request: "what is this", image: JPEG, locale, pageID: uuid() };
   const third = await (await start(carol, photo)).json();
