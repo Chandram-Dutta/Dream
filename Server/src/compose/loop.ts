@@ -562,7 +562,11 @@ export class PageLoop {
     try {
       const topics = await abortable(this.memory.topics(), limit.signal);
       const transcript = new Transcript(this.generation.prompts.gapCheck);
-      const round = await this.respond({ transcript, tools: null, web: new WebLog() }, gapRequest(this.generation, intent, topics), { schema: this.generation.schemas.gaps, temperature: 0.2, maximumResponseTokens: 600 }, () => undefined, () => undefined, limit.signal);
+      // Where the user is, when the phone said: the check sees only the request, and asked "where
+      // is here?" of someone whose phone had just told it.
+      const here = this.services.tools.here;
+      const where = here?.from === "phone" && here.city ? `\n\nThe user is in ${here.city}: that's where "here" is, so don't ask where they are.` : "";
+      const round = await this.respond({ transcript, tools: null, web: new WebLog() }, gapRequest(this.generation, intent, topics) + where, { schema: this.generation.schemas.gaps, temperature: 0.2, maximumResponseTokens: 600 }, () => undefined, () => undefined, limit.signal);
       const wire = wholeObject(round.text);
       if (!wire) throw new ParsingError();
       const resolved = await abortable(this.resolve(list(wire.questions).slice(0, 3), topics), limit.signal);
