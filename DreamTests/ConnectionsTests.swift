@@ -374,3 +374,49 @@ struct ConnectionsTests {
         #expect(received.surface.sources?.first?.parameters["server"] == nil, "nor a source that would ask them anything")
     }
 }
+
+// For a page made on Dream's server, the same tools run on the phone (DeviceTools.swift). Here,
+// since they share the connections and the consent answerer with the tests above.
+extension ConnectionsTests {
+    @Test("For a page on the server, a service's tool runs here as it would for a page made here, asking first")
+    func deviceTools() async throws {
+        let notes = TeamNotes(port: 9101)
+        notes.connect()
+        let earlier = Consent.answerer
+        Consent.answerer = .user
+        defer { Consent.answerer = earlier }
+        let consent = Consent()
+        let devices = DeviceTools.offered(for: "which tasks are still open in my team notes", asking: Asking(), consent: consent, live: LiveLog(), log: ConnectionLog())
+        let names = devices.definitions.map(\.name)
+        #expect(names.last == "travel", "travel times, always, as the live tool reads them here")
+        let listing = try #require(names.first { $0.hasSuffix("list_tasks") }, "the service's tools picked for the request: \(names)")
+        let definition = try #require(devices.definitions.first { $0.name == listing })
+        #expect(definition.description.hasPrefix("From Team Notes, a service the user connected."), "described as the phone describes it to a model")
+
+        let asked = Task { await devices.run(DeviceToolCall(id: "call-1", name: listing, arguments: #"{"status": "open"}"#)) }
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(consent.pending?.question == "Let Team Notes look this up?", "asked on the page, at call time")
+        #expect(notes.calls(of: "list_tasks").isEmpty, "and nothing runs before the answer")
+        consent.answer(.once)
+        let once = try #require(await asked.value)
+        #expect(once.id == "call-1" && once.output.contains("What Team Notes returned") && notes.calls(of: "list_tasks") == [.object(["status": .string("open")])])
+        #expect(once.source == nil, "allowed once, it isn't kept current")
+        #expect(await devices.run(DeviceToolCall(id: "call-1", name: listing, arguments: "{}")) == nil, "a call run already isn't run again")
+
+        let withdrawn = Task { await devices.run(DeviceToolCall(id: "call-2", name: listing, arguments: "{}")) }
+        try await Task.sleep(for: .milliseconds(100))
+        #expect(consent.pending != nil)
+        withdrawn.cancel()
+        _ = await withdrawn.value
+        try await Task.sleep(for: .milliseconds(50))
+        #expect(consent.pending == nil && notes.calls(of: "list_tasks").count == 1, "a call the server went past comes off the page, and nothing runs")
+
+        let always = Task { await devices.run(DeviceToolCall(id: "call-3", name: listing, arguments: "{}")) }
+        try await Task.sleep(for: .milliseconds(100))
+        consent.answer(.always)
+        let kept = try #require(await always.value)
+        #expect(kept.source?.kind == Source.connectionKind && kept.source?.name == "listTasks" && kept.source?.fields.isEmpty == false,
+                "allowed always, its source goes with what it returned, for the page to keep current")
+        #expect(kept.output.contains("Dream keeps these current"))
+    }
+}
