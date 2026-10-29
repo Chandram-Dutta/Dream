@@ -218,9 +218,10 @@ function span(ms: number): string {
  * goes over it after waiting on the phone: search and read, so nothing is paid for twice, and
  * Wikipedia and what Dream remembers, so the page reads as it did. A live reading is read again,
  * whole while it's counted in flight; what the model was told of it is kept with its call
- * (loop.ts, runTool). */
-function remembered(tools: ToolServices, journal: Journal): ToolServices {
+ * (loop.ts, runTool). Everything else the services carry, like where the user is, goes as it is. */
+export function remembered(tools: ToolServices, journal: Journal): ToolServices {
   return {
+    ...tools,
     lookup: (subject, language) => journal.remember("lookup", [subject, language], () => tools.lookup(subject, language)),
     related: (title, language) => journal.remember("related", [title, language], () => tools.related(title, language)),
     search: (query) => journal.remember("search", query, () => tools.search(query)),
@@ -233,7 +234,6 @@ function remembered(tools: ToolServices, journal: Journal): ToolServices {
         const body = empty ? null : await response.arrayBuffer();
         return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
       }),
-    here: tools.here,
   };
 }
 

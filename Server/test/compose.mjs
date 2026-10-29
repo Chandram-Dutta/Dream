@@ -26,7 +26,8 @@ registerHooks({
 });
 
 const { PageLoop, TIMING, questionFrom } = await import("../src/compose/loop.ts");
-const { Runner, memoryStore, pageShape } = await import("../src/compose/runner.ts");
+const { Runner, memoryStore, pageShape, remembered } = await import("../src/compose/runner.ts");
+const { Journal } = await import("../src/compose/journal.ts");
 const { readPartial, partialObject, fitted } = await import("../src/compose/partial.ts");
 const { answersContext, repairPrompt, surfaceRequest, surfaceInstructions, gapRequest, writing, editPrompt, describeBlock, changedAnswer, memoryContext, isMemoryLine } = await import("../src/compose/prompts.ts");
 const { Padding, readRound, Activity, ModelProblem, requestBody } = await import("../src/compose/chat.ts");
@@ -1298,6 +1299,23 @@ console.log("The job: a gap check still deciding decides first");
   await later.alarm();
   const lines = logLines(quiet.after(0));
   expect(quiet.after(0).at(-1).type === "done" && nothing.calls.gaps.length === 1 && lines.filter((line) => line.startsWith("Check: nothing to ask")).length === 1, "and picking up, the check isn't asked again, nor said twice");
+}
+
+console.log("The journal: what the tools' services gave, given again");
+{
+  const tools = fakeTools({ here: { latitude: 12.3, longitude: 76.6, name: "Mysuru" }, weatherKit: { key: "k", keyID: "K", teamID: "T", serviceID: "S" } });
+  const first = new Journal();
+  const kept = remembered(tools, first);
+  expect(kept.here === tools.here && kept.weatherKit === tools.weatherKit, "everything else the services carry goes as it is: where the user is, and Apple Weather");
+  const query = { query: "mercury", count: 5 };
+  const found = await kept.search(query);
+  await kept.search(query);
+  const again = remembered(tools, new Journal(first.entries(), true));
+  const given = await again.search(query);
+  await again.search(query);
+  expect(tools.calls.filter(([kind]) => kind === "search").length === 2 && JSON.stringify(given) === JSON.stringify(found), "gone over again, a search is given what it gave, each time it was asked, and the web isn't asked");
+  await again.search({ query: "venus" });
+  expect(tools.calls.filter(([kind]) => kind === "search").length === 3, "something it hadn't asked before is asked");
 }
 
 console.log("The job: two calls to the phone at once");
