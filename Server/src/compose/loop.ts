@@ -10,7 +10,9 @@
 // Where the app waits on the user's answers, the loop stops instead and says what it would ask
 // (`asking`); the job (runner.ts) starts it again with the answers, so a page never holds the
 // object for the ten minutes it may wait. A question about something Dream remembers is
-// answered from the account's synced facts, as on the phone.
+// answered from the account's synced facts, as on the phone. A call to the phone's tools that
+// waits on an app nobody has open stops it too (`paused`), and it starts again from the top,
+// going over what it did before from the job's journal (journal.ts) until it's back at the call.
 //
 // test/compose.mjs runs it in Node, with a fake model and a fake engine.
 
@@ -18,6 +20,7 @@ import type * as EngineModule from "../engine/index";
 import type { EngineLocale, MoleculeStructure, Recording, Surface, Issue, Reference } from "../engine/index";
 import type { ComposeEditing, ComposePhase, ComposeRequest } from "./contract";
 import { Activity, ask, Changes, ModelProblem, readRound, requestBody, RETRY_DELAYS, Transcript, userContent, type Message, type RequestOptions, type Round } from "./chat";
+import type { Journal } from "./journal";
 import { LiveLog, type DeviceAnswer } from "./live";
 import { findMolecule, findRecording } from "./media";
 import { Memory, recallKey } from "./memory";
@@ -55,6 +58,9 @@ export interface LoopServices {
   /** Asks the phone to run one of its tools (the job sets it): what it answered, or null when no
    * answer came in time, or the page stopped. */
   device?(call: { name: string; arguments: string }, signal: AbortSignal): Promise<DeviceAnswer | null>;
+  /** What the page did before it stopped to wait on the phone, which it's given again, and where
+   * what it does now is kept (journal.ts). The job sets it. */
+  journal?: Journal;
   now(): number;
   sleep(ms: number, signal: AbortSignal): Promise<void>;
 }
@@ -126,7 +132,9 @@ export type Outcome =
   | { kind: "done"; surface: Surface; model: string }
   /** `remembered` answers the questions Dream could answer itself; `questions` are the rest. */
   | { kind: "asking"; questions: Question[]; remembered: Answer[]; checkedAt: number }
-  | { kind: "failed"; message: string; reason: "empty" | "other" };
+  | { kind: "failed"; message: string; reason: "empty" | "other" }
+  /** Stopped to wait on the phone with nobody watching (Paused): the job starts it again. */
+  | { kind: "paused" };
 
 // MARK: - Errors
 
@@ -147,6 +155,15 @@ export class Cancelled extends Error {
 }
 
 type StopReason = "stalled" | "repeating" | "cutOff";
+
+/** The job stopped the page to wait on the phone without holding its alarm open: it starts again
+ * from the top once the phone answers, or its time is up (runner.ts). */
+export class Paused extends Error {
+  constructor() {
+    super("Waiting on the phone.");
+    this.name = "Paused";
+  }
+}
 
 /** The model stopped before finishing, with what it had written by then. */
 class Unfinished extends Error {
@@ -411,6 +428,7 @@ export class PageLoop {
       return { kind: "done", surface: done, model: this.modelName };
     } catch (error) {
       const stopped = this.signal.aborted ? this.signal.reason : error;
+      if (stopped instanceof Paused) return { kind: "paused" };
       const message = describe(stopped);
       if (!(stopped instanceof Cancelled) && describe(stopped) === describe(null)) console.error("Page failed", stopped instanceof Error ? stopped.name : typeof stopped);
       this.note(`Failed: ${message}`);
@@ -703,7 +721,8 @@ export class PageLoop {
     for (let round = 0; round <= 2; round++) {
       const checked = this.engine.checkLogic(surface, this.reader);
       surface = checked.surface;
-      let issues = checked.issues;
+      // A request to act whose changing tool was never called goes back, as on the phone.
+      let issues = checked.issues.concat(this.serviceLog.problems());
       // Once: a page about the world that looked nothing up goes back to look it up, and this
       // time it must: asked nicely, a model cited Wikipedia pages it never read instead.
       const unsourced = round === 0 ? this.engine.checkSourcing(surface, session.web.reading(found.all)) : [];
@@ -910,14 +929,13 @@ export class PageLoop {
           // Only the first round: once it has looked, it writes.
           requireTool: round === 0 && options.requireTool === true,
         });
-        const stream = await ask(this.services.model, body, signal, this.services.sleep, this.timing.retries);
-        const result = await readRound(stream, this.activity, () => this.now, onText, signal);
+        const result = await this.round(body, onText, signal);
         if (result.toolCalls.length && !result.padded && tools) {
           if (round >= this.timing.toolRounds) throw new ComposeError("The model kept looking things up without writing the page.");
           onToolRound();
           const calls: Message["tool_calls"] = result.toolCalls.map((call) => ({ id: call.id, type: "function", function: { name: call.name, arguments: call.arguments } }));
           transcript.messages.push({ role: "assistant", content: "", tool_calls: calls });
-          const outputs = await Promise.all(result.toolCalls.map((call) => abortable(tools.run(call.name, call.arguments), signal)));
+          const outputs = await Promise.all(result.toolCalls.map((call) => abortable(this.runTool(tools, call), signal)));
           result.toolCalls.forEach((call, index) => transcript.messages.push({ role: "tool", tool_call_id: call.id, content: outputs[index] }));
           continue;
         }
@@ -930,6 +948,37 @@ export class PageLoop {
     } finally {
       if (!kept) transcript.messages.length = mark;
     }
+  }
+
+  /** One answer from the model, or the one it gave here before the page stopped to wait on the
+   * phone (journal.ts), given again whole. One the padding guard ended isn't kept: asked again,
+   * it may go better. */
+  private async round(body: JSONObject, onText: (text: string) => void, signal: AbortSignal): Promise<Round> {
+    const journal = this.services.journal;
+    const step = journal?.step<Round>("model", body);
+    if (step?.kept) {
+      this.activity.seen = this.activity.heard = this.now;
+      if (step.kept.text) onText(step.kept.text);
+      return step.kept;
+    }
+    const answer = async () => readRound(await ask(this.services.model, body, signal, this.services.sleep, this.timing.retries), this.activity, () => this.now, onText, signal);
+    const result = journal ? await journal.working(answer) : await answer();
+    if (step && !result.padded) journal!.keep(step.key, result);
+    return result;
+  }
+
+  /** What a tool call returns. Gone over again after the page stopped for the phone, the tool
+   * runs again for what it notes (the pages read, the sources declared), on what its services
+   * gave before, and the model is given what it was given then, so its transcript stays the
+   * same even where a live reading has moved on since. */
+  private async runTool(tools: ToolBox, call: { id: string; name: string; arguments: string }): Promise<string> {
+    const output = await tools.run(call.name, call.arguments);
+    const journal = this.services.journal;
+    if (!journal) return output;
+    const step = journal.step<string>("output", call.id);
+    if (step.kept !== undefined) return step.kept;
+    journal.keep(step.key, output);
+    return output;
   }
 
   // MARK: Showing

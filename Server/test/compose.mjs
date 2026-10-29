@@ -927,6 +927,46 @@ console.log("The loop: the phone's own tools");
   expect(outcome.surface.services?.join() === "Notes" && outcome.surface.sources?.[0]?.name === "notesSearch", "the page lists the service it read, and keeps the source");
 }
 
+/** A connected service's tools as the phone sends them for "file an issue in Linear": one that
+ * changes things (offered because the request asks to act), one that only reads, and one whose
+ * service doesn't say. */
+const FILE_ISSUE = { name: "linear_create_issue", description: "From Linear, a service the user connected. It changes things there.", parameters: { type: "object", properties: { title: { type: "string" } }, required: ["title"] }, service: "Linear", changes: true };
+const FIND_ISSUES = { name: "linear_search_issues", description: "From Linear, a service the user connected. It only looks things up.", parameters: { type: "object", properties: { query: { type: "string" } } }, service: "Linear", changes: false };
+const COMMENT = { name: "linear_comment", description: "From Linear, a service the user connected. Its service doesn't say whether it changes anything.", parameters: { type: "object", properties: { text: { type: "string" } } }, service: "Linear" };
+const NOT_FILED = "The request asks to do something in a connected service, but you didn't call linear_create_issue. Call it now with the values to send: Dream asks the user, and it runs if they allow it. Then say on the screen what happened, and drop any other action standing in for it.";
+const callTool = (id, name, args) => stream([{ tool_calls: [{ index: 0, id, type: "function", function: { name, arguments: JSON.stringify(args) } }] }, { finish: "tool_calls" }]);
+
+/** A page for "file an issue about the login bug in Linear", written the way `write` says, with the phone's tools `tools`. */
+async function acting(write, tools = [FIND_ISSUES, FILE_ISSUE, COMMENT]) {
+  const calls = [];
+  const device = async (call) => (calls.push(call.name), { output: call.name === "linear_create_issue" ? "What Linear returned for create_issue: ENG-42.\nIt's done: Linear has made this change. Say so plainly on the screen, without a button for it." : "What Linear returned: two issues.", service: "Linear" });
+  const model = fakeModelOf({ write });
+  const record = recorder();
+  const loop = new PageLoop({ ...REQUEST, request: "file an issue about the login bug in Linear", deviceTools: tools }, { ...services(model), device }, record.sink, new AbortController().signal, FAST);
+  const outcome = await loop.run(startFresh());
+  return { outcome, calls, model, problems: record.lines().filter((line) => line.startsWith("Problem: ")) };
+}
+
+console.log("The loop: a request to act that never calls the tool for it goes back, as on the phone");
+{
+  // A reminder written in its place, as models do; sent back, it calls the tool.
+  const reminded = await acting((index) => (index === 0 ? stream(pieces(JSON.stringify(page({ title: "Remember to file it" })))) : index === 1 ? callTool("c", "linear_create_issue", { title: "Login bug" }) : stream(pieces(JSON.stringify(page({ title: "Filed: ENG-42" }))))));
+  expect(reminded.problems.length === 1 && reminded.problems[0] === `Problem: ${NOT_FILED}`, "the page goes back once, saying which tool it didn't call, in the app's words");
+  expect(textOf(lastUser(reminded.model.calls.write[1]).content) === repairPrompt(generation, [NOT_FILED]), "as the checker's problems go back");
+  expect(reminded.calls.join() === "linear_create_issue" && reminded.outcome.surface.title === "Filed: ENG-42" && reminded.model.calls.write.length === 3, "and once it's called, the page is done");
+
+  // Looking something up isn't doing it.
+  const looked = await acting((index) => (index === 0 ? callTool("l", "linear_search_issues", { query: "login" }) : stream(pieces(JSON.stringify(page())))));
+  expect(looked.problems.length === 3 && looked.calls.every((name) => name === "linear_search_issues"), "a page that only looked things up goes back, until the repairs run out");
+
+  const filed = await acting((index) => (index === 0 ? callTool("c", "linear_create_issue", { title: "Login bug" }) : stream(pieces(JSON.stringify(page({ title: "Filed: ENG-42" }))))));
+  expect(!filed.problems.length && filed.model.calls.write.length === 2, "not when it called the tool");
+  const unsaid = await acting((index) => (index === 0 ? callTool("m", "linear_comment", { text: "Seen on login" }) : stream(pieces(JSON.stringify(page())))));
+  expect(!unsaid.problems.length && unsaid.model.calls.write.length === 2, "nor when it called one whose service doesn't say what it does, which may have done it");
+  const reading = await acting(() => stream(pieces(JSON.stringify(page()))), [FIND_ISSUES, COMMENT]);
+  expect(!reading.problems.length && reading.model.calls.write.length === 1, "nor when nothing that changes things was offered: the request didn't ask to act");
+}
+
 // MARK: - The job
 
 /** A job's services, with a clock the test moves. */
@@ -1081,40 +1121,207 @@ console.log("The job: what Dream remembers comes first");
   expect(done.type === "done" && done.surface.answers.map((answer) => answer.choice).join("|") === "Pune, Mumbai|The element" && done.surface.answers[0].isRemembered, "the page is built for what Dream remembered, then what the user said");
 }
 
-console.log("The job: the phone's tools");
+/** The first call to the phone's tools in a job's log, once there is one. */
+async function deviceEvent(store) {
+  for (let tries = 0; tries < 300; tries++) {
+    const event = store.after(0).find((item) => item.type === "deviceTool");
+    if (event) return event;
+    await pause(10);
+  }
+  return undefined;
+}
+
+/** Reads a watcher's stream as the app does, a little at a time: `until` reads on to the first
+ * event `stop` takes (or for `ms`), and `events` is everything read so far. */
+function follow(stream) {
+  const reader = stream.getReader();
+  const decoder = new TextDecoder();
+  const events = [];
+  let text = "";
+  return {
+    events,
+    async until(stop, ms = 5_000) {
+      const end = Date.now() + ms;
+      for (;;) {
+        const found = events.find(stop);
+        if (found) return found;
+        const result = await Promise.race([reader.read(), pause(Math.max(0, end - Date.now())).then(() => null)]);
+        if (!result || result.done) return undefined;
+        text += decoder.decode(result.value, { stream: true });
+        let at;
+        while ((at = text.indexOf("\n\n")) >= 0) {
+          const part = text.slice(0, at);
+          text = text.slice(at + 2);
+          if (part.startsWith("data: ")) events.push(JSON.parse(part.slice(6)));
+        }
+      }
+    },
+  };
+}
+
+const isCall = (item) => item.type === "deviceTool";
+const logLines = (events) => events.filter((item) => item.type === "log").map((item) => item.line);
+const NOTES_UNANSWERED = "Notes couldn't answer this time. Build the screen without it, and don't claim anything about what it holds.";
+
+console.log("The job: the phone's tools, while someone watches");
 {
   const clock = { now: () => Date.now() };
   const store = memoryStore();
   const model = fakeModelOf({ write: callsNotes });
-  const runner = new Runner(store, jobServices(model, clock).services, { ...QUICK_JOB, deviceWait: 600 }, FAST);
+  const notified = [];
+  const runner = new Runner(store, { ...jobServices(model, clock).services, notify: (job, notice) => notified.push(notice) }, { ...QUICK_JOB, deviceWait: 600 }, FAST);
   await runner.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  const watching = collect(runner.watch(JOB.owner, 0));
   const running = runner.alarm();
-  let event;
-  for (let tries = 0; tries < 300 && !event; tries++) {
-    await pause(10);
-    event = store.after(0).find((item) => item.type === "deviceTool");
-  }
+  const event = await deviceEvent(store);
   expect(event?.call.name === "notes_search" && event.call.arguments === '{"query":"trip"}' && /^[0-9a-f-]{36}$/.test(event.call.id), "a call to one of the phone's tools is an event, with an id of its own");
-  expect(event.deadline > Date.now() && event.deadline <= Date.now() + 600, "and when the server stops waiting on it");
+  expect(event.deadline > Date.now() && event.deadline <= Date.now() + 600 && notified.length === 0, "and when the server stops waiting on it: a minute while someone watches (600 ms here), with nobody told");
   expect((await runner.output("someone-else", { id: event.call.id, output: "x" })).status === 404, "only the page's own account may answer it");
   expect((await runner.output(JOB.owner, { id: "not-waiting", output: "x" })).status === 409 && (await runner.output(JOB.owner, { id: event.call.id })).status === 400, "an id that isn't waiting is a conflict, and an answer has its output");
   expect((await runner.output(JOB.owner, { id: event.call.id, output: "Three notes about the trip.", service: "Notes", source: { name: "trip notes", kind: "connection", parameters: {}, fields: [{ name: "count", value: 3 }] } })).status === 200, "the owner's answer is taken");
   await running;
+  await watching;
   const done = store.after(0).at(-1);
-  expect((await runner.output(JOB.owner, { id: event.call.id, output: "again" })).status === 409 && !store.after(0).some((item) => item.type === "deviceTool"), "once it's answered it isn't waiting, and the call leaves the log, so a phone catching up never runs it twice");
+  expect((await runner.output(JOB.owner, { id: event.call.id, output: "again" })).status === 409 && !store.after(0).some(isCall), "once it's answered it isn't waiting, and the call leaves the log, so a phone catching up never runs it twice");
   expect(model.calls.write[1].messages.at(-1).content === "Three notes about the trip." && done.type === "done" && done.surface.services?.join() === "Notes" && done.surface.sources?.[0]?.name === "tripNotes", "and the page goes on with what it returned");
 
-  // Nobody answers: the app isn't open.
+  // Nobody answers, though the page is open: its consent card, say, was left alone.
   const quiet = memoryStore();
   const unanswered = fakeModelOf({ write: callsNotes });
   const nobody = new Runner(quiet, jobServices(unanswered, clock).services, { ...QUICK_JOB, deviceWait: 600 }, FAST);
   await nobody.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  const open = collect(nobody.watch(JOB.owner, 0));
   const started = Date.now();
   await nobody.alarm();
-  const lines = quiet.after(0).filter((item) => item.type === "log").map((item) => item.line);
-  expect(unanswered.calls.write[1].messages.at(-1).content === "Notes couldn't answer this time. Build the screen without it, and don't claim anything about what it holds." && Date.now() - started >= 600, "with no answer in its time (60 seconds; 600 ms here), the model is told it couldn't be read");
+  await open;
+  const lines = logLines(quiet.after(0));
+  expect(unanswered.calls.write[1].messages.at(-1).content === NOTES_UNANSWERED && Date.now() - started >= 600, "with no answer in its time (60 seconds; 600 ms here), the model is told it couldn't be read");
   expect(quiet.after(0).at(-1).type === "done" && !lines.some((line) => line.includes("stopped making progress") || line.includes("stopped after")), `and the page carries on: the wait, longer than a stall's ${FAST.patience} ms, isn't taken for a stalled model`);
-  expect(lines.includes("The phone didn't answer notes_search, so it couldn't be read") && !quiet.after(0).some((item) => item.type === "deviceTool"), "the log says so, and the call is gone from it");
+  expect(lines.includes("The phone didn't answer notes_search, so it couldn't be read") && !quiet.after(0).some(isCall), "the log says so, and the call is gone from it");
+}
+
+console.log("The job: the phone's tools, with nobody watching");
+{
+  let now = Date.now();
+  const clock = { now: () => now };
+  const store = memoryStore(() => now);
+  const model = fakeModelOf({ write: callsNotes });
+  const notified = [];
+  const runner = new Runner(store, { ...jobServices(model, clock).services, notify: (job, notice) => notified.push(notice) }, { ...QUICK_JOB, deviceWait: 600, deviceAwayWait: 3_000 }, FAST);
+  await runner.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  const begun = Date.now();
+  await runner.alarm();
+  const event = store.after(0).find(isCall);
+  expect(runner.job.status === "device" && event?.deadline === now + 3_000 && Date.now() - begun < 2_000, "nobody is watching: the call waits ten minutes (3 s here), and the alarm doesn't wait with it");
+  expect(store.alarm === event.deadline, "the alarm wakes the page at its deadline");
+  expect(notified.length === 1 && notified[0].body === "Dream needs your iPhone to read Notes for “tell me about mercury”" && notified[0].payload.kind === "device" && notified[0].payload.page === REQUEST.pageID && notified[0].payload.job === JOB.id, "the account's iPhones are told, once");
+  expect(notified[0].expires === Math.floor(event.deadline / 1000) && !notified[0].title, "for as long as it waits");
+  expect(logLines(store.after(0)).includes("Nobody has this page open, so Dream sent a notification and waits up to 3 seconds for the phone to run notes_search."), "the log says so");
+  await runner.alarm();
+  expect(runner.job.status === "device" && model.calls.write.length === 1, "an early alarm leaves it waiting");
+  now += 3_000;
+  expect((await runner.output(JOB.owner, { id: event.call.id, output: "late" })).status === 409, "an answer after its deadline isn't taken");
+  await runner.alarm();
+  const lines = logLines(store.after(0));
+  const once = (line) => lines.filter((each) => each === line).length === 1;
+  expect(model.calls.write.length === 2 && model.calls.write[1].messages.at(-1).content === NOTES_UNANSWERED, "with no answer in its time, the model is told it couldn't be read, as before");
+  expect(runner.job.status === "done" && store.after(0).at(-1).type === "done" && !store.after(0).some(isCall), "the page is made, and the call is gone from the log");
+  expect(model.calls.gaps.length === 1 && once("Request: tell me about mercury") && once("Asked the phone to run notes_search") && lines.filter((line) => line.startsWith("Check: nothing to ask")).length === 1 && lines.includes("The phone didn't answer notes_search, so it couldn't be read"), "picked up where it stopped, without asking the model again or saying anything twice");
+  expect(notified.length === 2 && notified[1].payload.kind === "done", "then it says the page is ready");
+  expect(store.get("journal") === null && store.get("waiting") === null, "and what it kept to pick up from is let go");
+}
+
+console.log("The job: the phone answers once the app is opened");
+{
+  let now = Date.now();
+  const clock = { now: () => now };
+  const store = memoryStore(() => now);
+  // A search beside the call, which the page doesn't stop before.
+  const tools = fakeTools({
+    async search(query) {
+      this.calls.push(["search", query]);
+      await pause(150);
+      return { status: 200, body: { results: [{ title: "Trip ideas", url: "https://www.example.com/trips", snippet: "Places to go.", site: "example.com" }] } };
+    },
+  });
+  const model = fakeModelOf({
+    write: (index) =>
+      index === 0
+        ? stream([{ tool_calls: [{ index: 0, id: "n", type: "function", function: { name: "notes_search", arguments: '{"query":"trip"}' } }, { index: 1, id: "s", type: "function", function: { name: "search", arguments: JSON.stringify({ question: "q", keywords: "trip ideas", freshness: "any", country: "" }) } }] }, { finish: "tool_calls" }])
+        : stream(pieces(JSON.stringify(page()))),
+  });
+  const searches = () => tools.calls.filter(([kind]) => kind === "search").length;
+  const runner = new Runner(store, jobServices(model, clock, { tools }).services, { ...QUICK_JOB, deviceAwayWait: 5_000 }, FAST);
+  await runner.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  await runner.alarm();
+  expect(runner.job.status === "device" && searches() === 1 && store.get("journal")?.length > 0, "the page stops for the phone once the search beside it is done, keeping what it did");
+  // A while later, the app is opened: the page's screen reads its events from the first.
+  now += 2_000;
+  const watcher = follow(runner.watch(JOB.owner, 0));
+  const event = await watcher.until(isCall);
+  expect(event && (await runner.output(JOB.owner, { id: event.call.id, output: "Three notes about the trip.", service: "Notes" })).status === 200 && store.alarm === now, "its call is in the catch-up, and its answer is taken, waking the page at once");
+  expect(!store.after(0).some(isCall) && (await runner.output(JOB.owner, { id: event.call.id, output: "again" })).status === 409, "the call leaves the log, and isn't answered twice");
+  await runner.alarm();
+  await watcher.until((item) => item.type === "done");
+  const { events } = watcher;
+  const second = model.calls.write[1]?.messages ?? [];
+  expect(events.filter(isCall).length === 1 && events.at(-1)?.type === "done", "the watcher sees the call, then the page made");
+  expect(model.calls.write.length === 2 && model.calls.gaps.length === 1 && searches() === 1, "from where it stopped: neither the model nor the web is asked again");
+  expect(second.at(-2)?.tool_call_id === "n" && second.at(-2).content === "Three notes about the trip." && second.at(-1)?.tool_call_id === "s" && second.at(-1).content.startsWith("Search results"), "and the model has both answers, as if it had never stopped");
+  expect(events.at(-1).surface.services?.join() === "Notes", "the page lists the service it read");
+  const seen = logLines(events);
+  expect(seen.filter((line) => line === "Asked the phone to run notes_search").length === 1 && seen.filter((line) => line.startsWith("Search: trip ideas")).length === 1 && seen.includes("The phone answered notes_search: 27 characters"), "nothing it did is said twice");
+}
+
+console.log("The job: a gap check still deciding decides first");
+{
+  let now = Date.now();
+  const clock = { now: () => now };
+  const slow = (questions) => () => stream([{ wait: 300 }, ...pieces(JSON.stringify({ questions }))]);
+  const store = memoryStore(() => now);
+  const asks = fakeModelOf({ gaps: slow([{ question: "Which trip?", topic: "Trip", options: ["Goa", "Pune"], personal: false, typing: false, remembered: "" }]), write: callsNotes });
+  const notified = [];
+  const runner = new Runner(store, { ...jobServices(asks, clock).services, notify: (job, notice) => notified.push(notice) }, { ...QUICK_JOB, deviceAwayWait: 5_000 }, FAST);
+  await runner.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  await runner.alarm();
+  expect(runner.job.status === "asking" && !store.after(0).some(isCall) && store.get("waiting") === null, "questions come first: the call the page was waiting on goes, and nothing waits on the phone");
+  expect(notified.map((notice) => notice.payload.kind).join() === "device,asking", "the question's notification takes the place of the phone's");
+
+  const quiet = memoryStore(() => now);
+  const nothing = fakeModelOf({ gaps: slow([]), write: callsNotes });
+  const later = new Runner(quiet, jobServices(nothing, clock).services, { ...QUICK_JOB, deviceAwayWait: 5_000 }, FAST);
+  await later.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  await later.alarm();
+  const order = logLines(quiet.after(0));
+  expect(later.job.status === "device" && order.findIndex((line) => line.startsWith("Check: nothing to ask")) > order.indexOf("Asked the phone to run notes_search"), "with nothing to ask, the page stops for the phone once the check has said so");
+  now += 5_000;
+  await later.alarm();
+  const lines = logLines(quiet.after(0));
+  expect(quiet.after(0).at(-1).type === "done" && nothing.calls.gaps.length === 1 && lines.filter((line) => line.startsWith("Check: nothing to ask")).length === 1, "and picking up, the check isn't asked again, nor said twice");
+}
+
+console.log("The job: two calls to the phone at once");
+{
+  let now = Date.now();
+  const clock = { now: () => now };
+  const store = memoryStore(() => now);
+  const model = fakeModelOf({
+    write: (index) =>
+      index === 0
+        ? stream([{ tool_calls: [{ index: 0, id: "a", type: "function", function: { name: "notes_search", arguments: '{"query":"trip"}' } }, { index: 1, id: "b", type: "function", function: { name: "notes_search", arguments: '{"query":"hotel"}' } }] }, { finish: "tool_calls" }])
+        : stream(pieces(JSON.stringify(page()))),
+  });
+  const notified = [];
+  const runner = new Runner(store, { ...jobServices(model, clock).services, notify: (job, notice) => notified.push(notice) }, { ...QUICK_JOB, deviceAwayWait: 5_000 }, FAST);
+  await runner.start(JOB, { ...REQUEST, deviceTools: [NOTES] });
+  await runner.alarm();
+  const [trip, hotel] = store.after(0).filter(isCall);
+  expect(runner.job.status === "device" && trip && hotel && notified.length === 1, "the page stops for both, and the iPhone is told once");
+  expect((await runner.output(JOB.owner, { id: trip.call.id, output: "A note about the trip." })).status === 200 && store.alarm === trip.deadline, "one answered, it waits on the other");
+  expect((await runner.output(JOB.owner, { id: hotel.call.id, output: "A note about the hotel." })).status === 200 && store.alarm === now, "both answered, it goes on");
+  await runner.alarm();
+  const second = model.calls.write[1]?.messages ?? [];
+  expect(store.after(0).at(-1).type === "done" && second.at(-2)?.content === "A note about the trip." && second.at(-1)?.content === "A note about the hotel.", "each with its own answer");
 }
 
 console.log("The job: a change is counted as one");
@@ -1199,6 +1406,8 @@ console.log("POST /api/compose's body");
   expect("error" in readComposeRequest({ ...REQUEST, pageID: "not-a-uuid" }) && "error" in readComposeRequest({ ...REQUEST, request: "" }) && "error" in readComposeRequest({ ...REQUEST, image: "iVBORw0KGgo=" }) && "error" in readComposeRequest({ ...REQUEST, locale: {} }), "and what isn't one");
   const changing = readComposeRequest({ ...REQUEST, editing: { surface: CURRENT, instruction: "  make it monthly ", focus: "b2" }, deviceTools: [NOTES, { name: "travel", description: "Travel times.", parameters: { type: "object" } }] });
   expect(changing.request?.editing.instruction === "make it monthly" && changing.request.editing.focus === "b2" && changing.request.deviceTools.map((tool) => tool.name).join() === "notes_search,travel" && changing.request.deviceTools[0].service === "Notes", "a change, and the phone's tools");
+  const hinted = readComposeRequest({ ...REQUEST, deviceTools: [FILE_ISSUE, FIND_ISSUES, COMMENT, { ...NOTES, changes: "yes" }] });
+  expect(hinted.request?.deviceTools.map((tool) => String(tool.changes)).join() === "true,false,undefined,undefined", "whether each changes things, when its service says");
   expect("request" in readComposeRequest({ ...REQUEST, editing: { surface: CURRENT, answer: { question: QUESTION, choice: "" } } }) && "request" in readComposeRequest({ ...REQUEST, editing: { surface: CURRENT, again: true } }), "a different answer, or made again");
   const refused = [
     { editing: { surface: CURRENT, instruction: "x", again: true } },

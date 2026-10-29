@@ -863,13 +863,19 @@ Object for that page, which runs the loop on its alarm and keeps its events in i
   `memory.ts`), live (the weather from Open-Meteo and exchange rates from ExchangeRate-API, with
   the fields the app's own providers give, `live.ts`), search and read, and the phone's own
   (`deviceTools`: connected services and travel times). A call to one of the phone's is a
-  `deviceTool` event; the loop waits a minute for `POST …/tools`, then tells the model it
+  `deviceTool` event; the loop waits for `POST …/tools` (The phone, below), then tells the model it
   couldn't be read. "Here", for the weather, is where Cloudflare places the request.
 - **Changes** (`editing`) are made from the page as it is, as Composer.edit makes them, and kept
   onto the page's item in sync: its history and editRequests added to, its log, and the user's
   numbers where the change left their inputs alone.
 - **Questions** stop the loop: the job waits for `POST …/answers`, and after ten minutes goes on
   as if every answer were "You choose". One about something Dream remembers is answered from it.
+- **The phone** gets a minute to run a call while someone watches the page. With nobody
+  watching, the account's iPhones get a `device` notification and the call waits ten minutes:
+  once nothing else is in flight the loop stops and the alarm ends, keeping what it did
+  (`journal.ts`); the answer, or the deadline, wakes it, and it goes over what it did, quietly
+  and without asking the model or the web again, back to the call. A request to act whose
+  changing tool (`changes: true`) is never called is sent back, as on the phone.
 - **Watching** catches up from the log after `after`, then streams events as they happen, with a
   `: keep-alive` comment every 15 seconds, and ends after `done` or `failed`. Only the latest
   page shown is kept in the log. Only the account the page is for may watch it or answer it.

@@ -28,6 +28,14 @@ Decided with the user on 2026-10-28: move it, in stages.
 - **Questions wait.** The gap check's questions, and a connected service's request for consent, are
   events. The loop waits for `POST /api/compose/:id/answers`. If nobody answers in 10 minutes it
   goes on as if the answer were "You choose".
+- **So does the phone.** A call to one of the phone's tools waits a minute while someone watches
+  the page. With nobody watching, the account's iPhones are told (a `device` notification) and it
+  waits 10 minutes, without holding the alarm open: once nothing else is in flight the loop stops,
+  what it did so far is kept (compose/journal.ts: each model answer, tool output and what search,
+  read, Wikipedia and memory gave), and the alarm ends. The phone's answer, or the call's
+  deadline, wakes it; the loop starts again from the top, is given everything it was given
+  before, quietly, until it's back at the call, and goes on from there. Nothing is asked of the
+  model or the web twice, and nothing is said twice in the log.
 - **Finished pages sync.** The finished page is written to the account's synced pages (sync kind
   `surface`, syncdata.ts), so it reaches the phone the next time it syncs, even if it never watched.
 - **Models are called in-process.** model.ts's checks, routing (Auto), metering and provider
@@ -87,11 +95,18 @@ Events, one JSON object per `data:` line, each with `seq`:
 
 `POST /api/push/devices` (`PushDevice`: the APNs token and `sandbox` or `production`) registers
 the phone for notifications, and `DELETE /api/push/devices/:token` forgets it at sign-out. A
-notification carries `PushPayload` (`page`, `job`, `kind`: `done` or `asking`) beside `aps`.
+notification carries `PushPayload` (`page`, `job`, `kind`: `done`, `asking` or `device`) beside
+`aps`.
 
 The phone answers a `deviceTool` call at `POST /api/compose/:id/tools` with `{ id, output }`, and
-the live `source` it read, if any. After `deadline` (a minute) the model is told it couldn't be
-read and the page goes on.
+the live `source` it read, if any. After `deadline` (a minute while someone watches, ten minutes
+when nobody did as the call began) the model is told it couldn't be read and the page goes on.
+The app runs a call, one read again from the log included, only before its deadline, and gives
+up on one still waiting on the user five seconds before it.
+
+Each of `deviceTools` says whether it `changes` things, from its service's own hint: a request to
+act (the phone only offers changing tools then) whose changing tool is never called goes back to
+the model, with the message the phone's own loop sends (ConnectionLog.problems).
 
 ## Stages
 
@@ -107,15 +122,19 @@ read and the page goes on.
 3. **Come back to it.** Push notifications for a finished page and for a question (APNs, with an
    auth key from the developer account set as secrets; off until they're set). The shelf shows
    pages still being made (done in Stage 1). Built 2026-10-29 (`Server/src/push.ts`, the app's
-   `Dream/Account/Notifications.swift`): a page that finishes, or asks, while no event stream is
-   open on it notifies the account's iPhones, and the app drops its streams when it goes to the
+   `Dream/Account/Notifications.swift`): a page that finishes, asks, or needs one of the phone's
+   tools while no event stream is open on it notifies the account's iPhones, collapsing into one
+   per page, and the app drops its streams when it goes to the
    background. The app asks to notify the first time a page is still being made when it's left.
    Tapping one opens the page, finished or forming. Setting up: Server/README.md, Notifications.
 4. **Server by default, phone where only the phone can.** Tools only the phone can run go
    through it (`deviceTools`): connected services, whose sign-ins never leave the phone, and
    travel times from Apple Maps. While the app is open the phone runs them; when it isn't, the
-   model is told they couldn't be read. The phone's own loop stays for a testing build that turns
-   the server off, and for Private Cloud Compute.
+   account's iPhones are told and the page waits ten minutes for the app to be opened (built
+   2026-10-29: "Dream needs your iPhone to read Linear for “…”"), then the model is told they
+   couldn't be read. Tapping the notification opens the forming page, which runs the call with
+   its consent card. The phone's own loop stays for a testing build that turns the server off,
+   and for Private Cloud Compute.
 
 ## Who builds what
 
