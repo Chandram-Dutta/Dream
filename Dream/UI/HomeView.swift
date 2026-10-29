@@ -18,13 +18,16 @@ struct HomeView: View {
     @State private var showingSettings = false
     @State private var listener = Listener()
     @State private var sharedLinks = SharedLinks()
+    /// The pages open over the shelf, so a tapped notification can open its own.
+    @State private var path = NavigationPath()
+    private let notifications = Notifications.shared
     @FocusState private var focused: Bool
     @MainActor private static var startedAutomatically = false
 
     private let palette = Palette.dream
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             ScrollView {
                 VStack(alignment: .leading, spacing: 28) {
                     // One button for everything that isn't making a page, so the name stands alone.
@@ -71,6 +74,7 @@ struct HomeView: View {
             .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
         .receivingSharedScreens(sharedLinks)
+        .onChange(of: notifications.opened, initial: true) { _, opened in open(opened) }
         .sheet(isPresented: $showingSettings, onDismiss: { canCompose = Composer.canCompose }) {
             DebugView(surface: nil, values: [:], log: [], modelName: "")
         }
@@ -254,6 +258,20 @@ struct HomeView: View {
         photo = nil
         photoItem = nil
         focused = false
+    }
+
+    /// A tapped notification (Notifications.swift): its page, finished or still being made, alone
+    /// over the shelf; or the shelf, when neither is here.
+    private func open(_ opened: Notifications.Opened?) {
+        guard let opened else { return }
+        notifications.opened = nil
+        request = nil
+        sharedLinks.opened = nil
+        switch opened.destination {
+        case .page(let saved): path = NavigationPath([saved])
+        case .forming(let page): path = NavigationPath([page])
+        case .shelf: path = NavigationPath()
+        }
     }
 
     private func loadPhoto(_ item: PhotosPickerItem?) async {

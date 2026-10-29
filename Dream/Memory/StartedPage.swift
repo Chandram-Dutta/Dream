@@ -81,6 +81,9 @@ final class ServerPages {
             center.addObserver(forName: UIApplication.willEnterForegroundNotification, object: nil, queue: .main) { _ in
                 MainActor.assumeIsolated { ServerPages.shared.resume() }
             },
+            center.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: .main) { _ in
+                MainActor.assumeIsolated { ServerPages.shared.leave() }
+            },
             center.addObserver(forName: Session.didChange, object: nil, queue: .main) { _ in
                 MainActor.assumeIsolated {
                     if Session.isSignedIn { ServerPages.shared.resume() } else { ServerPages.shared.stopAll() }
@@ -162,6 +165,14 @@ final class ServerPages {
             follow(started)
         }
         try? context.save()
+    }
+
+    /// The app went to the background: every line is let go of until it's back (`resume`), so the
+    /// server knows nobody is watching, and a page that finishes or asks meanwhile notifies
+    /// (Notifications.swift).
+    private func leave() {
+        if !following.isEmpty { Notifications.shared.pageLeft() }
+        for composer in following.values { composer.watch?.leave() }
     }
 
     private func follow(_ started: StartedPage, with given: Composer? = nil) {

@@ -72,6 +72,16 @@ enum AccountServer {
         _ = try await send("api/me/sessions/\(id)", method: "DELETE", expecting: 204)
     }
 
+    /// This iPhone's token for notifications (Server/src/push.ts), for the account signed in on it.
+    static func registerPush(token: String, environment: PushEnvironment) async throws {
+        _ = try await send("api/push/devices", method: "POST", body: ["token": token, "environment": environment.rawValue], expecting: 204)
+    }
+
+    /// Forgets this iPhone's token, so the account's pages aren't announced on it any more.
+    static func forgetPush(token: String) async throws {
+        _ = try await send("api/push/devices/\(token)", method: "DELETE", expecting: 204)
+    }
+
     /// Everything the server keeps for the user, as the JSON file it sends.
     static func export() async throws -> Data {
         try await send("api/me/export", method: "POST")

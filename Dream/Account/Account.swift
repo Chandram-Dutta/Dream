@@ -191,6 +191,8 @@ final class Account {
     func signOut() async {
         // Whatever hasn't reached the account yet goes now, while the session still works.
         await Sync.flush()
+        // And this iPhone stops hearing about the account's pages.
+        await Notifications.shared.signOut()
         try? await AccountServer.signOut("current")
         await forget()
     }

@@ -258,6 +258,8 @@ struct SurfaceScreen: View {
         // server goes on without the screen, and its questions wait for the user to come back
         // to them from the shelf.
         .onDisappear {
+            // Left while the server still makes it: when a notification is worth asking for.
+            if composer.job != nil, composer.phase.isBusy { Notifications.shared.pageLeft() }
             guard composer.job == nil else { return }
             composer.asking.cancel()
             composer.consent.cancel()
