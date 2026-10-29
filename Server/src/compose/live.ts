@@ -217,6 +217,12 @@ async function findPlace(text: string, here: Here | null, fetcher: Fetch, langua
     if (!here) throw new LiveError("unavailable", "Dream couldn't find where you are.");
     return { name: here.city || "your location", latitude: here.latitude, longitude: here.longitude, timeZone: zone(here.timeZone), here: here.from ?? "network" };
   }
+  // The model often names the user's own town, as the phone told it, rather than saying "here":
+  // that's where the phone is, with no search. A search by name once missed a city of a million
+  // (Dombivli) and the page fell back to the next big city.
+  if (here?.from === "phone" && here.city && sameTown(name, here.city)) {
+    return { name: here.city.split(",")[0].trim(), latitude: here.latitude, longitude: here.longitude, timeZone: zone(here.timeZone) };
+  }
   const key = name.toLowerCase();
   const known = placesFound.get(key);
   if (known) return known;
@@ -242,6 +248,12 @@ async function findPlace(text: string, here: Here | null, fetcher: Fetch, langua
   if (placesFound.size > 500) placesFound.delete(placesFound.keys().next().value!);
   placesFound.set(key, place);
   return place;
+}
+
+/** Whether a place's name is the user's own town: the same first part, ignoring case and accents. */
+function sameTown(name: string, city: string): boolean {
+  const town = (text: string) => text.split(",")[0].normalize("NFD").replace(/\p{M}/gu, "").trim().toLowerCase();
+  return town(name) !== "" && town(name) === town(city);
 }
 
 function regionMatches(result: JSONObject, within: string[]): boolean {
