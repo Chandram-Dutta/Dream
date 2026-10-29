@@ -32,6 +32,10 @@ export interface ComposeRequest {
    * (Prompts.connectionRules) while one is offered. A tool named like one of the server's own
    * (lookup, recall, live, search, read) is left out. */
   deviceTools?: DeviceToolDefinition[];
+  /** Where the user is, when they've let the phone know: rounded to about a kilometre, with the
+   * place's name (town, region, country). The name goes to the model among the user's details;
+   * the coordinates stay on the server, for the weather "here". */
+  here?: { latitude: number; longitude: number; name: string };
 }
 
 export interface ComposeEditing {
@@ -65,6 +69,9 @@ export interface DeviceToolDefinition {
   /** The connected service it's from, like Linear, for saying it couldn't answer. Its name is
    * said otherwise. */
   service?: string;
+  /** It changes something in the service (files an issue, sends a message) rather than reading:
+   * a request to act that never calls one is sent back (ConnectionLog.problems). */
+  changes?: boolean;
 }
 
 /** POST /api/compose → */
@@ -129,5 +136,6 @@ export interface PushDevice {
 export interface PushPayload {
   page: string;
   job: string;
-  kind: "done" | "asking";
+  /** `device`: the page waits on one of the phone's tools, which only runs with the app open. */
+  kind: "done" | "asking" | "device";
 }
