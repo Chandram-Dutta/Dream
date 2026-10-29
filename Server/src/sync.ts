@@ -14,7 +14,8 @@
 // and photos. What's stored is readable by the server (PRODUCTION.md) but never logged.
 //
 // A page the server made (compose/) is kept the same way, as if a phone had sent it
-// (`keepItems`, `keepPhoto`).
+// (`keepItems`, `keepPhoto`); a change to one starts from the item kept (`readItem`), and a page
+// reads what Dream remembers from the account's facts (`readBodies`).
 
 import { signInNeeded, userFrom, type AuthEnv, type User } from "./auth";
 import { decodeCursor, encodeCursor, imageType, LIMITS, parseChanges, PHOTO_ID, photoKey, SyncRejection, type Change, type Cursor } from "./syncdata";
@@ -181,6 +182,21 @@ async function push(request: Request, env: SyncEnv, user: User): Promise<Respons
   if (!changes.length) return json({ applied: 0, stale: [], refused, now });
   const { applied, staleItems } = await store(env, user.id, changes);
   return json(`{"applied":${applied},"stale":[${staleItems.join(",")}],"refused":${JSON.stringify(refused)},"now":${now}}`);
+}
+
+/** One of someone's items as it's kept, for the server's own use of it: when it last changed,
+ * whether it's deleted, and its body. Null when they have none by that id. */
+export async function readItem(env: SyncEnv, userID: string, kind: string, id: string): Promise<{ updatedAt: number; deleted: boolean; body: unknown } | null> {
+  const row = await env.DB.prepare("SELECT updated_at, deleted, body FROM sync_items WHERE user_id = ? AND kind = ? AND id = ?").bind(userID, kind, id).first<{ updated_at: number; deleted: number; body: string | null }>();
+  if (!row) return null;
+  return { updatedAt: row.updated_at, deleted: row.deleted !== 0 || row.body === null, body: row.body === null ? null : JSON.parse(row.body) };
+}
+
+/** The bodies of someone's items of one kind that aren't deleted, most recently changed first,
+ * for the server's own use of them, like a page reading what Dream remembers. */
+export async function readBodies(env: SyncEnv, userID: string, kind: string, limit = 1_000): Promise<unknown[]> {
+  const { results } = await env.DB.prepare("SELECT body FROM sync_items WHERE user_id = ? AND kind = ? AND deleted = 0 ORDER BY updated_at DESC LIMIT ?").bind(userID, kind, limit).all<{ body: string | null }>();
+  return results.flatMap((row) => (row.body === null ? [] : [JSON.parse(row.body) as unknown]));
 }
 
 /** Items for someone's account, from the server itself rather than a phone: checked as a sync

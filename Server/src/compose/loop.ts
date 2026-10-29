@@ -1,24 +1,32 @@
 // The page loop on the server, ported from Dream/Generation/Composer.swift and GapCheck.swift
 // (docs/ServerGeneration.md): Auto picks the model once, a quick check looks for what only the
-// user can tell while the page starts to stream out of sight, the page is written with lookup,
-// search and read, the checker fixes what it can and sends real mistakes back for repair, and
-// what's finished is checked once more. Everything it does is an event: the phase, each step of
-// the work as it starts, the page so far, the log.
+// user can tell while the page starts to stream out of sight, the page is written with its tools
+// (lookup, recall, live data, search and read, and the phone's own), the checker fixes what it
+// can and sends real mistakes back for repair, recordings and molecules are found, and what's
+// finished is checked once more. A change to a page (Composer.edit, and Composer.rebuild for a
+// different answer) goes through the same writing, from the page as it is. Everything it does is
+// an event: the phase, each step of the work as it starts, the page so far, the log.
 //
 // Where the app waits on the user's answers, the loop stops instead and says what it would ask
 // (`asking`); the job (runner.ts) starts it again with the answers, so a page never holds the
-// object for the ten minutes it may wait. Memory recall, live data, connected services,
-// recordings and molecules are Stage 2.
+// object for the ten minutes it may wait. A question about something Dream remembers is
+// answered from the account's synced facts, as on the phone.
 //
 // test/compose.mjs runs it in Node, with a fake model and a fake engine.
 
 import type * as EngineModule from "../engine/index";
-import type { Surface, Issue, Reference } from "../engine/index";
-import type { ComposePhase, ComposeRequest } from "./contract";
+import type { EngineLocale, MoleculeStructure, Recording, Surface, Issue, Reference } from "../engine/index";
+import type { ComposeEditing, ComposePhase, ComposeRequest } from "./contract";
 import { Activity, ask, Changes, ModelProblem, readRound, requestBody, RETRY_DELAYS, Transcript, userContent, type Message, type RequestOptions, type Round } from "./chat";
+import { LiveLog, type DeviceAnswer } from "./live";
+import { findMolecule, findRecording } from "./media";
+import { Memory, recallKey } from "./memory";
 import { partialObject } from "./partial";
-import { answersContext, gapRequest, repairPrompt, surfaceInstructions, surfaceRequest, type Answer, type Generation, type Question } from "./prompts";
-import { ReferenceLog, toolBox, WebLog, type ToolBox, type ToolServices } from "./tools";
+import {
+  answersContext, changeOf, describeBlock, editPrompt, gapRequest, isMemoryLine, memoryContext, repairPrompt, sameQuestion, surfaceRequest, writing,
+  type Answer, type Generation, type Pointed, type Question,
+} from "./prompts";
+import { citationKey, ReferenceLog, ServiceLog, toolBox, WebLog, type Citation, type ToolBox, type ToolServices } from "./tools";
 import { languageOf } from "./lookup";
 
 type JSONObject = Record<string, unknown>;
@@ -44,6 +52,9 @@ export interface LoopServices {
   /** Auto's pick for the page: asked once, at its start. */
   route(request: string, image: string | undefined): Promise<PagePick>;
   tools: ToolServices;
+  /** Asks the phone to run one of its tools (the job sets it): what it answered, or null when no
+   * answer came in time, or the page stopped. */
+  device?(call: { name: string; arguments: string }, signal: AbortSignal): Promise<DeviceAnswer | null>;
   now(): number;
   sleep(ms: number, signal: AbortSignal): Promise<void>;
 }
@@ -113,7 +124,8 @@ export interface Start {
 
 export type Outcome =
   | { kind: "done"; surface: Surface; model: string }
-  | { kind: "asking"; questions: Question[]; checkedAt: number }
+  /** `remembered` answers the questions Dream could answer itself; `questions` are the rest. */
+  | { kind: "asking"; questions: Question[]; remembered: Answer[]; checkedAt: number }
   | { kind: "failed"; message: string; reason: "empty" | "other" };
 
 // MARK: - Errors
@@ -239,12 +251,41 @@ export function questionFrom(wire: unknown): Question | null {
 /** Every question left to Dream: "You choose". */
 export const leftToDream = (question: Question): Answer => ({ question, choice: "", isRemembered: false });
 
+/** The answers as the log says them. */
+const answerWords = (answers: Answer[]) => answers.map((answer) => (!answer.choice ? "You choose" : answer.isRemembered ? `${answer.choice} (remembered)` : answer.choice)).join("; ");
+
 /** The same surface, carrying the answers it was built from (Surface.answered). */
 function answered(surface: Surface, answers: Answer[]): Surface {
   const out: Surface = { ...surface };
   if (answers.length) out.answers = answers;
   else delete out.answers;
   return out;
+}
+
+const text = (value: unknown) => (typeof value === "string" ? value : "");
+
+/** Surface.credits: the article it looked up and the pages it cites, each once, which a change
+ * may cite again without reading them again. */
+function credits(surface: Surface): Citation[] {
+  const all: Citation[] = [...(surface.reference ? [{ title: surface.reference.title, site: "Wikipedia", url: surface.reference.url }] : []), ...(surface.citations ?? [])];
+  const seen = new Set<string>();
+  return all.filter((credit) => {
+    const key = citationKey(credit.url);
+    if (key === null || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+/** The block with an id, wherever it is on the page. */
+function blockWithID(blocks: unknown, id: string): Pointed | null {
+  for (const block of list(blocks)) {
+    if (!isObject(block)) continue;
+    if (block.id === id) return { id, kind: text(block.kind), title: text(block.title), ref: text(block.ref), over: text(block.over) };
+    const inside = blockWithID(block.children, id);
+    if (inside) return inside;
+  }
+  return null;
 }
 
 /** A language's name in English, for the log (Languages.name). */
@@ -290,6 +331,18 @@ export class PageLoop {
   private pending: Surface | null = null;
   private lastSurfaceAt = -Infinity;
   private surfaceTimer: ReturnType<typeof setTimeout> | null = null;
+  /** What Dream remembers about the user, read when first asked. */
+  private readonly memory: Memory;
+  /** The page a change starts from; null for a new page, or one made again. */
+  private readonly current: Surface | null;
+  /** The live data fetched while writing, which the page's live inputs bind to. */
+  private readonly live: LiveLog;
+  /** The connected services read while writing, and the buttons for theirs it had. */
+  private readonly serviceLog: ServiceLog;
+  /** The pages a change's page already credits. */
+  private readonly kept: Citation[];
+  /** The language lookups read first: the page's own for a change. */
+  private readonly language: string;
 
   constructor(request: ComposeRequest, services: LoopServices, events: LoopEvents, signal: AbortSignal, timing: Timing = TIMING) {
     this.request = request;
@@ -300,6 +353,18 @@ export class PageLoop {
     this.engine = services.engine;
     this.generation = services.generation;
     this.activity = new Activity(services.now());
+    this.memory = new Memory(() => services.tools.memory());
+    const editing = request.editing;
+    this.current = editing && !editing.again && isObject(editing.surface) ? (editing.surface as unknown as Surface) : null;
+    this.live = new LiveLog(this.current?.sources ?? []);
+    this.serviceLog = new ServiceLog(this.current);
+    this.kept = this.current ? credits(this.current) : [];
+    this.language = this.current?.locale?.language || request.locale.language;
+  }
+
+  /** The reader the checker works for, as the phone's locale would have it. */
+  private get reader(): EngineLocale {
+    return this.request.locale;
   }
 
   private get now(): number {
@@ -319,20 +384,29 @@ export class PageLoop {
   async run(start: Start): Promise<Outcome> {
     try {
       const image = this.request.image;
-      if (start.first) this.note(`Request: ${this.request.request}${image ? " (with photo)" : ""}`);
-      // Auto (route.ts): the model and thinking for this page, picked once, up front.
+      const change = this.change();
+      if (start.first) {
+        if (change) this.note(`Change: ${change.instruction}${change.focus ? ` (pointing at #${change.focus.id})` : ""}`);
+        else this.note(`Request: ${this.request.request}${image ? " (with photo)" : ""}`);
+      }
+      // Auto (route.ts): the model and thinking for this page, picked once, up front. A change is
+      // picked for like a new page, from the request and the change together.
       this.pick = start.pick;
-      if (this.onAuto && !this.pick) await this.route();
+      if (this.onAuto && !this.pick) await (change ? this.route(`${this.request.request}. ${change.instruction}`, undefined) : this.route(this.request.request, image));
       this.modelName = this.pick ? `Auto → ${this.pick.name} · ${this.pick.effort}` : `Dream (${this.request.model || "default"})`;
       if (start.first) this.note(`Model: ${this.modelName}`);
       if (start.answers && start.checkedAt !== null && !start.first) {
-        this.note(`Answered: ${start.answers.map((answer) => (!answer.choice ? "You choose" : answer.isRemembered ? `${answer.choice} (remembered)` : answer.choice)).join("; ")} after ${elapsed(start.checkedAt, this.now)}`);
+        this.note(`Answered: ${answerWords(start.answers)} after ${elapsed(start.checkedAt, this.now)}`);
       }
-      const asking = await this.writeRequest(start.answers ?? []);
-      if (asking) return { kind: "asking", ...asking };
+      if (change) {
+        await this.writeChange(change);
+      } else {
+        const asking = await this.writeRequest(start.answers ?? []);
+        if (asking) return { kind: "asking", ...asking };
+      }
       const surface = this.surface;
       if (!surface || this.engine.isEmpty(surface)) throw new ComposeError("Nothing came out of this. Try asking another way.");
-      const done = this.recordLocale(surface);
+      const done = this.recordLocale(surface, change?.current.locale);
       this.note(`Done in ${elapsed(start.startedAt, this.now)}`);
       return { kind: "done", surface: done, model: this.modelName };
     } catch (error) {
@@ -346,12 +420,12 @@ export class PageLoop {
     }
   }
 
-  private async route(): Promise<void> {
+  private async route(text: string, photo: string | undefined): Promise<void> {
     const started = this.now;
-    const image = this.request.image ? `data:image/jpeg;base64,${this.request.image}` : undefined;
+    const image = photo ? `data:image/jpeg;base64,${photo}` : undefined;
     let pick: PagePick;
     try {
-      pick = await abortable(this.services.route(this.request.request.slice(0, 4_000), image), this.signal);
+      pick = await abortable(this.services.route(text.slice(0, 4_000), image), this.signal);
     } catch (error) {
       if (this.signal.aborted) throw this.signal.reason;
       // Auto shouldn't stop a page from being made: the server's default, as if Auto weren't on.
@@ -366,13 +440,66 @@ export class PageLoop {
     this.note(`Auto → ${pick.name} · ${pick.effort} (${pick.category}, ${pick.difficulty}: ${pick.why}; ${elapsed(started, this.now)})`);
   }
 
+  // MARK: Context
+
+  /** Prompts.context: what's said beside the request. The phone sends its lines (the language,
+   * the region, the time, its connected services); what Dream remembers comes from the account's
+   * synced facts, which recall reads, in place of the phone's own line. A line saying the web
+   * can't be searched doesn't hold here, where it can. */
+  private async contextLines(): Promise<string[]> {
+    const phone = (this.request.context ?? []).filter((line) => !isMemoryLine(this.generation, line) && line !== this.generation.context.webUnavailable);
+    return [...memoryContext(this.generation, await this.memory.topics()), ...phone];
+  }
+
+  // MARK: Changes
+
+  /** The change to make, when the request is one (Composer.edit): the page as it is, what the
+   * user said about it, and the block they point at. A different answer (Composer.rebuild) is a
+   * change in their words, from the page with that answer in place of the old one. Null for a
+   * new page, or one made again. */
+  private change(): { current: Surface; instruction: string; focus: Pointed | null; pointing: string | null } | null {
+    const editing: ComposeEditing | undefined = this.request.editing;
+    if (!editing || editing.again || !this.current) return null;
+    let current = this.current;
+    const { instruction, answers } = changeOf(this.generation, editing, current.answers);
+    if (answers) current = answered(current, answers);
+    const focus = !editing.answer && editing.focus ? blockWithID(current.blocks, editing.focus) : null;
+    const page = current;
+    const pointing = focus
+      ? describeBlock(this.generation, focus, {
+          label: (name) => this.engine.label(page, name),
+          sound: (name) => page.sounds?.find((sound) => sound.name === name),
+          action: (name) => page.actions?.find((action) => action.name === name),
+        })
+      : null;
+    return { current, instruction, focus: pointing ? focus : null, pointing };
+  }
+
+  /** Writes the change: the page as it is, and what to change, with the context. Not streamed:
+   * the page stays as it is on screen until the change is whole. */
+  private async writeChange(change: { current: Surface; instruction: string; pointing: string | null }): Promise<void> {
+    const current = change.current;
+    this.answers = list(current.answers) as Answer[];
+    this.display(current);
+    const asked = editPrompt(this.generation, {
+      intent: this.request.request,
+      outline: this.engine.outline(current),
+      logic: this.engine.hasLogic(current) ? this.engine.logicSummary(current) : null,
+      instruction: change.instruction,
+      pointing: change.pointing,
+      context: await this.contextLines(),
+    });
+    await this.write(asked, asked, current.reference ?? null, false, this.signal);
+  }
+
   // MARK: Asking
 
   /** Writes the page for the request while a quick check, in its own session, looks for what the
    * request leaves out that only the user can tell. If it finds nothing, the writing carries on
-   * untouched. If it has questions, the writing stops and they're returned, to ask. */
-  private async writeRequest(answers: Answer[]): Promise<{ questions: Question[]; checkedAt: number } | null> {
-    const context = this.request.context ?? [];
+   * untouched. If it has questions, the writing stops; those Dream remembers the answer to are
+   * answered at once, and the rest are returned, to ask. */
+  private async writeRequest(answers: Answer[]): Promise<{ questions: Question[]; remembered: Answer[]; checkedAt: number } | null> {
+    const context = await this.contextLines();
     const image = this.request.image;
     const asked = (given: Answer[]) => surfaceRequest(this.generation, this.request.request, !!image, [...context, ...answersContext(this.generation, given)]);
     const prompt = (given: Answer[]) => userContent(asked(given), image);
@@ -407,50 +534,144 @@ export class PageLoop {
         `Check: ${gaps.questions.length} to ask after ${gaps.seconds.toFixed(1)}s, so the screen stopped ${where}: ` +
           gaps.questions.map((question) => `${question.text} (${question.options.join(" / ")}${question.allowsTyping ? ", or typed" : ""})`).join("; "),
       );
+      for (const answer of gaps.remembered) this.note(`Remembered: ${answer.question.topic}`);
       await written.catch(() => undefined);
-      return { questions: gaps.questions, checkedAt: started };
+      const open = gaps.questions.filter((question) => !gaps.remembered.some((answer) => sameQuestion(answer.question, question)));
+      if (open.length) return { questions: open, remembered: gaps.remembered, checkedAt: started };
+      // Dream remembers every answer, so nobody is asked: the page is written for them at once.
+      this.note(`Answered: ${answerWords(gaps.remembered)} after ${elapsed(started, this.now)}`);
+      this.isChecking = false;
+      this.held = null;
+      this.quiet = false;
+      this.surface = null;
+      this.answers = gaps.remembered;
+      await this.write(prompt(gaps.remembered), asked(gaps.remembered), null, true, this.signal);
+      return null;
     } finally {
       this.isChecking = false;
       this.held = null;
     }
   }
 
-  /** The gap check, on the model this page runs on. If it fails, nothing is asked. */
-  private async gaps(intent: string): Promise<{ questions: Question[]; seconds: number }> {
+  /** The gap check, on the model this page runs on, told the topics Dream remembers. If it fails,
+   * nothing is asked. */
+  private async gaps(intent: string): Promise<{ questions: Question[]; remembered: Answer[]; seconds: number }> {
     const started = this.now;
     const limit = linked(this.signal);
     const timer = setTimeout(() => limit.abort(new ComposeError("The check took too long.")), this.timing.gapPatience);
     try {
+      const topics = await abortable(this.memory.topics(), limit.signal);
       const transcript = new Transcript(this.generation.prompts.gapCheck);
-      const round = await this.respond({ transcript, tools: null, web: new WebLog() }, gapRequest(this.generation, intent), { schema: this.generation.schemas.gaps, temperature: 0.2, maximumResponseTokens: 600 }, () => undefined, () => undefined, limit.signal);
+      const round = await this.respond({ transcript, tools: null, web: new WebLog() }, gapRequest(this.generation, intent, topics), { schema: this.generation.schemas.gaps, temperature: 0.2, maximumResponseTokens: 600 }, () => undefined, () => undefined, limit.signal);
       const wire = wholeObject(round.text);
       if (!wire) throw new ParsingError();
-      const questions = list(wire.questions).slice(0, 3).map(questionFrom).filter((question): question is Question => question !== null);
-      return { questions, seconds: (this.now - started) / 1000 };
+      const resolved = await abortable(this.resolve(list(wire.questions).slice(0, 3), topics), limit.signal);
+      return { ...resolved, seconds: (this.now - started) / 1000 };
     } catch (error) {
       if (!this.signal.aborted) this.note(`Check failed after ${elapsed(started, this.now)} (${describe(limit.signal.aborted ? limit.signal.reason : error)}); building without asking.`);
-      return { questions: [], seconds: (this.now - started) / 1000 };
+      return { questions: [], remembered: [], seconds: (this.now - started) / 1000 };
     } finally {
       clearTimeout(timer);
     }
   }
 
+  /** GapCheck.resolve: the questions, with those Dream can answer itself answered. The model names
+   * the topic that answers one, and a question about a remembered topic is answered even if it
+   * didn't. */
+  private async resolve(items: unknown[], topics: string[]): Promise<{ questions: Question[]; remembered: Answer[] }> {
+    const questions: Question[] = [];
+    const remembered: Answer[] = [];
+    for (const item of items) {
+      const question = questionFrom(item);
+      if (!question) continue;
+      questions.push(question);
+      const named = isObject(item) && typeof item.remembered === "string" ? item.remembered.trim() : "";
+      const topic = named || topics.find((known) => recallKey(known) === recallKey(question.topic));
+      if (!topic) continue;
+      const facts = await this.memory.facts([topic]);
+      if (facts.length) remembered.push({ question, choice: facts.map((fact) => fact.detail).join(", "), isRemembered: true });
+    }
+    return { questions, remembered };
+  }
+
   // MARK: Writing
 
-  private session(found: ReferenceLog): Session {
-    const web = new WebLog();
-    const tools = toolBox(
+  /** A new session's tools and the instructions that describe them, which always agree
+   * (prompts.ts, `writing`). */
+  private session(found: ReferenceLog, signal: AbortSignal): Session {
+    const web = new WebLog(this.kept);
+    const phone = this.request.deviceTools?.length && this.services.device ? this.request.deviceTools : null;
+    const box = toolBox(
       this.generation,
       this.services.tools,
       {
         trace: (kind, text) => this.events.trace(kind, text),
         use: (line) => this.researching(line),
+        note: (line) => this.note(line),
       },
-      found,
-      web,
-      this.request.locale.language,
+      {
+        found,
+        web,
+        live: this.live,
+        memory: this.memory,
+        services: this.serviceLog,
+        language: this.language,
+        reader: this.request.locale,
+        device: phone ? { tools: phone, run: (call) => this.onPhone(call, signal) } : null,
+        now: () => this.now,
+      },
     );
-    return { transcript: new Transcript(surfaceInstructions(this.generation, this.request.locale.currency)), tools, web };
+    const { instructions, tools } = writing(this.generation, this.request.locale.currency, box.definitions, box);
+    return { transcript: new Transcript(instructions), tools: { ...box, definitions: tools }, web };
+  }
+
+  /** Asks the phone to run one of its tools. Waiting on the phone isn't a stalled model: the line
+   * counts as busy until it answers, or its time is up. */
+  private async onPhone(call: { name: string; arguments: string }, signal: AbortSignal): Promise<DeviceAnswer | null> {
+    const device = this.services.device;
+    if (!device) return null;
+    const touch = () => {
+      const now = this.now;
+      this.activity.seen = now;
+      this.activity.heard = now;
+    };
+    touch();
+    const beat = setInterval(touch, this.timing.watch);
+    try {
+      return await device(call, signal);
+    } finally {
+      clearInterval(beat);
+      touch();
+    }
+  }
+
+  /** Surface.fetched(live).connected(…): with the sources fetched while it was written, for the
+   * checker to bind its live inputs to, and the connected services it read. */
+  private prepared(surface: Surface): Surface {
+    const out: Surface = { ...surface };
+    const sources = this.live.sources;
+    if (sources.length) out.sources = sources;
+    else delete out.sources;
+    return this.serviceLog.connected(out);
+  }
+
+  /** Surface.findRecordings and findMolecules: a recording for every sound that asks for one,
+   * and the structure of every molecule a scene names, all at once. One that finds nothing is
+   * left without, and the checker drops it. */
+  private async findMedia(surface: Surface, signal: AbortSignal): Promise<Surface> {
+    const searches = [...new Set(this.engine.recordingSearches(surface))];
+    const names = [...new Set(this.engine.moleculeNames(surface))];
+    if (!searches.length && !names.length) return surface;
+    const fetcher = this.services.tools.fetch;
+    const [recordings, molecules] = await abortable(
+      Promise.all([
+        Promise.all(searches.map(async (search) => [search, await findRecording(search, fetcher).catch(() => null)] as const)),
+        Promise.all(names.map(async (name) => [name, await findMolecule(name, fetcher).catch(() => null)] as const)),
+      ]),
+      signal,
+    );
+    const found = <T>(pairs: readonly (readonly [string, T | null])[]) => new Map(pairs.flatMap(([key, value]) => (value ? [[key, value] as [string, T]] : [])));
+    return this.engine.addMolecules(this.engine.addRecordings(surface, found<Recording>(recordings)), found<MoleculeStructure>(molecules));
   }
 
   /** Writes a whole surface, then has the checker fix what it can and sends real mistakes back
@@ -459,7 +680,7 @@ export class PageLoop {
   private async write(prompt: unknown, asked: string, fallback: Reference | null, streaming: boolean, signal: AbortSignal): Promise<void> {
     this.setPhase("composing");
     const found = new ReferenceLog();
-    let session = this.session(found);
+    let session = this.session(found, signal);
     let surface: Surface;
     // A page Auto's router knows is about the world (an explainer, or something current) looks it
     // up before it writes: cheap models skipped it, and sending the page back for it doubled the
@@ -475,11 +696,12 @@ export class PageLoop {
       // Nothing usable came out. Another go in a new session usually works, and costs less than
       // a page that fails.
       this.note(`Writing again in a new session, after: ${describe(error)}`);
-      session = this.session(found);
+      session = this.session(found, signal);
       surface = await this.generateSurface(session, "Surface", prompt, found, fallback, streaming, signal);
     }
+    surface = this.prepared(surface);
     for (let round = 0; round <= 2; round++) {
-      const checked = this.engine.checkLogic(surface);
+      const checked = this.engine.checkLogic(surface, this.reader);
       surface = checked.surface;
       let issues = checked.issues;
       // Once: a page about the world that looked nothing up goes back to look it up, and this
@@ -498,7 +720,7 @@ export class PageLoop {
         : repairPrompt(this.generation, messages, { asked, outline: this.engine.outline(surface), logic: this.engine.hasLogic(surface) ? this.engine.logicSummary(surface) : null });
       const before = surface;
       try {
-        surface = await this.generateSurface(session, `Repair ${round + 1}`, repair, found, fallback, false, signal, { repairing: true, requireTool: unsourced.length > 0 });
+        surface = this.prepared(await this.generateSurface(session, `Repair ${round + 1}`, repair, found, fallback, false, signal, { repairing: true, requireTool: unsourced.length > 0 }));
         // A repair fixes the page; one that lost most of it isn't worth having.
         if (list(surface.blocks).length * 2 < list(before.blocks).length) {
           this.note(`Kept the screen as it was: repair ${round + 1} left ${list(surface.blocks).length} of its ${list(before.blocks).length} blocks.`);
@@ -512,10 +734,11 @@ export class PageLoop {
         break;
       }
     }
+    surface = await this.findMedia(surface, signal);
     const reading = session.web.reading(found.all);
     const cited = this.engine.checkCitations(surface, reading);
     this.report(cited.issues);
-    const blocks = this.engine.checkBlocks(cited.surface);
+    const blocks = this.engine.checkBlocks(cited.surface, this.reader);
     this.report(blocks.issues);
     surface = answered(blocks.surface, this.answers);
     if (signal.aborted) throw signal.reason;
@@ -756,10 +979,11 @@ export class PageLoop {
   // MARK: Reporting
 
   /** The language and units a finished surface is written in. The app tells the language from
-   * the page's own text; the server has no recognizer, so it's the user's, as the app falls back
-   * to when it can't tell. */
-  private recordLocale(surface: Surface): Surface {
-    const locale = { language: this.request.locale.language, measurementSystem: this.request.locale.measurementSystem };
+   * the page's own text; the server has no recognizer, so it's the one the page had before a
+   * change, or the user's, as the app falls back to when it can't tell. A change keeps the units
+   * of the page it changed (SurfaceLocale(written:editing:)). */
+  private recordLocale(surface: Surface, earlier?: { language: string; measurementSystem: string }): Surface {
+    const locale = { language: earlier?.language || this.request.locale.language, measurementSystem: earlier?.measurementSystem || this.request.locale.measurementSystem };
     this.note(`Written in ${languageName(locale.language)}, for ${locale.measurementSystem} units`);
     return { ...surface, locale };
   }

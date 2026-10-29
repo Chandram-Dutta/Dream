@@ -1,10 +1,10 @@
 // What POST /api/compose takes (contract.ts), checked before a job is made for it: the request
-// and its photo within the sizes the app sends, the locale's fields, the context lines, and an id
-// the app's sync can keep the page under.
+// and its photo within the sizes the app sends, the locale's fields, the context lines, an id
+// the app's sync can keep the page under, a change to a page, and the phone's own tools.
 //
 // Only types are imported, so test/compose.mjs runs it in Node.
 
-import type { ComposeRequest } from "./contract";
+import type { ComposeEditing, ComposeRequest, DeviceToolDefinition } from "./contract";
 
 type JSONObject = Record<string, unknown>;
 
@@ -60,6 +60,20 @@ export function readComposeRequest(body: unknown): { request: ComposeRequest } |
 
   if (typeof body.pageID !== "string" || !PAGE_ID.test(body.pageID)) return { error: "pageID is the id the page is kept under: a UUID." };
 
+  let editing: ComposeEditing | undefined;
+  if (body.editing !== undefined && body.editing !== null) {
+    const checked = readEditing(body.editing);
+    if ("error" in checked) return checked;
+    editing = checked.editing;
+  }
+
+  let deviceTools: DeviceToolDefinition[] | undefined;
+  if (body.deviceTools !== undefined && body.deviceTools !== null) {
+    const checked = readDeviceTools(body.deviceTools);
+    if ("error" in checked) return checked;
+    if (checked.tools.length) deviceTools = checked.tools;
+  }
+
   return {
     request: {
       request: text,
@@ -69,6 +83,58 @@ export function readComposeRequest(body: unknown): { request: ComposeRequest } |
       locale: { language: language.replace(/_/g, "-"), region, currency: currency.toUpperCase(), measurementSystem },
       ...(context ? { context } : {}),
       pageID: body.pageID,
+      ...(editing ? { editing } : {}),
+      ...(deviceTools ? { deviceTools } : {}),
     },
   };
+}
+
+/** A page as big as sync keeps one (Sync.maxItem), which is what's being changed. */
+export const MAX_SURFACE = 250_000;
+const MAX_INSTRUCTION = 4_000;
+const MAX_DEVICE_TOOLS = 40;
+const MAX_DEVICE_TOOLS_BYTES = 200_000;
+/** How the model calls a tool, as chat completions allow function names. */
+const TOOL_NAME = /^[A-Za-z0-9_-]{1,64}$/;
+
+const bytes = (value: unknown) => new TextEncoder().encode(JSON.stringify(value)).length;
+
+/** A change to a page: the page as it is, and one of an instruction, a different answer, or
+ * made again. */
+function readEditing(value: unknown): { editing: ComposeEditing } | { error: string } {
+  if (!isObject(value)) return { error: "editing is the page and what to change about it." };
+  const surface = value.surface;
+  if (!isObject(surface) || typeof surface.title !== "string" || !Array.isArray(surface.blocks)) return { error: "editing.surface is the page, as the app's Surface encodes it." };
+  if (bytes(surface) > MAX_SURFACE) return { error: "That page is too big to change here." };
+  const instruction = typeof value.instruction === "string" ? value.instruction.trim() : "";
+  const again = value.again === true;
+  const answer = value.answer;
+  const asked = [instruction !== "", again, answer !== undefined && answer !== null].filter(Boolean).length;
+  if (asked !== 1) return { error: "editing has one of instruction, answer or again." };
+  if (instruction) {
+    if (instruction.length > MAX_INSTRUCTION) return { error: `Say what to change in up to ${MAX_INSTRUCTION.toLocaleString("en")} characters.` };
+    const focus = typeof value.focus === "string" && value.focus.trim() ? value.focus.trim() : undefined;
+    if (focus !== undefined && focus.length > 200) return { error: "focus is the id of the block they pointed at." };
+    return { editing: { surface, instruction, ...(focus ? { focus } : {}) } };
+  }
+  if (again) return { editing: { surface, again: true } };
+  if (!isObject(answer) || !isObject(answer.question) || typeof answer.question.text !== "string" || typeof answer.choice !== "string" || answer.choice.length > 300) {
+    return { error: "editing.answer is the question, as the page's answers hold it, and the new choice." };
+  }
+  return { editing: { surface, answer: { question: answer.question, choice: answer.choice.trim() } } };
+}
+
+/** The phone's tools: each with a name the model can call, what it does, and its arguments. */
+function readDeviceTools(value: unknown): { tools: DeviceToolDefinition[] } | { error: string } {
+  if (!Array.isArray(value) || value.length > MAX_DEVICE_TOOLS || bytes(value) > MAX_DEVICE_TOOLS_BYTES) return { error: `deviceTools is a list of up to ${MAX_DEVICE_TOOLS} tools.` };
+  const tools: DeviceToolDefinition[] = [];
+  for (const tool of value) {
+    if (!isObject(tool) || typeof tool.name !== "string" || !TOOL_NAME.test(tool.name) || typeof tool.description !== "string" || tool.description.length > 4_000 || !isObject(tool.parameters)) {
+      return { error: "Each of deviceTools has a name (letters, digits, _ and -), a description and parameters as a JSON Schema object." };
+    }
+    if (tools.some((other) => other.name === tool.name)) return { error: `deviceTools has ${tool.name} twice.` };
+    const service = typeof tool.service === "string" && tool.service.trim() ? tool.service.trim().slice(0, 100) : undefined;
+    tools.push({ name: tool.name, description: tool.description, parameters: tool.parameters, ...(service ? { service } : {}) });
+  }
+  return { tools };
 }

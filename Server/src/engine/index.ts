@@ -19,7 +19,7 @@ import { checkBlocks as checkBlocksIn, checkLogic as checkLogicIn, isRepeatingIt
 import { checkCitations as checkCitationsIn, checkSourcing as checkSourcingIn, citationOf, ReadingList, type ReadPage } from "./citations.ts";
 import { logicSummary as summaryOf, outline as outlineOf } from "./outline.ts";
 import { parsePartial } from "./partial.ts";
-import { hasLogic as logicIn, isEmpty as emptyIn } from "./surface.ts";
+import { hasLogic as logicIn, isEmpty as emptyIn, label as labelIn } from "./surface.ts";
 import type { Citation, EngineLocale, Issue, MoleculeStructure, Recording, Reference, Surface } from "./types.ts";
 import { asReader } from "./units.ts";
 import { fromPartial, fromWire, wireIsReadable, wireIsWhole } from "./wire.ts";
@@ -85,6 +85,12 @@ export function logicSummary(surface: Surface): string {
 /** Surface.hasLogic: it has inputs or outputs. */
 export function hasLogic(surface: Surface): boolean {
   return logicIn(surface);
+}
+
+/** Surface.label(of:): what the page calls a name: an input's, output's, sound's, list's or list
+ * field's label, or the name itself. For describing the block a change points at. */
+export function label(surface: Surface, name: string): string {
+  return labelIn(surface, name);
 }
 
 // MARK: - What the lookups after the repairs find

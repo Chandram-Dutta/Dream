@@ -29,6 +29,7 @@ their own account instead, for their devices only: see [Sync](#sync).
 | `GET /api/compose/:id/events?after=<seq>` | The page's events as server-sent events: from the log after `seq`, then live. |
 | `POST /api/compose/:id/answers` | The answers to the page's questions. |
 | `POST /api/push/devices`, `DELETE /api/push/devices/:token` | This iPhone, for notifications about its pages, and forgetting it. See [Notifications](#notifications). |
+| `POST /api/compose/:id/tools` | What one of the phone's tools returned, for a call the page waits on. |
 | `GET /api/usage` | The account's plan, and pages used and left. See [Plans and limits](#plans-and-limits). |
 | `POST /api/appstore/transactions` | Dream Plus purchases the app made or restored. See [Dream Plus](#dream-plus). |
 | `POST /api/appstore/notifications` | App Store Server Notifications v2. |
@@ -845,18 +846,30 @@ calls. No public benchmark measures that, so the page bench decides.
 ## Pages made on the server
 
 The page loop the app runs (`Dream/Generation/Composer.swift`) also runs here, so a page is made
-whether or not anyone watches (docs/ServerGeneration.md, Stage 1). `POST /api/compose` takes the
-request (`src/compose/contract.ts`) with the session and the app's proof, as `/api/model` does,
-counts the page against the allowance, and starts a `PageJob`: a Durable Object for that page,
-which runs the loop on its alarm and keeps its events in its own storage (`src/compose/`).
+whether or not anyone watches (docs/ServerGeneration.md, Stages 1 and 2). `POST /api/compose`
+takes the request (`src/compose/contract.ts`) with the session and the app's proof, as
+`/api/model` does, counts the page against the allowance, and starts a `PageJob`: a Durable
+Object for that page, which runs the loop on its alarm and keeps its events in its own storage
+(`src/compose/`).
 
 - **The loop** (`loop.ts`) is Composer's: Auto once, the gap check beside the writing with its
-  hold, lookup, search and read, the check and repair loop, and the stall, runaway and padding
-  guards. It calls the model, Auto, search and read in-process, through the same checks as their
-  routes (`askModel`, `routePage`, `searchFor`, `readFor`). Its prompts, schemas and tools come
-  from `src/generated/generation.json`, which `Tools/export-generation.sh` writes from the app.
+  hold, the tools, the check and repair loop, the recordings and molecules found once the page is
+  written, and the stall, runaway and padding guards. It calls the model, Auto, search and read
+  in-process, through the same checks as their routes (`askModel`, `routePage`, `searchFor`,
+  `readFor`). Its prompts, schemas and tools come from `src/generated/generation.json`, which
+  `Tools/export-generation.sh` writes from the app; the instructions are put together from the
+  features whose tools are offered, so they never describe a tool that isn't (`prompts.ts`).
+- **Tools** (`tools.ts`): lookup (Wikipedia), recall (the account's synced, confirmed facts,
+  `memory.ts`), live (the weather from Open-Meteo and exchange rates from ExchangeRate-API, with
+  the fields the app's own providers give, `live.ts`), search and read, and the phone's own
+  (`deviceTools`: connected services and travel times). A call to one of the phone's is a
+  `deviceTool` event; the loop waits a minute for `POST …/tools`, then tells the model it
+  couldn't be read. "Here", for the weather, is where Cloudflare places the request.
+- **Changes** (`editing`) are made from the page as it is, as Composer.edit makes them, and kept
+  onto the page's item in sync: its history and editRequests added to, its log, and the user's
+  numbers where the change left their inputs alone.
 - **Questions** stop the loop: the job waits for `POST …/answers`, and after ten minutes goes on
-  as if every answer were "You choose".
+  as if every answer were "You choose". One about something Dream remembers is answered from it.
 - **Watching** catches up from the log after `after`, then streams events as they happen, with a
   `: keep-alive` comment every 15 seconds, and ends after `done` or `failed`. Only the latest
   page shown is kept in the log. Only the account the page is for may watch it or answer it.

@@ -5,10 +5,13 @@
 //   POST /api/compose                     a ComposeRequest (contract.ts), from the app → { id }
 //   GET  /api/compose/:id/events?after=   the job's events since a seq, as server-sent events
 //   POST /api/compose/:id/answers         { answers }: the answers to its questions
+//   POST /api/compose/:id/tools           { id, output }: what one of the phone's tools returned
 //
 // Starting a page is like asking /api/model: the user's session, proof that it's the app
 // (attest.ts), and the account's allowance, which counts the page then. Watching and answering
-// need the session of the account the page is for, and nobody else's.
+// need the session of the account the page is for, and nobody else's. Where the request came
+// from, as Cloudflare places it, goes with the page, for the weather "here"; it's never kept on
+// the page, which says "current location".
 
 import { countsAllowed } from "../analytics";
 import { proveApp } from "../attest";
@@ -17,11 +20,15 @@ import { allowed, bodyBytes, isJSON, json, object, problem } from "../reply";
 import { accountOf, admitModel, refusalResponse } from "../usage";
 import type { ComposeStarted } from "./contract";
 import type { ComposeEnv } from "./job";
+import type { Here } from "./live";
 import { readComposeRequest } from "./request";
 
 /** A page's request is a few KB, with a photo up to about 1.5 MB more as base64. */
 const MAX_BODY = 2_000_000;
 const MAX_ANSWERS = 50_000;
+/** A tool's answer: a connected service's is cut to 8,000 characters on the phone, and a live
+ * source rides along. */
+const MAX_TOOL_OUTPUT = 200_000;
 /** A job's id, as Durable Objects write theirs. */
 const JOB_ID = /^[0-9a-f]{64}$/;
 
@@ -30,11 +37,11 @@ const only = (method: string) => problem(405, `Only ${method}.`, { Allow: method
 /** The routes here, or null for any other path. */
 export async function routeCompose(request: Request, env: ComposeEnv, url: URL): Promise<Response | null> {
   if (url.pathname === "/api/compose") return request.method === "POST" ? start(request, env, url) : only("POST");
-  const match = /^\/api\/compose\/([^/]+)\/(events|answers)$/.exec(url.pathname);
+  const match = /^\/api\/compose\/([^/]+)\/(events|answers|tools)$/.exec(url.pathname);
   if (!match) return null;
   const [, id, what] = match;
   if (what === "events" && request.method !== "GET") return only("GET");
-  if (what === "answers" && request.method !== "POST") return only("POST");
+  if (what !== "events" && request.method !== "POST") return only("POST");
   const user = await userFrom(request, env);
   if (!user) return signInNeeded();
   if (!(await allowed(env.MODEL_LIMIT, `compose-${what}:${user.id}`))) return problem(429, "Too many requests at once. Try again in a minute.", { "Retry-After": "60" });
@@ -46,11 +53,25 @@ export async function routeCompose(request: Request, env: ComposeEnv, url: URL):
     return job.fetch(`https://page-job/events?after=${after}`, { headers: { "X-Dream-User": user.id } });
   }
   if (!isJSON(request)) return problem(415, "Send application/json.");
-  const raw = await bodyBytes(request, MAX_ANSWERS);
+  const raw = await bodyBytes(request, what === "tools" ? MAX_TOOL_OUTPUT : MAX_ANSWERS);
   if (!raw) return problem(413, "That's too much to send at once.");
   const body = object(raw);
   if (!body) return problem(400, "Expected a JSON object.");
-  return job.fetch("https://page-job/answers", { method: "POST", headers: { "Content-Type": "application/json", "X-Dream-User": user.id }, body: JSON.stringify(body) });
+  return job.fetch(`https://page-job/${what}`, { method: "POST", headers: { "Content-Type": "application/json", "X-Dream-User": user.id }, body: JSON.stringify(body) });
+}
+
+/** Where the request came from, as Cloudflare places it, or null when it doesn't. */
+function hereOf(request: Request): Here | null {
+  const cf = (request as { cf?: Record<string, unknown> }).cf;
+  const latitude = Number(cf?.latitude);
+  const longitude = Number(cf?.longitude);
+  if (!cf || typeof cf.latitude !== "string" || !Number.isFinite(latitude) || !Number.isFinite(longitude)) return null;
+  return {
+    latitude,
+    longitude,
+    ...(typeof cf.city === "string" && cf.city ? { city: cf.city } : {}),
+    ...(typeof cf.timezone === "string" && cf.timezone ? { timeZone: cf.timezone } : {}),
+  };
 }
 
 function jobFor(env: ComposeEnv, id: string): DurableObjectStub | null {
@@ -87,7 +108,7 @@ async function start(request: Request, env: ComposeEnv, url: URL): Promise<Respo
   const started = await env.PAGE_JOBS.get(id).fetch("https://page-job/start", {
     method: "POST",
     headers: { "Content-Type": "application/json", "X-Dream-User": user.id },
-    body: JSON.stringify({ counted: countsAllowed(request), origin: url.origin, request: checked.request }),
+    body: JSON.stringify({ counted: countsAllowed(request), origin: url.origin, here: hereOf(request), request: checked.request }),
   });
   if (!started.ok) {
     console.error("Page job didn't start", started.status);

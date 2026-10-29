@@ -24,7 +24,13 @@ export interface ComposeRequest {
   editing?: ComposeEditing;
   /** Tools only the phone can run: a connected service's (its sign-in never leaves the phone) or
    * a travel time (Apple Maps). The server offers them to the model and asks the phone to run
-   * each call (a `deviceTool` event), answered at POST /api/compose/:id/tools. */
+   * each call (a `deviceTool` event), answered at POST /api/compose/:id/tools.
+   *
+   * A travel time is the phone's tool named `travel` (TravelTool): the server's own `live` reads
+   * the weather and exchange rates, and offers no routes. Any other tool is a connected
+   * service's, and the instructions gain the app's rules for connected services
+   * (Prompts.connectionRules) while one is offered. A tool named like one of the server's own
+   * (lookup, recall, live, search, read) is left out. */
   deviceTools?: DeviceToolDefinition[];
 }
 
@@ -35,18 +41,30 @@ export interface ComposeEditing {
   instruction?: string;
   /** The id of the block they pointed at, if any. */
   focus?: string;
-  /** A different answer to one of the questions the page was built from (Composer.rebuild). */
+  /** A different answer to one of the questions the page was built from (Composer.rebuild): the
+   * question as the page's answers hold it, and the new choice ("" leaves it to Dream). */
   answer?: { question: unknown; choice: string };
   /** Made again from the request, as it was (after the user connected a service it names). */
   again?: boolean;
 }
+// A change is kept in sync under the request's pageID, onto the item the account already has:
+// the page; its history as the account keeps it, with the change's turn added (changed,
+// answered or rebuilt, as SurfaceScreen notes them), and the change asked for added to
+// editRequests (not for one made again); its log added to; and the user's numbers kept where the
+// change left their inputs as they were (all of them, made again). Everything else stays. A page
+// the account doesn't hold in sync (or deleted) isn't written; the `done` event still carries it.
+// A change is counted as page_changed, or page_failed with changing; one made again as a new page.
 
 /** A tool the phone runs, offered to the model like any other. */
 export interface DeviceToolDefinition {
+  /** As the model calls it: letters, digits, _ and -, up to 64. */
   name: string;
   description: string;
   /** JSON Schema for its arguments. */
   parameters: unknown;
+  /** The connected service it's from, like Linear, for saying it couldn't answer. Its name is
+   * said otherwise. */
+  service?: string;
 }
 
 /** POST /api/compose → */
@@ -66,8 +84,10 @@ export type ComposeEvent = { seq: number } & (
   | { type: "asking"; questions: unknown[] }
   | { type: "log"; line: string }
   /** The phone should run one of its tools and answer at POST /api/compose/:id/tools. If no
-   * answer comes in 60 seconds (the app isn't open), the model is told it couldn't be read. */
-  | { type: "deviceTool"; call: { id: string; name: string; arguments: string } }
+   * answer comes in 60 seconds (the app isn't open), the model is told it couldn't be read. The
+   * event stays in the log only while the call waits, and `deadline` (milliseconds since 1970)
+   * is when the server stops waiting on it: a call seen after that is stale. */
+  | { type: "deviceTool"; call: { id: string; name: string; arguments: string }; deadline: number }
   /** Finished, and kept in sync under the request's pageID as a `surface` item (SurfacePayload). */
   | { type: "done"; surface: unknown; model: string; pageID: string }
   | { type: "failed"; message: string }
@@ -78,10 +98,22 @@ export interface ComposeAnswers {
   answers: unknown[];
 }
 
-/** POST /api/compose/:id/tools: what a device tool returned, as text for the model. */
+/** POST /api/compose/:id/tools: what a device tool returned, as text for the model. Only the
+ * page's own account may answer, and only a call still waiting (409 otherwise: it was answered,
+ * or its 60 seconds are up and the model was told it couldn't be read). */
 export interface DeviceToolOutput {
   id: string;
   output: string;
+  /** The live source the call read, as the app's Source encodes it (Dream/Engine/Live.swift),
+   * when it read one: a travel time (what TravelTool declared in the phone's LiveLog), or a
+   * connected service's look-up kept current (ConnectionTool.readLive). The server declares it
+   * in the page's live sources, as the app's LiveLog does, so the page's live inputs bind to it.
+   * Without it, values the output names can't be shown live. */
+  source?: unknown;
+  /** The connected service whose data the output holds, when the call read one
+   * (ConnectionLog.use): the page lists it among its services (Surface.services), so sharing it
+   * says so first. */
+  service?: string;
 }
 
 /** POST /api/push/devices registers this phone for notifications (a page ready, a question

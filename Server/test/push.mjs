@@ -195,7 +195,7 @@ function jobServices(notified) {
       generation,
       model: async (body) => fakeModel(body),
       route: async () => PICK,
-      tools: { lookup: async () => null, related: async () => [], search: async () => ({ status: 0, body: null }), read: async () => ({ status: 0, body: null }) },
+      tools: { lookup: async () => null, related: async () => [], search: async () => ({ status: 0, body: null }), read: async () => ({ status: 0, body: null }), memory: async () => [], fetch: async () => new Response("", { status: 404 }), here: null },
       now: Date.now,
       sleep: (ms) => pause(ms),
     }),
