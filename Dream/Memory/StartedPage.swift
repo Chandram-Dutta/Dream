@@ -162,7 +162,7 @@ final class ServerPages {
     func composer(for forming: FormingPage) -> Composer {
         if let composer = following[forming.job.page] { return composer }
         let composer = Composer()
-        guard let started = record(forming.job.page) else {
+        guard let started = record(forming.job) else {
             composer.show(ending: forming.job, intent: forming.intent, with: nil, failure: "This page isn't here anymore.")
             return composer
         }

@@ -595,6 +595,8 @@ final class ServerWatch {
         progress.calls.contains { $0.id == call.id }
     }
 
+    /// Runs a call once events settle, if the loop still waits on it, and sends what it returned,
+    /// unless the loop went on without it meanwhile or the server's patience ran out first.
     private func run(_ call: DeviceToolCall) {
         running[call.id] = Task {
             try? await Task.sleep(for: settle)

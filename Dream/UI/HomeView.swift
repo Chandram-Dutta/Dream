@@ -123,10 +123,10 @@ struct HomeView: View {
     // MARK: - Shelf
 
     /// Started pages that aren't saved yet. One that came by sync before its record went is
-    /// shown once, as the page.
+    /// shown once, as the page. A change shows on its page's own screen, never as a tile.
     private var forming: [StartedPage] {
         let saved = Set(surfaces.map(\.id))
-        return started.filter { !saved.contains($0.pageID) }
+        return started.filter { $0.changeData == nil && !saved.contains($0.pageID) }
     }
 
     private var shelf: some View {
