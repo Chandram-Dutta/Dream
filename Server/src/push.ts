@@ -1,6 +1,8 @@
 // Push notifications (docs/ServerGeneration.md, Stage 3): an iPhone that left a page being made
-// on the server hears when it's ready, or when Dream has a question about it, so there's a reason
-// to come back. The job (compose/runner.ts) only asks for one when nobody is watching the page.
+// on the server hears when it's ready, when Dream has a question about it, or when the page needs
+// one of the phone's own tools (a connected service, a journey), which only run with the app
+// open, so there's a reason to come back. The job (compose/runner.ts) only asks for one when
+// nobody is watching the page.
 //
 //   POST   /api/push/devices          { token, environment } (contract.ts's PushDevice): this
 //                                     iPhone, for the account signed in on it → 204
@@ -13,8 +15,8 @@
 // Notifications go to Apple's Push Notification service with token-based auth: a JWT signed
 // (ES256) with Dream's APNs key, from the secrets APNS_KEY, APNS_KEY_ID and APNS_TEAM_ID. Until
 // they're set, nothing is sent, and that's logged once. What a notification says is only ever the
-// page's title or the request's first few words: it's shown on a lock screen, and passes through
-// Apple. Tokens are never logged.
+// page's title, the request's first few words, or the name of a service the user connected: it's
+// shown on a lock screen, and passes through Apple. Tokens are never logged.
 //
 // Only types are imported besides auth.ts, reply.ts and apple.ts, so test/push.mjs runs the
 // sender in Node with a key of its own and a stand-in for Apple.
@@ -158,6 +160,18 @@ export function questionWaiting(job: Job, request: string, now = Date.now()): No
   };
 }
 
+/** One of the phone's tools waits on the app being opened: the service it reads (the travel
+ * tool works out a journey, contract.ts), and the request's first few words. It lasts as long
+ * as the call waits. */
+export function phoneNeeded(job: Job, request: string, tool: { name: string; service?: string }, deadline: number): Notice {
+  const what = tool.name === "travel" ? "work out a journey" : `read ${clip(tool.service?.replace(/\s+/g, " ").trim() || "a connected service", CHARACTERS)}`;
+  return {
+    body: `Dream needs your iPhone to ${what} for “${shortRequest(request)}”`,
+    payload: { page: job.pageID, job: job.id, kind: "device" },
+    expires: Math.floor(deadline / 1000),
+  };
+}
+
 // MARK: - Apple
 
 /** How to reach APNs, or null while the secrets aren't set. */
@@ -218,7 +232,7 @@ export async function deliver(config: APNsConfig, device: PushDevice, notice: No
         "apns-push-type": "alert",
         "apns-priority": "10",
         "apns-expiration": String(notice.expires),
-        // A question's notification is replaced by the page's, once it's made.
+        // A question's notification, or the phone's, is replaced by the page's, once it's made.
         "apns-collapse-id": notice.payload.page,
         "content-type": "application/json",
       },

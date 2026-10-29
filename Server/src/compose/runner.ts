@@ -3,7 +3,9 @@
 //
 //   start     the request is kept and the loop is set to run at once, on the alarm
 //   alarm     the loop runs; questions stop it, and the alarm wakes it again when they're
-//             answered or in ten minutes, as if every answer were "You choose"
+//             answered or in ten minutes, as if every answer were "You choose"; so does a call
+//             to the phone's tools that nobody is there to run, which wakes it when the phone
+//             answers or in ten minutes, as if it couldn't be read
 //   watch     every event after a seq from the log, then new ones as they happen
 //   answer    the user's answers to the questions it's waiting on
 //   output    what one of the phone's tools returned, for a call the loop is waiting on
@@ -13,17 +15,26 @@
 // every step of it. A call to one of the phone's tools stays only while it waits, so the phone
 // never runs one twice. If the object is restarted mid-page, the alarm runs again and the page
 // starts over, keeping only the model Auto picked and any answers. A day after it's done, it's
-// forgotten. A page finished, or questions asked, while nobody watches is a notification
-// (push.ts).
+// forgotten. A page finished, questions asked, or the phone needed while nobody watches is a
+// notification (push.ts).
+//
+// A call to the phone's tools waits a minute while someone watches the page: the app is open,
+// and runs it. With nobody watching, the account's iPhones are told, and it waits ten minutes,
+// without holding the alarm open: once nothing else is in flight, the loop stops, what it did so
+// far is kept (journal.ts), and the alarm ends. The phone's answer, or the call's deadline, wakes
+// it, and the loop starts again from the top, going over what it did from the journal, quietly,
+// until it's back at the call, which is given the answer, and goes on from there.
 //
 // test/compose.mjs runs it in Node, with a store kept in memory.
 
 import type { Surface } from "../engine/index";
-import { pageReady, questionWaiting, type Notice } from "../push";
+import { pageReady, phoneNeeded, questionWaiting, type Notice } from "../push";
 import type { ComposeEvent, ComposeRequest } from "./contract";
+import { Journal } from "./journal";
 import { sourceOf, type DeviceAnswer, type Here } from "./live";
-import { Cancelled, leftToDream, PageLoop, TIMING, type LoopServices, type PagePick, type Start, type Timing } from "./loop";
+import { Cancelled, leftToDream, PageLoop, Paused, TIMING, type LoopServices, type PagePick, type Start, type Timing } from "./loop";
 import type { Answer, Question } from "./prompts";
+import type { ToolServices } from "./tools";
 
 type JSONObject = Record<string, unknown>;
 
@@ -53,7 +64,8 @@ export interface JobStore {
   clear(): Promise<void>;
 }
 
-export type JobStatus = "queued" | "running" | "asking" | "done" | "failed";
+/** `device`: stopped to wait on the phone, with nobody watching (Waiting). */
+export type JobStatus = "queued" | "running" | "asking" | "device" | "done" | "failed";
 
 /** What a job keeps about itself, apart from its request. */
 export interface JobRecord {
@@ -111,9 +123,11 @@ export interface JobTiming {
   attempts: number;
   /** A comment this often while nothing happens, so the line stays open. */
   keepAlive: number;
-  /** How long a call to one of the phone's tools waits for its answer before the model is told
-   * it couldn't be read: the app isn't open. */
+  /** How long a call to one of the phone's tools waits for its answer, while someone watches the
+   * page, before the model is told it couldn't be read: the app is open, and runs it at once. */
   deviceWait: number;
+  /** How long one waits with nobody watching: the iPhone is told, and the app has to be opened. */
+  deviceAwayWait: number;
 }
 
 export const JOB_TIMING: JobTiming = {
@@ -123,13 +137,105 @@ export const JOB_TIMING: JobTiming = {
   attempts: 3,
   keepAlive: 15_000,
   deviceWait: 60_000,
+  deviceAwayWait: 10 * 60_000,
 };
 
 /** Most of what a phone's tool may answer: a connected service's answer is cut to 8,000
  * characters on the phone (ConnectionTool.resultLimit), fenced and explained. */
 const MAX_OUTPUT = 40_000;
+/** Most of a journal kept while the page waits on the phone, in characters of JSON, inside what
+ * a Durable Object keeps in one row. More than that, and the call waits with the alarm held. */
+const MAX_JOURNAL = 1_500_000;
 
 const finished = (status: JobStatus) => status === "done" || status === "failed";
+
+/** A call to the phone's tools the page stopped to wait on, kept with the job while it waits. */
+interface WaitingCall {
+  id: string;
+  name: string;
+  arguments: string;
+  /** Its place among the page's steps (journal.ts), by which the loop finds it again. */
+  key: string;
+  /** Its event, which leaves the log once it's answered or its time is up. */
+  seq: number;
+  deadline: number;
+  /** What the phone returned; null once its time is up; absent while it waits. */
+  answer?: DeviceAnswer | null;
+}
+
+/** What the page stopped for: the calls it waits on, and whether it was at its very start. */
+interface Waiting {
+  calls: WaitingCall[];
+  first: boolean;
+}
+
+/** A call to the phone's tools waiting in this instance. */
+interface Call {
+  seq: number;
+  key: string;
+  name: string;
+  arguments: string;
+  deadline: number;
+  /** Nobody was watching when it began: it waits ten minutes, and the page may stop for it. */
+  away: boolean;
+  /** What the phone returned, or null when its time is up: the loop goes on with it. */
+  answer(answer: DeviceAnswer | null): void;
+  /** The page stopped: nothing more waits on it here. */
+  drop(): void;
+  /** Lets go of it here, leaving it in the log: the page stopped to wait on it (Waiting). */
+  release(): void;
+}
+
+/** One run of the loop in this instance. */
+interface Running {
+  job: JobRecord;
+  request: ComposeRequest;
+  limit: AbortController;
+  journal: Journal;
+  first: boolean;
+  /** The calls the page stopped for last time, when this run picks up from there: each `reached`
+   * once the loop calls it again, and held (`release`) until it's all the loop waits on. */
+  resumed: (WaitingCall & { reached?: boolean; release?: () => void })[] | null;
+  /** Stopped to wait on the phone: nothing more it says goes out. */
+  paused: boolean;
+}
+
+/** When a page waiting on the phone goes on: at once when every call is answered or out of
+ * time, otherwise at the soonest deadline still to come. */
+function wakeAt(waiting: Waiting | null | undefined, now: number): number {
+  const open = (waiting?.calls ?? []).filter((call) => call.answer === undefined && call.deadline > now);
+  return open.length ? Math.min(...open.map((call) => call.deadline)) : now;
+}
+
+/** A wait in words, for the log. */
+function span(ms: number): string {
+  if (ms < 60_000) return `${Math.round(ms / 100) / 10} seconds`;
+  const minutes = Math.round(ms / 60_000);
+  return minutes === 1 ? "a minute" : `${minutes} minutes`;
+}
+
+/** The tools' services, with what they gave kept in the journal, and given again when the page
+ * goes over it after waiting on the phone: search and read, so nothing is paid for twice, and
+ * Wikipedia and what Dream remembers, so the page reads as it did. A live reading is read again,
+ * whole while it's counted in flight; what the model was told of it is kept with its call
+ * (loop.ts, runTool). Everything else the services carry, like where the user is, goes as it is. */
+export function remembered(tools: ToolServices, journal: Journal): ToolServices {
+  return {
+    ...tools,
+    lookup: (subject, language) => journal.remember("lookup", [subject, language], () => tools.lookup(subject, language)),
+    related: (title, language) => journal.remember("related", [title, language], () => tools.related(title, language)),
+    search: (query) => journal.remember("search", query, () => tools.search(query)),
+    read: (query) => journal.remember("read", query, () => tools.read(query)),
+    memory: () => journal.remember("memory", null, () => tools.memory()),
+    fetch: (url, init) =>
+      journal.working(async () => {
+        const response = await tools.fetch(url, init);
+        const empty = [101, 204, 205, 304].includes(response.status);
+        const body = empty ? null : await response.arrayBuffer();
+        return new Response(body, { status: response.status, statusText: response.statusText, headers: response.headers });
+      }),
+  };
+}
 
 /** What a page is made of, for analytics: never its words (Analytics.Shape). */
 export function pageShape(surface: Surface): Record<string, number | boolean | string | string[]> {
@@ -178,12 +284,16 @@ export class Runner {
   /** Event streams open now: someone is watching, and needs no notification. */
   private watchers = 0;
   /** Calls to the phone's tools waiting on their answers, by their id. */
-  private readonly calls = new Map<string, { seq: number; settle: (answer: DeviceAnswer | null) => void }>();
+  private readonly calls = new Map<string, Call>();
+  /** The loop's run in this instance, while there is one. */
+  private current: Running | null = null;
+  /** A look, once what's in flight has settled, at whether the page waits on the phone alone. */
+  private pausing: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(store: JobStore, services: JobServices, timing: JobTiming = JOB_TIMING, loopTiming: Timing = TIMING) {
+  constructor(store: JobStore, services: JobServices, timing: Partial<JobTiming> = JOB_TIMING, loopTiming: Timing = TIMING) {
     this.store = store;
     this.services = services;
-    this.timing = timing;
+    this.timing = { ...JOB_TIMING, ...timing };
     this.loopTiming = loopTiming;
   }
 
@@ -237,7 +347,23 @@ export class Runner {
     }
     if (this.active) return;
     let start: Start;
-    if (job.status === "asking") {
+    let waiting: Waiting | null = null;
+    if (job.status === "device") {
+      waiting = this.store.get<Waiting>("waiting") ?? null;
+      const at = wakeAt(waiting, this.now);
+      if (at > this.now) {
+        await this.store.setAlarm(at);
+        return;
+      }
+      // Those the phone didn't answer in time: the model is told they couldn't be read.
+      for (const call of waiting?.calls ?? []) {
+        if (call.answer !== undefined) continue;
+        call.answer = null;
+        this.store.drop(call.seq);
+      }
+      if (waiting) this.store.put("waiting", waiting);
+      start = { pick: job.pick, answers: job.answers, checkedAt: job.checkedAt, startedAt: job.startedAt, first: waiting?.first ?? false };
+    } else if (job.status === "asking") {
       if (!job.answers) {
         if (job.deadline !== null && this.now < job.deadline) {
           await this.store.setAlarm(job.deadline);
@@ -255,6 +381,10 @@ export class Runner {
           return;
         }
         job.logFrom = this.emit({ type: "log", line: "Started again: Dream's server restarted while it was making this page." }).seq;
+        // Nothing waits on the phone for the run that stopped, and nothing it kept carries over.
+        this.store.forget("deviceTool", this.store.lastSeq() + 1);
+        this.store.put("waiting", null);
+        this.store.put("journal", null);
       } else {
         job.logFrom = this.store.lastSeq() + 1;
       }
@@ -266,23 +396,39 @@ export class Runner {
     }
     job.status = "running";
     this.save(job);
-    await this.run(job, request, start);
+    await this.run(job, request, start, waiting);
   }
 
-  private async run(job: JobRecord, request: ComposeRequest, start: Start): Promise<void> {
+  /** Runs the loop: from what it did before, when `waiting` says what it stopped for. */
+  private async run(job: JobRecord, request: ComposeRequest, start: Start, waiting: Waiting | null = null): Promise<void> {
     this.active = true;
     const limit = new AbortController();
     const timer = setTimeout(() => limit.abort(new Cancelled("This page took too long to make. Try again.")), this.timing.runLimit);
+    const journal = new Journal(waiting ? (this.store.get<[string, unknown][]>("journal") ?? []) : [], !!waiting);
+    const running: Running = { job, request, limit, journal, first: start.first, resumed: waiting?.calls.map((call) => ({ ...call })) ?? null, paused: false };
+    this.current = running;
+    journal.onIdle = () => this.pauseSoon();
+    // Going over what it did before, or stopped for the phone: it was said already, or it isn't so.
+    const quiet = () => journal.replaying || running.paused;
     try {
-      const services: LoopServices = { ...this.services.loop(job, request), device: (call, signal) => this.ask(call, signal) };
+      const given = this.services.loop(job, request);
+      const services: LoopServices = { ...given, tools: remembered(given.tools, journal), device: (call, signal) => this.ask(call, signal), journal };
       const loop = new PageLoop(
         request,
         services,
         {
-          phase: (phase) => this.emit({ type: "phase", phase }),
-          trace: (kind, text) => this.emit({ type: "trace", kind, text }),
-          surface: (surface) => this.emit({ type: "surface", surface }),
-          log: (line) => this.emit({ type: "log", line }),
+          phase: (phase) => {
+            if (!quiet()) this.emit({ type: "phase", phase });
+          },
+          trace: (kind, text) => {
+            if (!quiet()) this.emit({ type: "trace", kind, text });
+          },
+          surface: (surface) => {
+            if (!quiet()) this.emit({ type: "surface", surface });
+          },
+          log: (line) => {
+            if (!quiet()) this.emit({ type: "log", line });
+          },
           picked: (pick) => {
             job.pick = pick;
             this.save(job);
@@ -294,6 +440,13 @@ export class Runner {
       const outcome = await loop.run(start);
       clearTimeout(timer);
       switch (outcome.kind) {
+        case "paused": {
+          // The alarm ends here: the phone's answer, or the soonest deadline, wakes it.
+          job.status = "device";
+          this.save(job);
+          await this.store.setAlarm(wakeAt(this.store.get<Waiting>("waiting"), this.now));
+          return;
+        }
         case "asking": {
           job.status = "asking";
           job.questions = outcome.questions;
@@ -340,9 +493,17 @@ export class Runner {
       this.fail(job, "Something went wrong. Try again in a moment.", "other");
     } finally {
       clearTimeout(timer);
+      if (this.pausing !== null) clearTimeout(this.pausing);
+      this.pausing = null;
       this.active = false;
+      this.current = null;
       // Nothing waits on the phone once the loop is over.
-      for (const call of [...this.calls.values()]) call.settle(null);
+      for (const call of [...this.calls.values()]) call.drop();
+      // What it kept to pick up from only lasts while it waits on the phone.
+      if (!running.paused) {
+        this.store.put("waiting", null);
+        this.store.put("journal", null);
+      }
     }
   }
 
@@ -359,49 +520,158 @@ export class Runner {
   // MARK: The phone's tools
 
   /** Asks the phone to run one of its tools: a `deviceTool` event, and the answer it posts, or
-   * null when none comes in `deviceWait` (the app isn't open) or the page stops. Once it's
-   * answered or given up on, the call leaves the log, so a watcher catching up never runs it. */
+   * null when none comes by its deadline or the page stops. It waits `deviceWait` while someone
+   * watches the page; with nobody watching, the account's iPhones are told, and it waits
+   * `deviceAwayWait`, for which the page stops (`pause`). Once it's answered or given up on, the
+   * call leaves the log, so a watcher catching up never runs it.
+   *
+   * Going over what it did before it stopped, a call answered then is answered the same way, and
+   * the one it stopped for is given what the phone returned meanwhile, or null, once the loop is
+   * back where it stopped: waiting on it alone, with everything it did before gone over, like a
+   * gap check that decided beside it (`pause`). */
   private ask(call: { name: string; arguments: string }, signal: AbortSignal): Promise<DeviceAnswer | null> {
+    const running = this.current;
+    if (!running) return Promise.resolve(null);
+    const { journal } = running;
+    const step = journal.step<DeviceAnswer | null>("device", [call.name, call.arguments], { fresh: false });
+    if (step.kept !== undefined) return Promise.resolve(step.kept);
+    const resumed = running.resumed?.find((waited) => waited.key === step.key && !waited.reached);
+    if (resumed) {
+      resumed.reached = true;
+      const answer = resumed.answer ?? null;
+      journal.keep(step.key, answer);
+      if (!journal.replaying) return Promise.resolve(answer);
+      return new Promise((resolve) => {
+        resumed.release = () => resolve(answer);
+        this.pauseSoon();
+      });
+    }
+    journal.replaying = false;
+    if (signal.aborted) return Promise.resolve(null);
     const id = crypto.randomUUID();
+    const away = this.watchers === 0;
+    const wait = away ? this.timing.deviceAwayWait : this.timing.deviceWait;
+    const deadline = this.now + wait;
     return new Promise((resolve) => {
       let timer: ReturnType<typeof setTimeout> | null = null;
-      const settle = (answer: DeviceAnswer | null) => {
-        if (!this.calls.has(id)) return;
-        const waiting = this.calls.get(id)!;
+      const finish = (answer: DeviceAnswer | null, leave: boolean) => {
+        const waiting = this.calls.get(id);
+        if (!waiting) return;
         this.calls.delete(id);
         if (timer !== null) clearTimeout(timer);
         signal.removeEventListener("abort", stop);
-        this.store.drop(waiting.seq);
+        if (leave) this.store.drop(waiting.seq);
         resolve(answer);
+        // What's left may be calls the page could stop for.
+        this.pauseSoon();
       };
-      const stop = () => settle(null);
-      if (signal.aborted) return resolve(null);
-      const { seq } = this.emit({ type: "deviceTool", call: { id, name: call.name, arguments: call.arguments }, deadline: this.now + this.timing.deviceWait });
-      this.calls.set(id, { seq, settle });
-      timer = setTimeout(stop, this.timing.deviceWait);
+      const stop = () => finish(null, true);
+      // Push: nobody is there to run it, so the account's iPhones are told, once for the calls
+      // the page stops for together.
+      const told = [...this.calls.values()].some((other) => other.away);
+      if (away && !told) {
+        const tool = running.request.deviceTools?.find((tool) => tool.name === call.name) ?? { name: call.name };
+        this.services.notify?.(running.job, phoneNeeded(running.job, running.request.request, tool, deadline));
+        this.emit({ type: "log", line: `Nobody has this page open, so Dream sent a notification and waits up to ${span(wait)} for the phone to run ${call.name}.` });
+      }
+      const { seq } = this.emit({ type: "deviceTool", call: { id, name: call.name, arguments: call.arguments }, deadline });
+      this.calls.set(id, {
+        seq,
+        key: step.key,
+        name: call.name,
+        arguments: call.arguments,
+        deadline,
+        away,
+        answer: (answer) => {
+          journal.keep(step.key, answer);
+          finish(answer, true);
+        },
+        drop: () => finish(null, true),
+        release: () => finish(null, false),
+      });
+      timer = setTimeout(() => this.calls.get(id)?.answer(null), wait);
       signal.addEventListener("abort", stop, { once: true });
+      if (away) this.pauseSoon();
     });
   }
 
-  /** What one of the phone's tools returned, for a call the page is waiting on. */
+  /** Has a look at whether the page waits on the phone alone, once what's in flight now has had a
+   * moment to settle: going over what it did, all of it is in hand at once, so by then it's back
+   * where it stopped. */
+  private pauseSoon(): void {
+    if (this.pausing !== null || !this.current || this.current.paused) return;
+    this.pausing = setTimeout(() => {
+      this.pausing = null;
+      this.pause();
+    }, 0);
+  }
+
+  /** Stops the page when all it waits on is the phone, with nobody watching: what it did so far
+   * is kept, the calls stay in the log, and the alarm ends (`run`). Nothing else may be in
+   * flight, so the journal holds everything up to the calls, and a gap check still deciding
+   * decides first.
+   *
+   * Picking up again, it's where the calls it stopped for are answered: the loop is back at
+   * them, with nothing else to go over, so from here what it says is new. One that went another
+   * way meanwhile (something it hadn't done before) has them answered at once. */
+  private pause(): void {
+    const running = this.current;
+    if (!running || running.paused || !running.journal.idle) return;
+    const held = running.resumed?.filter((call) => call.release) ?? [];
+    if (held.length && (!running.journal.replaying || running.resumed!.every((call) => call.reached))) {
+      running.journal.replaying = false;
+      for (const call of held) {
+        const release = call.release!;
+        call.release = undefined;
+        release();
+      }
+      return;
+    }
+    const waiting = [...this.calls.entries()];
+    if (!waiting.length || !waiting.every(([, call]) => call.away)) return;
+    const entries = running.journal.entries();
+    // Too much to keep in one row: the calls wait here, holding the alarm, as they always may.
+    if (JSON.stringify(entries).length > MAX_JOURNAL) return;
+    this.store.put("journal", entries);
+    const kept: Waiting = { calls: waiting.map(([id, call]) => ({ id, name: call.name, arguments: call.arguments, key: call.key, seq: call.seq, deadline: call.deadline })), first: running.first };
+    this.store.put("waiting", kept);
+    running.paused = true;
+    // Let go of here before the loop stops, so stopping doesn't take them out of the log.
+    for (const [, call] of waiting) call.release();
+    running.limit.abort(new Paused());
+  }
+
+  /** What one of the phone's tools returned, for a call the page is waiting on: here, or kept
+   * while the page stopped for it, which wakes it once every call it stopped for is answered. */
   async output(owner: string, body: unknown): Promise<{ status: number; body: JSONObject }> {
     const job = this.job;
     if (!job || job.owner !== owner) return { status: 404, body: { error: "There's no page being made with that id." } };
     if (!isObject(body) || typeof body.id !== "string" || typeof body.output !== "string") return { status: 400, body: { error: "Send { id, output }: the call's id, and what the tool returned." } };
     const call = this.calls.get(body.id);
-    if (!call) return { status: 409, body: { error: "This page isn't waiting on that call." } };
+    const waiting = call ? null : this.store.get<Waiting>("waiting");
+    const kept = waiting?.calls.find((each) => each.id === body.id && each.answer === undefined && each.deadline > this.now);
+    if (!call && !kept) return { status: 409, body: { error: "This page isn't waiting on that call." } };
     const source = body.source === undefined || body.source === null ? null : sourceOf(body.source);
     if (body.source !== undefined && body.source !== null && !source) return { status: 400, body: { error: "source is a live source, as the app's Source encodes it." } };
     const service = typeof body.service === "string" && body.service.trim() ? body.service.trim().slice(0, 100) : undefined;
     const output = [...body.output].length > MAX_OUTPUT ? `${[...body.output].slice(0, MAX_OUTPUT).join("")}\n[Cut off here.]` : body.output;
-    call.settle({ output, ...(source ? { source } : {}), ...(service ? { service } : {}) });
+    const answer: DeviceAnswer = { output, ...(source ? { source } : {}), ...(service ? { service } : {}) };
+    if (call) {
+      call.answer(answer);
+      return { status: 200, body: { ok: true } };
+    }
+    kept!.answer = answer;
+    this.store.drop(kept!.seq);
+    this.store.put("waiting", waiting);
+    if (wakeAt(waiting, this.now) <= this.now) await this.store.setAlarm(this.now);
     return { status: 200, body: { ok: true } };
   }
 
-  /** A page that was being made when this instance began, with no alarm to start it again: one
-   * is set, so a watcher never waits on a page nothing is making. */
+  /** A page that was being made when this instance began, or waits on the phone, with no alarm
+   * to start it again: one is set, so a watcher never waits on a page nothing is making. */
   private async heal(): Promise<void> {
-    if ((await this.store.getAlarm()) === null && this.job?.status === "running" && !this.active) await this.store.setAlarm(this.now);
+    const status = this.job?.status;
+    if ((await this.store.getAlarm()) === null && (status === "running" || status === "device") && !this.active) await this.store.setAlarm(this.now);
   }
 
   /** Resolves true at the next event, or false after `ms` without one. */
@@ -426,7 +696,7 @@ export class Runner {
   watch(owner: string, after: number): ReadableStream<Uint8Array> | null {
     const job = this.job;
     if (!job || job.owner !== owner) return null;
-    if (job.status === "running" && !this.active) this.heal().catch(() => undefined);
+    if ((job.status === "running" || job.status === "device") && !this.active) this.heal().catch(() => undefined);
     const encoder = new TextEncoder();
     let cursor = after;
     let cancelled = false;

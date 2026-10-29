@@ -17,6 +17,12 @@ struct DeviceToolDefinition: Encodable, Equatable {
     /// The connected service it's from, like Linear, so the server can say which one couldn't
     /// answer. Nil for travel times.
     var service: String? = nil
+    /// Whether it changes something in its service rather than reading, as its service says
+    /// (ConnectedTool.readOnlyHint, turned round): true for one Connections counts among its
+    /// changing tools, offered only when the request asks to act; false for one that only reads;
+    /// nil when its service doesn't say, and for travel times. The server sends a page back when
+    /// a request to act never calls a changing one, as ConnectionLog.problems does here.
+    var changes: Bool? = nil
 }
 
 /// The model called one of the phone's tools, and the server waits on what it returns.
@@ -25,6 +31,10 @@ struct DeviceToolCall: Hashable, Sendable {
     var name: String
     /// As the model wrote them: JSON.
     var arguments: String
+    /// When the server stops waiting on it, and tells the model it couldn't be read: a minute
+    /// while the app watches the page, ten when nobody did as it began. Nil from a server that
+    /// doesn't say. A call is run only before it (ServerWatch).
+    var deadline: Date? = nil
 }
 
 /// What a tool returned, for the model: the body of POST /api/compose/:id/tools.
@@ -79,8 +89,8 @@ final class DeviceTools {
         let definition: DeviceToolDefinition
         let run: @Sendable (GeneratedContent) async throws -> String
 
-        init<T: Tool>(_ tool: T, service: String? = nil) where T.Output == String {
-            definition = DeviceToolDefinition(name: tool.name, description: tool.description, parameters: Self.json(tool.parameters), service: service)
+        init<T: Tool>(_ tool: T, service: String? = nil, changes: Bool? = nil) where T.Output == String {
+            definition = DeviceToolDefinition(name: tool.name, description: tool.description, parameters: Self.json(tool.parameters), service: service, changes: changes)
             run = { arguments in try await tool.call(arguments: try T.Arguments(arguments)) }
         }
 
@@ -123,14 +133,15 @@ final class DeviceTools {
     var definitions: [DeviceToolDefinition] { entries.map(\.definition) }
 
     /// What this iPhone would offer the model for a request if it made the page itself
-    /// (Composer.tools): the connected services' tools picked for it, and travel times. The rest
-    /// the server has of its own.
+    /// (Composer.tools): the connected services' tools picked for it, each saying whether it
+    /// changes things, and travel times. The rest the server has of its own.
     static func offered(for request: String, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, ran: Set<String> = []) -> DeviceTools {
         let devices = DeviceTools(live: live, ran: ran)
         let note: @Sendable (String) -> Void = { [weak devices] line in Task { @MainActor in devices?.note(line) } }
         let connections = ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: log, onUse: note)
             .compactMap { $0 as? ConnectionTool }
-        devices.entries = connections.map { Entry($0, service: $0.connection.name) } + [Entry(TravelTool(log: live, onFetch: note))]
+        devices.entries = connections.map { Entry($0, service: $0.connection.name, changes: $0.tool.readOnlyHint.map { !$0 }) }
+            + [Entry(TravelTool(log: live, onFetch: note))]
         return devices
     }
 

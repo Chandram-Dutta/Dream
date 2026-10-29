@@ -190,7 +190,7 @@ struct ComposeEvent: Equatable {
 
 extension ComposeEvent: Decodable {
     private enum Keys: String, CodingKey {
-        case seq, type, phase, kind, text, surface, questions, line, model, message, call
+        case seq, type, phase, kind, text, surface, questions, line, model, message, call, deadline
     }
 
     /// A call as the server sends it. Its arguments are the JSON the model wrote, as a string, or
@@ -239,7 +239,13 @@ extension ComposeEvent: Decodable {
         case "log":
             kind = string(.line).map(Kind.log) ?? .other(type)
         case "deviceTool":
-            kind = (try? c.decodeIfPresent(Call.self, forKey: .call))?.call.map(Kind.deviceTool) ?? .other(type)
+            // When the server stops waiting on it, in milliseconds since 1970.
+            let deadline = (try? c.decodeIfPresent(Double.self, forKey: .deadline)).map { Date(timeIntervalSince1970: $0 / 1000) }
+            kind = (try? c.decodeIfPresent(Call.self, forKey: .call))?.call.map { call in
+                var call = call
+                call.deadline = deadline
+                return Kind.deviceTool(call)
+            } ?? .other(type)
         case "done":
             kind = .done(Self.surface(try? c.decodeIfPresent(JSONValue.self, forKey: .surface)), model: string(.model) ?? "")
         case "failed":
@@ -339,7 +345,8 @@ struct PageProgress: Equatable {
     /// The answers sent, which the finished page carries if the server left them off.
     private(set) var answers: [Answer] = []
     /// Calls to this iPhone's tools the loop is waiting on, oldest first. One goes once it's
-    /// answered, or once the loop shows it went on without it.
+    /// answered, once the loop shows it went on without it, or once its deadline is past
+    /// (ServerWatch).
     private(set) var calls: [DeviceToolCall] = []
     /// The request's language, if it's clear, and the reader's otherwise: what a finished page
     /// is labelled with if the server didn't say (Language.swift).
@@ -521,9 +528,14 @@ final class ServerWatch {
     /// be sent, as for a call run already. Stopping it (its task cancelled) takes a question about
     /// it back off the screen, and refuses it.
     var runTool: (DeviceToolCall) async -> DeviceToolOutput? = { _ in nil }
-    /// The server waits a minute on a call before it tells the model it couldn't be read. One
-    /// still waiting on the user after this long is given up on here first, so nothing the user
-    /// allows then runs for a page that's gone on without it.
+    /// The server waits on a call until its deadline (a minute while the app watches, ten when it
+    /// began with nobody watching) before it tells the model it couldn't be read. One still
+    /// waiting on the user `margin` before then is given up on here first, so nothing the user
+    /// allows runs for a page that's gone on without it; one read again with less time than that
+    /// left isn't run at all.
+    var margin: Duration = .seconds(5)
+    /// How long a call from a server that sends no deadline may wait here: its minute, less the
+    /// margin.
     var patience: Duration = .seconds(55)
 
     private var reading: Task<Void, Error>?
@@ -630,12 +642,28 @@ final class ServerWatch {
         progress.calls.contains { $0.id == call.id }
     }
 
-    /// Runs a call once events settle, if the loop still waits on it, and sends what it returned,
-    /// unless the loop went on without it meanwhile or the server's patience ran out first.
+    /// How long a call may still wait on the user here: until `margin` before its deadline, or
+    /// `patience` for one from a server that sends none. Nil once that's past: the server has
+    /// gone on without it, or is about to.
+    func timeLeft(for call: DeviceToolCall, at now: Date = .now) -> Duration? {
+        guard let deadline = call.deadline else { return patience }
+        let left = deadline.timeIntervalSince(now) - margin / .seconds(1)
+        return left > 0 ? .milliseconds(Int(left * 1000)) : nil
+    }
+
+    /// Runs a call once events settle, if the loop still waits on it and there's time before its
+    /// deadline, and sends what it returned, unless the loop went on without it meanwhile or its
+    /// time ran out first. A call read again from the first event, say after the app was opened
+    /// from a notification, runs only while the server still waits on it.
     private func run(_ call: DeviceToolCall) {
         running[call.id] = Task {
             try? await Task.sleep(for: settle)
             guard !Task.isCancelled, isWaiting(on: call) else { return }
+            guard let patience = timeLeft(for: call) else {
+                progress.settled(call)
+                note("Dream's server had stopped waiting on \(call.name), so it wasn't run.")
+                return
+            }
             let begun = ContinuousClock.now
             let work = Task { await runTool(call) }
             let timer = Task {

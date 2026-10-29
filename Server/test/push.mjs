@@ -3,10 +3,11 @@
 // what a notification says and carries, the provider token (its shape, its signature checked with
 // the key's public half, and kept for its half hour), which host each kind of build's tokens go
 // to, and a token Apple says is gone. Then the job (compose/runner.ts), in memory, on the
-// stand-in model: a page or a question nobody is watching notifies, one being watched doesn't.
-// Then the routes end to end under `wrangler dev`, against a stand-in for APNs on this Mac
-// (test/stub-apns.mjs): registering and forgetting devices, a session ending, deleting the
-// account, the limits, and pages made on the server telling the account's iPhones.
+// stand-in model: a page, a question or a call to the phone's tools nobody is watching notifies,
+// one being watched doesn't. Then the routes end to end under `wrangler dev`, against a stand-in
+// for APNs on this Mac (test/stub-apns.mjs): registering and forgetting devices, a session
+// ending, deleting the account, the limits, and pages made on the server telling the account's
+// iPhones, among them one that waits for the phone to be opened, and goes on once it answers.
 //
 //   node test/push.mjs
 //
@@ -34,7 +35,7 @@ registerHooks({
   },
 });
 
-const { apnsConfig, apnsHost, deliver, MAX_DEVICES, notify, pageReady, providerToken, questionWaiting, readDevice, shortRequest, TOPIC } = await import("../src/push.ts");
+const { apnsConfig, apnsHost, deliver, MAX_DEVICES, notify, pageReady, phoneNeeded, providerToken, questionWaiting, readDevice, shortRequest, TOPIC } = await import("../src/push.ts");
 const { Runner, memoryStore } = await import("../src/compose/runner.ts");
 const { fakeModel } = await import("../src/compose/fake.ts");
 const engine = await import("../src/engine/index.ts");
@@ -107,6 +108,12 @@ console.log("What a notification says");
   const asking = questionWaiting(JOB, "tell me about mercury and its orbit please", now);
   expect(!asking.title && asking.body === "Dream has a question about “tell me about mercury and its…”" && asking.payload.kind === "asking", "a question: the request's first few words");
   expect(asking.expires === Math.floor(JOB.deadline / 1000), "and it lasts as long as the question waits");
+  const deadline = now + 600_000;
+  const service = phoneNeeded(JOB, "file an issue about the login bug in Linear", { name: "linear_create_issue", service: "Linear" }, deadline);
+  expect(!service.title && service.body === "Dream needs your iPhone to read Linear for “file an issue about the login…”" && service.payload.kind === "device" && service.payload.page === JOB.pageID && service.payload.job === JOB.id, "the phone's tool: the service it reads, and the request's first few words");
+  expect(service.expires === Math.floor(deadline / 1000), "lasting as long as the call waits");
+  expect(phoneNeeded(JOB, "how long to drive to the airport", { name: "travel" }, deadline).body === "Dream needs your iPhone to work out a journey for “how long to drive to the…”", "a travel time is a journey to work out");
+  expect(phoneNeeded(JOB, "my notes", { name: "notes_search" }, deadline).body === "Dream needs your iPhone to read a connected service for “my notes”", "a service that didn't say its name is a connected service");
 }
 
 console.log("The provider token");
@@ -151,6 +158,9 @@ console.log("Sending to APNs");
   const question = questionWaiting(JOB, "tell me about mercury");
   await deliver(config, sandbox, question, send);
   expect(asked.at(-1).body.aps.alert.title === undefined && asked.at(-1).body.kind === "asking", "a question has no title");
+  await deliver(config, sandbox, phoneNeeded(JOB, "how long to drive to the airport", { name: "travel" }, Date.now() + 600_000), send);
+  const needed = asked.at(-1);
+  expect(needed.body.kind === "device" && needed.body.aps.alert.title === undefined && needed.init.headers["apns-collapse-id"] === JOB.pageID && needed.body.aps["thread-id"] === JOB.pageID, "nor does the phone's, which collapses with the page's others");
 
   answer = () => Response.json({ reason: "Unregistered" }, { status: 410 });
   expect((await deliver(config, sandbox, ready, send)) === "gone", "410: the app was deleted, so the token is gone");
@@ -232,6 +242,10 @@ async function read(stream, stop = () => false) {
 
 const job = () => ({ id: crypto.randomUUID().replace(/-/g, "").padEnd(64, "0"), owner: "user-1", counted: false, origin: "https://dream.example" });
 const request = (text) => ({ request: text, locale, pageID: uuid() });
+/** The phone's travel tool, as the app offers it (DeviceTools.swift's TravelTool). */
+const TRAVEL = { name: "travel", description: "Fetches the distance and travel time between places now, from Apple Maps.", parameters: { type: "object", properties: { name: { type: "string" }, from: { type: "string" }, to: { type: "string" }, travel: { type: "string" } }, required: ["name", "from", "to", "travel"] } };
+const JOURNEY = "how long to drive to the airport";
+const journey = () => ({ ...request(JOURNEY), deviceTools: [TRAVEL] });
 
 console.log("The job: nobody watching");
 {
@@ -252,6 +266,12 @@ console.log("The job: nobody watching");
   await asking.answer("user-1", { answers: [{ question: { text: "Which Mercury?" }, choice: "The planet" }] });
   await asking.alarm();
   expect(asking.job.status === "done" && later.length === 2 && later[1].payload.kind === "done", "then another when the page is made");
+
+  const needed = [];
+  const away = new Runner(memoryStore(), jobServices(needed), TIMING);
+  await away.start(job(), journey());
+  await away.alarm();
+  expect(away.job.status === "device" && needed.length === 1 && needed[0].body === "Dream needs your iPhone to work out a journey for “how long to drive to the…”" && needed[0].payload.kind === "device" && needed[0].payload.job === away.job.id, "a journey only the phone can work out, with nobody there to run it: one notification, and the page waits for it");
 }
 
 console.log("The job: someone watching");
@@ -284,6 +304,15 @@ console.log("The job: someone watching");
   await both.alarm();
   await Promise.all([left, stays]);
   expect(both.job.status === "done" && twice.length === 0, "one of two watchers leaving still leaves someone watching");
+
+  const open = [];
+  const watched = new Runner(memoryStore(), jobServices(open), { ...TIMING, deviceWait: 300 });
+  await watched.start(job(), journey());
+  const following = read(watched.watch("user-1", 0));
+  await watched.alarm();
+  const all = await following;
+  const call = all.find((event) => event.type === "deviceTool");
+  expect(all.at(-1)?.type === "done" && open.length === 0 && call?.deadline <= Date.now(), "a call to the phone's tools someone sees: none, and the minute's wait (300 ms here), after which the page goes on without it");
 }
 
 // MARK: - End to end
@@ -326,8 +355,7 @@ async function startLocal(apns) {
       }
     };
     child.stdout.on("data", watch);
-    child.stderr.on("data", watch);
-    child.on("exit", (code) => reject(new Error(`wrangler dev exited with ${code}`)));
+    child.stderr.on("data", watch);    child.on("exit", (code) => reject(new Error(`wrangler dev exited with ${code}`)));
   });
   return { base: `http://127.0.0.1:${port}`, stop: () => child.kill("SIGTERM") };
 }
@@ -356,11 +384,11 @@ async function endToEnd(base, apns) {
   const register = (who, token, environment = "sandbox") => call(who, "/api/push/devices", { method: "POST", body: { token, environment } });
   const forget = (who, token) => call(who, `/api/push/devices/${token}`, { method: "DELETE" });
   const devices = (user) => query(`SELECT token, environment, session_hash FROM push_devices WHERE user_id = '${user}' ORDER BY updated_at, created_at`);
-  const start = (who, text) =>
+  const start = (who, text, fields = {}) =>
     fetch(`${base}/api/compose`, {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${who.token}`, "X-Dream-Key": APP_KEY },
-      body: JSON.stringify({ request: text, locale, pageID: uuid(), model: "auto" }),
+      body: JSON.stringify({ request: text, locale, pageID: uuid(), model: "auto", ...fields }),
     }).then(async (response) => ({ status: response.status, ...(await response.json()) }));
   const watch = async (who, id) => {
     const response = await fetch(`${base}/api/compose/${id}/events?after=0`, { headers: { Authorization: `Bearer ${who.token}` } });
@@ -455,6 +483,28 @@ async function endToEnd(base, apns) {
   expect(await until(() => sentFor(mercury.id).length === 1), "questions nobody is there to answer send one");
   const question = sentFor(mercury.id)[0]?.body;
   expect(question?.aps.alert.body === "Dream has a question about “tell me about mercury”" && question.kind === "asking" && !question.aps.alert.title, "saying what it's about");
+
+  const jo = await signIn("jo");
+  await register(jo, deviceToken());
+  const trip = await start(jo, JOURNEY, { deviceTools: [TRAVEL] });
+  expect(trip.status === 200 && (await until(() => sentFor(trip.id).length === 1)), "a journey only the phone can work out, with nobody there: one notification");
+  const needed = sentFor(trip.id)[0];
+  expect(needed?.body.aps.alert.body === "Dream needs your iPhone to work out a journey for “how long to drive to the…”" && needed.body.kind === "device" && !needed.body.aps.alert.title && needed.headers["apns-collapse-id"] === needed.body.page, "saying what for, and collapsing with the page's others");
+  // Opened from it, the app reads the page's events from the first, and finds the call waiting.
+  await pause(500);
+  const opened = await fetch(`${base}/api/compose/${trip.id}/events?after=0`, { headers: { Authorization: `Bearer ${jo.token}` } });
+  // The same line, read in two goes: up to the call, then on, as the app reads it.
+  const reader = opened.body.getReader();
+  const piece = () => new ReadableStream({ pull: async (controller) => { const { done, value } = await reader.read(); if (done) controller.close(); else controller.enqueue(value); } }, { highWaterMark: 0 });
+  const within = (reading) => Promise.race([reading, pause(20_000).then(() => [])]);
+  const caught = await within(read(piece(), (event) => event.type === "deviceTool"));
+  const waiting = caught.at(-1);
+  expect(waiting?.type === "deviceTool" && waiting.call.name === "travel" && waiting.deadline > Date.now() + 9 * 60_000, "its call is in the catch-up, with ten minutes to answer it");
+  const answered = await call(jo, `/api/compose/${trip.id}/tools`, { method: "POST", body: { id: waiting?.call.id, output: "Live source trip: current location to Kempegowda Airport, driving\n- trip.minutes = 52" } });
+  expect(answered.status === 200, "the phone's answer is taken");
+  const rest = await within(read(piece(), (event) => event.type === "done" || event.type === "failed"));  const lines = [...caught, ...rest].filter((event) => event.type === "log").map((event) => event.line);
+  expect(rest.at(-1)?.type === "done" && lines.some((each) => each.startsWith("The phone answered travel: ")) && lines.filter((each) => each === "Asked the phone to run travel").length === 1, "and the page goes on from there, and is made");
+  expect(sentFor(trip.id).length === 1, "seen as it's made, it sends nothing more");
 
   const ivan = await signIn("ivan");
   const deleted = deviceToken();

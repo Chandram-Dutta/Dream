@@ -73,7 +73,10 @@ export interface DeviceToolDefinition {
    * said otherwise. */
   service?: string;
   /** It changes something in the service (files an issue, sends a message) rather than reading:
-   * a request to act that never calls one is sent back (ConnectionLog.problems). */
+   * a request to act that never calls one is sent back (ConnectionLog.problems). The service's
+   * own hint, turned round (an MCP tool's readOnlyHint): true for a tool that changes things,
+   * which the phone offers only when the request asks to act; false for one that only reads;
+   * absent when its service doesn't say, which counts as one that may change, as on the phone. */
   changes?: boolean;
 }
 
@@ -93,10 +96,12 @@ export type ComposeEvent = { seq: number } & (
   /** Questions the loop waits on, as the app's Asking reads GapCheck's (Dream/Generation/GapCheck.swift). */
   | { type: "asking"; questions: unknown[] }
   | { type: "log"; line: string }
-  /** The phone should run one of its tools and answer at POST /api/compose/:id/tools. If no
-   * answer comes in 60 seconds (the app isn't open), the model is told it couldn't be read. The
-   * event stays in the log only while the call waits, and `deadline` (milliseconds since 1970)
-   * is when the server stops waiting on it: a call seen after that is stale. */
+  /** The phone should run one of its tools and answer at POST /api/compose/:id/tools. It waits
+   * 60 seconds while someone watches the page; with nobody watching, the account's iPhones are
+   * told (a `device` notification) and it waits 10 minutes, for the app to be opened. With no
+   * answer by then, the model is told it couldn't be read. The event stays in the log only while
+   * the call waits, and `deadline` (milliseconds since 1970) is when the server stops waiting on
+   * it: a call seen after that is stale, and isn't run. */
   | { type: "deviceTool"; call: { id: string; name: string; arguments: string }; deadline: number }
   /** Finished, and kept in sync under the request's pageID as a `surface` item (SurfacePayload). */
   | { type: "done"; surface: unknown; model: string; pageID: string }
@@ -110,7 +115,7 @@ export interface ComposeAnswers {
 
 /** POST /api/compose/:id/tools: what a device tool returned, as text for the model. Only the
  * page's own account may answer, and only a call still waiting (409 otherwise: it was answered,
- * or its 60 seconds are up and the model was told it couldn't be read). */
+ * or its deadline passed and the model was told it couldn't be read). */
 export interface DeviceToolOutput {
   id: string;
   output: string;

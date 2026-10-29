@@ -3,7 +3,8 @@
 // loop asks for it (model.ts, `fake`); /api/model never does. It answers in chat completions, as
 // the providers do once translated, slowly enough to watch: the gap check asks "Which Mercury?"
 // about Mercury and nothing otherwise; the writing looks its subject up first when the request
-// says "look up", then streams a small page, thinking a little before it starts.
+// says "look up", and asks the phone for a journey first when it asks how long or how far and
+// the phone offers its travel tool, then streams a small page, thinking a little before it starts.
 //
 // No imports, so test/compose.mjs runs it in Node.
 
@@ -110,11 +111,18 @@ export function fakeModel(body: JSONObject): Response {
       const subject = request.replace(/.*\blook up\b/i, "").trim() || request;
       pieces = [{ tool_calls: [{ index: 0, id: "call-fake-0", type: "function", function: { name: "lookup", arguments: JSON.stringify({ subject, language: "en" }) } }] }];
       finish = "tool_calls";
+    } else if (/\bhow (?:long|far)\b/i.test(request) && tools.includes("travel") && !messages.some((message) => message.role === "tool")) {
+      // A journey is the phone's to work out (contract.ts), so it's asked, as a model would, once
+      // for the page: a repair has the answer already.
+      const to = /.*\bto (?:the )?(.+?)[?.!]*$/i.exec(request)?.[1] ?? "there";
+      pieces = [{ tool_calls: [{ index: 0, id: "call-fake-travel", type: "function", function: { name: "travel", arguments: JSON.stringify({ name: "trip", from: "current location", to, travel: "driving" }) } }] }];
+      finish = "tool_calls";
     } else {
       const asked = messages.filter((message) => message.role === "user").map((message) => textOf(message.content)).join("\n");
       const block = /Before building, the user answered:\n((?:- .*\n?)+)/.exec(asked)?.[1] ?? "";
       const answered = block.split("\n").filter(Boolean).map((line) => line.slice(2));
-      const title = looked ? (/Wikipedia, "([^"]+)"/.exec(textOf(looked.content))?.[1] ?? "nothing found") : null;
+      const said = looked ? textOf(looked.content) : "";
+      const title = looked ? (/Wikipedia, "([^"]+)"/.exec(said)?.[1] ?? (said.split("\n")[0].slice(0, 80) || "nothing found")) : null;
       pieces = answer(page(request, answered, title));
     }
   }

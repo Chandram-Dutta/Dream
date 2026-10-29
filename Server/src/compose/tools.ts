@@ -15,7 +15,7 @@
 //
 // test/compose.mjs runs it in Node.
 
-import type { Action, Surface } from "../engine/index";
+import type { Action, Issue, Surface } from "../engine/index";
 import type { DeviceToolDefinition } from "./contract";
 import { liveCall, type DeviceAnswer, type Here, type LiveLog, type Reader } from "./live";
 import type { Memory, Remembered } from "./memory";
@@ -187,11 +187,16 @@ export interface ToolNotes {
 /** Runs one of the phone's tools: what it answered, or null when no answer came in time. */
 export type DeviceRunner = (call: { name: string; arguments: string }) => Promise<DeviceAnswer | null>;
 
-/** The connected services a page read, and the buttons for theirs it already had
- * (ConnectionLog): a change keeps what the page shows. */
+/** The connected services a page read, the buttons for theirs it already had, and which changing
+ * tools were offered and tried (ConnectionLog): a change keeps what the page shows. */
 export class ServiceLog {
   private readonly earlier: Action[];
   private readonly used: string[];
+  /** The changing tools offered because the request asks to do something, by the names the
+   * model calls them: the phone offers them only then (ToolPicker.asksToAct). */
+  private offered: string[] = [];
+  /** Changing tools the model called, whether or not the user allowed them. */
+  private readonly attempted = new Set<string>();
 
   constructor(keeping: Surface | null = null) {
     this.earlier = (keeping?.actions ?? []).filter((action) => action.kind === "connection");
@@ -200,6 +205,23 @@ export class ServiceLog {
 
   use(service: string): void {
     if (service && !this.used.includes(service)) this.used.push(service);
+  }
+
+  offer(tools: string[]): void {
+    this.offered = [...tools];
+  }
+
+  tried(tool: string): void {
+    this.attempted.add(tool);
+  }
+
+  /** ConnectionLog.problems: what goes back to the model with the checker's problems, when the
+   * request asks to do something a service's tool does and it never called that tool. Models
+   * often write a reminder in its place, or say it's done. In the app's words; keep the two the
+   * same. */
+  problems(): Issue[] {
+    if (!this.offered.length || this.attempted.size) return [];
+    return [{ kind: "needsModel", message: `The request asks to do something in a connected service, but you didn't call ${this.offered.join(" or ")}. Call it now with the values to send: Dream asks the user, and it runs if they allow it. Then say on the screen what happened, and drop any other action standing in for it.` }];
   }
 
   /** Surface.connected: the service buttons it had that it still shows, and the services whose
@@ -382,8 +404,10 @@ export function toolBox(generation: Generation, services: ToolServices, notes: T
   /** One of the phone's tools: what it returned, with the live source it declared (a travel
    * time, or a connected service's look-up kept current) and the service it read. When the phone
    * didn't answer, the model is told it couldn't be read, in the words the app uses when a source
-   * or a service fails (LiveTool, ConnectionTool.run). */
+   * or a service fails (LiveTool, ConnectionTool.run). A connected service's tool that may change
+   * something (one whose service doesn't say counts) is tried as it's called, as on the phone. */
   const phone = (definition: DeviceToolDefinition) => async (_args: JSONObject, argumentsJSON: string): Promise<string> => {
+    if (definition.name !== TRAVEL && definition.changes !== false) session.services.tried(definition.name);
     const answer = await ask(definition.name, argumentsJSON);
     if (!answer) {
       if (definition.name === TRAVEL) return fill(text.live.failed, { message: "Dream couldn't reach the phone to read this." });
@@ -399,6 +423,8 @@ export function toolBox(generation: Generation, services: ToolServices, notes: T
   // A phone's tool named like one of the server's own isn't offered: the server's is.
   const theirs = [...phoneTools.values()].filter((tool) => !(tool.name in tools));
   for (const tool of theirs) tools[tool.name] = phone(tool);
+  // The phone sends a service's changing tools only when the request asks to do something.
+  session.services.offer(theirs.filter((tool) => tool.name !== TRAVEL && tool.changes === true).map((tool) => tool.name));
   return {
     definitions: [...own(OWN), ...theirs.map((tool) => ({ name: tool.name, description: tool.description, parameters: tool.parameters as JSONObject })), ...own(WEB)],
     connections: theirs.filter((tool) => tool.name !== TRAVEL).map((tool) => tool.name),

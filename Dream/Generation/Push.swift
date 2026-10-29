@@ -1,7 +1,8 @@
 import Foundation
 
 // Notifications from Dream's server (docs/ServerGeneration.md, Stage 3; Server/src/push.ts): a page
-// made there with nobody watching says when it's ready, or when Dream has a question about it.
+// made there with nobody watching says when it's ready, when Dream has a question about it, or when
+// it needs one of this iPhone's own tools, which only run with the app open.
 // What a notification carries, where tapping one goes, and which of Apple's servers this build's
 // token belongs to. Nothing here needs an iPhone, so Tools/tests.sh checks it on a Mac; asking,
 // registering and opening are Dream/Account/Notifications.swift.
@@ -14,6 +15,9 @@ struct PushPayload: Equatable, Sendable {
         case done
         /// Questions wait on an answer.
         case asking
+        /// The page waits on one of this iPhone's tools (a connected service, a journey), which
+        /// runs once the page is open again, asking first as it always does (DeviceTools.swift).
+        case device
     }
 
     let page: UUID
@@ -51,7 +55,9 @@ enum PushOpening<Saved, Forming> {
     case shelf
 
     /// The page if it's saved, whatever the notification said, since it may have finished since;
-    /// the page being made if it's still started here; the shelf otherwise.
+    /// the page being made if it's still started here, whose screen follows it again and puts its
+    /// question, or the call to this iPhone's tools it waits on, in front of the user; the shelf
+    /// otherwise.
     static func destination(for payload: PushPayload?, saved: (UUID) -> Saved?, forming: (UUID) -> Forming?) -> PushOpening {
         guard let payload else { return .shelf }
         if let page = saved(payload.page) { return .page(page) }

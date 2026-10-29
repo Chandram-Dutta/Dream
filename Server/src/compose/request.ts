@@ -146,7 +146,8 @@ function readEditing(value: unknown): { editing: ComposeEditing } | { error: str
   return { editing: { surface, answer: { question: answer.question, choice: answer.choice.trim() } } };
 }
 
-/** The phone's tools: each with a name the model can call, what it does, and its arguments. */
+/** The phone's tools: each with a name the model can call, what it does, and its arguments, and
+ * whether it changes things, when its service says. */
 function readDeviceTools(value: unknown): { tools: DeviceToolDefinition[] } | { error: string } {
   if (!Array.isArray(value) || value.length > MAX_DEVICE_TOOLS || bytes(value) > MAX_DEVICE_TOOLS_BYTES) return { error: `deviceTools is a list of up to ${MAX_DEVICE_TOOLS} tools.` };
   const tools: DeviceToolDefinition[] = [];
@@ -156,7 +157,8 @@ function readDeviceTools(value: unknown): { tools: DeviceToolDefinition[] } | { 
     }
     if (tools.some((other) => other.name === tool.name)) return { error: `deviceTools has ${tool.name} twice.` };
     const service = typeof tool.service === "string" && tool.service.trim() ? tool.service.trim().slice(0, 100) : undefined;
-    tools.push({ name: tool.name, description: tool.description, parameters: tool.parameters, ...(service ? { service } : {}) });
+    const changes = typeof tool.changes === "boolean" ? tool.changes : undefined;
+    tools.push({ name: tool.name, description: tool.description, parameters: tool.parameters, ...(service ? { service } : {}), ...(changes !== undefined ? { changes } : {}) });
   }
   return { tools };
 }

@@ -471,6 +471,12 @@ struct ServerChangeTests {
         #expect(event(#"{"seq":4,"type":"deviceTool","call":{"name":"travel","arguments":"{}"}}"#)?.kind == .other("deviceTool"), "a call without its id can't be answered")
         #expect(event(#"{"seq":5,"type":"deviceTool"}"#)?.kind == .other("deviceTool"))
         #expect(EventLine.event(#"data: {"seq":6,"type":"deviceTool","call":{"id":"c","name":"travel","arguments":"{}"}}"#)?.seq == 6)
+        guard case .deviceTool(let timed)? = event(#"{"seq":7,"type":"deviceTool","call":{"id":"c","name":"travel","arguments":"{}"},"deadline":1793270400000}"#)?.kind else {
+            Issue.record("a call with its deadline")
+            return
+        }
+        #expect(timed.deadline == Date(timeIntervalSince1970: 1_793_270_400), "with when the server stops waiting on it, from milliseconds since 1970")
+        #expect(call.deadline == nil, "and none from a server that doesn't say")
     }
 
     @Test("A change keeps the page on screen until the changed one is done")
@@ -611,6 +617,59 @@ struct ServerChangeTests {
         follow.runTool = { await devices.run($0) }
         #expect(await follow.run() == .done)
         #expect(tool.calls.count == 1 && server.returned.isEmpty, "it began, was stopped, and nothing went back")
+        #expect(follow.progress.log.contains("Dream's server went on without count, so what it returned wasn't sent."))
+    }
+
+    @Test("A call read again runs only before its deadline, and waits on the user until a little before it")
+    @MainActor func deadlines() async {
+        var stale = counting
+        stale.id = "call-stale"
+        stale.deadline = Date.now.addingTimeInterval(-60)
+        var close = counting
+        close.id = "call-close"
+        close.deadline = Date.now.addingTimeInterval(3)
+        var fresh = counting
+        fresh.id = "call-fresh"
+        fresh.deadline = Date.now.addingTimeInterval(600)
+        // As the app opened from a notification reads the page from its first event.
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(stale))),
+            .event(ComposeEvent(seq: 2, kind: .deviceTool(close))),
+            .event(ComposeEvent(seq: 3, kind: .deviceTool(fresh))),
+            .awaitOutput(.seconds(5)),
+            .event(ComposeEvent(seq: 4, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        let devices = DeviceTools([tool.entry()])
+        let follow = watch(server)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.count == 1 && server.returned.map(\.id) == ["call-fresh"], "only the call the server still waits on runs, and goes back")
+        #expect(follow.progress.log.filter { $0 == "Dream's server had stopped waiting on count, so it wasn't run." }.count == 2,
+                "one past its deadline, or too close to it, isn't run at all")
+
+        #expect(follow.timeLeft(for: counting) == follow.patience, "a call from a server that sends no deadline waits its minute, less the margin")
+        let left = follow.timeLeft(for: fresh, at: fresh.deadline!.addingTimeInterval(-65)) ?? .zero
+        #expect(left > .seconds(59) && left <= .seconds(60), "one with ten minutes waits until a little before them: \(left)")
+        #expect(follow.timeLeft(for: fresh, at: fresh.deadline!.addingTimeInterval(-4)) == nil, "and none once that's past")
+    }
+
+    @Test("A call still waiting on the user near its deadline is given up on, and nothing is sent")
+    @MainActor func nearDeadline() async {
+        var call = counting
+        call.deadline = Date.now.addingTimeInterval(1.2)
+        let server = ScriptedServer([[
+            .event(ComposeEvent(seq: 1, kind: .deviceTool(call))),
+            .awaitOutput(.seconds(2)),
+            .event(ComposeEvent(seq: 2, kind: .done(billSplit(), model: "grok-4.7"))),
+        ]])
+        let tool = Counting()
+        let devices = DeviceTools([tool.entry(taking: .seconds(30))])
+        let follow = watch(server)
+        follow.margin = .milliseconds(500)
+        follow.runTool = { await devices.run($0) }
+        #expect(await follow.run() == .done)
+        #expect(tool.calls.count == 1 && server.returned.isEmpty, "it began, was stopped before the deadline, and nothing went back")
         #expect(follow.progress.log.contains("Dream's server went on without count, so what it returned wasn't sent."))
     }
 
