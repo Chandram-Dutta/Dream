@@ -2,9 +2,10 @@
 // The runner (runner.ts) decides what happens; this keeps it in the object's SQLite storage, runs
 // it on the object's alarm, and gives the loop what it calls in-process: the model through
 // model.ts's checks, routing, metering and translation, Auto's pick (route.ts), web search and
-// reading (web.ts), Wikipedia, what Dream remembers (the account's synced facts), the engine,
-// the finished page kept in sync (sync.ts): a new page as a new item, a change onto the item
-// the account keeps; and the notifications for a page nobody is watching (push.ts).
+// reading (web.ts), Wikipedia, what Dream remembers (the account's synced facts), Apple Weather
+// (weatherkit.ts), the engine, the finished page kept in sync (sync.ts): a new page as a new
+// item, a change onto the item the account keeps; and the notifications for a page nobody is
+// watching (push.ts).
 //
 // The Worker talks to it over fetch, only ever for a signed-in user, whose id it sends:
 //
@@ -31,8 +32,9 @@ import { changedItem, surfaceItem, type MadeChange, type SurfaceItem } from "./p
 import { changeOf, questionOf, sameQuestion, type Generation } from "./prompts";
 import { Runner, type EventBody, type JobRecord, type JobStore } from "./runner";
 import type { WebAnswer } from "./tools";
+import { weatherKitConfig, type WeatherKitEnv } from "./weatherkit";
 
-export interface ComposeEnv extends RouteEnv, WebEnv, SyncEnv, AnalyticsEnv, PushEnv {
+export interface ComposeEnv extends RouteEnv, WebEnv, SyncEnv, AnalyticsEnv, PushEnv, WeatherKitEnv {
   /** The PageJob Durable Objects (wrangler.jsonc). */
   PAGE_JOBS?: DurableObjectNamespace;
 }
@@ -145,6 +147,7 @@ export class PageJob implements DurableObject {
         memory: async () => confirmedFacts(await readBodies(env, job.owner, "fact")),
         fetch: (url, init) => fetch(url, init),
         here: job.here ?? null,
+        weatherKit: weatherKitConfig(env),
       },
       now: Date.now,
       sleep: (ms, signal) =>

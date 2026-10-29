@@ -73,7 +73,12 @@ compares (`Server/test/engine.mjs`). Change the Swift engine, run the script, po
 ```
 
 Answers `{ "id": "job id" }`. The types are `Server/src/compose/contract.ts`. Changes to a page
-(Stage 2) add an `editing` field. The finished page is written to sync as a `surface` item
+(Stage 2) add an `editing` field. When the user has already allowed location, the phone adds
+`here`: its position rounded to about a kilometre, the place's name (town, region, country) and
+its time zone, and a line in `context`, "The user is in Bengaluru, Karnataka, India." It never
+asks for location for this, and waits at most two seconds for a fix. The server's weather "here"
+uses it, or else where Cloudflare places the request; the coordinates never reach the model or
+the page. The finished page is written to sync as a `surface` item
 (the app's `SurfacePayload`, Dream/Sync/SyncPayloads.swift) under `pageID`, and the app saves a
 page it watched under the same id, so it's never kept twice.
 
@@ -114,8 +119,10 @@ the model, with the message the phone's own loop sends (ConnectionLog.problems).
    on the server (Under the hood can turn it off in a testing build).
 2. **Everything a page can be.** Changes to a page (`editing`: an instruction, a different answer,
    or made again); memory, read from the account's synced facts; live data from the server (the
-   weather from Open-Meteo and exchange rates from ExchangeRate-API, with the same fields the app's
-   providers give, so the phone refreshes them as its own); recordings and molecules. Server side
+   weather from Apple Weather, WeatherKit's REST API, as the phone reads it, with Open-Meteo
+   standing in until its secrets are set or when it fails; exchange rates from ExchangeRate-API;
+   with the same fields the app's providers give, so the phone refreshes them as its own);
+   recordings and molecules. Server side
    done 2026-10-29, with the phone's tools (Stage 4's `deviceTools`): the instructions are put
    together from the features whose tools are offered, so they never describe a tool that isn't
    offered, nor offer one they don't describe.

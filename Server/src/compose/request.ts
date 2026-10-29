@@ -1,6 +1,7 @@
 // What POST /api/compose takes (contract.ts), checked before a job is made for it: the request
 // and its photo within the sizes the app sends, the locale's fields, the context lines, an id
-// the app's sync can keep the page under, a change to a page, and the phone's own tools.
+// the app's sync can keep the page under, a change to a page, the phone's own tools, and where
+// the user is.
 //
 // Only types are imported, so test/compose.mjs runs it in Node.
 
@@ -74,6 +75,13 @@ export function readComposeRequest(body: unknown): { request: ComposeRequest } |
     if (checked.tools.length) deviceTools = checked.tools;
   }
 
+  let here: ComposeRequest["here"];
+  if (body.here !== undefined && body.here !== null) {
+    const checked = readHere(body.here);
+    if ("error" in checked) return checked;
+    here = checked.here;
+  }
+
   return {
     request: {
       request: text,
@@ -85,8 +93,22 @@ export function readComposeRequest(body: unknown): { request: ComposeRequest } |
       pageID: body.pageID,
       ...(editing ? { editing } : {}),
       ...(deviceTools ? { deviceTools } : {}),
+      ...(here ? { here } : {}),
     },
   };
+}
+
+/** Where the user is: a place on Earth, to about a kilometre whatever was sent, and its name. */
+function readHere(value: unknown): { here: NonNullable<ComposeRequest["here"]> } | { error: string } {
+  const wrong = { error: "here is where the user is: latitude, longitude and the place's name." };
+  if (!isObject(value) || typeof value.latitude !== "number" || typeof value.longitude !== "number" || typeof value.name !== "string") return wrong;
+  if (!(Math.abs(value.latitude) <= 90 && Math.abs(value.longitude) <= 180)) return wrong;
+  const name = value.name.replace(/\s+/g, " ").trim();
+  if (name.length > 200) return wrong;
+  // A time zone's name, like America/Argentina/Buenos_Aires; one that isn't is left out.
+  const timeZone = typeof value.timeZone === "string" && /^[A-Za-z][A-Za-z0-9_+-]*(\/[A-Za-z0-9_+-]+){0,2}$/.test(value.timeZone) && value.timeZone.length <= 64 ? value.timeZone : undefined;
+  const coarse = (degrees: number) => Math.round(degrees * 100) / 100;
+  return { here: { latitude: coarse(value.latitude), longitude: coarse(value.longitude), name, ...(timeZone ? { timeZone } : {}) } };
 }
 
 /** A page as big as sync keeps one (Sync.maxItem), which is what's being changed. */

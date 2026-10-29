@@ -101,9 +101,10 @@ enum Prompts {
     }
 
     /// What the model is told alongside each request about the user and their device. Each
-    /// feature adds its own lines from its own file.
-    static func context(for intent: String) async -> [String] {
-        await memoryContext(for: intent) + languageContext(for: intent) + liveContext() + connectionContext(for: intent) + webContext()
+    /// feature adds its own lines from its own file. `place` is where the user is, for a page
+    /// made on Dream's server (`languageContext`).
+    static func context(for intent: String, in place: String? = nil) async -> [String] {
+        await memoryContext(for: intent) + languageContext(for: intent, in: place) + liveContext() + connectionContext(for: intent) + webContext()
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {

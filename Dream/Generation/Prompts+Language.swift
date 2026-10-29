@@ -19,8 +19,10 @@ extension Prompts {
     }
 
     /// The language of the request, and the user's region, currency, measurement system and
-    /// way of writing numbers.
-    static func languageContext(for intent: String) -> [String] {
+    /// way of writing numbers. A page made on Dream's server is told where the user is too, when
+    /// they've let Dream know: `place`, like Bengaluru, Karnataka, India. The phone's own loop
+    /// reads where they are only for the sources that need it.
+    static func languageContext(for intent: String, in place: String? = nil) -> [String] {
         let locale = Locale.current
         let english = Locale(identifier: "en")
         var lines: [String] = []
@@ -43,6 +45,9 @@ extension Prompts {
         }
         region.append(numberStyle(locale))
         lines.append(region.joined(separator: " "))
+        if let place, !place.isEmpty {
+            lines.append("The user is in \(place).")
+        }
         return lines
     }
 

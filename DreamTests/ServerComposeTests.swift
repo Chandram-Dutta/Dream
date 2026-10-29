@@ -332,6 +332,40 @@ struct ServerComposeTests {
         let fields = try JSONSerialization.jsonObject(with: JSONEncoder().encode(plain)) as? [String: Any]
         #expect(fields?["image"] == nil, "no photo, no field")
         #expect((fields?["model"] as? String) == Composer.dreamModelID)
+        #expect(fields?["here"] == nil, "nowhere, unless the user has let Dream know")
+    }
+
+    @Test("Where the user is goes with a page to about a kilometre, and the model is told only its name")
+    func here() throws {
+        let place = LivePlace(name: "Bengaluru", latitude: 12.971599, longitude: 77.594566, timeZone: TimeZone(identifier: "Asia/Kolkata")!,
+                              isHere: true, area: "Bengaluru, Karnataka, India")
+        let here = ComposeStart.Here(place)
+        let intent = "will it rain here this evening?"
+        var start = ComposeStart(intent: intent, image: nil, page: UUID(), context: Prompts.languageContext(for: intent, in: here.name))
+        start.here = here
+        let text = String(decoding: try start.body(), as: UTF8.self)
+        let body = try #require(try JSONSerialization.jsonObject(with: start.body()) as? [String: Any])
+        let sent = try #require(body["here"] as? [String: Any])
+        #expect(Set(sent.keys) == ["latitude", "longitude", "name", "timeZone"])
+        #expect(sent["latitude"] as? Double == 12.97 && sent["longitude"] as? Double == 77.59, "rounded to two places of a degree")
+        #expect(sent["name"] as? String == "Bengaluru, Karnataka, India" && sent["timeZone"] as? String == "Asia/Kolkata", "town, region and country, and this iPhone's time zone")
+        #expect(!text.contains("12.9715") && !text.contains("77.5945"), "never where exactly")
+
+        let context = try #require(body["context"] as? [String])
+        let plain = Prompts.languageContext(for: intent)
+        #expect(context == plain + ["The user is in Bengaluru, Karnataka, India."], "one line more, after the region's, among what the model is told about the user")
+        #expect(!context.joined().contains("12.97"), "and only the name: the coordinates are the server's, for the weather")
+        #expect(!plain.joined().contains("The user is in") && Prompts.languageContext(for: intent, in: "") == plain,
+                "without a place, or one Maps couldn't name, the lines are as the phone's own loop has them")
+    }
+
+    @Test("Where the user is is never asked for, nor stood in")
+    func hereNotAsked() async {
+        // On the Mac the location is a stand-in (LiveSources.standIns), which a page on the server
+        // is never told.
+        let started = ContinuousClock.now
+        #expect(await Places.hereIfAllowed() == nil)
+        #expect(ContinuousClock.now - started < .seconds(1), "at once")
     }
 }
 

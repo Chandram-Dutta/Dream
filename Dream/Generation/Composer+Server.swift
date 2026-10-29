@@ -23,8 +23,9 @@ extension Composer {
             show(progress, job: nil)
             return .failed
         }
-        let context = await Prompts.context(for: intent)
+        let (context, here) = await aboutTheUser(intent)
         var start = ComposeStart(intent: intent, image: image, page: page, context: context)
+        start.here = here
         start.deviceTools = offerDeviceTools(for: intent, changing: nil).definitions
         return await begin(start, page: page, from: progress, through: transport)
     }
@@ -42,10 +43,18 @@ extension Composer {
             show(failed, job: nil)
             return .failed
         }
-        let context = await Prompts.context(for: intent)
+        let (context, here) = await aboutTheUser(intent)
         var start = ComposeStart(changing: change, intent: intent, image: image, page: page, context: context)
+        start.here = here
         start.deviceTools = offerDeviceTools(for: change.request(intent), changing: change.kind == .again ? nil : change.base).definitions
         return await begin(start, page: page, from: progress, through: transport)
+    }
+
+    /// What this iPhone tells the server about the user with a request: the lines it adds below
+    /// it, and where they are, when they've already let Dream know, which a line says by name.
+    private func aboutTheUser(_ intent: String) async -> (context: [String], here: ComposeStart.Here?) {
+        let here = await Places.hereIfAllowed().map(ComposeStart.Here.init)
+        return (await Prompts.context(for: intent, in: here?.name), here)
     }
 
     /// Shows a change as begun, at once, so the screen that asked never sees it idle.

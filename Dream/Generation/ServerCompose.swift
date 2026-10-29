@@ -61,6 +61,20 @@ struct ComposeStart: Encodable, Equatable {
     /// The tools only this iPhone can run, which the server offers the model and asks the phone
     /// to run (DeviceTools.swift).
     var deviceTools: [DeviceToolDefinition]?
+    /// Where the user is, when they've already let Dream know (`Places.hereIfAllowed`), for the
+    /// weather "here" on the server. Its name is in `context` too; the coordinates go no further
+    /// than the server, never to the model or onto the page.
+    var here: Here?
+
+    /// Where the user is: to about a kilometre, the place's name, and this iPhone's time zone,
+    /// where the weather's days start and end there.
+    struct Here: Encodable, Equatable {
+        var latitude: Double
+        var longitude: Double
+        /// Town, region and country, like Bengaluru, Karnataka, India. Empty when Maps can't say.
+        var name: String
+        var timeZone: String?
+    }
 
     /// What's changing, and the page as it is now (PageChange).
     struct Editing: Encodable, Equatable {
@@ -112,6 +126,14 @@ extension ComposeStart {
     /// declared, as the phone sends a model its tools (ChatCompletions.ordered).
     func body() throws -> Data {
         try ChatCompletions.ordered(JSONSerialization.jsonObject(with: JSONEncoder().encode(self)))
+    }
+}
+
+extension ComposeStart.Here {
+    /// Where the user is, rounded to two decimal places of a degree: about a kilometre.
+    init(_ place: LivePlace) {
+        func coarse(_ degrees: Double) -> Double { (degrees * 100).rounded() / 100 }
+        self.init(latitude: coarse(place.latitude), longitude: coarse(place.longitude), name: place.area, timeZone: place.timeZone.identifier)
     }
 }
 

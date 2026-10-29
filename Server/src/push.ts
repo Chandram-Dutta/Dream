@@ -21,7 +21,7 @@
 // Only types are imported besides auth.ts, reply.ts and apple.ts, so test/push.mjs runs the
 // sender in Node with a key of its own and a stand-in for Apple.
 
-import { encodeBase64URL, pemBytes } from "./apple";
+import { signES256 } from "./apple";
 import { sessionHash, signInNeeded, userFrom, type AuthEnv } from "./auth";
 import type { PushDevice, PushPayload } from "./compose/contract";
 import { allowed, bodyBytes, isJSON, object, problem } from "./reply";
@@ -208,11 +208,7 @@ let signed: { keyID: string; teamID: string; iat: number; token: string } | null
 export async function providerToken(config: APNsConfig, now = Date.now()): Promise<string> {
   const iat = Math.floor(now / 1000 / TOKEN_WINDOW) * TOKEN_WINDOW;
   if (signed && signed.iat === iat && signed.keyID === config.keyID && signed.teamID === config.teamID) return signed.token;
-  const key = await crypto.subtle.importKey("pkcs8", pemBytes(config.key), { name: "ECDSA", namedCurve: "P-256" }, false, ["sign"]);
-  const input = `${encodeBase64URL(JSON.stringify({ alg: "ES256", kid: config.keyID }))}.${encodeBase64URL(JSON.stringify({ iss: config.teamID, iat }))}`;
-  // WebCrypto signs ECDSA as r ‖ s, which is what JWS expects.
-  const signature = await crypto.subtle.sign({ name: "ECDSA", hash: "SHA-256" }, key, new TextEncoder().encode(input));
-  const token = `${input}.${encodeBase64URL(new Uint8Array(signature))}`;
+  const token = await signES256(config.key, { alg: "ES256", kid: config.keyID }, { iss: config.teamID, iat });
   signed = { keyID: config.keyID, teamID: config.teamID, iat, token };
   return token;
 }

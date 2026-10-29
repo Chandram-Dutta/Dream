@@ -860,11 +860,13 @@ Object for that page, which runs the loop on its alarm and keeps its events in i
   `Tools/export-generation.sh` writes from the app; the instructions are put together from the
   features whose tools are offered, so they never describe a tool that isn't (`prompts.ts`).
 - **Tools** (`tools.ts`): lookup (Wikipedia), recall (the account's synced, confirmed facts,
-  `memory.ts`), live (the weather from Open-Meteo and exchange rates from ExchangeRate-API, with
-  the fields the app's own providers give, `live.ts`), search and read, and the phone's own
-  (`deviceTools`: connected services and travel times). A call to one of the phone's is a
-  `deviceTool` event; the loop waits for `POST …/tools` (The phone, below), then tells the model it
-  couldn't be read. "Here", for the weather, is where Cloudflare places the request.
+  `memory.ts`), live (the weather from Apple Weather, below, and exchange rates from
+  ExchangeRate-API, with the fields the app's own providers give, `live.ts`), search and read,
+  and the phone's own (`deviceTools`: connected services and travel times). A call to one of the
+  phone's is a `deviceTool` event; the loop waits for `POST …/tools` (The phone, below), then
+  tells the model it couldn't be read. "Here", for the weather, is where the phone says the user
+  is, when they've allowed location (the request's `here`), or else where Cloudflare places the
+  request.
 - **Changes** (`editing`) are made from the page as it is, as Composer.edit makes them, and kept
   onto the page's item in sync: its history and editRequests added to, its log, and the user's
   numbers where the change left their inputs alone.
@@ -888,6 +890,33 @@ Locally, `MODEL_FAKE=1` with `DEV_LOGIN=1` answers the page loop's model request
 stand-in (`src/compose/fake.ts`) and skips Clef, so `wrangler dev` makes whole pages without a
 provider's key; `/api/model` never uses it. `npm test` runs the loop on scripted streams
 (`test/compose.mjs`) and the routes on the stand-in (`test/compose-http.mjs`).
+
+### Apple Weather
+
+The weather a page reads comes from WeatherKit's REST API (`src/compose/weatherkit.ts`), the
+service the app's own WeatherProvider reads, so a page's values are the ones the phone refreshes
+them to; `live.ts` makes the fields from WeatherKit's values as `LiveWeather.swift` does. Each
+request asks for the place's day from midnight to midnight there, in its time zone, with its
+hours when an hour was asked for and the weather now for today. Places by name are found with
+Open-Meteo's geocoding (no key).
+
+It needs three secrets: `WEATHERKIT_KEY` (the .p8's text), `WEATHERKIT_KEY_ID` and
+`WEATHERKIT_TEAM_ID`. The key is one with WeatherKit ticked, under Keys in the developer portal,
+and WeatherKit is enabled for `xyz.onlychan.Dream` (Identifiers, App Services). Each request
+carries an ES256 JWT (`kid` the key, `id` team.bundle ID; `iss` the team, `sub` the bundle ID),
+good for an hour and reused for half of it; after a 401 or 403 the next request signs a new one.
+Until the secrets are set, and whenever WeatherKit doesn't answer with a forecast, the weather
+comes from Open-Meteo instead, with the same fields; the page's log says which ("Weather from
+Apple Weather", or "from Open-Meteo, since …"), and the Worker logs why.
+
+```sh
+npx wrangler secret put WEATHERKIT_KEY < AuthKey_ABC123DEFG.p8
+printf %s "ABC123DEFG" | npx wrangler secret put WEATHERKIT_KEY_ID
+printf %s "DR99P625RR" | npx wrangler secret put WEATHERKIT_TEAM_ID
+```
+
+`npm test` runs `test/weather.mjs`: the token, made with a key of its own and checked with its
+public half, and every kind of reading against a stand-in for WeatherKit, with nothing sent.
 
 ## Notifications
 
