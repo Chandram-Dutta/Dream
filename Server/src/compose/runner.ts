@@ -11,10 +11,12 @@
 // so only the latest stays in the log: a watcher catching up gets the page as it stands, not
 // every step of it. If the object is restarted mid-page, the alarm runs again and the page starts
 // over, keeping only the model Auto picked and any answers. A day after it's done, it's forgotten.
+// A page finished, or questions asked, while nobody watches is a notification (push.ts).
 //
 // test/compose.mjs runs it in Node, with a store kept in memory.
 
 import type { Surface } from "../engine/index";
+import { pageReady, questionWaiting, type Notice } from "../push";
 import type { ComposeEvent, ComposeRequest } from "./contract";
 import { Cancelled, leftToDream, PageLoop, TIMING, type LoopServices, type PagePick, type Start, type Timing } from "./loop";
 import type { Answer, Question } from "./prompts";
@@ -81,6 +83,9 @@ export interface JobServices {
   finish(job: JobRecord, request: ComposeRequest, surface: Surface, log: string[], model: string): Promise<string | null>;
   /** An analytics event, for someone who lets Dream count what's used. */
   analytics(job: JobRecord, event: string, properties: Record<string, string | number | boolean | null | string[]>): void;
+  /** Tells the account's iPhones what they'd come back for (push.ts). Absent where nothing is
+   * sent, as in tests. */
+  notify?(job: JobRecord, notice: Notice): void;
   now(): number;
 }
 
@@ -151,6 +156,8 @@ export class Runner {
   private readonly waiters = new Set<() => void>();
   /** The loop is running in this instance. */
   private active = false;
+  /** Event streams open now: someone is watching, and needs no notification. */
+  private watchers = 0;
 
   constructor(store: JobStore, services: JobServices, timing: JobTiming = JOB_TIMING, loopTiming: Timing = TIMING) {
     this.store = store;
@@ -267,6 +274,8 @@ export class Runner {
           job.deadline = this.now + this.timing.answerWait;
           this.save(job);
           this.emit({ type: "asking", questions: outcome.questions });
+          // Push: nobody is there to answer, so the account's iPhones are told.
+          if (!this.watchers) this.services.notify?.(job, questionWaiting(job, request.request, this.now));
           await this.store.setAlarm(job.deadline);
           return;
         }
@@ -287,6 +296,8 @@ export class Runner {
           job.finishedAt = this.now;
           this.save(job);
           this.emit({ type: "done", surface: outcome.surface, model: outcome.model, pageID: job.pageID });
+          // Push: nobody saw it finish, so the account's iPhones are told it's ready.
+          if (!this.watchers) this.services.notify?.(job, pageReady(job, request.request, outcome.surface, this.now));
           this.services.analytics(job, "page_built", { ...pageShape(outcome.surface), model: outcome.model, seconds: seconds(this.now - job.startedAt) });
           await this.store.setAlarm(job.finishedAt + this.timing.keep);
           return;
@@ -343,6 +354,13 @@ export class Runner {
     const encoder = new TextEncoder();
     let cursor = after;
     let cancelled = false;
+    // Push: counted while it's open, so a page nobody watches notifies instead.
+    let open = true;
+    this.watchers += 1;
+    const leave = () => {
+      if (open) this.watchers -= 1;
+      open = false;
+    };
     return new ReadableStream<Uint8Array>(
       {
         pull: async (controller) => {
@@ -358,11 +376,15 @@ export class Runner {
                 if (event.type === "done" || event.type === "failed") ended = true;
               }
               controller.enqueue(encoder.encode(out));
-              if (ended) controller.close();
+              if (ended) {
+                leave();
+                controller.close();
+              }
               return;
             }
             const now = this.job;
             if (!now || finished(now.status)) {
+              leave();
               controller.close();
               return;
             }
@@ -374,6 +396,7 @@ export class Runner {
         },
         cancel: () => {
           cancelled = true;
+          leave();
         },
       },
       { highWaterMark: 0 },

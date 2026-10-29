@@ -76,6 +76,18 @@ const HOLDINGS: Holding[] = [
       })),
     erase: async (env, user) => sharingErasure(env, user),
   },
+  {
+    name: "notifications",
+    // Which kinds of build get notifications, and since when; never the devices' tokens. Before
+    // sessions, which each device row refers to.
+    export: async (env, user) =>
+      (await rows(env, "SELECT environment, created_at, updated_at FROM push_devices WHERE user_id = ? ORDER BY created_at", user)).map((row) => ({
+        build: row.environment === "sandbox" ? "development" : "App Store or TestFlight",
+        since: date(row.created_at),
+        lastRegisteredAt: date(row.updated_at),
+      })),
+    erase: async (env, user) => [env.DB.prepare("DELETE FROM push_devices WHERE user_id = ?").bind(user)],
+  },
 ];
 
 /** Who the person is, and where they're signed in. Always last. */

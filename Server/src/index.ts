@@ -14,6 +14,7 @@
 //   GET, POST /api/sync; GET, PUT, DELETE /api/photos/:id   a signed-in person's own data (sync.ts)
 //   POST /api/model, GET /api/usage, /api/appstore/*, /api/attest/*   the model, limits and Dream Plus (plan.ts)
 //   POST /api/compose, GET /api/compose/:id/events, POST …/answers   pages made on the server (compose/)
+//   POST /api/push/devices, DELETE /api/push/devices/:token   notifications for those pages (push.ts)
 //   GET  /privacy, /terms, /support   the policy, terms and help (legal.ts)
 //   POST /api/diagnostics     crash and hang reports, anonymous; GET /api/admin/diagnostics (diagnostics.ts)
 //
@@ -28,6 +29,7 @@ import type { ComposeEnv } from "./compose/job";
 import { routeCompose } from "./compose/routes";
 import { CSP, messagePage } from "./page";
 import { routePlan, type PlanEnv } from "./plan";
+import { routePush, type PushEnv } from "./push";
 import { routeRelease, type ReleaseEnv } from "./release";
 import { routeSharing, type SharingEnv } from "./sharing";
 import { routeSync, type SyncEnv } from "./sync";
@@ -35,7 +37,7 @@ import { routeWeb, type WebEnv } from "./web";
 
 export { PageJob } from "./compose/job";
 
-export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv, SyncEnv, PlanEnv, ReleaseEnv, ComposeEnv {
+export interface Env extends WebEnv, AuthEnv, AppleEnv, SharingEnv, SyncEnv, PlanEnv, ReleaseEnv, ComposeEnv, PushEnv {
   DB: D1Database;
   CREATE_LIMIT?: RateLimit;
   READ_LIMIT?: RateLimit;
@@ -99,6 +101,10 @@ export default {
       if (path.startsWith("/api/compose")) {
         const composed = await routeCompose(request, env, url);
         if (composed) return composed;
+      }
+      if (path.startsWith("/api/push/")) {
+        const push = await routePush(request, env, url);
+        if (push) return push;
       }
       const release = await routeRelease(request, env, ctx, url);
       if (release) return release;

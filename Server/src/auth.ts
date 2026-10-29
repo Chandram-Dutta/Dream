@@ -69,6 +69,13 @@ export async function userFrom(request: Request, env: AuthEnv): Promise<User | n
   return { id: row.id, email: row.email, name: row.name, createdAt: row.created_at };
 }
 
+/** The stored hash of the session this request carries, which names it; null without one. It
+ * says nothing about whether the session is good: `userFrom` does. */
+export async function sessionHash(request: Request): Promise<string | null> {
+  const token = /^Bearer\s+([A-Za-z0-9_-]{32,200})$/.exec(request.headers.get("Authorization") ?? "")?.[1];
+  return token ? hashToken(token) : null;
+}
+
 /** The answer to a request that needs someone signed in. */
 export function signInNeeded(): Response {
   return new Response(JSON.stringify({ error: "Sign in to continue." }), {

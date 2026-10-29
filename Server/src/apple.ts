@@ -316,8 +316,9 @@ function decodeJSON(part: string): Record<string, unknown> | null {
   }
 }
 
-/** A .p8 file's key as bytes. Its text may arrive with real line breaks or with "\n" written out. */
-function pemBytes(pem: string): Uint8Array {
+/** A .p8 file's key as bytes. Its text may arrive with real line breaks or with "\n" written out.
+ * The APNs key (push.ts) is read the same way. */
+export function pemBytes(pem: string): Uint8Array {
   const body = pem
     .replace(/\\n/g, "\n")
     .replace(/-----(BEGIN|END) [A-Z ]+-----/g, "")
