@@ -3,9 +3,9 @@ import UIKit
 import UserNotifications
 
 /// Notifications from Dream's server (docs/ServerGeneration.md, Stage 3): a page made there that
-/// nobody is watching says when it's ready, or when Dream has a question about it. What they carry
-/// and where tapping one goes are Push.swift; this asks for them, registers this iPhone with the
-/// account, and opens what was tapped.
+/// nobody is watching says when it's ready, when Dream has a question about it, or when it needs
+/// this iPhone to run one of its tools. What they carry and where tapping one goes are Push.swift;
+/// this asks for them, registers this iPhone with the account, and opens what was tapped.
 ///
 /// Dream asks the first time a page is still being made when the user leaves it, its screen or
 /// the app: that's when a notification is worth having, and never at launch. Once they're allowed,

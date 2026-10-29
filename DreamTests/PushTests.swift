@@ -77,6 +77,7 @@ struct PushTests {
     func payload() {
         #expect(PushPayload(userInfo()) == PushPayload(page: page, job: jobID, kind: .done))
         #expect(PushPayload(userInfo(page: page.uuidString.lowercased(), kind: "asking")) == PushPayload(page: page, job: jobID, kind: .asking), "a page's id in either case")
+        #expect(PushPayload(userInfo(kind: "device")) == PushPayload(page: page, job: jobID, kind: .device), "the page waiting on one of this iPhone's tools")
         #expect(PushPayload(userInfo(page: "page-1")) == nil, "a page id that isn't one")
         #expect(PushPayload(userInfo(job: nil)) == nil && PushPayload(userInfo(job: "")) == nil, "no job")
         #expect(PushPayload(userInfo(kind: "shared")) == nil, "something this version doesn't know")
@@ -95,6 +96,9 @@ struct PushTests {
         #expect(Opening.destination(for: done, saved: saved, forming: forming) == .page("saved"), "a finished page that's saved opens")
         #expect(Opening.destination(for: asking, saved: saved, forming: forming) == .page("saved"), "a question about a page that has since been made opens the page")
         #expect(Opening.destination(for: asking, saved: none, forming: forming) == .forming("forming"), "a question opens the page being made")
+        let device = PushPayload(page: page, job: jobID, kind: .device)
+        #expect(Opening.destination(for: device, saved: none, forming: forming) == .forming("forming"), "so does a call to this iPhone's tools, which runs there, asking first")
+        #expect(Opening.destination(for: device, saved: saved, forming: forming) == .page("saved"), "unless the page was made meanwhile")
         #expect(Opening.destination(for: done, saved: none, forming: forming) == .forming("forming"), "so does a page that's done before sync has brought it")
         #expect(Opening.destination(for: done, saved: none, forming: none) == .shelf, "neither here: the shelf")
         #expect(Opening.destination(for: nil, saved: saved, forming: forming) == .shelf, "a notification that isn't about a page: the shelf")

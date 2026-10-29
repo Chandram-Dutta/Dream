@@ -419,4 +419,30 @@ extension ConnectionsTests {
                 "allowed always, its source goes with what it returned, for the page to keep current")
         #expect(kept.output.contains("Dream keeps these current"))
     }
+
+    @Test("For a page on the server, each service's tool says whether it changes things, as its service does")
+    func deviceToolChanges() throws {
+        let notes = TeamNotes(port: 9102)
+        notes.connect()
+        let request = "add a task to book the venue in my team notes"
+        let devices = DeviceTools.offered(for: request, asking: Asking(), consent: Consent(), live: LiveLog(), log: ConnectionLog())
+        func tool(_ definition: DeviceToolDefinition) -> ConnectedTool? {
+            notes.connection.tools.first { definition.name.hasSuffix($0.name) }
+        }
+        let services = devices.definitions.filter { $0.name != "travel" }
+        #expect(services.contains { tool($0)?.name == "add_task" && $0.changes == true }, "asked to act, the changing tool is offered, and says it changes things: \(services.map(\.name))")
+        #expect(services.allSatisfy { definition in tool(definition).map { definition.changes == $0.readOnlyHint.map { !$0 } } ?? false },
+                "each says what its service's hint says, turned round: false for one that only reads, nothing for one whose service doesn't say")
+        let travel = try #require(devices.definitions.first { $0.name == "travel" })
+        #expect(travel.changes == nil, "a travel time is no service's")
+        let looking = DeviceTools.offered(for: "which tasks are still open in my team notes", asking: Asking(), consent: Consent(), live: LiveLog(), log: ConnectionLog())
+        #expect(!looking.definitions.contains { $0.changes == true }, "asked only to know, nothing that changes things is offered")
+
+        var start = ComposeStart(intent: request, image: nil, page: UUID(), context: [])
+        start.deviceTools = devices.definitions
+        let body = try #require(try JSONSerialization.jsonObject(with: start.body()) as? [String: Any])
+        let sent = try #require(body["deviceTools"] as? [[String: Any]])
+        #expect(sent.first { ($0["name"] as? String)?.hasSuffix("add_task") == true }?["changes"] as? Bool == true, "and the server is told")
+        #expect(sent.first { $0["name"] as? String == "travel" }?.keys.contains("changes") == false, "with nothing said where there's nothing to say")
+    }
 }
