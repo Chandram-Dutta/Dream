@@ -141,15 +141,22 @@ final class Notifications: NSObject {
     }
 }
 
+// The completion-handler forms, each answered on the main thread. The async forms finish on a
+// background thread, and a tap that waited on a sync round before finishing had UIKit end the
+// app (UIApplication's state restoration asserts it's on the main thread).
 extension Notifications: UNUserNotificationCenterDelegate {
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification) async -> UNNotificationPresentationOptions {
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping @Sendable (UNNotificationPresentationOptions) -> Void) {
         let payload = PushPayload(notification.request.content.userInfo)
-        return await presents(payload)
+        Task { @MainActor in completionHandler(Notifications.shared.presents(payload)) }
     }
 
-    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse) async {
+    /// iOS is told at once that the tap was taken; the page opens after, sync round and all.
+    nonisolated func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping @Sendable () -> Void) {
         let payload = PushPayload(response.notification.request.content.userInfo)
-        await open(payload)
+        Task { @MainActor in
+            completionHandler()
+            await Notifications.shared.open(payload)
+        }
     }
 }
 
