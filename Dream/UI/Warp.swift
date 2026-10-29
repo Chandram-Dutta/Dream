@@ -56,7 +56,7 @@ struct ConstructionGlow: View, Animatable {
             // The screen's own corner, as far as the container says.
             let corner = geometry.containerCornerInsets.topLeading.width
             let radius = corner > 0 ? corner : 55
-            TimelineView(.animation(minimumInterval: 1.0 / 60, paused: reduceMotion || (border < 0.01 && stars < 0.01))) { timeline in
+            TimelineView(.animation(minimumInterval: 1.0 / 60, paused: reduceMotion)) { timeline in
                 let frame = clock.advance(to: timeline.date, cruising: stars)
                 Rectangle()
                     .colorEffect(ShaderLibrary.construction(

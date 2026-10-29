@@ -166,10 +166,13 @@ struct SurfaceScreen: View {
         .background(Color(.systemBackground))
         .overlay {
             // The border while Dream works, and stars flying into it at each step of the work.
-            if style == .warp {
+            // Gone once the page is done, fading as it goes: a glow left at zero still showed
+            // its last frame.
+            if style == .warp, border > 0 || stars > 0 {
                 ConstructionGlow(palette: palette, border: border, stars: stars, pulse: pulse)
                     .animation(.easeInOut(duration: 1), value: border)
                     .animation(.easeInOut(duration: 0.8), value: stars)
+                    .transition(.opacity.animation(.easeInOut(duration: 1)))
             }
         }
         // What the work is touching, while there's no page yet.
