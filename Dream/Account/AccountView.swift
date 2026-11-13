@@ -25,7 +25,7 @@ struct AccountView: View {
                     .listRowBackground(Color.clear)
                     .listRowInsets(EdgeInsets())
                 email
-                PlanSection()
+                IntelligenceSection()
                 devicesSection
                 ImproveDreamSection()
                 if LocalData.move == .declined, !onPhone.isEmpty {
@@ -319,13 +319,6 @@ struct DeleteAccountView: View {
                 Text("This can't be undone. To keep a copy, export your data first.")
                     .font(.subheadline.weight(.semibold))
                     .fixedSize(horizontal: false, vertical: true)
-                if Plan.shared.status?.isPlus == true {
-                    // Apple bills the subscription, so deleting the account here can't stop it.
-                    Text("Deleting your account doesn't cancel Dream Plus. Cancel it in Settings › Apple Account › Subscriptions first.")
-                        .font(.subheadline)
-                        .foregroundStyle(.orange)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
                 if let failure {
                     Text(failure)
                         .font(.footnote)

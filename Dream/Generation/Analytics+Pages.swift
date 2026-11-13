@@ -3,7 +3,7 @@ import FoundationModels
 
 extension Composer {
     /// Counts a finished page or change made here (Analytics.swift): its shape, the model and how
-    /// long it took, never its words. Dream's server counts the pages and changes it makes itself.
+    /// long it took, never its words.
     func countFinished(changing: Bool, pointed: Bool = false, since started: Date) {
         guard let surface else { return }
         let seconds = Date().timeIntervalSince(started)
@@ -33,8 +33,8 @@ extension Analytics.Failure {
             }
         case is URLError:
             self = .network
-        case is XAIError:
-            self = .model
+        case let error as PrivateCloudComputeLanguageModel.Error:
+            if case .quotaLimitReached = error { self = .rateLimited } else { self = .network }
         case is ComposeError:
             self = Composer.canCompose ? .empty : .noModel
         default:

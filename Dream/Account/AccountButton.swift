@@ -148,9 +148,8 @@ private struct AccountCard: View {
 
     /// Under the name: what's left of today's pages, which otherwise lives deep in Account.
     private var detail: String? {
-        guard account.isSignedIn else { return "To make, sync and share pages" }
-        guard let left = Plan.shared.status?.pagesLeftToday else { return nil }
-        return left == 1 ? "1 page left today" : "\(left) pages left today"
+        guard account.isSignedIn else { return "To sync and share pages" }
+        return nil
     }
 
     private func row(_ title: String, systemImage: String, to place: AccountPlace, marked: Bool = false) -> some View {

@@ -7,8 +7,8 @@ import SwiftUI
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \SavedSurface.updatedAt, order: .reverse) private var surfaces: [SavedSurface]
-    /// Pages still being made on Dream's server.
-    @Query(sort: \StartedPage.startedAt, order: .reverse) private var started: [StartedPage]
+    /// Pages still being made.
+    private let maker = PageMaker.shared
     @State private var intent = ""
     @State private var photoItem: PhotosPickerItem?
     @State private var photo: UIImage?
@@ -18,9 +18,7 @@ struct HomeView: View {
     @State private var showingSettings = false
     @State private var listener = Listener()
     @State private var sharedLinks = SharedLinks()
-    /// The pages open over the shelf, so a tapped notification can open its own.
     @State private var path = NavigationPath()
-    private let notifications = Notifications.shared
     @FocusState private var focused: Bool
     @MainActor private static var startedAutomatically = false
 
@@ -38,17 +36,14 @@ struct HomeView: View {
                         AccountButton(palette: palette)
                     }
                     .padding(.top, 24)
-                    // The key goes in Under the hood, which only testing builds have.
-                    if !canCompose, Build.hasTestingHooks {
-                        Button { showingSettings = true } label: {
-                            Label("Add an xAI API key to start making screens.", systemImage: "key.fill")
-                                .font(.subheadline)
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                        }
-                        .buttonStyle(.plain)
-                        .panel(palette)
+                    // Pages are made by Apple Intelligence, so without it there's nothing to make them.
+                    if !canCompose {
+                        Label(AppleModels.unavailableMessage, systemImage: "apple.intelligence")
+                            .font(.subheadline)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .panel(palette)
                     }
-                    if !surfaces.isEmpty || !forming.isEmpty {
+                    if !surfaces.isEmpty || !maker.pages.isEmpty {
                         shelf
                     }
                     ideaList
@@ -69,17 +64,19 @@ struct HomeView: View {
             // whole page off in any direction, and pages are full of things a finger drags sideways.
             .navigationDestination(item: $request) { SurfaceScreen(request: $0) }
             .navigationDestination(for: SavedSurface.self) { SurfaceScreen(saved: $0) }
-            .navigationDestination(for: FormingPage.self) { SurfaceScreen(forming: $0) }
+            .navigationDestination(for: PageMaker.Making.self) { SurfaceScreen(making: $0) }
             // Shared with the user, from a link (SharedLinks.swift).
             .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
         .receivingSharedScreens(sharedLinks)
-        .onChange(of: notifications.opened, initial: true) { _, opened in open(opened) }
         .sheet(isPresented: $showingSettings, onDismiss: { canCompose = Composer.canCompose }) {
             DebugView(surface: nil, values: [:], log: [], modelName: "")
         }
         .onChange(of: photoItem) { _, item in
             Task { await loadPhoto(item) }
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
+            canCompose = Composer.canCompose
         }
         .task {
             startFromLaunchArgument()
@@ -126,31 +123,17 @@ struct HomeView: View {
 
     // MARK: - Shelf
 
-    /// Started pages that aren't saved yet. One that came by sync before its record went is
-    /// shown once, as the page. A change shows on its page's own screen, never as a tile.
-    private var forming: [StartedPage] {
-        let saved = Set(surfaces.map(\.id))
-        return started.filter { $0.changeData == nil && !saved.contains($0.pageID) }
-    }
-
     private var shelf: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
-            ForEach(forming) { started in
-                // As values: the record goes the moment the page is saved, and the tile can be
-                // drawn once more before the shelf hears.
-                let page = FormingPage(started)
-                let failure = started.failure
+            ForEach(maker.pages) { page in
                 NavigationLink(value: page) {
-                    FormingTile(page: page, failure: failure)
+                    FormingTile(page: page)
                 }
                 .buttonStyle(.plain)
                 .transition(.blurReplace)
                 .contextMenu {
-                    // Nothing on the server stops a page part way, so only one that failed can go.
-                    if failure != nil {
-                        Button("Delete", systemImage: "trash", role: .destructive) {
-                            ServerPages.shared.discard(page.job.page)
-                        }
+                    Button(maker.failure(of: page) == nil ? "Stop" : "Delete", systemImage: "trash", role: .destructive) {
+                        maker.discard(page)
                     }
                 }
             }
@@ -172,16 +155,8 @@ struct HomeView: View {
     // MARK: - Asking
 
     private var composer: some View {
-        let options = ModelOptions.offered
-        return VStack(spacing: 10) {
+        VStack(spacing: 10) {
             SavedSuggestion(text: intent, surfaces: surfaces)
-            // What will make the page, for accounts that can choose (ModelPicker.swift).
-            if let options {
-                ModelChip(options: options, palette: palette, focus: $focused)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 16)
-                    .transition(.opacity)
-            }
             VStack(alignment: .leading, spacing: 10) {
                 if let photo {
                     Image(uiImage: photo)
@@ -237,7 +212,6 @@ struct HomeView: View {
         .animation(.smooth, value: photo)
         .animation(.smooth, value: focused)
         .animation(.smooth, value: listener.isActive)
-        .animation(.smooth, value: options)
     }
 
     private var canMake: Bool {
@@ -247,12 +221,6 @@ struct HomeView: View {
     private func make(_ text: String) {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty || photo != nil else { return }
-        // Pages are made through Dream's server, so they need an account (Account.swift).
-        guard Account.shared.mayMake else {
-            focused = false
-            Account.shared.askToSignIn("Sign in to make pages") { make(text) }
-            return
-        }
         request = ComposeRequest(intent: text.isEmpty ? "What is this?" : text, image: photo?.cgImage)
         intent = ""
         photo = nil
@@ -260,54 +228,17 @@ struct HomeView: View {
         focused = false
     }
 
-    /// A tapped notification (Notifications.swift): its page, finished or still being made, alone
-    /// over the shelf; or the shelf, when neither is here. Back to the shelf first, and the page
-    /// once that's settled: replacing a page opened another way (a request, a shared link, a
-    /// topic explored from a page) in the same moment left a blank screen with a back button.
-    private func open(_ opened: Notifications.Opened?) {
-        guard let opened else { return }
-        notifications.opened = nil
-        let wasOpen = request != nil || sharedLinks.opened != nil || !path.isEmpty
-        request = nil
-        sharedLinks.opened = nil
-        path = NavigationPath()
-        let next: NavigationPath
-        switch opened.destination {
-        case .page(let saved): next = NavigationPath([saved])
-        case .forming(let page): next = NavigationPath([page])
-        case .shelf: return
-        }
-        Task { @MainActor in
-            if wasOpen { try? await Task.sleep(for: .milliseconds(450)) }
-            path = next
-        }
-    }
-
     private func loadPhoto(_ item: PhotosPickerItem?) async {
         guard let item, let data = try? await item.loadTransferable(type: Data.self), let image = UIImage(data: data) else { return }
         photo = image.downscaled(toFit: 1024)
     }
 
-    /// For testing on a device: launch with `-DreamAutoIntent "split a bill"`. `-DreamXAIKey`
-    /// moves an xAI key into this device's Keychain and switches to Grok; `-DreamWebKey` does
-    /// the same for the key the web search server expects. Release builds ignore all three.
+    /// For testing on a device: launch with `-DreamAutoIntent "split a bill"`. `-DreamWebKey`
+    /// moves the key the web search server expects into this device's Keychain. Release builds
+    /// ignore both.
     private func startFromLaunchArgument() {
-        if let key = Build.argument("DreamXAIKey") {
-            Keychain.save(key, for: "xai")
-            UserDefaults.standard.set(Composer.Provider.xai.rawValue, forKey: "provider")
-        }
         if let key = Build.argument("DreamWebKey") {
             Keychain.save(key, for: "web")
-        }
-        // `-DreamOpenPage <page id>`: as if its "ready" notification were tapped; with
-        // `-DreamOpenAfter <seconds>`, tapped that long after the request below has opened its page.
-        if let page = Build.argument("DreamOpenPage").flatMap(UUID.init(uuidString:)) {
-            let after = Build.argument("DreamOpenAfter").flatMap(Double.init) ?? 0
-            Task {
-                try? await Task.sleep(for: .seconds(after))
-                await Notifications.shared.open(PushPayload(page: page, job: "testing", kind: .done))
-            }
-            if after == 0 { return }
         }
         guard !Self.startedAutomatically, let auto = Build.argument("DreamAutoIntent") else { return }
         Self.startedAutomatically = true
@@ -381,27 +312,24 @@ struct SurfaceTile: View {
     }
 }
 
-/// A page still being made on Dream's server, on the shelf. Nothing stands in for the page:
-/// Dream's light moves through the tile while Dream works and holds still while a question waits
-/// for the user, and it turns to the page's colors once the page knows its subject, with its
-/// title as it's written, or the request until there is one.
+/// A page still being made, on the shelf. Nothing stands in for the page: Dream's light moves
+/// through the tile in the colors of the stage the request is at, and holds still while a
+/// question waits for the user; it turns to the page's colors once the page knows its subject,
+/// with its title as it's written, or the request until there is one.
 struct FormingTile: View {
-    let started: FormingPage
-    /// Why the server couldn't make it, once it couldn't.
-    let failed: String?
-    private let pages = ServerPages.shared
+    let started: PageMaker.Making
+    private let maker = PageMaker.shared
 
-    init(page: FormingPage, failure: String?) {
+    init(page: PageMaker.Making) {
         started = page
-        failed = failure
     }
 
     var body: some View {
-        let composer = pages.following[started.job.page]
+        let composer = maker.composer(for: started)
         let page = composer?.surface.flatMap { $0.title.isEmpty ? nil : $0 }
-        let failure = failed ?? composer.flatMap(Self.failure)
-        // A question, or a connected service's tool to allow.
-        let waiting = composer.map { $0.asking.isWaiting || $0.consent.isWaiting } ?? false
+        let failure = maker.failure(of: started)
+        let stage = composer?.stage ?? .understanding
+        let waiting = stage == .yourTurn
         let palette = page?.palette ?? .dream
         VStack(alignment: .leading, spacing: 6) {
             if failure != nil {
@@ -431,12 +359,10 @@ struct FormingTile: View {
         .background {
             ZStack {
                 palette.wash
-                // Moving while it's Dream's turn, still while it's the user's; each step of the
-                // work and each block landing surges it, as on the page's own screen.
-                Aura(palette: palette, energy: failure != nil ? 0 : waiting ? 0.04 : 0.8, flood: failure != nil ? 0 : 1,
-                     pulse: (composer?.trail.count ?? 0) + (composer?.surface?.blocks.count ?? 0))
-                    .animation(.easeInOut(duration: 1.4), value: waiting)
-                    .animation(.easeInOut(duration: 1.2), value: failure != nil)
+                // The stage's light, as on the page's own screen; each step of the work and each
+                // block landing surges it.
+                StageLight(stage: failure != nil ? .failed : stage, palette: page?.palette, flood: 1,
+                           pulse: (composer?.trail.count ?? 0) + (composer?.surface?.blocks.count ?? 0))
             }
         }
         .clipShape(.rect(cornerRadius: 26))
@@ -445,7 +371,7 @@ struct FormingTile: View {
         .animation(.smooth(duration: 0.6), value: page?.title)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(failure.map { "\(started.intent). Couldn't make this page: \($0)" }
-            ?? (waiting ? "\(page?.title ?? started.intent). Dream has a question" : "Making a page for: \(started.intent)"))
+            ?? (waiting ? "\(page?.title ?? started.intent). Dream has a question" : "\(stage.label): \(started.intent)"))
     }
 
     private static func failure(_ composer: Composer) -> String? {

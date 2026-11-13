@@ -7,62 +7,31 @@ struct DebugView: View {
     let values: [String: Double]
     let log: [String]
     let modelName: String
-    @AppStorage("provider") private var provider = Composer.Provider.dream.rawValue
-    @AppStorage("xaiModel") private var xaiModel = Composer.xaiModelID
-    @AppStorage(ServerCompose.key) private var serverCompose = true
-    @State private var xaiKey = ""
-    @State private var hasXAIKey = XAILanguageModel.savedKey != nil
+    @AppStorage("provider") private var provider = Composer.Provider.privateCloud.rawValue
+    @AppStorage("reasoning") private var reasoning = "light"
     @Environment(\.dismiss) private var dismiss
-
-    @AppStorage(ConstructionStyle.key) private var constructionStyle = ConstructionStyle.warp
 
     var body: some View {
         NavigationStack {
             List {
                 Section {
                     LabeledContent("Last used", value: modelName.isEmpty ? "—" : modelName)
-                    LabeledContent("Private Cloud Compute", value: String(describing: PrivateCloudComputeLanguageModel().availability))
-                    Picker("Model", selection: $provider) {
-                        Text("Dream").tag(Composer.Provider.dream.rawValue)
-                        Text("Grok with my key").tag(Composer.Provider.xai.rawValue)
+                    LabeledContent("Private Cloud Compute", value: AppleModels.cloudStatus)
+                    LabeledContent("On this iPhone", value: AppleModels.deviceStatus)
+                    Picker("Write pages with", selection: $provider) {
                         Text("Private Cloud Compute").tag(Composer.Provider.privateCloud.rawValue)
+                        Text("This iPhone").tag(Composer.Provider.onDevice.rawValue)
                     }
-                    if provider == Composer.Provider.xai.rawValue {
-                        SecureField(hasXAIKey ? "xAI API key saved" : "xAI API key", text: $xaiKey)
-                            .textContentType(.password)
-                            .onSubmit {
-                                Keychain.save(xaiKey, for: "xai")
-                                hasXAIKey = XAILanguageModel.savedKey != nil
-                                xaiKey = ""
-                            }
-                    }
-                    if provider != Composer.Provider.privateCloud.rawValue {
-                        TextField("Grok model", text: $xaiModel)
-                            .autocorrectionDisabled()
-                            .textInputAutocapitalization(.never)
+                    Picker("Reasoning", selection: $reasoning) {
+                        Text("Light").tag("light")
+                        Text("Moderate").tag("moderate")
+                        Text("Deep").tag("deep")
                     }
                 } header: {
-                    Text("Model")
+                    Text("Apple Intelligence")
                 } footer: {
-                    Text("Dream reaches Grok through its own server, with your account's pages. Grok with my key sends requests straight to xAI with your API key, kept in the Keychain. Private Cloud Compute needs an entitlement Apple grants on request. If the chosen model can't be used, Dream tries the next one.")
+                    Text("Every page is written by Apple's models. Private Cloud Compute runs Apple's larger model on Apple silicon servers that keep nothing; it reasons before it writes. The model on this iPhone works offline, from a shorter brief. If the chosen one can't be used, Dream uses the other.")
                 }
-                Section {
-                    Picker("While a page is made", selection: $constructionStyle) {
-                        ForEach(ConstructionStyle.allCases, id: \.self) { Text($0.name).tag($0) }
-                    }
-                } header: {
-                    Text("Look")
-                } footer: {
-                    Text("Border and stars: the screen's border glows while a page is made, and stars fly into it at each step. Light: Dream's light fills the screen.")
-                }
-                Section {
-                    Toggle("Make pages on Dream's server", isOn: $serverCompose)
-                } header: {
-                    Text("Pages")
-                } footer: {
-                    Text("New pages are made by Dream's server, with your account, instead of on this iPhone, so a page goes on being made when you leave it and is on the shelf when it's done. Changes to a page are still made here. Launching with -DreamServerCompose 1 turns it on too.")
-                }
-                PlanSection()
                 ShareServerSettings()
                 WebSearchSettings()
                 SyncSection()

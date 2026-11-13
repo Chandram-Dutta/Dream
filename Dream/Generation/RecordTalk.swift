@@ -63,7 +63,7 @@ enum RecordTalk {
 
         var name: String {
             switch self {
-            case .onDevice: "On-device model"
+            case .onDevice: "On this iPhone"
             case .cloud(let provider): provider.name
             }
         }
@@ -74,7 +74,7 @@ enum RecordTalk {
         let system = SystemLanguageModel.default
         let onDevice: [Model] = system.isAvailable && (!hasImage || system.capabilities.contains(.vision)) ? [.onDevice] : []
         let chosen = Composer.provider
-        let cloud: [Model] = ([chosen] + Composer.Provider.allCases.filter { $0 != chosen }).first(where: \.isUsable).map { [.cloud($0)] } ?? []
+        let cloud: [Model] = ([chosen] + Composer.Provider.allCases.filter { $0 != chosen }).filter { $0 != .onDevice }.first(where: \.isUsable).map { [.cloud($0)] } ?? []
         return privateFirst ? onDevice + cloud : (cloud.isEmpty ? onDevice : cloud)
     }
 
@@ -85,12 +85,8 @@ enum RecordTalk {
         }
         let session: LanguageModelSession
         switch model {
-        case .onDevice:
+        case .onDevice, .cloud(.onDevice):
             session = LanguageModelSession(instructions: Prompts.recordInstructions)
-        case .cloud(.dream):
-            session = LanguageModelSession(model: DreamLanguageModel(modelID: Composer.dreamModelID, page: nil), instructions: Prompts.recordInstructions)
-        case .cloud(.xai):
-            session = LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Composer.xaiModelID), instructions: Prompts.recordInstructions)
         case .cloud(.privateCloud):
             session = LanguageModelSession(model: PrivateCloudComputeLanguageModel(), instructions: Prompts.recordInstructions)
         }

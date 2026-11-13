@@ -26,10 +26,11 @@ struct Trace: Identifiable, Equatable, Sendable {
 
 /// Turns what the user wants into a surface: one screen that explains, calculates, or both.
 ///
-/// A capable model (Grok, or Private Cloud Compute once Apple grants it) writes the whole surface
-/// in one pass, looking things up itself through `LookupTool`. The checker fixes what it can and
-/// sends real mistakes back in the same session. Apple's on-device model doesn't build screens;
-/// it's kept for small private jobs elsewhere, like the ideas on the home screen.
+/// Apple's model on Private Cloud Compute writes the whole surface in one pass, reasoning first and
+/// looking things up itself through its tools. The checker fixes what it can and sends real
+/// mistakes back in the same session. Without PCC (offline, or this account's share used up for
+/// now), Apple's model on the iPhone writes it instead, from a shorter brief, through the same
+/// format, checker and renderer.
 @MainActor @Observable
 final class Composer {
     enum Phase: Equatable {
@@ -52,6 +53,34 @@ final class Composer {
     /// Working, but with nothing new on screen for a moment: reasoning, or looking something up.
     /// The screen shows it in the color field rather than in words.
     private(set) var isThinking = false
+    /// Where a request is, as the screen's light shows it (Stage.swift).
+    var stage: Stage {
+        switch phase {
+        case .idle: return .understanding
+        case .done: return .done
+        case .failed: return .failed
+        case .fixing: return .checking
+        case .researching, .composing:
+            if asking.isWaiting || consent.isWaiting { return .yourTurn }
+            if phase == .researching { return .researching }
+            // Before anything is on screen and while the gap check decides: still taking it in.
+            if surface == nil || surface?.isEmpty == true { return isChecking || trail.isEmpty && isThinking ? .understanding : .researching }
+            return .writing
+        }
+    }
+
+    /// Roughly how far along the page is, 0 to 1, for the Lock Screen while Dream is in the background.
+    var progress: Double {
+        switch stage {
+        case .understanding: 0.05
+        case .yourTurn: 0.1
+        case .researching: 0.1 + min(0.25, Double(trail.count) * 0.05)
+        case .writing: 0.4 + min(0.45, Double(surface?.blocks.count ?? 0) * 0.05)
+        case .checking: 0.9
+        case .done, .failed: 1
+        }
+    }
+
     /// The model's questions before it builds, and the user's answers. The screen shows them while the model waits.
     let asking = Asking()
     /// The live data fetched while writing, which the surface's live inputs bind to.
@@ -71,75 +100,59 @@ final class Composer {
     /// The web pages read while writing, which the surface may cite (WebSearch.swift).
     private let web = WebLog()
 
-    /// Which model writes surfaces. If the chosen one can't be used or fails, the next is tried.
+    /// Which of Apple's models writes a page. Both run the same harness: the format, the tools,
+    /// the checker and the renderer. Nothing a person asks leaves Apple's models.
     enum Provider: String, CaseIterable {
-        /// Grok through Dream's server, with the signed-in user's session and allowance (DreamModel.swift).
-        case dream
-        /// Grok, with the developer's own xAI API key from the Keychain.
-        case xai
-        /// Needs an entitlement Apple grants on request (com.apple.developer.private-cloud-compute).
+        /// Apple's larger model on Private Cloud Compute: the whole page, in one pass, with
+        /// reasoning. Requests are processed on Apple silicon servers and never kept.
         case privateCloud
+        /// Apple's model on this iPhone: offline and immediate, with a shorter brief to fit its
+        /// smaller window (Prompts+OnDevice.swift).
+        case onDevice
 
         var name: String {
             switch self {
-            // On Auto, what the router picked for this page (Route.swift), like "Auto → Grok 4.7 · high".
-            case .dream: Route.current?.label ?? "Dream (\(Composer.dreamModelID.isEmpty ? "default" : Composer.dreamModelID))"
-            case .xai: "Grok (\(Composer.xaiModelID))"
             case .privateCloud: "Private Cloud Compute"
+            case .onDevice: "On this iPhone"
             }
         }
 
         var isUsable: Bool {
             switch self {
-            case .dream: DreamLanguageModel.isUsable
-            case .xai: XAILanguageModel.savedKey != nil
             case .privateCloud: PrivateCloudComputeLanguageModel().isAvailable
+            case .onDevice: SystemLanguageModel.default.isAvailable
             }
         }
     }
 
-    nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .dream }
-    nonisolated static var xaiModelID: String { Build.setting("xaiModel") ?? "grok-4.7" }
-    /// The model Dream's server is asked for: the one picked in Account, which only Dream Plus
-    /// can use, or none, for the server's default (Server/src/models.ts). Testing builds can name
-    /// one at launch, like `-xaiModel grok-4.7`.
-    nonisolated static var dreamModelID: String { Build.setting("xaiModel") ?? ModelChoice.picked ?? ModelChoice.auto }
+    /// The model pages are written with first. Testing builds can start on the iPhone's own model
+    /// (`-provider onDevice`).
+    nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .privateCloud }
 
     /// Whether any model can make screens right now.
     static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
 
     /// The model this request runs on.
-    private var active: Provider = .dream
-    /// This build or change, as Dream's server counts pages: every request for it, the gap check
-    /// included, carries it.
-    private var page = UUID().uuidString
+    private var active: Provider = .privateCloud
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
     /// rarely appears only to give way to questions.
-    private var isChecking = false
+    private(set) var isChecking = false
     private var held: Surface?
     private var holdUntil = Date.distantPast
     /// What the user asked for, which picks the connected services' tools worth offering.
     private var request = ""
 
-    /// Makes a new page: on Dream's server when that's switched on (Composer+Server.swift),
-    /// otherwise here.
-    func compose(intent: String, image: CGImage? = nil, onServer: Bool = ServerCompose.isOn) async {
-        if onServer {
-            await composeOnServer(intent: intent, image: image)
-            return
-        }
+    /// Makes a new page.
+    func compose(intent: String, image: CGImage? = nil) async {
         let started = Date()
-        job = nil
-        change = nil
         log = []
         trail = []
         surface = nil
         isThinking = true
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
-        page = UUID().uuidString
         Analytics.send(.pageRequested(withPhoto: image != nil))
         asking.start()
         live.start()
@@ -148,8 +161,6 @@ final class Composer {
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
         suggestions = Connections.unconnected(in: intent)
-        // Auto (Route.swift): the server picks this page's model and thinking once, up front.
-        if let line = await Route.start(page: page, request: intent, image: image) { note(line) }
         do {
             let context = await Prompts.context(for: intent)
             try await withModel {
@@ -166,27 +177,21 @@ final class Composer {
         }
     }
 
-    /// Changes a surface, here. `focus` is the block the user pointed at, if any. When pages are
-    /// made on Dream's server, so are changes (`changeOnServer`, Composer+Server.swift).
+    /// Changes a surface. `focus` is the block the user pointed at, if any.
     func edit(_ current: Surface, intent: String, instruction: String, focus: Block?) async {
         let started = Date()
-        job = nil
-        change = nil
         log = []
         trail = []
         surface = current
         isThinking = true
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
-        page = UUID().uuidString
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
         connected.start(keeping: current)
         web.start(keeping: current.credits)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
-        // Auto (Route.swift): a change is picked for like a new page.
-        if let line = await Route.start(page: page, request: request, image: nil) { note(line) }
         do {
             let context = await Prompts.context(for: intent)
             let asked = Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context)
@@ -204,71 +209,18 @@ final class Composer {
         }
     }
 
-    // MARK: - On Dream's server
-
-    /// The job on Dream's server making what this shows, while a page or a change is made there.
-    private(set) var job: ServerJob?
-    /// The change being made there, when it's a change to a page on the shelf. The page screen
-    /// keeps its numbers current while it's made, so it lands with the latest.
-    @ObservationIgnored var change: PageChange?
-    /// What reads the job's events, while something does.
-    @ObservationIgnored var watch: ServerWatch?
-    /// The tools only this iPhone can run, which the job's model may call.
-    @ObservationIgnored private(set) var devices: DeviceTools?
-    /// Told as soon as a page has started on Dream's server, so the app can keep the job and find
-    /// it again if it leaves the page mid-way.
-    @ObservationIgnored var onJob: ((ServerJob) -> Void)?
-    /// Told of each call to this iPhone's tools as it starts to run, so the app can keep it and
-    /// never run it twice.
-    @ObservationIgnored var onDeviceCall: ((String) -> Void)?
-
-    /// The tools this iPhone would give the model for a request if it made the page here
-    /// (`tools(found:)`), less those the server has of its own: what a page on the server may ask
-    /// the phone to run. A change starts from what its page already reads and shows.
-    func offerDeviceTools(for request: String, changing page: Surface?, ran: Set<String> = []) -> DeviceTools {
-        live.start(keeping: page?.sources)
-        connected.start(keeping: page)
-        let devices = DeviceTools.offered(for: request, asking: asking, consent: consent, live: live, log: connected, ran: ran)
-        devices.onRun = { [weak self] id in self?.onDeviceCall?(id) }
-        self.devices = devices
-        return devices
-    }
-
-    /// Services the request names that the user hasn't connected, which the screen offers to
-    /// connect, as for a page made here.
-    func suggestConnections(for intent: String) {
-        suggestions = Connections.unconnected(in: intent)
-    }
-
-    /// Shows a page being made on Dream's server as far as its events have got, in the same state
-    /// a page made here fills, so the screen can't tell the two apart. Everything on that path
-    /// reaches the screen through here.
-    func show(_ progress: PageProgress, job: ServerJob?) {
-        if self.job != job { self.job = job }
-        if phase != progress.phase { phase = progress.phase }
-        if surface != progress.surface { surface = progress.surface }
-        if trail != progress.trail { trail = progress.trail }
-        if log != progress.log {
-            for line in progress.log.dropFirst(log.count) { Build.trace("[Dream] \(line)") }
-            log = progress.log
-        }
-        if isThinking != progress.isThinking { isThinking = progress.isThinking }
-        if modelName != progress.model { modelName = progress.model }
-    }
-
     // MARK: - Model
 
-    /// Runs on the chosen model, or on the other one if the chosen can't be used or fails.
+    /// Runs on Private Cloud Compute, or on this iPhone's model when PCC can't be reached, is
+    /// busy, or this account has used its share for now.
     private func withModel(_ run: () async throws -> Void) async throws {
         let usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
-        guard let first = usable.first else {
-            throw ComposeError("Sign in to make pages.")
-        }
+        guard let first = usable.first else { throw ComposeError(AppleModels.unavailableMessage) }
         active = first
         note("Model: \(active.name)")
         do {
             try await run()
-        } catch let error where !(error is CancellationError) && usable.count > 1 {
+        } catch let error where !(error is CancellationError) && usable.count > 1 && AppleModels.isWorthTheOtherModel(error) {
             note("\(active.name) failed (\(describe(error))); trying \(usable[1].name).")
             active = usable[1]
             try await run()
@@ -277,10 +229,14 @@ final class Composer {
 
     private func session(_ instructions: String, tools: [any Tool]) -> LanguageModelSession {
         switch active {
-        case .dream: LanguageModelSession(model: DreamLanguageModel(modelID: Self.dreamModelID, page: page), tools: tools, instructions: instructions)
-        case .xai: LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Self.xaiModelID), tools: tools, instructions: instructions)
         case .privateCloud: LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: tools, instructions: instructions)
+        case .onDevice: LanguageModelSession(model: SystemLanguageModel.default, tools: tools, instructions: instructions)
         }
+    }
+
+    /// How much the model reasons before it writes. Only Private Cloud Compute reasons.
+    private var context: ContextOptions {
+        ContextOptions(includeSchemaInPrompt: true, reasoningLevel: active == .privateCloud ? AppleModels.reasoning : nil)
     }
 
     /// The tools a surface is written with. Features that give the model a tool add it here.
@@ -489,10 +445,8 @@ final class Composer {
 
     // MARK: - Generation
 
-    // A screen has no budget of its own below the server's cap. Providers count thinking against
-    // it, and Grok thinking at low can spend 20,000 tokens on a quadratic: a budget of 20,000 cut
-    // its answer off after 400 characters. Runaways are caught as they start instead: loops by
-    // `isRepeatingItself`, padding by ChatCompletions.Padding.
+    // A screen has no token budget of its own: the model's window is the limit. Runaways are
+    // caught as they start instead, loops by `isRepeatingItself`.
 
     /// Whether writing the screen again might work where this failed: the model looped, padded or
     /// broke its answer with nothing worth keeping, or left it empty. Not when it was stopped, the
@@ -514,7 +468,7 @@ final class Composer {
         let started = Date()
         isThinking = true
         let watch = StreamWatch<Content.PartiallyGenerated>()
-        let stream = session.streamResponse(to: prompt, generating: type, options: options)
+        let stream = session.streamResponse(to: prompt, generating: type, options: options, contextOptions: context)
         // The stream is read in its own task so the watchdog below can stop it.
         let reading = Task { @MainActor in
             for try await snapshot in stream {
@@ -533,11 +487,10 @@ final class Composer {
             }
         }
         // A model can stall: nothing new arrives, or tokens keep coming but nothing changes.
-        // Models report activity while they think, so only real silence counts. The server's
-        // heartbeat says the line is open, not that the model is working: it buys a long think,
-        // up to `ceiling`, never a hang. A repair once waited on one for over three minutes.
-        let patience: TimeInterval = 45
-        let ceiling: TimeInterval = 150
+        // Private Cloud Compute reasons before it writes, and tools and the user (a consent card)
+        // count as activity, so only real silence counts, up to `ceiling` for a long think.
+        let patience: TimeInterval = active == .privateCloud ? 90 : 45
+        let ceiling: TimeInterval = 180
         let watchdog = Task { @MainActor in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
@@ -593,8 +546,7 @@ final class Composer {
         do {
             return try Content(last)
         } catch {
-            // The answer filled its room before it was done, or turned to padding and was cut
-            // off (ChatCompletions.swift).
+            // The answer filled the model's window before it was done.
             note("\(step) ended before it was finished.")
             if let partial = watch.partial { throw Unfinished(partial: partial, reason: .cutOff) }
             throw error
@@ -628,6 +580,14 @@ final class Composer {
             default: break
             }
         }
+        if let error = error as? PrivateCloudComputeLanguageModel.Error {
+            switch error {
+            case .networkFailure: return "Couldn't reach Private Cloud Compute."
+            case .quotaLimitReached: return "Private Cloud Compute is used up for now."
+            case .serviceUnavailable: return "Private Cloud Compute is busy right now."
+            @unknown default: break
+            }
+        }
         return error.localizedDescription
     }
 
@@ -651,32 +611,20 @@ final class Composer {
     }
 }
 
-/// When a remote model last sent anything, reasoning included, so a long think isn't taken for a
-/// stall; and when it last did anything but keep the line open.
+/// When the model, a tool or the user last did something while a page is written, so a tool
+/// that takes a while, or a person reading a consent card, isn't taken for a stalled model.
 enum ModelActivity {
     private static let lock = NSLock()
     nonisolated(unsafe) private static var heard = Date.distantPast
-    nonisolated(unsafe) private static var beat = Date.distantPast
 
     /// The model, a tool or the user did something.
     static func touch() {
         lock.withLock { heard = .now }
     }
 
-    /// Dream's server says the line is still open while the model is quiet (Server/src/stream.ts).
-    static func heartbeat() {
-        lock.withLock { beat = .now }
-    }
-
-    /// When anything last arrived, heartbeats included.
-    static var lastSeen: Date {
-        lock.withLock { max(heard, beat) }
-    }
-
-    /// When the model, a tool or the user last did something. Heartbeats don't count.
-    static var lastHeard: Date {
-        lock.withLock { heard }
-    }
+    /// When anything last happened.
+    static var lastSeen: Date { lock.withLock { heard } }
+    static var lastHeard: Date { lastSeen }
 }
 
 /// Lets something happen at most once every so often.

@@ -73,10 +73,10 @@ final class Account {
         }
     }
 
-    /// Whether this iPhone can make pages: signed in, or using a developer's own model key.
-    var mayMake: Bool {
-        isSignedIn || XAILanguageModel.savedKey != nil
-    }
+    /// Whether this iPhone can make pages. Apple's models need no account: pages are made on
+    /// the iPhone or on Private Cloud Compute, whoever is signed in. The account keeps pages in
+    /// sync, shares them and searches the web.
+    var mayMake: Bool { true }
 
     /// Asks the user to sign in, for `reason`, then carries on with `then`.
     func askToSignIn(_ reason: String, then: (@MainActor () -> Void)? = nil) {
@@ -191,8 +191,6 @@ final class Account {
     func signOut() async {
         // Whatever hasn't reached the account yet goes now, while the session still works.
         await Sync.flush()
-        // And this iPhone stops hearing about the account's pages.
-        await Notifications.shared.signOut()
         try? await AccountServer.signOut("current")
         await forget()
     }

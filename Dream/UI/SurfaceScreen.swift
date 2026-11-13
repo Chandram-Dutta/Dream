@@ -15,13 +15,12 @@ struct ChangeTarget: Equatable {
     var block: Block?
 }
 
-/// One surface, either being made from a request or opened from the shelf: saved, or still
-/// being made on Dream's server.
+/// One surface, either being made from a request or opened from the shelf.
 struct SurfaceScreen: View {
     @Environment(\.modelContext) private var context
     private let request: ComposeRequest?
-    /// A page still being made on Dream's server, opened from the shelf.
-    private var forming: FormingPage?
+    /// The page being made for the request, by PageMaker, so it goes on if this screen is left.
+    @State private var making: PageMaker.Making?
     @State private var saved: SavedSurface?
     @State private var composer = Composer()
     @State private var state = SurfaceState()
@@ -34,7 +33,6 @@ struct SurfaceScreen: View {
     @State private var scroll = ScrollPosition(edge: .top)
     @State private var userScrolled = false
     @State private var voice = PageVoice()
-    @AppStorage(ConstructionStyle.key) private var style = ConstructionStyle.warp
     @FocusState private var instructionFocused: Bool
 
     init(request: ComposeRequest) {
@@ -47,18 +45,19 @@ struct SurfaceScreen: View {
         _saved = State(initialValue: saved)
     }
 
-    init(forming: FormingPage) {
+    /// A page still being made, opened from the shelf.
+    init(making: PageMaker.Making) {
         request = nil
-        self.forming = forming
+        _making = State(initialValue: making)
         _saved = State(initialValue: nil)
     }
 
     private var surface: Surface? { composer.surface ?? saved?.surface }
-    private var intent: String { saved?.intent ?? request?.intent ?? forming?.intent ?? "" }
+    private var intent: String { saved?.intent ?? request?.intent ?? making?.intent ?? "" }
 
     private var photo: UIImage? {
         if let image = request?.image { return UIImage(cgImage: image) }
-        return (saved?.photoData ?? forming?.photoData).flatMap { UIImage(data: $0) }
+        return (saved?.photoData ?? making?.photoData).flatMap { UIImage(data: $0) }
     }
 
     private var hasFailed: Bool {
@@ -83,17 +82,15 @@ struct SurfaceScreen: View {
 
     /// Dream is on it: making or changing the page, or about to start on a new request.
     private var isWorking: Bool {
-        composer.phase.isBusy || (composer.phase == .idle && saved == nil && (request != nil || forming != nil))
+        composer.phase.isBusy || (composer.phase == .idle && saved == nil && (request != nil || making != nil))
     }
 
-    /// The light means one thing: moving is Dream's turn, still is yours. It churns while Dream
-    /// works, from the first frame until the page is finished, writing itself or changing, and
-    /// holds nearly still while questions wait. It settles only when the page is done: that's
-    /// how the reader knows.
-    private var energy: Double {
-        guard isWorking else { return 0 }
-        if yourTurn { return 0.04 }
-        return isForming ? 1 : 0.85
+    /// Where the request is, which the light shows in its colors (StageLight.swift). A saved
+    /// page at rest is done; one starting up is still being understood.
+    private var stage: Stage {
+        if !isWorking { return hasFailed ? .failed : .done }
+        if composer.phase == .idle { return .understanding }
+        return composer.stage
     }
 
     /// The light fills the screen while there's no page, from the first frame; behind a page
@@ -102,19 +99,6 @@ struct SurfaceScreen: View {
     private var flood: Double {
         guard isWorking else { return 0 }
         return isForming ? 1 : 0.6
-    }
-
-    /// How strongly the screen's border glows in the border-and-stars style: fully while Dream
-    /// works, from the first frame until the page is done; dimly while it waits on the user.
-    private var border: Double {
-        guard isWorking else { return 0 }
-        return yourTurn ? 0.3 : 1
-    }
-
-    /// Stars stream into the border the whole time Dream thinks, before there's a page; not
-    /// while it writes, and not while it's the user's turn.
-    private var stars: Double {
-        isWorking && isForming && !yourTurn ? 1 : 0
     }
 
     /// Blocks shown, so each one landing surges the light.
@@ -155,33 +139,21 @@ struct SurfaceScreen: View {
             }
         }
         .background {
-            // In the warp style the stars and the border show the work, never the light with
-            // them; it comes back as a glow at the top once the page is done.
-            Aura(palette: palette, energy: style == .light ? energy : 0, flood: style == .light ? flood : 0, pulse: pulse)
-                .animation(.easeInOut(duration: 1.4), value: energy)
-                .animation(.easeInOut(duration: 1.2), value: flood)
-                .opacity(style == .warp && isWorking ? 0 : 1)
-                .animation(.easeInOut(duration: 1), value: isWorking)
+            // The light, in the colors of the stage the request is at; the page's own once it's done.
+            StageLight(stage: stage, palette: surface.flatMap { $0.isEmpty ? nil : $0.palette }, flood: flood, pulse: pulse)
         }
         .background(Color(.systemBackground))
-        .overlay {
-            // The border while Dream works, and stars flying into it at each step of the work.
-            // Gone once the page is done, fading as it goes: a glow left at zero still showed
-            // its last frame.
-            if style == .warp, border > 0 || stars > 0 {
-                ConstructionGlow(palette: palette, border: border, stars: stars, pulse: pulse)
-                    .animation(.easeInOut(duration: 1), value: border)
-                    .animation(.easeInOut(duration: 0.8), value: stars)
-                    .transition(.opacity.animation(.easeInOut(duration: 1)))
-            }
-        }
-        // What the work is touching, while there's no page yet.
+        // What the work is touching while there's no page yet, and the stage it's at.
         .overlay(alignment: .bottom) {
-            if busy, isForming, !yourTurn {
-                WorkGlimpses(trail: composer.trail)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 12)
-                    .transition(.opacity)
+            if busy, !yourTurn {
+                VStack(alignment: .leading, spacing: 10) {
+                    if isForming { WorkGlimpses(trail: composer.trail) }
+                    StageSteps(stage: stage)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, 20)
+                .padding(.bottom, 12)
+                .transition(.opacity)
             }
         }
         .animation(.smooth(duration: 0.6), value: isForming)
@@ -212,7 +184,6 @@ struct SurfaceScreen: View {
         .onChange(of: composer.phase) {
             if !composer.phase.isBusy { changingID = nil }
             guard composer.phase == .done else { return }
-            keepServerPage()
             // The last blocks can land after the final surface update; settle at the top.
             if !userScrolled { scroll.scrollTo(edge: .top) }
             Task { await tour() }
@@ -255,20 +226,17 @@ struct SurfaceScreen: View {
                 modelName: composer.modelName.isEmpty ? (saved?.modelName ?? "") : composer.modelName)
         }
         .task { await start() }
-        // Never leave the model waiting on questions nobody can see. A page made on Dream's
-        // server goes on without the screen, and its questions wait for the user to come back
-        // to them from the shelf.
+        // A new page goes on being made on the shelf, and its questions wait for the user to
+        // come back to them. A change to a saved page stops with its screen, and never leaves the
+        // model waiting on questions nobody can see.
+        .onChange(of: madePage?.id) { adopt(madePage) }
         .onDisappear {
-            // Left while the server still makes it: when a notification is worth asking for.
-            if composer.job != nil, composer.phase.isBusy { Notifications.shared.pageLeft() }
-            guard composer.job == nil else { return }
+            guard saved != nil || making == nil else { return }
             composer.asking.cancel()
             composer.consent.cancel()
         }
         .onChange(of: state.values) { _, values in
             saved?.values = values
-            // A change being made on Dream's server lands with the numbers as they are now.
-            if composer.phase.isBusy, composer.change != nil { composer.change?.values = values }
         }
         .countingControlUses(state.values, of: surface, settled: !busy)
         .keepingRecords(of: saved?.id, collections: surface?.recordCollections ?? [], in: state)
@@ -305,13 +273,7 @@ struct SurfaceScreen: View {
 
     @ViewBuilder private var changeBar: some View {
         if let target = changing {
-            VStack(alignment: .leading, spacing: 8) {
-                // What will make the change, for accounts that can choose (ModelPicker.swift).
-                if let options = ModelOptions.offered {
-                    ModelChip(options: options, palette: palette, focus: $instructionFocused)
-                }
-                instructionField(for: target)
-            }
+            instructionField(for: target)
             .padding(.horizontal, 16)
             .padding(.bottom, 8)
             .transition(.move(edge: .bottom).combined(with: .opacity))
@@ -365,80 +327,39 @@ struct SurfaceScreen: View {
             state.values = saved.values.merging(state.values) { _, current in current }
             saved.openCount += 1
             saved.lastOpenedAt = .now
-            // A change still being made on Dream's server shows here as it did where it was asked.
-            if composer.job == nil, let changing = ServerPages.shared.changing(saved.id) {
-                composer = changing
-                changingID = changing.change?.focus
+            return
+        }
+        if let making {
+            // Made while the screen was away, or still being made: carry on with it.
+            if let made = madePage { adopt(made); return }
+            if hasFailed {
+                PageMaker.shared.retry(making)
             }
+            if let current = PageMaker.shared.composer(for: making), current !== composer { composer = current }
             return
         }
-        if let forming {
-            // It may have finished since the shelf showed it.
-            if let made = ServerPages.shared.page(forming.job.page) {
-                saved = made
-                await start()
-            } else if hasFailed {
-                if let job = composer.job { ServerPages.shared.discard(job.page) }
-                composer = ServerPages.shared.retry(forming)
-            } else if composer.job == nil {
-                composer = ServerPages.shared.composer(for: forming)
-                keepServerPage()
-            }
-            return
-        }
-        guard let request, composer.phase == .idle || hasFailed else { return }
-        // Made on Dream's server, the page goes on if the screen is left, and it's kept under
-        // its id when it's done (keepServerPage).
-        if ServerCompose.isOn {
-            if let job = composer.job { ServerPages.shared.discard(job.page) }
-            composer = ServerPages.shared.begin(intent: request.intent, image: request.image)
-            return
-        }
-        await composer.compose(intent: request.intent, image: request.image, onServer: false)
-        guard composer.phase == .done, let surface = composer.surface else { return }
-        let saved = SavedSurface(intent: request.intent, surface: surface, modelName: composer.modelName, log: composer.log)
-        saved.values = state.values
-        saved.photoData = request.image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }
-        saved.history = [PageTurn(.asked, request.intent, answers: surface.answers ?? [])]
-        context.insert(saved)
-        try? context.save()
-        self.saved = saved
-        Memory.learn(from: request.intent, answers: surface.answers ?? [], in: context)
+        guard let request else { return }
+        let page = PageMaker.shared.begin(intent: request.intent, image: request.image)
+        making = page
+        if let current = PageMaker.shared.composer(for: page) { composer = current }
     }
 
-    /// A page made on Dream's server, once it's done: kept under the id it's synced under
-    /// (ServerPages.keep), and the screen goes on with it as with a page it made itself. A change
-    /// lands on the page it changed, and the user's numbers are those it kept.
-    private func keepServerPage() {
-        guard composer.job != nil else { return }
-        if composer.change != nil {
-            guard let kept = ServerPages.shared.keep(composer) else { return }
-            state.values = kept.values
-            saved = kept
-            return
-        }
-        guard saved == nil, let kept = ServerPages.shared.keep(composer) else { return }
-        if !state.values.isEmpty { kept.values = kept.values.merging(state.values) { _, current in current } }
-        saved = kept
-    }
+    /// The page PageMaker saved for this screen's request, once it has.
+    private var madePage: SavedSurface? { making.flatMap { PageMaker.shared.made[$0.id] } }
 
-    /// A change made on Dream's server, which goes on if the screen is left and lands on this
-    /// page when it's done (keepServerPage). False when changes are made here instead.
-    private func changeOnServer(_ change: PageChange) -> Bool {
-        guard ServerCompose.isOn, let saved else { return false }
-        composer = ServerPages.shared.change(saved, change)
-        return true
+    /// Carries on with the saved page, keeping the numbers the user changed while it was written.
+    private func adopt(_ made: SavedSurface?) {
+        guard let made, saved == nil else { return }
+        if !state.values.isEmpty { made.values = made.values.merging(state.values) { _, current in current } }
+        saved = made
+        saved?.lastOpenedAt = .now
+        saved?.openCount += 1
     }
 
     /// After connecting a service the request named, the request runs again, now able to read
-    /// it. On Dream's server, the service is read through this iPhone (DeviceTools.swift).
+    /// it.
     private func runAgain() async {
-        if ServerCompose.isOn {
-            guard !composer.phase.isBusy, let current = surface else { return }
-            _ = changeOnServer(.again(intent, on: current, values: state.values))
-            return
-        }
-        await composer.compose(intent: intent, image: request?.image ?? photo?.cgImage, onServer: false)
+        await composer.compose(intent: intent, image: request?.image ?? photo?.cgImage)
         guard composer.phase == .done, let surface = composer.surface, let saved else { return }
         saved.surface = surface
         saved.generationLog.append(contentsOf: composer.log)
@@ -467,7 +388,6 @@ struct SurfaceScreen: View {
                 saved?.note(.listed, text)
                 return
             }
-            if changeOnServer(.instruction(text, focus: target.block?.id, on: current, values: state.values)) { return }
             await composer.edit(current, intent: intent, instruction: text, focus: target.block)
             changingID = nil
             guard composer.phase == .done, let updated = composer.surface else { return }
@@ -490,7 +410,6 @@ struct SurfaceScreen: View {
     /// A different answer to one of the questions asked before building, from its tag in the header.
     private func changeAnswer(_ answer: Answer, to choice: String) {
         guard let current = surface else { return }
-        if changeOnServer(.answer(answer, to: choice, on: current, values: state.values)) { return }
         Task {
             await composer.rebuild(current, intent: intent, changing: answer, to: choice)
             guard composer.phase == .done, let updated = composer.surface else { return }
