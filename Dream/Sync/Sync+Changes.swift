@@ -174,6 +174,10 @@ extension SurfacePayload {
         values = saved.values.filter { $0.value.isFinite }
         sharedFrom = saved.sharedFrom
         self.seeded = seeded
+        starred = saved.isStarred
+        parent = saved.parentID?.uuidString
+        found = saved.found
+        subjects = saved.subjects
     }
 }
 

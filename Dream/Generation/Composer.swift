@@ -148,13 +148,23 @@ final class Composer {
     private var place: String?
     /// What understanding the request found out, and the articles it looked up, which the page
     /// is written from and credits.
-    private var understood = ""
+    private(set) var understood = ""
+    /// The particular things the request is about, which the saved page is remembered by.
+    private(set) var subjects: [String] = []
     private var understoodReferences = ReferenceLog()
     /// What the user asked for, which picks the connected services' tools worth offering.
     private var request = ""
+    /// What a page going on from another starts from, which understanding it reads too.
+    private var carrying: [String] = []
 
-    /// Makes a new page.
-    func compose(intent: String, image: CGImage? = nil) async {
+    /// Shows a page as it was, as when the user goes back to an earlier version.
+    func show(saved surface: Surface) {
+        self.surface = surface
+    }
+
+    /// Makes a new page. `carrying` is what a page going on from another starts from: that
+    /// page's request, answers, numbers and what was found for it (`Prompts.goingOn`).
+    func compose(intent: String, image: CGImage? = nil, carrying: [String] = []) async {
         let started = Date()
         log = []
         trail = []
@@ -165,6 +175,7 @@ final class Composer {
         Analytics.send(.pageRequested(withPhoto: image != nil))
         asking.start()
         understood = ""
+        subjects = []
         understoodReferences = ReferenceLog()
         live.start()
         connected.start()
@@ -176,7 +187,8 @@ final class Composer {
             // Where the user is, when they've let Dream know: the page and the gap check are told
             // the town, so "the weather tomorrow" needs no "Where?".
             place = await Places.hereIfAllowed()?.area
-            let context = await Prompts.context(for: intent, in: place)
+            let context = carrying + (await Prompts.context(for: intent, in: place))
+            self.carrying = carrying
             try await withModel {
                 try await self.write(request: intent, image: image, context: context)
             }
@@ -328,6 +340,8 @@ final class Composer {
         let started = Date()
         let gaps = await understand(intent)
         understood = gaps.found
+        subjects = gaps.subjects
+        if !gaps.subjects.isEmpty { note("About: " + gaps.subjects.joined(separator: ", ")) }
         if !gaps.found.isEmpty { note("Found: " + gaps.found.replacingOccurrences(of: "\n", with: " / ")) }
         var answers: [Answer] = []
         if gaps.questions.isEmpty {
@@ -360,7 +374,9 @@ final class Composer {
         do {
             let tools = tools(found: understoodReferences, lookingOnly: true)
             let session = session(Prompts.gapCheck, tools: tools, schema: GapCheck.WireGaps.generationSchema, answer: 8_000, calls: 4)
-            return try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), place: place)
+            // A page going on from another is understood with that one in front of it.
+            let related = carrying.isEmpty ? GapCheck.relatedPages(intent) : carrying
+            return try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), related: related, place: place)
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
             return GapCheck.Gaps()

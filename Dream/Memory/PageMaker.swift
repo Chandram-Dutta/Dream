@@ -20,6 +20,9 @@ final class PageMaker {
         let intent: String
         let photoData: Data?
         let startedAt: Date
+        /// The page this one goes on from, and what it starts from there (`Prompts.goingOn`).
+        var parent: UUID? = nil
+        var carrying: [String] = []
     }
 
     /// Pages being made, newest first, until they're saved.
@@ -43,12 +46,18 @@ final class PageMaker {
             recent.fetchLimit = 3
             return ((try? container.mainContext.fetch(recent)) ?? []).map { "\($0.surface.title) (asked as \"\($0.intent)\")" }
         }
+        // And the earlier pages about the same things, with what was found for them (PageGraph.swift).
+        GapCheck.relatedPages = { request in
+            let nodes = PageGraph.pages(in: container.mainContext).map(\.node)
+            return PageGraph.related(toRequest: request, in: nodes).map(PageGraph.described)
+        }
     }
 
     /// Starts a page for a request, and returns it.
     @discardableResult
-    func begin(intent: String, image: CGImage?) -> Making {
-        let making = Making(id: UUID(), intent: intent, photoData: image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }, startedAt: .now)
+    func begin(intent: String, image: CGImage?, parent: UUID? = nil, carrying: [String] = []) -> Making {
+        let making = Making(id: UUID(), intent: intent, photoData: image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }, startedAt: .now,
+                            parent: parent, carrying: carrying)
         pages.insert(making, at: 0)
         images[making.id] = image
         run(making)
@@ -86,7 +95,7 @@ final class PageMaker {
         let image = images[page.id]
         tasks[page.id] = Task { @MainActor in
             let background = BackgroundPage(page: page, composer: composer) { [weak self] in self?.tasks[page.id]?.cancel() }
-            await composer.compose(intent: page.intent, image: image)
+            await composer.compose(intent: page.intent, image: image, carrying: page.carrying)
             background.finish(success: composer.phase == .done)
             tasks[page.id] = nil
             guard composer.phase == .done, let surface = composer.surface, let container else { return }
@@ -94,6 +103,9 @@ final class PageMaker {
             let saved = SavedSurface(intent: page.intent, surface: surface, modelName: composer.modelName, log: composer.log)
             saved.photoData = page.photoData
             saved.history = [PageTurn(.asked, page.intent, answers: surface.answers ?? [])]
+            saved.parentID = page.parent
+            saved.found = composer.understood
+            saved.subjects = composer.subjects
             context.insert(saved)
             try? context.save()
             Memory.learn(from: page.intent, answers: surface.answers ?? [], in: context)

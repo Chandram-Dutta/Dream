@@ -31,7 +31,7 @@ enum ScreenMemory {
     /// How much of each side the other covers, from 0 to 1, mostly how much of what's typed: a
     /// short request inside a longer saved one is still a match. At least one word must be shared
     /// outright, so near-synonyms alone never make one.
-    private static func similarity(_ typed: [String], _ saved: [String]) -> Double {
+    static func similarity(_ typed: [String], _ saved: [String]) -> Double {
         guard !typed.isEmpty, !saved.isEmpty, !Set(typed).isDisjoint(with: saved) else { return 0 }
         let typedCovered = typed.map { cover($0, by: saved) }.reduce(0, +) / Double(typed.count)
         let savedCovered = saved.map { cover($0, by: typed) }.reduce(0, +) / Double(saved.count)

@@ -92,6 +92,31 @@ seconds leaves the parts about the request instead (`Excerpt`). Web pages are fe
 12,000 characters for a reader, instead of 4,000. Readers run on PCC, like the writer, so
 nothing goes anywhere new.
 
+## Going on from a page, and remembering
+
+What someone types to a page they're on is sorted first (`Dream/Generation/FollowUp.swift`), by
+a short session on the same model:
+- **A change** ("make it monthly") rewrites the page. The version before is kept, up to 12, and
+  the page's menu goes back to any of them; going back can itself be undone.
+- **Going on** ("what about Mumbai?", "how do Swahili verbs work?") makes a new page linked to
+  this one. It starts from the earlier page's request, the numbers as the user left them, their
+  answers and what was found for it (`Prompts.goingOn`), so a bill split for Mumbai is the same
+  bill, split the same way. The new page shows where it came from above it.
+- **Something unrelated** makes a page of its own.
+
+Every page remembers what understanding its request found and the particular things it's about
+(people, places, projects, works), which understanding names (`WireGaps.subjects`). Together
+with the links between pages, that's Dream's memory of what it has looked into for someone
+(`Dream/Memory/PageGraph.swift`), kept on the iPhone and synced only to the user's own devices:
+- A new request is understood with the earlier pages about the same things in front of it, and
+  what was found for them, so "the GTM plan" reads as the Hyena Dart plan made last week.
+- Each page lists the pages related to it.
+- All pages can be seen as a map (`Dream/UI/PageMapView.swift`): each page in its own color,
+  joined to the subjects it shares with others and to the page it went on from.
+- Home leads with suggestions, made on the iPhone from what was made lately (the next thing to
+  know about one, or the same for another case), then starred pages and the last four. The
+  rest are in All pages, with search and the map.
+
 ## Pages carry on
 
 A page is made by `PageMaker`, not by its screen. Going back to the shelf or opening another page

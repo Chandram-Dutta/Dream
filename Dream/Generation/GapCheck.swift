@@ -18,6 +18,8 @@ enum GapCheck {
         var seconds: TimeInterval = 0
         /// What was found out while understanding the request, for the writer to build from.
         var found = ""
+        /// The particular things the request is about.
+        var subjects: [String] = []
     }
 
     @Generable
@@ -30,6 +32,10 @@ enum GapCheck {
         // After looking, so the questions come from what's there, and the writer gets it too.
         @Guide(description: "What you found out with the tools that the screen should be built from: names, titles, ids, dates and figures exactly as the tools gave them, in a few short lines. Empty if you used no tools.")
         var found: String
+        // What Dream remembers each page by (PageGraph.swift), so a later request about the
+        // same things, or one going on from this, starts from what was found here.
+        @Guide(description: "The particular things the request is about, as their names: people, places, projects, products, works, documents. At most 4. Empty for a general idea or a calculation, like square roots or a bill split.", .maximumCount(4))
+        var subjects: [String]
         // Then, so the model decides whether anything is missing before it writes a question.
         // Asked for questions alone, Apple's model always wrote one, often the request itself.
         @Guide(description: "What your reading leaves open that only the user can tell and that changes which screen to build, in a few words. Empty when the request's words settle it, or the screen can offer it as a control or a choice, as for almost every request.")
@@ -63,16 +69,21 @@ enum GapCheck {
     /// (PageMaker.swift): what someone just read often settles what a short request means.
     @MainActor static var recentPages: () -> [String] = { [] }
 
-    static func run(_ intent: String, in session: LanguageModelSession, reasoning: ContextOptions.ReasoningLevel? = nil, recent: [String] = [], place: String? = nil) async throws -> Gaps {
+    /// Earlier pages about the same things as a request, with what was found for them, which the
+    /// app fills in (PageGraph.swift): "the GTM plan" finds the page made from those Notion notes.
+    @MainActor static var relatedPages: (String) -> [String] = { _ in [] }
+
+    static func run(_ intent: String, in session: LanguageModelSession, reasoning: ContextOptions.ReasoningLevel? = nil, recent: [String] = [], related: [String] = [], place: String? = nil) async throws -> Gaps {
         let started = Date()
         let topics = await Recall.source.topics()
-        let prompt = Prompts.gapRequest(intent, remembering: topics, recent: recent, place: place)
+        let prompt = Prompts.gapRequest(intent, remembering: topics, recent: recent, related: related, place: place)
         let wire = try await within(patience) {
             try await session.respond(to: prompt, generating: WireGaps.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 600),
                                       contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: reasoning)).content
         }
         var gaps = await resolve(wire, for: intent, remembering: topics)
         gaps.found = wire.found.trimmingCharacters(in: .whitespacesAndNewlines)
+        gaps.subjects = wire.subjects.map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }.filter { !$0.isEmpty }
         gaps.seconds = Date().timeIntervalSince(started)
         return gaps
     }

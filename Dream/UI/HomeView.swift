@@ -4,6 +4,11 @@ import SwiftUI
 
 /// Where everything starts. Ask at the bottom, or tap an idea; what you've made glows above,
 /// each in its own colors.
+/// Where home goes besides pages.
+enum HomeRoute: Hashable {
+    case library
+}
+
 struct HomeView: View {
     @Environment(\.modelContext) private var context
     @Query(sort: \SavedSurface.updatedAt, order: .reverse) private var surfaces: [SavedSurface]
@@ -43,10 +48,33 @@ struct HomeView: View {
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .panel(palette)
                     }
-                    if !surfaces.isEmpty || !maker.pages.isEmpty {
-                        shelf
-                    }
+                    // What to make next comes first; what was made, after it.
                     ideaList
+                    if !maker.pages.isEmpty { making }
+                    if !starred.isEmpty {
+                        section("Starred") { PageGrid(pages: starred) }
+                    }
+                    if !recent.isEmpty {
+                        section("Recent") { PageGrid(pages: recent) }
+                    }
+                    if surfaces.count >= 2 {
+                        NavigationLink(value: HomeRoute.library) {
+                            HStack {
+                                Label("All pages", systemImage: "square.grid.2x2")
+                                Spacer(minLength: 0)
+                                Text("\(surfaces.count)")
+                                    .foregroundStyle(.secondary)
+                                    .monospacedDigit()
+                                Image(systemName: "chevron.right")
+                                    .font(.footnote.weight(.semibold))
+                                    .foregroundStyle(.tertiary)
+                            }
+                            .font(.body.weight(.medium))
+                            .contentShape(Rectangle())
+                        }
+                        .buttonStyle(.plain)
+                        .padding(.vertical, 4)
+                    }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 24)
@@ -65,6 +93,11 @@ struct HomeView: View {
             .navigationDestination(item: $request) { SurfaceScreen(request: $0) }
             .navigationDestination(for: SavedSurface.self) { SurfaceScreen(saved: $0) }
             .navigationDestination(for: PageMaker.Making.self) { SurfaceScreen(making: $0) }
+            .navigationDestination(for: HomeRoute.self) { route in
+                switch route {
+                case .library: LibraryView()
+                }
+            }
             // Shared with the user, from a link (SharedLinks.swift).
             .navigationDestination(item: $sharedLinks.opened) { SurfaceScreen(saved: $0) }
         }
@@ -78,9 +111,10 @@ struct HomeView: View {
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
             canCompose = Composer.canCompose
         }
-        .task {
-            startFromLaunchArgument()
-            await ideas.load()
+        .task { startFromLaunchArgument() }
+        // Written again when what was made lately changes, so they go on from the newest.
+        .task(id: surfaces.prefix(6).map(\.id) + surfaces.filter(\.isStarred).map(\.id)) {
+            await ideas.load(after: Ideas.lately(surfaces))
         }
     }
 
@@ -123,7 +157,23 @@ struct HomeView: View {
 
     // MARK: - Shelf
 
-    private var shelf: some View {
+    /// Pages kept at the top.
+    private var starred: [SavedSurface] { surfaces.filter(\.isStarred) }
+
+    /// The last few made or changed, besides the starred ones. The rest are in All pages.
+    private var recent: [SavedSurface] { Array(surfaces.filter { !$0.isStarred }.prefix(4)) }
+
+    private func section(_ title: String, @ViewBuilder content: () -> some View) -> some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+            content()
+        }
+    }
+
+    /// Pages still being made, in their stage's light.
+    private var making: some View {
         LazyVGrid(columns: [GridItem(.flexible(), spacing: 12), GridItem(.flexible(), spacing: 12)], spacing: 12) {
             ForEach(maker.pages) { page in
                 NavigationLink(value: page) {
@@ -134,18 +184,6 @@ struct HomeView: View {
                 .contextMenu {
                     Button(maker.failure(of: page) == nil ? "Stop" : "Delete", systemImage: "trash", role: .destructive) {
                         maker.discard(page)
-                    }
-                }
-            }
-            ForEach(surfaces) { saved in
-                NavigationLink(value: saved) {
-                    SurfaceTile(saved: saved)
-                }
-                .buttonStyle(.plain)
-                .contextMenu {
-                    Button("Delete", systemImage: "trash", role: .destructive) {
-                        RecordStore.deleteAll(of: saved.id, in: context)
-                        context.delete(saved)
                     }
                 }
             }
