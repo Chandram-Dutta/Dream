@@ -36,6 +36,13 @@ final class PageMaker {
 
     func start(_ container: ModelContainer) {
         self.container = container
+        // The gap check reads what was made in the last few hours (GapCheck.recentPages).
+        GapCheck.recentPages = {
+            let since = Date.now.addingTimeInterval(-3 * 3600)
+            var recent = FetchDescriptor<SavedSurface>(predicate: #Predicate { $0.updatedAt > since }, sortBy: [SortDescriptor(\.updatedAt, order: .reverse)])
+            recent.fetchLimit = 3
+            return ((try? container.mainContext.fetch(recent)) ?? []).map { "\($0.surface.title) (asked as \"\($0.intent)\")" }
+        }
     }
 
     /// Starts a page for a request, and returns it.

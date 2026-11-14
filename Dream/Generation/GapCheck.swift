@@ -15,9 +15,14 @@ enum GapCheck {
 
     @Generable
     struct WireGaps {
-        // First, so the model decides whether anything is missing before it writes a question.
+        // First, so the model says how it reads the request, words and all, before it looks for
+        // what's missing: "Vulcan destruction in 2258" is already Star Trek's planet, and saying so
+        // keeps the check from asking which Vulcan.
+        @Guide(description: "What the request is about, as you read it from all its words and what the user just made, in one short line")
+        var reading: String
+        // Then, so the model decides whether anything is missing before it writes a question.
         // Asked for questions alone, Apple's model always wrote one, often the request itself.
-        @Guide(description: "What the request leaves out that only the user can tell and that changes which screen to build, in a few words. Empty when nothing is, as for almost every request.")
+        @Guide(description: "What your reading leaves open that only the user can tell and that changes which screen to build, in a few words. Empty when the request's words settle it, or the screen can offer it as a control or a choice, as for almost every request.")
         var missing: String
         @Guide(description: "Only when something is missing: 1 to 3 questions about it. Otherwise none.", .maximumCount(3))
         var questions: [WireQuestion]
@@ -46,12 +51,17 @@ enum GapCheck {
     /// seconds; past this the page shows, and gives way to questions only if the check finds some.
     static let hold: TimeInterval = 6
 
-    static func run(_ intent: String, in session: LanguageModelSession) async throws -> Gaps {
+    /// The titles of the pages the user made lately, newest first, which the app fills in
+    /// (PageMaker.swift): what someone just read often settles what a short request means.
+    @MainActor static var recentPages: () -> [String] = { [] }
+
+    static func run(_ intent: String, in session: LanguageModelSession, reasoning: ContextOptions.ReasoningLevel? = nil, recent: [String] = []) async throws -> Gaps {
         let started = Date()
         let topics = await Recall.source.topics()
-        let prompt = Prompts.gapRequest(intent, remembering: topics)
+        let prompt = Prompts.gapRequest(intent, remembering: topics, recent: recent)
         let wire = try await within(patience) {
-            try await session.respond(to: prompt, generating: WireGaps.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 600)).content
+            try await session.respond(to: prompt, generating: WireGaps.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 600),
+                                      contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: reasoning)).content
         }
         var gaps = await resolve(wire, for: intent, remembering: topics)
         gaps.seconds = Date().timeIntervalSince(started)

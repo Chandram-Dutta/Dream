@@ -331,7 +331,7 @@ final class Composer {
             // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
             // Private Cloud Compute the page is written without asking first.
             guard active == .privateCloud else { return GapCheck.Gaps() }
-            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []))
+            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []), reasoning: .light, recent: GapCheck.recentPages())
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
             return GapCheck.Gaps()
