@@ -103,8 +103,11 @@ progress on the Lock Screen and in the Dynamic Island.
 
 Dream's Cloudflare Worker no longer touches models on this branch's app. It keeps accounts (Sign
 in with Apple, optional now: pages are made without one), sync between devices, shared links, web
-search and reading (Parallel), and WeatherKit. The Worker's old model routes (`/api/model`,
-`/api/compose`, `/api/route`) are unused by this app.
+search and reading (Parallel). The Worker's old model routes (`/api/model`, `/api/compose`,
+`/api/route`) and its WeatherKit token, which served pages made on the server, are unused by
+this app. The weather comes from the WeatherKit framework on the iPhone
+(`Dream/Generation/LiveWeather.swift`), with the Apple Weather mark and legal link wherever it's
+shown.
 
 ## Building
 
