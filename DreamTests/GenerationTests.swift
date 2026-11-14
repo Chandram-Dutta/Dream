@@ -90,6 +90,7 @@ struct GenerationTests {
             await ContextBudget.fit(page, from: "Notion", looking: "launch", limit: 2_000)
         }
         #expect(cut.count <= 2_100 && cut.contains("The parts about it"), "a reader that fails leaves the parts about the request")
+        #expect(failing.readerGaveUp, "and the rest of the session doesn't wait on another")
     }
 
     @Test("Readers take turns, a few at a time")

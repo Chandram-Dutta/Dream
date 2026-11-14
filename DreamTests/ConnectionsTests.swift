@@ -170,6 +170,10 @@ struct ConnectionsTests {
         let tasks = ToolPicker.pick(for: "which tasks are still open in my team notes", from: Connections.lookingTools).map(\.tool.name)
         #expect(tasks.contains("list_tasks"), "a request about tasks gets the task tool")
         #expect(ToolPicker.pick(for: "split a restaurant bill between friends", from: Connections.usableTools).isEmpty, "a bill gets nothing")
+        #expect(ToolPicker.pick(for: "what makes a task hard to estimate", from: Connections.lookingTools).isEmpty,
+                "one word shared with a tool's description isn't enough: \"square root of 420\" once brought in Hugging Face by \"root\"")
+        #expect(!ToolPicker.pick(for: "how many tasks are open in team notes", from: Connections.lookingTools).isEmpty, "naming the service is")
+        #expect(!ToolPicker.pick(for: "how many tasks do I have", from: Connections.lookingTools).isEmpty, "and so is asking about their own")
         for (request, acts) in [("add a task to book the venue", true), ("which tasks are still open", false), ("what's in my team notes", false),
                                 ("save the offsite plan to my notes", true), ("create an issue for the login bug", true), ("my open Linear issues", false)] {
             #expect(ToolPicker.asksToAct(request) == acts, "\"\(request)\" \(acts ? "asks" : "doesn't ask") to do something")

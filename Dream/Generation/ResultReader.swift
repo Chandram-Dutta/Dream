@@ -20,16 +20,16 @@ struct ResultReader: Sendable {
     /// characters.
     let read: @Sendable (_ text: String, _ source: String, _ focus: String, _ limit: Int) async throws -> String
 
-    /// The most one reader takes in. Its window is 32,768 tokens; this leaves room for its brief
-    /// and its notes. Longer results are cut to their parts about the request first.
-    static let most = 70_000
+    /// The most one reader takes in. Its window is 32,768 tokens, but the more it takes in, the
+    /// longer it takes. Longer results are cut to their parts about the request first.
+    static let most = 40_000
 
     /// At most this many read at once: a model that opens ten pages together gets them read
     /// three at a time rather than ten PCC requests at once.
     static let together = TakingTurns(width: 3)
 
     /// How long a reader may take before the result is cut down instead.
-    static let patience: Duration = .seconds(45)
+    static let patience: Duration = .seconds(60)
 
     /// A reader on Private Cloud Compute, taking notes for `request`.
     static func privateCloud(for request: String, onNote: @escaping @Sendable (String) -> Void) -> ResultReader {
@@ -43,7 +43,9 @@ struct ResultReader: Sendable {
                 let session = LanguageModelSession(model: PrivateCloudComputeLanguageModel(), instructions: Prompts.reader)
                 let notes = try await withDeadline(patience) {
                     try await session.respond(to: Prompts.readerRequest(request, source: source, focus: focus, text: input, limit: limit),
-                                              options: GenerationOptions(temperature: 0.1, maximumResponseTokens: max(300, limit / 3))).content
+                                              options: GenerationOptions(temperature: 0.1, maximumResponseTokens: max(300, limit / 3)),
+                                              // Taking notes needs little thought; without this, one reasoned past 45 seconds on a 29,000-character Notion page.
+                                              contextOptions: ContextOptions(includeSchemaInPrompt: false, reasoningLevel: .light)).content
                 }
                 onNote(String(format: "Read \(source): %d characters of notes in %.1fs", notes.count, Date.now.timeIntervalSince(started)))
                 return notes
@@ -58,7 +60,7 @@ extension ContextBudget {
     /// reading fails, its parts about `focus` (`Excerpt`).
     static func fit(_ text: String, from source: String, looking focus: String, limit: Int) async -> String {
         guard text.count > limit else { return text }
-        if let reader = current?.reader {
+        if let budget = current, let reader = budget.reader, !budget.readerGaveUp {
             do {
                 let notes = try await reader.read(text, source, focus, min(limit, Self.notes))
                     .trimmingCharacters(in: .whitespacesAndNewlines)
@@ -69,7 +71,10 @@ extension ContextBudget {
             } catch is CancellationError {
                 return ""
             } catch {
-                Build.trace("[Dream] Reader failed for \(source): \(error.localizedDescription)")
+                // One that fails, usually by taking too long, is likely the next one too: the
+                // rest of this session's results are cut down straight away instead of waiting.
+                budget.giveUpReading()
+                Build.trace("[Dream] Reader failed for \(source): \(error.localizedDescription); cutting results down from here on")
             }
         }
         return Excerpt.focused(text, on: focus, limit: limit) + "\n[The parts about it, from \(text.count) characters.]"

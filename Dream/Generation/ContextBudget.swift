@@ -67,6 +67,15 @@ final class ContextBudget: @unchecked Sendable {
         lock.withLock { max(Self.smallest, min(most, (characters - used) / 2)) }
     }
 
+    private var gaveUp = false
+
+    /// Whether a reader failed in this session, so the rest aren't waited for.
+    var readerGaveUp: Bool { lock.withLock { gaveUp } }
+
+    func giveUpReading() {
+        lock.withLock { gaveUp = true }
+    }
+
     func spend(_ count: Int) {
         lock.withLock { used += count }
     }
