@@ -15,7 +15,11 @@ enum GapCheck {
 
     @Generable
     struct WireGaps {
-        @Guide(description: "0 to 3 questions. Usually none.", .maximumCount(3))
+        // First, so the model decides whether anything is missing before it writes a question.
+        // Asked for questions alone, Apple's model always wrote one, often the request itself.
+        @Guide(description: "What the request leaves out that only the user can tell and that changes which screen to build, in a few words. Empty when nothing is, as for almost every request.")
+        var missing: String
+        @Guide(description: "Only when something is missing: 1 to 3 questions about it. Otherwise none.", .maximumCount(3))
         var questions: [WireQuestion]
     }
 
@@ -49,17 +53,19 @@ enum GapCheck {
         let wire = try await within(patience) {
             try await session.respond(to: prompt, generating: WireGaps.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 600)).content
         }
-        var gaps = await resolve(wire, remembering: topics)
+        var gaps = await resolve(wire, for: intent, remembering: topics)
         gaps.seconds = Date().timeIntervalSince(started)
         return gaps
     }
 
     /// The questions, with those Dream can answer itself answered: the model names the topic that
     /// answers one, and a question about a remembered topic is answered even if it didn't.
-    static func resolve(_ wire: WireGaps, remembering topics: [String]) async -> Gaps {
+    static func resolve(_ wire: WireGaps, for intent: String, remembering topics: [String]) async -> Gaps {
         var gaps = Gaps()
+        // Nothing missing, nothing to ask, whatever questions came with it.
+        guard !wire.missing.trimmingCharacters(in: .whitespacesAndNewlines.union(.punctuationCharacters)).isEmpty else { return gaps }
         for item in wire.questions.prefix(3) {
-            guard let question = Question(item) else { continue }
+            guard let question = Question(item), !question.restates(intent) else { continue }
             gaps.questions.append(question)
             let named = item.remembered.trimmingCharacters(in: .whitespacesAndNewlines)
             let topic = named.isEmpty ? topics.first { Recall.key($0) == Recall.key(question.topic) } : named
@@ -104,6 +110,17 @@ extension Question {
             options: Array(options.prefix(4)),
             allowsTyping: wire.typing || options.count < 2,
             isPersonal: wire.personal)
+    }
+
+    /// Whether the question only says the request again ("Calculate 15% of 20000?"), which
+    /// asks the user nothing: nearly all its words are the request's.
+    func restates(_ request: String) -> Bool {
+        func words(_ text: String) -> Set<String> {
+            Set(text.lowercased().split { !$0.isLetter && !$0.isNumber }.map(String.init).filter { $0.count > 2 })
+        }
+        let asked = words(text)
+        guard !asked.isEmpty else { return true }
+        return Double(asked.intersection(words(request)).count) / Double(asked.count) >= 0.75
     }
 
     private static func isYouChoose(_ option: String) -> Bool {

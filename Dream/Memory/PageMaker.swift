@@ -36,7 +36,6 @@ final class PageMaker {
 
     func start(_ container: ModelContainer) {
         self.container = container
-        BackgroundPage.register()
     }
 
     /// Starts a page for a request, and returns it.
@@ -118,23 +117,20 @@ final class BackgroundPage {
         Self.stops[identifier] = onStop
         #if os(iOS)
         guard !ProcessInfo.processInfo.isiOSAppOnMac else { return }
+        // Each page's task is registered under its own identifier just before it's asked for:
+        // iOS takes continued-processing handlers registered while the app runs, but only for
+        // the identifier itself, never the wildcard in Info.plist.
+        let registered = BGTaskScheduler.shared.register(forTaskWithIdentifier: identifier, using: .main) { task in
+            guard let task = task as? BGContinuedProcessingTask else { task.setTaskCompleted(success: false); return }
+            MainActor.assumeIsolated { Self.started(task) }
+        }
+        guard registered else { return }
         let request = BGContinuedProcessingTaskRequest(identifier: identifier, title: "Making a page", subtitle: page.intent)
         request.strategy = .fail
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
             Build.trace("[Dream] No background time for this page: \(error.localizedDescription)")
-        }
-        #endif
-    }
-
-    /// Registers the launch handler for every page's task, once, at launch.
-    static func register() {
-        #if os(iOS)
-        guard !ProcessInfo.processInfo.isiOSAppOnMac else { return }
-        BGTaskScheduler.shared.register(forTaskWithIdentifier: prefix + "*", using: .main) { task in
-            guard let task = task as? BGContinuedProcessingTask else { task.setTaskCompleted(success: false); return }
-            MainActor.assumeIsolated { Self.started(task) }
         }
         #endif
     }
