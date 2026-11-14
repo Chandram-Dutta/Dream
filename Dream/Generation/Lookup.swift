@@ -39,7 +39,7 @@ struct LookupTool: Tool {
 /// What the lookup tool found, so the surface can credit its source and show its image.
 final class ReferenceLog: @unchecked Sendable {
     /// Enough for a screen, as for the web (`WebLog`); more is a model going round in circles.
-    /// Grok looks up five at most; DeepSeek once looked up the same few subjects a dozen times.
+    /// A capable model looks up five at most; a weaker one once looked up the same few subjects a dozen times.
     static let lookupLimit = 6
 
     /// How many lookups one screen may make: fewer on the iPhone, whose window holds about two.

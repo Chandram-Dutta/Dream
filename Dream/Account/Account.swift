@@ -33,7 +33,7 @@ final class Account {
 
     private(set) var isSignedIn = Session.isSignedIn
     private(set) var profile: Profile?
-    /// The welcome, shown until someone signs in.
+    /// The welcome, shown until someone signs in or goes on without an account.
     var showsWelcome = false
     var signInRequest: SignInRequest?
     /// After signing in, what's on the phone, to offer to move into the account (LocalData.swift).
@@ -56,7 +56,7 @@ final class Account {
         self.container = container
         // Device tours and the bench have nobody to sign in.
         let isTour = Build.flag("DreamTour") || Build.argument("DreamAutoIntent") != nil
-        showsWelcome = !isSignedIn && !isTour
+        showsWelcome = !isSignedIn && !isTour && !UserDefaults.standard.bool(forKey: Self.withoutAccountKey)
         Task {
             for await _ in NotificationCenter.default.notifications(named: Session.didChange) {
                 isSignedIn = Session.isSignedIn
@@ -120,6 +120,15 @@ final class Account {
         }
         offeredMove = nil
         finishSigningIn()
+    }
+
+    private static let withoutAccountKey = "goesWithoutAccount"
+
+    /// Goes on without an account: pages are made by Apple's models either way, and kept on this
+    /// iPhone. Signing in later, from the account button, keeps them in sync and shares them.
+    func continueWithoutAccount() {
+        UserDefaults.standard.set(true, forKey: Self.withoutAccountKey)
+        showsWelcome = false
     }
 
     /// Puts away the welcome or sheet, then carries on with what needed an account.

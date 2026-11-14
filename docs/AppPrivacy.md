@@ -37,7 +37,7 @@ Apple's rule is that optional collection is still collection.
 | User content › Audio data | No | | | | Speech is turned into text on the iPhone; audio never leaves it. |
 | User content › Gameplay content | No | | | | |
 | User content › Customer support | No | | | | Support is by email, outside the app. Revisit if in-app support is added. |
-| User content › Other user content | Yes | Yes | No | App functionality | Saved pages (template, values, answers, the history of requests and changes), list entries, memory facts, the list of connected services (not their tokens), settings, and shared pages. Requests and pages go to xAI to be made. |
+| User content › Other user content | Yes | Yes | No | App functionality | Saved pages (template, values, answers, the history of requests and changes), list entries, memory facts, the list of connected services (not their tokens), settings, and shared pages. Requests are made into pages by Apple's models, on the iPhone or on Private Cloud Compute; no other AI provider receives them. |
 | Browsing history | No | | | | Web pages are read by Dream's server for a page, not from the user's browsing. |
 | Search history | Yes | Yes | No | App functionality | What the user asks Dream, kept with each page's history. Web searches the model makes are cached for hours under hashed keys, but come from requests already declared. |
 | Identifiers › User ID | Yes | Yes | No | App functionality, analytics | Dream's own id for the account (a random UUID, never Apple's id or an email). Analytics are tied to it after sign-in. |
@@ -58,7 +58,7 @@ Apple's rule is that optional collection is still collection.
   Apple's own services for the request, and only results reach Dream's server and the model. If
   that changes (say, the server starts storing a page's place), or review disagrees, answer
   Location › Coarse location: collected, linked, app functionality.
-- **Third parties count.** xAI (the model), Parallel (web search) and PostHog (analytics) receive
+- **Third parties count.** Parallel (web search) and PostHog (analytics) receive
   data on Dream's behalf. Their data is covered by the rows above; the privacy policy names them.
 - **"Help improve Dream" is on from sign-in.** The line under Sign in with Apple says so, with the
   terms and privacy policy; turning it off in Account stops both MetricKit reports and PostHog at

@@ -104,7 +104,7 @@ private enum AccountPlace: Identifiable {
     var id: Self { self }
 }
 
-/// What the account button opens: who's signed in, with the pages left today, then the places
+/// What the account button opens: who's signed in, then the places
 /// that aren't about making a page. Sync shows at the bottom only when it needs attention.
 private struct AccountCard: View {
     let palette: Palette
