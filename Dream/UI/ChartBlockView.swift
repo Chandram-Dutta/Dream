@@ -245,25 +245,39 @@ struct DataChartView: View {
         }
     }
 
+    /// One row per value: its label and number on a line, then its bar on a faint track, the
+    /// longest full width. Drawn as rows rather than a chart with a category axis: there, a value
+    /// of 0 had no bar to sit beside, and its number landed on the next row's label.
     private func bars(_ points: [Point]) -> some View {
-        Chart(points) { point in
-            BarMark(x: .value("Value", grown ? point.value : 0), y: .value("Label", point.label))
-                .foregroundStyle(context.palette.accent)
-                .clipShape(.capsule)
-                .annotation(position: .trailing, spacing: 6) {
-                    Text(Format.number.display(point.value))
-                        .font(.display(.caption, weight: .semibold))
-                        .monospacedDigit()
-                        .foregroundStyle(.secondary)
+        let top = max(points.map { abs($0.value) }.max() ?? 0, .leastNonzeroMagnitude)
+        return VStack(alignment: .leading, spacing: 14) {
+            ForEach(Array(points.enumerated()), id: \.offset) { _, point in
+                VStack(alignment: .leading, spacing: 6) {
+                    HStack(alignment: .firstTextBaseline, spacing: 12) {
+                        Text(point.label)
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                            .lineLimit(2)
+                        Spacer(minLength: 8)
+                        Text(Format.number.display(point.value))
+                            .font(.display(.subheadline))
+                            .monospacedDigit()
+                    }
+                    GeometryReader { geometry in
+                        Capsule()
+                            .fill(context.palette.accent.opacity(0.12))
+                            .overlay(alignment: .leading) {
+                                Capsule()
+                                    .fill(context.palette.accent)
+                                    // A zero still shows where the bar would start.
+                                    .frame(width: max(8, geometry.size.width * (grown ? abs(point.value) / top : 0)))
+                            }
+                    }
+                    .frame(height: 10)
                 }
-        }
-        .chartXAxis(.hidden)
-        .chartYAxis {
-            AxisMarks { _ in
-                AxisValueLabel().font(.subheadline)
+                .accessibilityElement(children: .combine)
             }
         }
-        .frame(height: CGFloat(points.count) * 38 + 8)
         .accessibilityChartDescriptor(DataChartDescriptor(title: block.title, points: points.map { ($0.label, $0.value) }, overTime: false))
     }
 
