@@ -290,11 +290,11 @@ struct ReadTool: Tool {
         let page: WebService.Page
         let text: String
         do {
-            // As much as the screen has room for (ContextBudget.swift). With a reader, more of the
-            // page, which it reads apart and comes back as notes.
+            // As much as the screen has room for (ContextBudget.swift), already cut by the server
+            // to the parts about the focus.
             let room = min(4_000, ContextBudget.current?.allowance() ?? 4_000)
-            page = try await WebService.read(url, focus: focus, language: language, maxChars: ContextBudget.current?.reader != nil ? 12_000 : room)
-            text = await ContextBudget.fit(page.text, from: page.site, looking: focus, limit: room)
+            page = try await WebService.read(url, focus: focus, language: language, maxChars: room)
+            text = await ContextBudget.fit(page.text, from: page.site, looking: focus, limit: room, readsApart: false)
         } catch {
             let message = error.localizedDescription
             onUse("Read failed: \(message)")

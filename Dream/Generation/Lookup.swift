@@ -35,7 +35,7 @@ struct LookupTool: Tool {
         }
         found.append(reference)
         let room = min(maxCharacters, ContextBudget.current?.allowance(most: 6_000) ?? maxCharacters)
-        let extract = await ContextBudget.fit(reference.extract, from: "Wikipedia's \"\(reference.title)\"", looking: arguments.subject, limit: room)
+        let extract = await ContextBudget.fit(reference.extract, from: "Wikipedia's \"\(reference.title)\"", looking: arguments.subject, limit: room, readsApart: false)
         return "Wikipedia, \"\(reference.title)\" (cite it as \(reference.url)):\n\(extract)"
     }
 }

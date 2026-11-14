@@ -61,9 +61,13 @@ extension ContextBudget {
     /// A result made to fit the room this session's screen has: as it is when it fits; notes on
     /// it from a reader of its own when this session has one (`ResultReader`); otherwise, or if
     /// reading fails, its parts about `focus` (`Excerpt`).
-    static func fit(_ text: String, from source: String, looking focus: String, limit: Int) async -> String {
+    ///
+    /// Only what `readsApart` reads apart: a connected service's answers, which run to tens of
+    /// thousands of characters. A web page comes back from Dream's server already cut to its parts
+    /// about the request, and reading one apart added a median 7 seconds to every read.
+    static func fit(_ text: String, from source: String, looking focus: String, limit: Int, readsApart: Bool = true) async -> String {
         guard text.count > limit else { return text }
-        if let budget = current, let reader = budget.reader, !budget.readerGaveUp {
+        if readsApart, let budget = current, let reader = budget.reader, !budget.readerGaveUp {
             do {
                 let notes = try await reader.read(text, source, focus, min(limit, Self.notes))
                     .trimmingCharacters(in: .whitespacesAndNewlines)

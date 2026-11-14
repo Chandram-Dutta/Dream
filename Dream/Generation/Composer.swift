@@ -319,7 +319,10 @@ final class Composer {
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + (lookingOnly ? [] : [LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })] as [any Tool])
             + ConnectionTool.offered(for: request, lookingOnly: lookingOnly, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
-            + (!useWeb ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
+            // Understanding settles what a request refers to; researching the answer on the web
+            // is the writer's, which has the live tools too. Searching and reading while
+            // understanding took a median 22 seconds, and the writer looked the same things up again.
+            + (!useWeb || lookingOnly ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
                                onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } }))
     }
 

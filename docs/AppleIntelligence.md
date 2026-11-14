@@ -44,8 +44,9 @@ about Kenya's languages took 26 s with one Wikipedia lookup.
 
 1. **Understanding.** Before anything is asked or written, a short session on PCC reads the
    request and, when it's about the user's own things or a name that could mean several things,
-   looks first: in their connected services, what Dream remembers, Wikipedia and the web, with
-   look-up tools only. "Check my project's GTM notes" searches Notion and asks which project, by
+   looks first: in their connected services, what Dream remembers and Wikipedia, with look-up
+   tools only. It settles what the request refers to and never researches the answer: with web
+   search, it took a median 22 seconds and the writer looked the same things up again. "Check my project's GTM notes" searches Notion and asks which project, by
    the names it found, instead of guessing that GTM means Google Tag Manager. It writes down what
    it found, which the page is then built from, and asks only what it couldn't find out. A
    request that's already clear needs no tools and is understood in a couple of seconds.
@@ -88,9 +89,10 @@ written, then what else is there to open) and ends. Only the notes, at most 3,00
 come into the session writing the page. So a 20,000-character Notion page costs the writer
 about 3,000, and the writer's window holds the brief, the notes and the page rather than every
 page opened. At most three readers run at once; a reader that fails or takes longer than 45
-seconds leaves the parts about the request instead (`Excerpt`). Web pages are fetched at up to
-12,000 characters for a reader, instead of 4,000. Readers run on PCC, like the writer, so
-nothing goes anywhere new.
+seconds leaves the parts about the request instead (`Excerpt`). Only connected services' answers
+are read apart: a web page comes back from Dream's server already cut to its parts about the
+request, and reading one apart added a median 7 seconds. Readers run on PCC, like the writer,
+so nothing goes anywhere new.
 
 ## Easy requests are fast
 

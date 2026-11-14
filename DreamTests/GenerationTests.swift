@@ -85,6 +85,12 @@ struct GenerationTests {
         let after = await asked.calls.count
         #expect(short == "A short answer." && after == 1, "what fits isn't read apart")
 
+        let web = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit(page, from: "a web page", looking: "launch", limit: 2_000, readsApart: false)
+        }
+        let afterWeb = await asked.calls.count
+        #expect(afterWeb == 1 && web.contains("The parts about it"), "a web page, already cut by the server, isn't read apart")
+
         let failing = ContextBudget(characters: 40_000, calls: 10, reader: ResultReader { _, _, _, _ in throw DeadlinePassed() })
         let cut = await ContextBudget.$current.withValue(failing) {
             await ContextBudget.fit(page, from: "Notion", looking: "launch", limit: 2_000)

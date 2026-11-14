@@ -113,7 +113,7 @@ enum Prompts {
     /// the one read, and the checker drops it as a page that wasn't read.
     static func understoodContext(_ found: String, read: [Citation] = []) -> [String] {
         guard !found.isEmpty else { return [] }
-        var lines = ["Before writing, Dream looked into the request and found:\n\(found)\nBuild the screen from this. Call a tool again only for more than this, like a page's full text."]
+        var lines = ["Before writing, Dream looked into the request and found:\n\(found)\nBuild the screen from this, and don't look up again what's here: call a tool only for what this doesn't cover."]
         if !read.isEmpty {
             lines.append("Pages read for it, to cite exactly as written here: " + read.map { "\($0.url) (\($0.title))" }.joined(separator: "; "))
         }
