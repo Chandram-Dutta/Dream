@@ -89,7 +89,7 @@ struct ConnectionTool: Tool {
             log.use(connection.name)
             onUse("\(connection.name) answered\(result.isError ? " with an error" : ""): \(result.text.count) characters")
             let done = tool.readsOnly || result.isError ? "" : "\nIt's done: \(connection.name) has made this change. Say so plainly on the screen, without a button for it."
-            return Self.untrusted(result, from: connection.name, tool: tool.name) + done
+            return Self.untrusted(result, from: connection.name, tool: tool.name, about: request) + done
         } catch {
             onUse("\(connection.name) failed: \(error.localizedDescription)")
             return "\(connection.name) couldn't answer this time. Build the screen without it, and don't claim anything about what it holds."
@@ -109,7 +109,7 @@ struct ConnectionTool: Tool {
             let result = ConnectionResults.result(for: source) ?? ToolResult(text: "", structured: nil, isError: false)
             log.use(connection.name)
             onUse("\(connection.name) answered: \(result.text.count) characters, \(reading.fields.count) values, \(reading.lists.count) lists")
-            var answer = Self.untrusted(result, from: connection.name, tool: tool.name)
+            var answer = Self.untrusted(result, from: connection.name, tool: tool.name, about: request)
             if !reading.fields.isEmpty || !reading.lists.isEmpty {
                 source.lists = ConnectionReading.shapes(reading)
                 live.declare(source, reading: reading)
@@ -195,13 +195,17 @@ struct ConnectionTool: Tool {
 
     /// What the service returned, fenced and labelled as data, so nothing in it reads as an
     /// instruction. The fence is random each time, so the content can't close it.
-    static func untrusted(_ result: ToolResult, from service: String, tool: String) -> String {
+    /// What a service returned, fenced as data. A long answer keeps the parts about the request
+    /// (`Excerpt`), as much as the screen has room for (ContextBudget.swift).
+    static func untrusted(_ result: ToolResult, from service: String, tool: String, about request: String = "") -> String {
         var body = result.text
         if let structured = result.structured, !repeats(structured, body) {
             body += (body.isEmpty ? "" : "\n\nStructured content:\n") + structured.jsonString
         }
-        if body.count > resultLimit {
-            body = String(body.prefix(resultLimit)) + "\n[Cut off here; \(body.count - resultLimit) more characters.]"
+        let limit = min(resultLimit, (ContextBudget.current?.allowance(most: resultLimit) ?? resultLimit) - 600)
+        if body.count > limit {
+            let whole = body.count
+            body = Excerpt.focused(body, on: request, limit: limit) + "\n[The parts about the request, from \(whole) characters.]"
         }
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { body = "(nothing)" }
         let fence = "data-" + UUID().uuidString.prefix(8).lowercased()

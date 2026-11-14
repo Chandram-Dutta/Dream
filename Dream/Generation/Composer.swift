@@ -142,6 +142,8 @@ final class Composer {
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
     /// rarely appears only to give way to questions.
     private(set) var isChecking = false
+    /// The budget of the session opened last, which a repair checks for room.
+    private var budget: ContextBudget?
     /// The user's town, when they've let Dream use their location.
     private var place: String?
     /// What understanding the request found out, and the articles it looked up, which the page
@@ -244,10 +246,20 @@ final class Composer {
         }
     }
 
-    private func session(_ instructions: String, tools: [any Tool]) -> LanguageModelSession {
+    /// A session on the active model whose tools are held to what its window has room for
+    /// (ContextBudget.swift): the window, less the instructions, the answer's schema, the tools'
+    /// own descriptions and room for the answer. `calls` is how many tool calls it may make.
+    private func session(_ instructions: String, tools: [any Tool], schema: GenerationSchema? = nil, answer reserve: Int? = nil, calls: Int = 14) -> LanguageModelSession {
+        let window = active == .privateCloud ? 32_768 : 8_192
+        // A page and the reasoning before it, on PCC; a shorter page on the iPhone.
+        let room = reserve ?? (active == .privateCloud ? 30_000 : 6_000)
+        let budget = ContextBudget.forSession(window: window, instructions: instructions, schema: schema, tools: tools, answer: room, calls: calls)
+        self.budget = budget
+        if !tools.isEmpty { note("Room for tools: \(budget.characters) characters, \(calls) calls") }
+        let held = budget.holding(tools)
         switch active {
-        case .privateCloud: LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: tools, instructions: instructions)
-        case .onDevice: LanguageModelSession(model: SystemLanguageModel.default, tools: tools, instructions: instructions)
+        case .privateCloud: return LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: held, instructions: instructions)
+        case .onDevice: return LanguageModelSession(model: SystemLanguageModel.default, tools: held, instructions: instructions)
         }
     }
 
@@ -343,7 +355,8 @@ final class Composer {
         defer { isChecking = false }
         do {
             let tools = tools(found: understoodReferences, lookingOnly: true)
-            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: tools), reasoning: .light, recent: GapCheck.recentPages(), place: place)
+            let session = session(Prompts.gapCheck, tools: tools, schema: GapCheck.WireGaps.generationSchema, answer: 8_000, calls: 4)
+            return try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), place: place)
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
             return GapCheck.Gaps()
@@ -373,7 +386,7 @@ final class Composer {
                 Prompts.onDeviceBackground(reference)
             }
         }
-        var session = session(brief, tools: tools(found: found))
+        var session = session(brief, tools: tools(found: found), schema: format.generationSchema)
         var surface: Surface
         do {
             surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
@@ -386,14 +399,14 @@ final class Composer {
             // destroyed did). Written once more from Wikipedia alone; if the filter steps in
             // again, the page fails as it would have.
             note("The safety filter stopped the page after it read the web; writing it from Wikipedia alone.")
-            session = self.session(brief, tools: tools(found: found, web: false))
+            session = self.session(brief, tools: tools(found: found, web: false), schema: format.generationSchema)
             surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         } catch where Self.isWorthAnotherTry(error) {
             // Nothing usable came out: a loop or padding with nothing finished, a broken answer, or
             // an empty one. Another go in a new session usually works, and costs less than a page
             // that fails.
             note("Writing again in a new session, after: \(describe(error))")
-            session = self.session(brief, tools: tools(found: found))
+            session = self.session(brief, tools: tools(found: found), schema: format.generationSchema)
             surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         }
         surface = surface.fetched(live).connected(connected)
@@ -409,7 +422,13 @@ final class Composer {
             phase = .fixing(problems.count)
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
-            if active == .onDevice { session = self.session(brief, tools: tools(found: found)) }
+            // A repair repeats the whole page, so it needs room for two. After research that
+            // filled much of the window, it goes in a new session, given the request and the
+            // page as they stand; so it does on the iPhone, whose window holds one page.
+            if active == .onDevice || (budget?.spent ?? 0) > 0.4 {
+                note("Repairing in a new session, for room.")
+                session = self.session(brief, tools: tools(found: found), schema: format.generationSchema)
+            }
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
             let before = surface
             do {

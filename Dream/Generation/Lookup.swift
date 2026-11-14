@@ -34,7 +34,8 @@ struct LookupTool: Tool {
             return "Nothing found for \"\(arguments.subject)\"."
         }
         found.append(reference)
-        let extract = reference.extract.count > maxCharacters ? String(reference.extract.prefix(maxCharacters)) + "…" : reference.extract
+        let room = min(maxCharacters, ContextBudget.current?.allowance(most: 6_000) ?? maxCharacters)
+        let extract = reference.extract.count > room ? String(reference.extract.prefix(room)) + "…" : reference.extract
         return "Wikipedia, \"\(reference.title)\" (cite it as \(reference.url)):\n\(extract)"
     }
 }

@@ -289,7 +289,8 @@ struct ReadTool: Tool {
         onUse("Read: \(URL(string: url)?.host() ?? url)\(focus.isEmpty ? "" : ", for \(focus)")")
         let page: WebService.Page
         do {
-            page = try await WebService.read(url, focus: focus, language: language)
+            // As much as the screen has room for (ContextBudget.swift).
+            page = try await WebService.read(url, focus: focus, language: language, maxChars: min(4_000, ContextBudget.current?.allowance() ?? 4_000))
         } catch {
             let message = error.localizedDescription
             onUse("Read failed: \(message)")

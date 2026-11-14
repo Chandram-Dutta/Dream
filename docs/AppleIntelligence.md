@@ -69,6 +69,18 @@ to act, never while it's still being understood, and always ask first. The same 
 gets the first answer back instead of another trip. Calls made together share one token refresh,
 and a source a saved page keeps current backs off when its service fails.
 
+## Room in the window
+
+Every model session has a budget for what its tools return (`Dream/Generation/ContextBudget.swift`):
+the window (32,768 tokens on PCC), less the instructions, the answer's schema, the tools' own
+descriptions and room for the answer. Each result takes a share of what's left: half of it, at
+most 8,000 characters. So ten pages opened at once each get a smaller piece instead of
+overflowing the window, and once the budget is spent, tools tell the model to write from what
+it has. A long result keeps its opening and the parts that share the request's words
+(`Excerpt`), not just its first few thousand characters. Calls are counted too: 4 while
+understanding a request, 14 while writing. A repair after heavy research goes in a fresh
+session, given the request and the page as they stand, so it has room for both.
+
 ## Pages carry on
 
 A page is made by `PageMaker`, not by its screen. Going back to the shelf or opening another page

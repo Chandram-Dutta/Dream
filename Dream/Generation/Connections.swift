@@ -258,7 +258,7 @@ enum Connections {
 enum ToolPicker {
     /// Each service among those picked, with the rest of its look-up tools after the ones picked,
     /// up to `perService` from each.
-    static func whole(_ picked: [(connection: Connection, tool: ConnectedTool)], from tools: [(connection: Connection, tool: ConnectedTool)], perService: Int = 8) -> [(connection: Connection, tool: ConnectedTool)] {
+    static func whole(_ picked: [(connection: Connection, tool: ConnectedTool)], from tools: [(connection: Connection, tool: ConnectedTool)], perService: Int = 5) -> [(connection: Connection, tool: ConnectedTool)] {
         var services: [UUID] = []
         for entry in picked where !services.contains(entry.connection.id) { services.append(entry.connection.id) }
         return services.flatMap { service in

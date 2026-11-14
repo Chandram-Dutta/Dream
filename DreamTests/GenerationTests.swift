@@ -29,6 +29,41 @@ struct GenerationTests {
         #expect(Checker.checkLogic(&surface).filter { $0.kind == .needsModel }.isEmpty, "and the same checker finds nothing to send back")
     }
 
+    @Test("Tools share what's left of the window, and stop when it's spent")
+    func budget() {
+        let full = ContextBudget.forSession(window: 32_768, instructions: Prompts.surface, schema: WireSurface.generationSchema, tools: [], answer: 30_000, calls: 14)
+        #expect(full.characters > 20_000 && full.characters < 80_000, "PCC's window leaves real room for tools beside the whole brief: \(full.characters)")
+        let small = ContextBudget.forSession(window: 8_192, instructions: Prompts.surfaceOnDevice, schema: DeviceSurface.generationSchema, tools: [], answer: 6_000, calls: 4)
+        #expect(small.characters < full.characters / 2, "the iPhone's window much less")
+
+        let budget = ContextBudget(characters: 40_000, calls: 20)
+        var given: [Int] = []
+        for _ in 0..<10 where budget.mayCall() {
+            let room = budget.allowance()
+            given.append(room)
+            budget.spend(room)
+        }
+        #expect(given.first == 8_000, "a first result gets up to the most")
+        #expect(given == given.sorted(by: >), "each later one less, as many fetched at once: \(given)")
+        #expect(given.reduce(0, +) <= 40_000 + ContextBudget.smallest, "never much past the budget")
+        #expect(!budget.mayCall(), "and once it's spent, no more calls")
+
+        let few = ContextBudget(characters: 100_000, calls: 2)
+        #expect(few.mayCall() && few.mayCall() && !few.mayCall(), "calls are counted too")
+    }
+
+    @Test("A long result keeps its opening and the parts about the request")
+    func excerpt() {
+        let filler = (1...200).map { "Line \($0) about the office plants and the coffee rota." }
+        let page = (["Hyena Dart — project notes", "Owner: Chandram"] + filler.prefix(100) + ["GTM plan: launch in Bengaluru first, with campus ambassadors and a waitlist."] + filler.suffix(100)).joined(separator: "\n")
+        let kept = Excerpt.focused(page, on: "check my hyena dart gtm notes", limit: 1_500)
+        #expect(kept.count <= 1_700)
+        #expect(kept.hasPrefix("Hyena Dart — project notes"), "the opening says what it is")
+        #expect(kept.contains("GTM plan: launch in Bengaluru"), "and the part asked about, from the middle")
+        #expect(kept.contains("[…]"), "with the gaps marked")
+        #expect(Excerpt.focused("short", on: "anything", limit: 100) == "short")
+    }
+
     @Test("A page goes to the other Apple model only when that might help")
     func otherModel() {
         #expect(AppleModels.isWorthTheOtherModel(PrivateCloudComputeLanguageModel.Error.networkFailure(.init(debugDescription: "offline"))), "PCC out of reach: the iPhone writes it")
