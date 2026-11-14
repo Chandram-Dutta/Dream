@@ -92,6 +92,27 @@ seconds leaves the parts about the request instead (`Excerpt`). Web pages are fe
 12,000 characters for a reader, instead of 4,000. Readers run on PCC, like the writer, so
 nothing goes anywhere new.
 
+## Easy requests are fast
+
+How much a request needs decides how it's made (`Dream/Generation/Effort.swift`), from its
+words alone, before any model runs:
+- **Instant**: a sum ("square root of 420", "15% tax on 200 rupees", "20% off 1500", "12 x 7 +
+  3") is answered by Dream's own engine (`InstantPage.swift`): the answer, the equation worked
+  through and a control for each number, at once. So is a saved calculation asked again with
+  other numbers (`PageReuse.swift`): "15% tax on 300" is the 15% tax page set to 300.
+- **Quick**: a calculation with its numbers given ("split 2400 between 4 with a 10% tip") is
+  written straight away, without understanding first, with the short brief, the narrower page
+  and no tools.
+- **Standard**: understood first, then written with everything.
+- **Deep**: "compare", "in depth", "plan", "step by step": as standard, with moderate reasoning and
+  more tool calls.
+
+Anything that may need looking up goes the standard way: something current, a name, the user's
+own things in a service, money between currencies. Every stage is timed and sent to PostHog
+when the user allows it (docs/Analytics.md), as LLM analytics too, so each level's time can be
+watched and the rules tuned. PostHog can switch each fast path off (`instant-pages`,
+`page-reuse`, `quick-level`).
+
 ## Going on from a page, and remembering
 
 What someone types to a page they're on is sorted first (`Dream/Generation/FollowUp.swift`), by

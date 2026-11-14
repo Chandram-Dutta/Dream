@@ -123,9 +123,10 @@ struct HomeView: View {
     /// Things to try, written for this moment. With nothing made yet, they're the whole screen.
     private var ideaList: some View {
         VStack(alignment: .leading, spacing: 4) {
-            ForEach(ideas.items, id: \.self) { idea in
+            ForEach(Array(ideas.items.enumerated()), id: \.element) { position, idea in
                 Button {
-                    make(idea)
+                    Analytics.send(.suggestionTapped(position: position, personal: ideas.isPersonal))
+                    make(idea, from: "suggestion")
                 } label: {
                     HStack(alignment: .firstTextBaseline, spacing: 12) {
                         Text(idea)
@@ -229,7 +230,7 @@ struct HomeView: View {
                         .onSubmit { make(intent) }
                         .onChange(of: focused) { if focused, listener.isActive { listener.cancel() } }
                     if intent.isEmpty || listener.isActive {
-                        MicButton(listener: listener, text: $intent, palette: palette, onStart: { focused = false }) { make($0) }
+                        MicButton(listener: listener, text: $intent, palette: palette, onStart: { focused = false }) { make($0, from: "voice") }
                     }
                     if canMake && !listener.isActive {
                         Button("Make", systemImage: "arrow.up") { make(intent) }
@@ -256,10 +257,10 @@ struct HomeView: View {
         !intent.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || photo != nil
     }
 
-    private func make(_ text: String) {
+    private func make(_ text: String, from source: String = "typed") {
         let text = text.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !text.isEmpty || photo != nil else { return }
-        request = ComposeRequest(intent: text.isEmpty ? "What is this?" : text, image: photo?.cgImage)
+        request = ComposeRequest(intent: text.isEmpty ? "What is this?" : text, image: photo?.cgImage, source: photo != nil ? "photo" : source)
         intent = ""
         photo = nil
         photoItem = nil
@@ -280,7 +281,7 @@ struct HomeView: View {
         }
         guard !Self.startedAutomatically, let auto = Build.argument("DreamAutoIntent") else { return }
         Self.startedAutomatically = true
-        request = ComposeRequest(intent: auto, image: nil)
+        request = ComposeRequest(intent: auto, image: nil, source: "launch")
     }
 }
 

@@ -46,6 +46,12 @@ final class Composer {
     }
 
     private(set) var phase: Phase = .idle
+    /// How much the request needs (Effort.swift), which decides how it's made.
+    private(set) var level: Effort.Level = .standard
+    /// How this page is being made, stage by stage, for analytics: timings and counts, never words.
+    var run = Analytics.Run()
+    /// When the page was asked for, which the first block is timed from.
+    private var askedAt = Date()
     /// The surface as it stands, including while it's streaming in.
     private(set) var surface: Surface?
     private(set) var log: [String] = []
@@ -136,7 +142,7 @@ final class Composer {
     static var canCompose: Bool { provider.isUsable }
 
     /// The model this request runs on.
-    private var active: Provider = .privateCloud
+    private(set) var active: Provider = .privateCloud
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
@@ -164,15 +170,20 @@ final class Composer {
 
     /// Makes a new page. `carrying` is what a page going on from another starts from: that
     /// page's request, answers, numbers and what was found for it (`Prompts.goingOn`).
-    func compose(intent: String, image: CGImage? = nil, carrying: [String] = []) async {
+    func compose(intent: String, image: CGImage? = nil, carrying: [String] = [], source: String = "typed") async {
         let started = Date()
+        askedAt = started
+        level = Effort.level(for: intent, hasImage: image != nil)
+        if level == .quick, !FeatureFlag.quickLevel.isOn { level = .standard }
+        run = Analytics.Run(level: level.rawValue, source: source)
         log = []
         trail = []
         surface = nil
         isThinking = true
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
-        Analytics.send(.pageRequested(withPhoto: image != nil))
+        Analytics.send(.pageRequested(withPhoto: image != nil, run: run))
+        note("Level: \(level.rawValue)")
         asking.start()
         understood = ""
         subjects = []
@@ -198,8 +209,9 @@ final class Composer {
             note("Done in \(elapsed(since: started))")
             countFinished(changing: false, since: started)
         } catch {
+            let stage = stage.label
             fail(error)
-            countFailure(error, changing: false, since: started)
+            countFailure(error, changing: false, since: started, stage: stage)
         }
     }
 
@@ -267,9 +279,16 @@ final class Composer {
         let room = reserve ?? (active == .privateCloud ? 30_000 : 6_000)
         // On PCC, a long result is read apart, in a session of its own (ResultReader.swift), and only
         // notes on it come into this one.
+        let trace = run.trace, level = level.rawValue
         let reader = active == .privateCloud && !tools.isEmpty
-            ? ResultReader.privateCloud(for: request, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }) : nil
+            ? ResultReader.privateCloud(for: request, trace: trace, level: level, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }) : nil
         let budget = ContextBudget.forSession(window: window, instructions: instructions, schema: schema, tools: tools, answer: room, calls: calls, reader: reader)
+        budget.onCall = { [weak self] tool, seconds, characters, failed in
+            // By kind: a connected service's tools are named after it, which stays on the phone.
+            let kind = ["lookup", "recall", "live", "search", "read"].contains(tool) ? tool : "connection"
+            Analytics.send(.toolCall(kind: kind, seconds: seconds, characters: characters, trace: trace, failed: failed))
+            Task { @MainActor in self?.run.toolCalls += 1 }
+        }
         self.budget = budget
         if !tools.isEmpty { note("Room for tools: \(budget.characters) characters, \(calls) calls") }
         let held = budget.holding(tools)
@@ -281,7 +300,14 @@ final class Composer {
 
     /// How much the model reasons before it writes. Only Private Cloud Compute reasons.
     private var context: ContextOptions {
-        ContextOptions(includeSchemaInPrompt: true, reasoningLevel: active == .privateCloud ? AppleModels.reasoning : nil)
+        ContextOptions(includeSchemaInPrompt: true, reasoningLevel: active == .privateCloud ? reasoning.level : nil)
+    }
+
+    var reasoningName: String { reasoning.name }
+
+    /// How much PCC reasons at this request's level, or more if Under the hood says so.
+    private var reasoning: Effort.Reasoning {
+        max(Effort.Reasoning(AppleModels.reasoning), level.reasoning)
     }
 
     /// The tools a surface is written with. Features that give the model a tool add it here. On
@@ -325,13 +351,19 @@ final class Composer {
     /// written from the request, the answers and what was found.
     private func write(request intent: String, image: CGImage?, context: [String]) async throws {
         func asked(_ answers: [Answer], found: String) -> String {
-            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.understoodContext(found) + Prompts.answersContext(answers))
+            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context
+                + Prompts.understoodContext(found, read: web.reading(with: understoodReferences.all).pages) + Prompts.answersContext(answers))
         }
         func prompt(_ answers: [Answer], found: String) -> Prompt {
             Prompt {
                 asked(answers, found: found)
                 if let image { Attachment(image) }
             }
+        }
+        // A calculation with its numbers given needs nothing looked up or asked (Effort.swift).
+        if level == .quick {
+            note("Quick: writing straight away, without understanding first")
+            return try await write(prompt: prompt([], found: ""), asked: asked([], found: ""), fallback: nil, streaming: true)
         }
         // A photo usually settles what it's about; and on a second model, the answers are in.
         guard image == nil, asking.answers.isEmpty else {
@@ -350,7 +382,10 @@ final class Composer {
             note(String(format: "Check: %d to ask after %.1fs: ", gaps.questions.count, gaps.seconds)
                  + gaps.questions.map { "\($0.text) (\($0.options.joined(separator: " / "))\($0.allowsTyping ? ", or typed" : ""))" }.joined(separator: "; "))
             for answer in gaps.remembered { note("Remembered: \(answer.question.topic)") }
+            let askedAt = Date()
             answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
+            Analytics.send(.questionsAnswered(count: answers.count, leftToDream: answers.filter(\.isLeftToDream).count,
+                                              remembered: answers.filter(\.isRemembered).count, seconds: Date().timeIntervalSince(askedAt), trace: run.trace))
             note("Answered: " + answers.map { $0.isLeftToDream ? "You choose" : $0.isRemembered ? "\($0.choice) (remembered)" : $0.choice }.joined(separator: "; ")
                  + " after \(elapsed(since: started))")
         }
@@ -376,9 +411,18 @@ final class Composer {
             let session = session(Prompts.gapCheck, tools: tools, schema: GapCheck.WireGaps.generationSchema, answer: 8_000, calls: 4)
             // A page going on from another is understood with that one in front of it.
             let related = carrying.isEmpty ? GapCheck.relatedPages(intent) : carrying
-            return try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), related: related, place: place)
+            if !related.isEmpty, carrying.isEmpty { note("Related pages: \(related.count)") }
+            let gaps = try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), related: related, place: place)
+            let seconds = Date().timeIntervalSince(started)
+            run.understoodSeconds = seconds
+            run.questions = gaps.questions.count
+            Analytics.send(.pageUnderstood(seconds: seconds, toolCalls: budget?.callsMade ?? 0, questions: gaps.questions.count,
+                                           foundSomething: !gaps.found.isEmpty, relatedPages: related.count, trace: run.trace))
+            countGeneration("understanding", seconds: seconds, budget: budget, output: gaps.found.count + 300)
+            return gaps
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
+            countGeneration("understanding", seconds: Date().timeIntervalSince(started), budget: budget, output: 0, failed: true)
             return GapCheck.Gaps()
         }
     }
@@ -393,8 +437,14 @@ final class Composer {
         let found = ReferenceLog(limit: active == .onDevice ? 0 : ReferenceLog.lookupLimit)
         // What understanding the request looked up is credited like the writer's own lookups.
         for reference in understoodReferences.all { found.append(reference) }
-        let brief = active == .onDevice ? Prompts.surfaceOnDevice : Prompts.surface
-        let format: any SurfaceFormat.Type = active == .onDevice ? DeviceSurface.self : WireSurface.self
+        // A quick page (Effort.swift) is written the way the iPhone's model writes: the short brief
+        // and the narrower page, which is all a calculation needs, and no tools.
+        let quick = level == .quick
+        let narrow = active == .onDevice || quick
+        let brief = narrow ? Prompts.surfaceOnDevice : Prompts.surface
+        let format: any SurfaceFormat.Type = narrow ? DeviceSurface.self : WireSurface.self
+        let writingStarted = Date()
+        defer { run.writingSeconds = Date().timeIntervalSince(writingStarted) }
         // The iPhone's model gets there in steps: Dream looks the request up itself, and the model
         // only writes, with what was found in front of it. Calling tools while writing, it looked
         // the same things up again and again, or stopped.
@@ -406,7 +456,7 @@ final class Composer {
                 Prompts.onDeviceBackground(reference)
             }
         }
-        var session = session(brief, tools: tools(found: found), schema: format.generationSchema)
+        var session = session(brief, tools: quick ? [] : tools(found: found), schema: format.generationSchema, calls: level.calls)
         var surface: Surface
         do {
             surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
@@ -430,16 +480,18 @@ final class Composer {
             surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         }
         surface = surface.fetched(live).connected(connected)
-        // The iPhone's window holds one repair, in a session of its own.
-        let rounds = active == .onDevice ? 1 : 2
+        // The iPhone's window holds one repair, in a session of its own; a quick page gets one too.
+        let rounds = narrow ? 1 : 2
         for round in 0...rounds {
             var issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
             // Once: a page about the world that looked nothing up goes back to look it up.
-            if round == 0 { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
+            // A quick page is a calculation, which states nothing about the world.
+            if round == 0, !quick { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
             if problems.isEmpty || round == rounds { break }
             phase = .fixing(problems.count)
+            run.repairs += 1
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
             // A repair repeats the whole page, so it needs room for two. After research that
@@ -447,7 +499,7 @@ final class Composer {
             // page as they stand; so it does on the iPhone, whose window holds one page.
             if active == .onDevice || (budget?.spent ?? 0) > 0.4 {
                 note("Repairing in a new session, for room.")
-                session = self.session(brief, tools: tools(found: found), schema: format.generationSchema)
+                session = self.session(brief, tools: quick ? [] : tools(found: found), schema: format.generationSchema)
             }
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
             let before = surface
@@ -486,7 +538,15 @@ final class Composer {
         let checked = Pace(every: 0.25)
         let onPartial: ((Format.PartiallyGenerated) -> Void)? = streaming ? { partial in
             guard shown.isDue else { return }
-            self.show(Format.surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers))
+            let surface = Format.surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers)
+            self.show(surface)
+            // The moment the page starts to feel made.
+            if self.run.firstBlockSeconds == nil, !surface.blocks.isEmpty {
+                let seconds = Date().timeIntervalSince(self.askedAt)
+                self.run.firstBlockSeconds = seconds
+                self.note(String(format: "First block after %.1fs", seconds))
+                Analytics.send(.firstBlock(seconds: seconds, level: self.run.level, trace: self.run.trace))
+            }
         } : nil
         if streaming { isStreaming = true }
         defer { if streaming { isStreaming = false } }
@@ -604,6 +664,8 @@ final class Composer {
             }
         } catch where watch.stop == nil {
             note("\(step) stopped after \(elapsed(since: started)) (\(describe(error))).")
+            countGeneration(step.hasPrefix("Repair") ? "repair" : "writing", seconds: Date().timeIntervalSince(started), budget: budget,
+                            output: watch.last?.jsonString.count ?? 0, failed: true)
             // Never keep part of something the safety filter stopped.
             if let modelError = error as? LanguageModelError, case .guardrailViolation = modelError { throw error }
             if let partial = watch.partial, !(error is CancellationError) { throw Unfinished(partial: partial, reason: .cutOff) }
@@ -633,6 +695,7 @@ final class Composer {
         guard let last = watch.last else { throw ComposeError("The model returned nothing.") }
         modelName = active.name
         note("\(step): \(elapsed(since: started)) on \(modelName)")
+        countGeneration(step.hasPrefix("Repair") ? "repair" : "writing", seconds: Date().timeIntervalSince(started), budget: budget, output: last.jsonString.count)
         do {
             return try Content(last)
         } catch {

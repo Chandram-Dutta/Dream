@@ -20,6 +20,12 @@ final class ContextBudget: @unchecked Sendable {
     /// Who reads a long result apart and hands back notes on it (ResultReader.swift), or nil to cut it
     /// down instead.
     let reader: ResultReader?
+    /// What the session's fixed parts take, in characters: its instructions, the answer's schema
+    /// and the tools' descriptions. With what tools return, roughly what the model reads.
+    var fixed = 0
+    /// Told of each tool call as it finishes: the tool, how long it took, how much it returned
+    /// and whether it failed. For analytics ($ai_span), never what was sent or returned.
+    var onCall: (@Sendable (_ tool: String, _ seconds: Double, _ characters: Int, _ failed: Bool) -> Void)?
 
     private let lock = NSLock()
     private var used = 0
@@ -50,7 +56,9 @@ final class ContextBudget: @unchecked Sendable {
             + (schema.map(size) ?? 0)
             + tools.reduce(0) { $0 + $1.name.count + $1.description.count + size($1.parameters) }
         let window = Int(Double(tokens) * 3.2)
-        return ContextBudget(characters: window - fixed - reserve, calls: calls, reader: reader)
+        let budget = ContextBudget(characters: window - fixed - reserve, calls: calls, reader: reader)
+        budget.fixed = fixed
+        return budget
     }
 
     /// Whether another call may go ahead, counting it if so.
@@ -80,6 +88,10 @@ final class ContextBudget: @unchecked Sendable {
         lock.withLock { used += count }
     }
 
+    /// How many calls were made, and how many characters tools returned.
+    var callsMade: Int { lock.withLock { made } }
+    var returned: Int { lock.withLock { used } }
+
     /// How much of the budget is spent, 0 to 1.
     var spent: Double {
         lock.withLock { characters > 0 ? Double(used) / Double(characters) : 1 }
@@ -106,9 +118,17 @@ struct BudgetedTool<Inner: Tool>: Tool where Inner.Output == String {
             Build.trace("[Dream] Tool budget: refused \(name), the screen's room for tools is spent")
             return ContextBudget.exhausted
         }
-        let output = try await ContextBudget.$current.withValue(budget) {
-            try await inner.call(arguments: arguments)
+        let started = Date()
+        let output: String
+        do {
+            output = try await ContextBudget.$current.withValue(budget) {
+                try await inner.call(arguments: arguments)
+            }
+        } catch {
+            budget.onCall?(name, Date().timeIntervalSince(started), 0, true)
+            throw error
         }
+        defer { budget.onCall?(name, Date().timeIntervalSince(started), output.count, false) }
         // A tool that didn't size its own result is held to the allowance here.
         let room = budget.allowance(most: max(8_000, output.count))
         let kept = output.count > room ? String(output.prefix(room)) + "\n[Cut off here, for room on the screen.]" : output

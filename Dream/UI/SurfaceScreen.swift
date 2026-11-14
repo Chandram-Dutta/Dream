@@ -8,6 +8,8 @@ struct ComposeRequest: Hashable, Identifiable {
     /// The page this one goes on from, and what it starts from there (`Prompts.goingOn`).
     var parent: UUID? = nil
     var carrying: [String] = []
+    /// Where it was asked from, for analytics: typed, suggestion, follow_up, explore or launch.
+    var source = "typed"
 
     static func == (a: ComposeRequest, b: ComposeRequest) -> Bool { a.id == b.id }
     func hash(into hasher: inout Hasher) { hasher.combine(id) }
@@ -128,7 +130,7 @@ struct SurfaceScreen: View {
             ConnectSuggestions(entries: composer.suggestions, palette: palette) { Task { await runAgain() } }
                 .padding(.horizontal, 20)
             if !thread.isEmpty {
-                ThreadPath(pages: thread, palette: palette) { opening = $0 }
+                ThreadPath(pages: thread, palette: palette) { opening = $0; Analytics.send(.linkedPageOpened(from: "thread")) }
                     .padding(.horizontal, 20)
                     .padding(.bottom, 8)
             }
@@ -148,7 +150,7 @@ struct SurfaceScreen: View {
                     .padding(.bottom, related.isEmpty || busy ? 40 : 16)
                     .transition(.blurReplace)
                 if !related.isEmpty, !busy {
-                    RelatedPages(pages: related, parent: saved?.parentID, palette: palette) { opening = $0 }
+                    RelatedPages(pages: related, parent: saved?.parentID, palette: palette) { opening = $0; Analytics.send(.linkedPageOpened(from: "related")) }
                         .padding(.horizontal, 20)
                         .padding(.bottom, 40)
                 }
@@ -238,6 +240,7 @@ struct SurfaceScreen: View {
                     PageMenu(saved: saved) { version in
                         saved.restore(version)
                         composer.show(saved: saved.surface)
+                        Analytics.send(.versionRestored)
                         try? context.save()
                     }
                     .disabled(busy)
@@ -375,8 +378,10 @@ struct SurfaceScreen: View {
             return
         }
         guard let request else { return }
-        let page = PageMaker.shared.begin(intent: request.intent, image: request.image, parent: request.parent, carrying: request.carrying)
+        let page = PageMaker.shared.begin(intent: request.intent, image: request.image, parent: request.parent, carrying: request.carrying, source: request.source)
         making = page
+        // Made at once, with no model (PageMaker.madeAtOnce).
+        if let made = madePage { adopt(made); return }
         if let current = PageMaker.shared.composer(for: page) { composer = current }
     }
 
@@ -420,7 +425,7 @@ struct SurfaceScreen: View {
             return
         }
         exploring = ComposeRequest(intent: request, image: nil, parent: saved.id,
-                                   carrying: Prompts.goingOn(from: current, asked: saved.intent, found: saved.found, values: state.values))
+                                   carrying: Prompts.goingOn(from: current, asked: saved.intent, found: saved.found, values: state.values), source: "follow_up")
     }
 
     /// Where this page came from, and what's related to it.
@@ -454,8 +459,10 @@ struct SurfaceScreen: View {
             // change it: then it's a new page, linked to this one. Pointed at a block, it's a change.
             if target.block == nil, let saved, saved.sharedFrom == nil {
                 deciding = true
+                let decidingSince = Date()
                 let decision = await FollowUp.decide(text, on: current, asked: intent)
                 deciding = false
+                Analytics.send(.followUpDecided(kind: decision.kind.rawValue, seconds: Date().timeIntervalSince(decidingSince)))
                 switch decision.kind {
                 case .further:
                     close()
@@ -463,7 +470,7 @@ struct SurfaceScreen: View {
                     return
                 case .new:
                     close()
-                    exploring = ComposeRequest(intent: decision.request, image: nil)
+                    exploring = ComposeRequest(intent: decision.request, image: nil, source: "typed_on_page")
                     return
                 case .change:
                     break

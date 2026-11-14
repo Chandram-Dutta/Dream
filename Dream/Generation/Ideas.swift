@@ -9,6 +9,8 @@ import Observation
 @MainActor @Observable
 final class Ideas {
     private(set) var items: [String] = []
+    /// Whether they were made from the user's own pages.
+    private(set) var isPersonal = false
 
     @Generable
     struct WireIdeas {
@@ -30,6 +32,7 @@ final class Ideas {
     func load(after lately: [String] = []) async {
         let defaults = UserDefaults.standard
         let key = Self.momentKey + "|" + lately.joined(separator: "|")
+        isPersonal = !lately.isEmpty
         if defaults.string(forKey: "ideasMoment") == key, let cached = defaults.stringArray(forKey: "ideas"), !cached.isEmpty {
             items = cached
             return
@@ -48,7 +51,11 @@ final class Ideas {
             \(moment) Lately they made these pages: \(lately.joined(separator: "; ")).
             Suggest 4 requests: two that go on from those pages (the next thing to know about one, or the same for another case, naming it), one question about the world they might like, and one thing to work out with numbers for this moment. Make them varied and specific, and never repeat a page they already made.
             """
-        guard let response = try? await session.respond(to: prompt, generating: WireIdeas.self, options: GenerationOptions(temperature: 0.9, maximumResponseTokens: 200)) else { return }
+        let started = Date()
+        let response = try? await session.respond(to: prompt, generating: WireIdeas.self, options: GenerationOptions(temperature: 0.9, maximumResponseTokens: 200))
+        Analytics.send(.generation(Analytics.Generation(trace: UUID().uuidString, step: "ideas", model: "Apple on-device", seconds: Date().timeIntervalSince(started),
+                                                        inputTokens: prompt.count / 3, outputTokens: 60, reasoning: "none", level: "ideas", failed: response == nil)))
+        guard let response else { return }
         let fresh = response.content.ideas
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines.union(.init(charactersIn: "\"."))) }
             .filter { !$0.isEmpty }

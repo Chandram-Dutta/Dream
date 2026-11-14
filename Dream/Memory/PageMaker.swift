@@ -23,6 +23,8 @@ final class PageMaker {
         /// The page this one goes on from, and what it starts from there (`Prompts.goingOn`).
         var parent: UUID? = nil
         var carrying: [String] = []
+        /// Where it was asked from, for analytics: typed, suggestion, follow_up, explore or launch.
+        var source = "typed"
     }
 
     /// Pages being made, newest first, until they're saved.
@@ -55,9 +57,14 @@ final class PageMaker {
 
     /// Starts a page for a request, and returns it.
     @discardableResult
-    func begin(intent: String, image: CGImage?, parent: UUID? = nil, carrying: [String] = []) -> Making {
+    func begin(intent: String, image: CGImage?, parent: UUID? = nil, carrying: [String] = [], source: String = "typed") -> Making {
         let making = Making(id: UUID(), intent: intent, photoData: image.flatMap { UIImage(cgImage: $0).jpegData(compressionQuality: 0.8) }, startedAt: .now,
-                            parent: parent, carrying: carrying)
+                            parent: parent, carrying: carrying, source: source)
+        // A sum, or a saved page asked again with other numbers, is there at once, with no model.
+        if image == nil, let page = madeAtOnce(making) {
+            made[making.id] = page
+            return making
+        }
         pages.insert(making, at: 0)
         images[making.id] = image
         run(making)
@@ -65,6 +72,45 @@ final class PageMaker {
     }
 
     func composer(for page: Making) -> Composer? { composers[page.id] }
+
+    /// The page for a request that needs no model (Effort.swift): a sum Dream works out itself
+    /// (InstantPage), or a saved calculation made again with the request's numbers (PageReuse).
+    /// Saved straight away. Nil when the request needs a model, or the page wouldn't pass the
+    /// checker as it stands.
+    private func madeAtOnce(_ page: Making) -> SavedSurface? {
+        guard let container else { return nil }
+        let started = Date()
+        let context = container.mainContext
+        var made: (surface: Surface, level: Effort.Level, model: String)?
+        if FeatureFlag.instantPages.isOn, let surface = InstantPage.make(for: page.intent) {
+            made = (surface, .instant, "Dream")
+        } else if FeatureFlag.pageReuse.isOn {
+            for saved in PageGraph.pages(in: context).prefix(300) {
+                if let surface = PageReuse.adapt(saved.surface, asked: saved.intent, for: page.intent) {
+                    made = (surface, .reused, saved.modelName)
+                    break
+                }
+            }
+        }
+        guard var (surface, level, model) = made else { return nil }
+        // What the model's pages go through, so a page made here is held to the same bar.
+        let problems = Checker.checkLogic(&surface).filter { $0.kind == .needsModel }
+        guard problems.isEmpty else {
+            Build.trace("[Dream] \(level.rawValue) page didn't pass the checker; writing it instead")
+            return nil
+        }
+        _ = Checker.checkBlocks(&surface)
+        let saved = SavedSurface(intent: page.intent, surface: surface, modelName: model,
+                                 log: ["Request: \(page.intent)", "Level: \(level.rawValue)", String(format: "Made at once in %.2fs", Date().timeIntervalSince(started))])
+        saved.history = [PageTurn(.asked, page.intent)]
+        saved.parentID = page.parent
+        context.insert(saved)
+        try? context.save()
+        let run = Analytics.Run(level: level.rawValue, source: page.source)
+        Analytics.send(.pageRequested(withPhoto: false, run: run))
+        Analytics.send(.pageBuilt(Analytics.Shape(surface), model: level == .instant ? "none" : "reused", seconds: Date().timeIntervalSince(started), run: run))
+        return saved
+    }
 
     /// Why a page couldn't be made, once it couldn't.
     func failure(of page: Making) -> String? {
@@ -95,7 +141,7 @@ final class PageMaker {
         let image = images[page.id]
         tasks[page.id] = Task { @MainActor in
             let background = BackgroundPage(page: page, composer: composer) { [weak self] in self?.tasks[page.id]?.cancel() }
-            await composer.compose(intent: page.intent, image: image, carrying: page.carrying)
+            await composer.compose(intent: page.intent, image: image, carrying: page.carrying, source: page.source)
             background.finish(success: composer.phase == .done)
             tasks[page.id] = nil
             guard composer.phase == .done, let surface = composer.surface, let container else { return }

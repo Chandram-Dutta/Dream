@@ -88,6 +88,7 @@ struct PageMenu: View {
         Menu("More", systemImage: "ellipsis") {
             Button(saved.isStarred ? "Unstar" : "Star", systemImage: saved.isStarred ? "star.slash" : "star") {
                 saved.isStarred.toggle()
+                Analytics.send(.pageStarred(on: saved.isStarred))
             }
             let versions = saved.versions
             if !versions.isEmpty {

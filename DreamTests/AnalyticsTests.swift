@@ -45,6 +45,7 @@ struct AnalyticsTests {
             .pageBuilt(shape, model: "Grok (grok-4.7)", seconds: 3),
             .pageChanged(shape, pointedAtBlock: true, seconds: 2),
             .pageFailed(.network, changing: false, seconds: 1),
+            .pageBuilt(shape, model: "PCC", seconds: 3, run: Analytics.Run(level: "quick", source: "follow_up", understoodSeconds: 2, firstBlockSeconds: 3)),
         ]
         for event in events {
             let written = "\(event.properties)"
@@ -64,9 +65,18 @@ struct AnalyticsTests {
             .listEntriesAdded(count: 1), .connectionAdded(needsSignIn: false), .toolPromptShown, .toolPromptAnswered(.once),
             .paywallShown, .subscriptionStarted(product: "monthly"), .subscriptionEnded, .limitReached(kind: "pages"),
         ]
-        let names = events.map(\.name)
+        let generation = Analytics.Generation(trace: "t", step: "writing", model: "PCC", seconds: 1, inputTokens: 1, outputTokens: 1, reasoning: "light", level: "quick")
+        let more: [Analytics.Event] = [
+            .pageUnderstood(seconds: 1, toolCalls: 0, questions: 0, foundSomething: false, relatedPages: 0, trace: "t"),
+            .questionsAnswered(count: 1, leftToDream: 0, remembered: 0, seconds: 1, trace: "t"), .firstBlock(seconds: 1, level: "quick", trace: "t"),
+            .generation(generation), .toolCall(kind: "lookup", seconds: 1, characters: 1, trace: "t", failed: false),
+            .pageTrace(trace: "t", seconds: 1, level: "quick", failed: false), .followUpDecided(kind: "change", seconds: 1), .versionRestored,
+            .pageStarred(on: true), .suggestionTapped(position: 0, personal: true), .libraryOpened, .mapOpened(pages: 1), .linkedPageOpened(from: "map"),
+        ]
+        let names = (events + more).map(\.name)
         #expect(Set(names).count == names.count)
-        #expect(names.allSatisfy { $0.range(of: "^[a-z]+(_[a-z]+)*$", options: .regularExpression) != nil })
+        // PostHog's own LLM analytics events start with $ai_.
+        #expect(names.allSatisfy { $0.range(of: "^(\\$ai_)?[a-z]+(_[a-z]+)*$", options: .regularExpression) != nil })
     }
 
     @Test("nothing is sent while nobody listens, and flags fall back")

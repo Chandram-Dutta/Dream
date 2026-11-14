@@ -53,13 +53,21 @@ enum FollowUp {
         }
         let prompt = Prompts.followUpRequest(said, title: surface.title, summary: surface.summary, asked: intent)
         let reasoning: ContextOptions.ReasoningLevel? = Composer.provider == .privateCloud ? .light : nil
+        let started = Date()
+        func count(failed: Bool) {
+            Analytics.send(.generation(Analytics.Generation(trace: UUID().uuidString, step: "follow_up", model: Composer.provider.name,
+                                                            seconds: Date().timeIntervalSince(started), inputTokens: (Prompts.followUp.count + prompt.count) / 3,
+                                                            outputTokens: 60, reasoning: reasoning == nil ? "none" : "light", level: "follow_up", failed: failed)))
+        }
         do {
             let wire = try await withDeadline(patience) {
                 try await session.respond(to: prompt, generating: WireDecision.self, options: GenerationOptions(temperature: 0.1, maximumResponseTokens: 200),
                                           contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: reasoning)).content
             }
+            count(failed: false)
             return decision(wire, said: said)
         } catch {
+            count(failed: true)
             Build.trace("[Dream] Follow-up: couldn't tell (\(error.localizedDescription)); changing the page")
             return change
         }

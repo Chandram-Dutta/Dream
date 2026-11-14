@@ -32,7 +32,7 @@ struct ResultReader: Sendable {
     static let patience: Duration = .seconds(60)
 
     /// A reader on Private Cloud Compute, taking notes for `request`.
-    static func privateCloud(for request: String, onNote: @escaping @Sendable (String) -> Void) -> ResultReader {
+    static func privateCloud(for request: String, trace: String = "", level: String = "", onNote: @escaping @Sendable (String) -> Void) -> ResultReader {
         ResultReader { text, source, focus, limit in
             let input = text.count > most ? Excerpt.focused(text, on: request + " " + focus, limit: most) : text
             return try await together.run {
@@ -47,7 +47,10 @@ struct ResultReader: Sendable {
                                               // Taking notes needs little thought; without this, one reasoned past 45 seconds on a 29,000-character Notion page.
                                               contextOptions: ContextOptions(includeSchemaInPrompt: false, reasoningLevel: .light)).content
                 }
-                onNote(String(format: "Read \(source): %d characters of notes in %.1fs", notes.count, Date.now.timeIntervalSince(started)))
+                let seconds = Date.now.timeIntervalSince(started)
+                onNote(String(format: "Read \(source): %d characters of notes in %.1fs", notes.count, seconds))
+                Analytics.send(.generation(Analytics.Generation(trace: trace, step: "reader", model: "Private Cloud Compute", seconds: seconds,
+                                                                inputTokens: input.count / 3, outputTokens: notes.count / 3, reasoning: "light", level: level)))
                 return notes
             }
         }

@@ -102,4 +102,14 @@ enum AppleModels {
         suggestion.show()
         return true
     }
+
+    /// Whether this account is near its share of Private Cloud Compute for now, for analytics.
+    @MainActor static func isApproachingQuota(_ provider: Composer.Provider) -> Bool {
+        guard provider == .privateCloud, cloudIsAvailable else { return false }
+        switch PrivateCloudComputeLanguageModel().quotaUsage.status {
+        case .belowLimit(let below): return below.isApproachingLimit
+        case .limitReached: return true
+        @unknown default: return false
+        }
+    }
 }

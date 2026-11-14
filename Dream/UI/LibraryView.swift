@@ -42,6 +42,8 @@ struct LibraryView: View {
             }
         }
         .background(Color(.systemBackground))
+        .onAppear { Analytics.send(.libraryOpened) }
+        .onChange(of: showing) { if showing == .map { Analytics.send(.mapOpened(pages: surfaces.count)) } }
         .navigationTitle("All pages")
         .navigationBarTitleDisplayMode(.inline)
         .toolbarVisibility(.visible, for: .navigationBar)
@@ -73,6 +75,7 @@ struct PageGrid: View {
                     if saved.sharedFrom == nil {
                         Button(saved.isStarred ? "Unstar" : "Star", systemImage: saved.isStarred ? "star.slash" : "star") {
                             withAnimation(.smooth) { saved.isStarred.toggle() }
+                            Analytics.send(.pageStarred(on: saved.isStarred))
                         }
                     }
                     Button("Delete", systemImage: "trash", role: .destructive) {

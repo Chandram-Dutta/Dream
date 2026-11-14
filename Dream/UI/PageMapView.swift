@@ -47,6 +47,7 @@ struct PageMapView: View {
                                 MapPoint(saved: saved, compact: scale < 0.7)
                             }
                             .buttonStyle(.plain)
+                            .simultaneousGesture(TapGesture().onEnded { Analytics.send(.linkedPageOpened(from: "map")) })
                             .position(place(point, in: size))
                         }
                     }

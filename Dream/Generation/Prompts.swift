@@ -108,9 +108,16 @@ enum Prompts {
     }
 
     /// What understanding the request found out, which the screen is built from.
-    static func understoodContext(_ found: String) -> [String] {
+    /// `read` are the pages read while looking into it, which the screen may cite: by their
+    /// addresses exactly as given here. Copied from the notes instead, an address can differ from
+    /// the one read, and the checker drops it as a page that wasn't read.
+    static func understoodContext(_ found: String, read: [Citation] = []) -> [String] {
         guard !found.isEmpty else { return [] }
-        return ["Before writing, Dream looked into the request and found:\n\(found)\nBuild the screen from this. Call a tool again only for more than this, like a page's full text."]
+        var lines = ["Before writing, Dream looked into the request and found:\n\(found)\nBuild the screen from this. Call a tool again only for more than this, like a page's full text."]
+        if !read.isEmpty {
+            lines.append("Pages read for it, to cite exactly as written here: " + read.map { "\($0.url) (\($0.title))" }.joined(separator: "; "))
+        }
+        return lines
     }
 
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
