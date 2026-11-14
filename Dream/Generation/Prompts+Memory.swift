@@ -41,7 +41,7 @@ extension Prompts {
     static func gapRequest(_ intent: String, remembering topics: [String], recent: [String] = []) -> String {
         var parts = ["Request: \(intent)"]
         if !recent.isEmpty {
-            parts.append("Pages the user made in the last few hours, newest first: \(recent.joined(separator: "; ")). A request often follows on from them.")
+            parts.append("Pages the user made in the last few hours, newest first: \(recent.joined(separator: "; ")). They can settle what a short request means. They aren't answers to offer: a request that names what it's about needs no question about it.")
         }
         if !topics.isEmpty {
             parts.append("Dream remembers these about the user: \(topics.joined(separator: ", ")).")

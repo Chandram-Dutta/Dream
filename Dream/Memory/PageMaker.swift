@@ -119,7 +119,9 @@ final class BackgroundPage {
     private let identifier: String
 
     init(page: PageMaker.Making, composer: Composer, onStop: @escaping () -> Void) {
-        identifier = Self.prefix + page.id.uuidString
+        // A new identifier each time, since iOS takes one handler per identifier for good and a
+        // page made again (Try again) needs its own.
+        identifier = Self.prefix + UUID().uuidString
         Self.composers[identifier] = composer
         Self.stops[identifier] = onStop
         #if os(iOS)

@@ -168,6 +168,9 @@ final class WebLog: @unchecked Sendable {
         }
     }
 
+    /// Whether any web page was read for this screen.
+    var hasReadAny: Bool { lock.withLock { reads > 0 } }
+
     func hasRead(_ url: String) -> Bool {
         lock.withLock { Citation.key(url).map(addresses.contains) ?? false }
     }

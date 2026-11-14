@@ -241,7 +241,7 @@ final class Composer {
 
     /// The tools a surface is written with. Features that give the model a tool add it here. On
     /// the iPhone, only looking things up and recalling the user, which fit its smaller window.
-    private func tools(found: ReferenceLog) -> [any Tool] {
+    private func tools(found: ReferenceLog, web useWeb: Bool = true) -> [any Tool] {
         if active == .onDevice {
             return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }, maxCharacters: 1_800),
                     RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
@@ -250,8 +250,8 @@ final class Composer {
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
-            + WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
-                               onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } })
+            + (!useWeb ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
+                               onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } }))
     }
 
     private func lookingUp(_ subject: String) {
@@ -355,6 +355,14 @@ final class Composer {
             // A title and a sentence with nothing under them is as empty as nothing at all: a
             // cheap model once answered a whole EV comparison with just that.
             if surface.blocks.isEmpty, !surface.hasLogic { throw EmptyScreen() }
+        } catch let error as LanguageModelError where Self.isGuardrail(error) && web.hasReadAny {
+            // The safety filter stepped in after the model read pages from the open web, whose
+            // words can trip it on a harmless request (a fan wiki's account of a starship being
+            // destroyed did). Written once more from Wikipedia alone; if the filter steps in
+            // again, the page fails as it would have.
+            note("The safety filter stopped the page after it read the web; writing it from Wikipedia alone.")
+            session = self.session(brief, tools: tools(found: found, web: false))
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         } catch where Self.isWorthAnotherTry(error) {
             // Nothing usable came out: a loop or padding with nothing finished, a broken answer, or
             // an empty one. Another go in a new session usually works, and costs less than a page
@@ -465,6 +473,11 @@ final class Composer {
     /// broke its answer with nothing worth keeping, or left it empty. Not when it was stopped, the
     /// safety filter stepped in, or the server refused (sign-in, allowance, a busy model it
     /// already retried).
+    private static func isGuardrail(_ error: LanguageModelError) -> Bool {
+        if case .guardrailViolation = error { return true }
+        return false
+    }
+
     private static func isWorthAnotherTry(_ error: Error) -> Bool {
         error is UnfinishedGeneration || error is EmptyScreen || error is GeneratedContent.ParsingError
     }
@@ -587,7 +600,7 @@ final class Composer {
     private func describe(_ error: Error) -> String {
         if let error = error as? LanguageModelError {
             switch error {
-            case .guardrailViolation: return "The model's safety filters blocked this request."
+            case .guardrailViolation: return "Apple's safety filter stopped this page."
             case .contextSizeExceeded: return "This got too big for the model."
             case .rateLimited: return "Too many requests at once. Try again in a moment."
             default: break
