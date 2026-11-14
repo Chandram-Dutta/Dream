@@ -119,7 +119,7 @@ final class Composer {
 
         var isUsable: Bool {
             switch self {
-            case .privateCloud: PrivateCloudComputeLanguageModel().isAvailable
+            case .privateCloud: AppleModels.cloudIsAvailable
             case .onDevice: SystemLanguageModel.default.isAvailable
             }
         }
@@ -239,9 +239,14 @@ final class Composer {
         ContextOptions(includeSchemaInPrompt: true, reasoningLevel: active == .privateCloud ? AppleModels.reasoning : nil)
     }
 
-    /// The tools a surface is written with. Features that give the model a tool add it here.
+    /// The tools a surface is written with. Features that give the model a tool add it here. On
+    /// the iPhone, only looking things up and recalling the user, which fit its smaller window.
     private func tools(found: ReferenceLog) -> [any Tool] {
-        [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
+        if active == .onDevice {
+            return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }, maxCharacters: 1_800),
+                    RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+        }
+        return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
@@ -323,6 +328,9 @@ final class Composer {
     private func gaps(in intent: String) async -> GapCheck.Gaps {
         let started = Date()
         do {
+            // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
+            // Private Cloud Compute the page is written without asking first.
+            guard active == .privateCloud else { return GapCheck.Gaps() }
             return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []))
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
@@ -337,11 +345,13 @@ final class Composer {
     /// for a repair to repeat when the session no longer holds it.
     private func write(prompt: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
         phase = .composing
-        let found = ReferenceLog()
-        var session = session(Prompts.surface, tools: tools(found: found))
+        let found = ReferenceLog(limit: active == .onDevice ? 2 : ReferenceLog.lookupLimit)
+        let brief = active == .onDevice ? Prompts.surfaceOnDevice : Prompts.surface
+        let format: any SurfaceFormat.Type = active == .onDevice ? DeviceSurface.self : WireSurface.self
+        var session = session(brief, tools: tools(found: found))
         var surface: Surface
         do {
-            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
             // A title and a sentence with nothing under them is as empty as nothing at all: a
             // cheap model once answered a whole EV comparison with just that.
             if surface.blocks.isEmpty, !surface.hasLogic { throw EmptyScreen() }
@@ -350,24 +360,27 @@ final class Composer {
             // an empty one. Another go in a new session usually works, and costs less than a page
             // that fails.
             note("Writing again in a new session, after: \(describe(error))")
-            session = self.session(Prompts.surface, tools: tools(found: found))
-            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+            session = self.session(brief, tools: tools(found: found))
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         }
         surface = surface.fetched(live).connected(connected)
-        for round in 0...2 {
+        // The iPhone's window holds one repair, in a session of its own.
+        let rounds = active == .onDevice ? 1 : 2
+        for round in 0...rounds {
             var issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
             // Once: a page about the world that looked nothing up goes back to look it up.
             if round == 0 { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
-            if problems.isEmpty || round == 2 { break }
+            if problems.isEmpty || round == rounds { break }
             phase = .fixing(problems.count)
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
+            if active == .onDevice { session = self.session(brief, tools: tools(found: found)) }
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
             let before = surface
             do {
-                surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false, repairing: true)
+                surface = try await generateSurface(format, in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false, repairing: true)
                     .fetched(live).connected(connected)
                 // A repair fixes the page; one that lost most of it isn't worth having.
                 if surface.blocks.count * 2 < before.blocks.count {
@@ -393,28 +406,28 @@ final class Composer {
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
     /// Not a repair: one that stops early leaves the page it was repairing, which is whole, instead
     /// of a few blocks of its rewrite (a page about vaccines once came down to one block that way).
-    private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool, repairing: Bool = false) async throws -> Surface {
+    private func generateSurface<Format: SurfaceFormat>(_ format: Format.Type, in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool, repairing: Bool = false) async throws -> Surface {
         // The page so far, about six times a second rather than on every token: each update lays
         // out and compares the whole page, and on every token that took the main thread whole
         // while a page streamed in, so it couldn't scroll. The runaway check keeps the same pace.
         let shown = Pace(every: 0.15)
         let checked = Pace(every: 0.25)
-        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { partial in
+        let onPartial: ((Format.PartiallyGenerated) -> Void)? = streaming ? { partial in
             guard shown.isDue else { return }
-            self.show(Surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers))
+            self.show(Format.surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers))
         } : nil
         if streaming { isStreaming = true }
         defer { if streaming { isStreaming = false } }
         do {
-            let wire = try await generate(WireSurface.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
-                                          onPartial: onPartial, isRunaway: { checked.isDue && Surface(partial: $0, reference: nil).isRepeatingItself })
-            let surface = Surface(wire, reference: found.first ?? fallback)
+            let wire = try await generate(Format.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
+                                          onPartial: onPartial, isRunaway: { checked.isDue && Format.surface(partial: $0, reference: nil).isRepeatingItself })
+            let surface = wire.surface(reference: found.first ?? fallback)
             // The whole answer at once, not the last update before it, while the checks run.
             if streaming { show(surface.answered(asking.answers)) }
             return surface
-        } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
+        } catch let unfinished as Unfinished<Format.PartiallyGenerated> {
             if repairing { throw unfinished }
-            let kept = await salvaged(Surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: unfinished.partial.related != nil)
+            let kept = await salvaged(Format.surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: Format.blocksFinished(unfinished.partial))
             // Finished blocks are worth keeping, and so is a calculation with none, if it has
             // results: the checker gives it its controls and results (Checker.checkBlocks). Inputs
             // alone were kept once, and every repair stopped early too: a page of one slider.
@@ -453,7 +466,7 @@ final class Composer {
     /// safety filter stepped in, or the server refused (sign-in, allowance, a busy model it
     /// already retried).
     private static func isWorthAnotherTry(_ error: Error) -> Bool {
-        error is Unfinished<WireSurface.PartiallyGenerated> || error is EmptyScreen || error is GeneratedContent.ParsingError
+        error is UnfinishedGeneration || error is EmptyScreen || error is GeneratedContent.ParsingError
     }
 
     private func generate<Content: Generable>(
@@ -665,8 +678,11 @@ enum StopReason {
     case cutOff
 }
 
+/// Any generation that stopped before finishing.
+protocol UnfinishedGeneration: Error {}
+
 /// The model stopped before finishing, with what it had written by then.
-struct Unfinished<Partial>: LocalizedError {
+struct Unfinished<Partial>: LocalizedError, UnfinishedGeneration {
     let partial: Partial
     let reason: StopReason
 

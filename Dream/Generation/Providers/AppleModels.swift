@@ -8,6 +8,21 @@ import FoundationModels
 /// requests run on Apple silicon servers that keep nothing and that no one, Apple included, can
 /// read; or the one on the iPhone itself. Dream has no model of its own and no model provider.
 enum AppleModels {
+    /// Whether this build carries the Private Cloud Compute entitlement. Asking PCC anything
+    /// without it stops the app, so a build signed without it (DREAM_PRIVATE_CLOUD = NO, like a
+    /// test copy on a Mac whose profile lacks it) never touches PCC and writes on the device.
+    static let isCloudEntitled: Bool = {
+        #if os(iOS)
+        (Bundle.main.object(forInfoDictionaryKey: "DreamPrivateCloud") as? String).map { $0 != "NO" } ?? true
+        #else
+        // The Mac bench runs unsigned, so PCC is only tried when asked for (`-provider privateCloud`).
+        Build.setting("provider") == "privateCloud"
+        #endif
+    }()
+
+    /// Private Cloud Compute, when this build may use it and it's there.
+    static var cloudIsAvailable: Bool { isCloudEntitled && PrivateCloudComputeLanguageModel().isAvailable }
+
     /// How much Private Cloud Compute reasons before writing a page. Testing builds can pick one
     /// at launch (`-reasoning light|moderate|deep`).
     static var reasoning: ContextOptions.ReasoningLevel {
@@ -48,6 +63,7 @@ enum AppleModels {
 
     /// A line about Private Cloud Compute for Under the hood and the account screen.
     static var cloudStatus: String {
+        guard isCloudEntitled else { return "Not in this build" }
         let model = PrivateCloudComputeLanguageModel()
         switch model.availability {
         case .available:
@@ -80,7 +96,7 @@ enum AppleModels {
 
     /// When PCC's share has run out, the system's own sheet offering more, if it has one.
     static func offerMoreIfLimited(_ error: Error) -> Bool {
-        guard let error = error as? PrivateCloudComputeLanguageModel.Error,
+        guard isCloudEntitled, let error = error as? PrivateCloudComputeLanguageModel.Error,
               case .quotaLimitReached(let reached) = error,
               let suggestion = reached.limitIncreaseSuggestion else { return false }
         suggestion.show()
