@@ -129,8 +129,11 @@ final class Composer {
     /// (`-provider onDevice`).
     nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .privateCloud }
 
+    /// Whether a page PCC can't make is written on the iPhone instead. Off for now.
+    nonisolated static let fallsBackOnDevice = false
+
     /// Whether any model can make screens right now.
-    static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
+    static var canCompose: Bool { provider.isUsable }
 
     /// The model this request runs on.
     private var active: Provider = .privateCloud
@@ -139,6 +142,8 @@ final class Composer {
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
     /// rarely appears only to give way to questions.
     private(set) var isChecking = false
+    /// The user's town, when they've let Dream use their location.
+    private var place: String?
     private var held: Surface?
     private var holdUntil = Date.distantPast
     /// What the user asked for, which picks the connected services' tools worth offering.
@@ -162,7 +167,10 @@ final class Composer {
         request = intent
         suggestions = Connections.unconnected(in: intent)
         do {
-            let context = await Prompts.context(for: intent)
+            // Where the user is, when they've let Dream know: the page and the gap check are told
+            // the town, so "the weather tomorrow" needs no "Where?".
+            place = await Places.hereIfAllowed()?.area
+            let context = await Prompts.context(for: intent, in: place)
             try await withModel {
                 try await self.write(request: intent, image: image, context: context)
             }
@@ -193,7 +201,10 @@ final class Composer {
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
         do {
-            let context = await Prompts.context(for: intent)
+            // Where the user is, when they've let Dream know: the page and the gap check are told
+            // the town, so "the weather tomorrow" needs no "Where?".
+            place = await Places.hereIfAllowed()?.area
+            let context = await Prompts.context(for: intent, in: place)
             let asked = Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context)
             try await withModel {
                 try await self.write(prompt: Prompt(asked), asked: asked, fallback: current.reference, streaming: false)
@@ -211,10 +222,12 @@ final class Composer {
 
     // MARK: - Model
 
-    /// Runs on Private Cloud Compute, or on this iPhone's model when PCC can't be reached, is
-    /// busy, or this account has used its share for now.
+    /// Runs on the chosen model: Private Cloud Compute, unless the iPhone's own model is picked in
+    /// Under the hood. For now a page PCC can't make doesn't fall back to the iPhone's model,
+    /// whose pages are much thinner (`fallsBackOnDevice`).
     private func withModel(_ run: () async throws -> Void) async throws {
-        let usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
+        let others = Self.fallsBackOnDevice ? Provider.allCases.filter { $0 != Self.provider } : []
+        let usable = ([Self.provider] + others).filter(\.isUsable)
         guard let first = usable.first else { throw ComposeError(AppleModels.unavailableMessage) }
         active = first
         note("Model: \(active.name)")
@@ -242,16 +255,23 @@ final class Composer {
     /// The tools a surface is written with. Features that give the model a tool add it here. On
     /// the iPhone, only looking things up and recalling the user, which fit its smaller window.
     private func tools(found: ReferenceLog, web useWeb: Bool = true) -> [any Tool] {
-        if active == .onDevice {
-            return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }, maxCharacters: 1_800),
-                    RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
-        }
+        // The iPhone's model writes without tools: its background is looked up first (`background`).
+        if active == .onDevice { return [] }
         return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
          RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
          LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
             + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
             + (!useWeb ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
                                onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } }))
+    }
+
+    /// The Wikipedia article for a request, looked up before the iPhone's model writes.
+    private func background(for request: String) async -> Reference? {
+        lookingUp(request)
+        let reference = await Lookup.find(request, language: language)
+        note(reference.map { "Background: \($0.title)" } ?? "Background: nothing found")
+        phase = .composing
+        return reference
     }
 
     private func lookingUp(_ subject: String) {
@@ -331,7 +351,7 @@ final class Composer {
             // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
             // Private Cloud Compute the page is written without asking first.
             guard active == .privateCloud else { return GapCheck.Gaps() }
-            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []), reasoning: .light, recent: GapCheck.recentPages())
+            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []), reasoning: .light, recent: GapCheck.recentPages(), place: place)
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
             return GapCheck.Gaps()
@@ -343,11 +363,22 @@ final class Composer {
     /// Writes a whole surface, then has the checker fix what it can and sends real mistakes
     /// back in the same session, so the model sees what it wrote. `asked` is the prompt's text,
     /// for a repair to repeat when the session no longer holds it.
-    private func write(prompt: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
+    private func write(prompt asked0: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
         phase = .composing
-        let found = ReferenceLog(limit: active == .onDevice ? 2 : ReferenceLog.lookupLimit)
+        let found = ReferenceLog(limit: active == .onDevice ? 0 : ReferenceLog.lookupLimit)
         let brief = active == .onDevice ? Prompts.surfaceOnDevice : Prompts.surface
         let format: any SurfaceFormat.Type = active == .onDevice ? DeviceSurface.self : WireSurface.self
+        // The iPhone's model gets there in steps: Dream looks the request up itself, and the model
+        // only writes, with what was found in front of it. Calling tools while writing, it looked
+        // the same things up again and again, or stopped.
+        var prompt = asked0
+        if active == .onDevice, fallback == nil, let reference = await background(for: request) {
+            found.append(reference)
+            prompt = Prompt {
+                asked0
+                Prompts.onDeviceBackground(reference)
+            }
+        }
         var session = session(brief, tools: tools(found: found))
         var surface: Surface
         do {

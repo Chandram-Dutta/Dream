@@ -23,7 +23,10 @@ struct LookupTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        guard found.mayLookUp() else { return "That's enough looking up for one screen. Build it from what you've found." }
+        guard found.mayLookUp() else {
+            Build.trace("[Dream] Lookup refused (limit): \(arguments.subject)")
+            return "That's enough looking up for one screen. Build it from what you've found."
+        }
         onLookup(arguments.subject)
         let code = arguments.language.trimmingCharacters(in: .whitespaces)
         let language = Locale(identifier: "en").localizedString(forLanguageCode: code) != nil ? code : self.language

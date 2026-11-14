@@ -44,6 +44,14 @@ struct ConnectionTool: Tool {
 
     func call(arguments: GeneratedContent) async throws -> String {
         let values = JSONValue(arguments)
+        // The same call again gets the same answer, not another trip to the service: Private
+        // Cloud Compute once searched Notion for "gtm" eight times running and never wrote the page.
+        let key = "\(connection.id)/\(tool.name)/\(values.jsonString)"
+        if let earlier = log.repeated(key) {
+            onUse("\(connection.name): \(tool.name) again, the same as before (\(earlier.times))")
+            if earlier.times > 2 { return "You have called this \(earlier.times) times with the same arguments. Stop calling it and write the screen now from what it returned." }
+            return "You already called this with the same arguments, and it answered the same. Don't call it again: write the screen from this.\n\n" + earlier.answer
+        }
         onUse("\(connection.name): \(tool.name) \(values.jsonString.prefix(160))")
         if !tool.readsOnly { log.tried(tool.name) }
         // The connection as it stands now: an earlier answer may have said "Always".
@@ -68,10 +76,9 @@ struct ConnectionTool: Tool {
             }
         }
         // A look-up the user lets run without asking can be read again when the page opens.
-        if tool.readsOnly, allowedAlways, personal.isEmpty {
-            return await readLive(values)
-        }
-        return await run(values, tool: tool)
+        let answer = tool.readsOnly && allowedAlways && personal.isEmpty ? await readLive(values) : await run(values, tool: tool)
+        if tool.readsOnly { log.answered(key, with: answer) }
+        return answer
     }
 
     // MARK: - Running

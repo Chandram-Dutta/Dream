@@ -296,7 +296,26 @@ final class ConnectionLog: @unchecked Sendable {
             used = surface?.services ?? []
             offered = []
             attempted = []
+            calls = [:]
         }
+    }
+
+    /// Each call made while writing, by service, tool and arguments, with what it answered and
+    /// how many times it was asked.
+    private var calls: [String: (answer: String, times: Int)] = [:]
+
+    /// What a call answered before, if the very same call was made already, counting this one.
+    func repeated(_ key: String) -> (answer: String, times: Int)? {
+        lock.withLock {
+            guard var call = calls[key] else { return nil }
+            call.times += 1
+            calls[key] = call
+            return call
+        }
+    }
+
+    func answered(_ key: String, with answer: String) {
+        lock.withLock { calls[key] = (answer, 1) }
     }
 
     func offer(_ tools: [String]) {

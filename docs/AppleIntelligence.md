@@ -26,14 +26,16 @@ same session. SwiftUI then draws it as a real interface.
 | Window | 32,768 tokens, with reasoning | 8,192 tokens |
 | Brief | The full brief (`Prompts.surface`, ~4.7k tokens) | A short brief (`Prompts.surfaceOnDevice`) |
 | Format | `WireSurface`: every block kind, figures, diagrams, 3D scenes, sounds, lists, actions | `DeviceSurface`: text, facts, timelines, a calculation with controls, charts |
-| Tools | Wikipedia, web search and reading, live data (weather, rates, places), memory, connected services (MCP) | Wikipedia (two lookups), memory |
+| Tools | Wikipedia, web search and reading, live data (weather, rates, places), memory, connected services (MCP) | None: Wikipedia is looked up first and given with the request |
 | Repairs | Up to two, in the same session | One, in a fresh session |
 | Asks first | Yes, a separate gap check, when only the user can say | No |
 
 Both formats become the same `Surface`, go through the same checker and are drawn by the same
-renderer (`Dream/Generation/Wire+OnDevice.swift`). PCC is the default. When it can't be reached,
-is busy, or this account's share is used up for now, the page is written on the iPhone instead
-(`AppleModels.isWorthTheOtherModel`). The safety filter is never routed around.
+renderer (`Dream/Generation/Wire+OnDevice.swift`). PCC writes every page. The iPhone's model
+can be picked in Under the hood, and can stand in automatically when PCC can't be reached
+(`Composer.fallsBackOnDevice`, off for now, since its pages are much thinner). On the iPhone,
+Dream looks the request up on Wikipedia first and the model only writes: calling tools while
+writing, the small model looped or stopped. The safety filter is never routed around.
 
 Private Cloud Compute measured on an iPhone Air: "square root of 420" took 10.9 s, and a page
 about Kenya's languages took 26 s with one Wikipedia lookup.

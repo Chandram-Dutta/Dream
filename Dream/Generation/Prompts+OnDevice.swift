@@ -7,6 +7,12 @@ import Foundation
 // tokens, which leaves room for a lookup and the page.
 
 extension Prompts {
+    /// What Dream looked up for the request, for the iPhone's model to write from.
+    static func onDeviceBackground(_ reference: Reference) -> String {
+        let extract = reference.extract.count > 2_000 ? String(reference.extract.prefix(2_000)) + "…" : reference.extract
+        return "Background, from Wikipedia's \"\(reference.title)\":\n\(extract)"
+    }
+
     static var surfaceOnDevice: String { surfaceOnDevice(currency: Currency.code) }
 
     static func surfaceOnDevice(currency: String) -> String {
@@ -27,7 +33,7 @@ extension Prompts {
         - facts: label and value pairs. bullets, steps: short points in order. timeline: dated events. stat: one striking number.
         - equation: LaTeX in text, or ref an output to show its formula.
 
-        Lead with the answer. For facts about the world, look up the one main subject first (at most twice) and use only what it says. Be specific: names, numbers, dates. Write about the subject, never about the screen, its data or its sources. Leave out any block you have nothing real for.
+        Lead with the answer. For facts about the world, use only the background given with the request; if it isn't about the request, ignore it. Be specific: names, numbers, dates. Write about the subject, never about the screen, its data or its sources. Leave out any block you have nothing real for.
 
         Example of a calculation: inputs principal (currency), rate (percent), years; output total = principal * (1 + rate / 100) ^ years; blocks hero total, slider principal, slider rate, slider years, chart total over years.
         """

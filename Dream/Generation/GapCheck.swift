@@ -55,10 +55,10 @@ enum GapCheck {
     /// (PageMaker.swift): what someone just read often settles what a short request means.
     @MainActor static var recentPages: () -> [String] = { [] }
 
-    static func run(_ intent: String, in session: LanguageModelSession, reasoning: ContextOptions.ReasoningLevel? = nil, recent: [String] = []) async throws -> Gaps {
+    static func run(_ intent: String, in session: LanguageModelSession, reasoning: ContextOptions.ReasoningLevel? = nil, recent: [String] = [], place: String? = nil) async throws -> Gaps {
         let started = Date()
         let topics = await Recall.source.topics()
-        let prompt = Prompts.gapRequest(intent, remembering: topics, recent: recent)
+        let prompt = Prompts.gapRequest(intent, remembering: topics, recent: recent, place: place)
         let wire = try await within(patience) {
             try await session.respond(to: prompt, generating: WireGaps.self, options: GenerationOptions(temperature: 0.2, maximumResponseTokens: 600),
                                       contextOptions: ContextOptions(includeSchemaInPrompt: true, reasoningLevel: reasoning)).content

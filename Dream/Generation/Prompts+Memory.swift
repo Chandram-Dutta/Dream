@@ -38,8 +38,11 @@ extension Prompts {
         Each question is short and plain, with 2 to 4 short answers to tap; "You choose" is always added, so leave it out. Allow typing only when no short list could cover the answer, like a place. Mark a question personal when its answer is a lasting fact about the user, like where they live, their diet or their household. If a topic Dream remembers answers a question, name that topic.
         """
 
-    static func gapRequest(_ intent: String, remembering topics: [String], recent: [String] = []) -> String {
+    static func gapRequest(_ intent: String, remembering topics: [String], recent: [String] = [], place: String? = nil) -> String {
         var parts = ["Request: \(intent)"]
+        if let place, !place.isEmpty {
+            parts.append("The user is in \(place), so a request about the weather, places nearby or local prices is about there unless it names somewhere else.")
+        }
         if !recent.isEmpty {
             parts.append("Pages the user made in the last few hours, newest first: \(recent.joined(separator: "; ")). They can settle what a short request means. They aren't answers to offer: a request that names what it's about needs no question about it.")
         }
