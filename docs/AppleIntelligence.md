@@ -81,6 +81,17 @@ it has. A long result keeps its opening and the parts that share the request's w
 understanding a request, 14 while writing. A repair after heavy research goes in a fresh
 session, given the request and the page as they stand, so it has room for both.
 
+A result too long for its share is read apart, in a model session of its own
+(`Dream/Generation/ResultReader.swift`): a reader with no tools and a whole 32K window for that
+one result, which takes notes for the request (names, numbers, dates, ids and links exactly as
+written, then what else is there to open) and ends. Only the notes, at most 3,000 characters,
+come into the session writing the page. So a 20,000-character Notion page costs the writer
+about 3,000, and the writer's window holds the brief, the notes and the page rather than every
+page opened. At most three readers run at once; a reader that fails or takes longer than 45
+seconds leaves the parts about the request instead (`Excerpt`). Web pages are fetched at up to
+12,000 characters for a reader, instead of 4,000. Readers run on PCC, like the writer, so
+nothing goes anywhere new.
+
 ## Pages carry on
 
 A page is made by `PageMaker`, not by its screen. Going back to the shelf or opening another page

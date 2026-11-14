@@ -17,6 +17,9 @@ final class ContextBudget: @unchecked Sendable {
     let characters: Int
     /// Calls the session may make.
     let calls: Int
+    /// Who reads a long result apart and hands back notes on it (ResultReader.swift), or nil to cut it
+    /// down instead.
+    let reader: ResultReader?
 
     private let lock = NSLock()
     private var used = 0
@@ -28,9 +31,10 @@ final class ContextBudget: @unchecked Sendable {
     /// A result smaller than this isn't worth having; the room is spent.
     static let smallest = 1_200
 
-    init(characters: Int, calls: Int) {
+    init(characters: Int, calls: Int, reader: ResultReader? = nil) {
         self.characters = max(characters, 0)
         self.calls = calls
+        self.reader = reader
     }
 
     /// The budget for a session: the window, less its fixed parts (instructions, the answer's
@@ -38,7 +42,7 @@ final class ContextBudget: @unchecked Sendable {
     ///
     /// Counted in characters at about 3.2 a token, which errs on the side of room: Apple's
     /// tokenizer gives about 3.5 for English, less for other scripts.
-    static func forSession(window tokens: Int, instructions: String, schema: GenerationSchema?, tools: [any Tool], answer reserve: Int, calls: Int) -> ContextBudget {
+    static func forSession(window tokens: Int, instructions: String, schema: GenerationSchema?, tools: [any Tool], answer reserve: Int, calls: Int, reader: ResultReader? = nil) -> ContextBudget {
         func size(_ schema: GenerationSchema) -> Int {
             (try? JSONEncoder().encode(schema).count) ?? 4_000
         }
@@ -46,7 +50,7 @@ final class ContextBudget: @unchecked Sendable {
             + (schema.map(size) ?? 0)
             + tools.reduce(0) { $0 + $1.name.count + $1.description.count + size($1.parameters) }
         let window = Int(Double(tokens) * 3.2)
-        return ContextBudget(characters: window - fixed - reserve, calls: calls)
+        return ContextBudget(characters: window - fixed - reserve, calls: calls, reader: reader)
     }
 
     /// Whether another call may go ahead, counting it if so.

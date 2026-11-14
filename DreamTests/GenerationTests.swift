@@ -64,6 +64,54 @@ struct GenerationTests {
         #expect(Excerpt.focused("short", on: "anything", limit: 100) == "short")
     }
 
+    @Test("A long result is read apart, and only notes on it come back")
+    func reader() async {
+        let page = (1...400).map { "Line \($0) of a long Notion page about the launch." }.joined(separator: "\n")
+        let asked = Asked()
+        let reading = ContextBudget(characters: 40_000, calls: 10, reader: ResultReader { text, source, focus, limit in
+            await asked.record(text.count, limit)
+            return "Launch: 12 March, Bengaluru first (id 1f2e)."
+        })
+        let notes = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit(page, from: "Notion's fetch", looking: "launch date", limit: 2_000)
+        }
+        #expect(notes.contains("Launch: 12 March") && notes.count < 300, "the writer gets the notes, not the page")
+        let calls = await asked.calls, limits = await asked.limits
+        #expect(calls == [page.count] && (limits.first ?? 0) <= 2_000, "the reader got all of it, and the room for notes")
+
+        let short = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit("A short answer.", from: "Notion", looking: "", limit: 2_000)
+        }
+        let after = await asked.calls.count
+        #expect(short == "A short answer." && after == 1, "what fits isn't read apart")
+
+        let failing = ContextBudget(characters: 40_000, calls: 10, reader: ResultReader { _, _, _, _ in throw DeadlinePassed() })
+        let cut = await ContextBudget.$current.withValue(failing) {
+            await ContextBudget.fit(page, from: "Notion", looking: "launch", limit: 2_000)
+        }
+        #expect(cut.count <= 2_100 && cut.contains("The parts about it"), "a reader that fails leaves the parts about the request")
+    }
+
+    @Test("Readers take turns, a few at a time")
+    func gate() async throws {
+        let gate = TakingTurns(width: 2)
+        let counter = Asked()
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for _ in 0..<6 {
+                group.addTask {
+                    try await gate.run {
+                        await counter.enter()
+                        try await Task.sleep(for: .milliseconds(20))
+                        await counter.leave()
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
+        let most = await counter.most
+        #expect(most == 2)
+    }
+
     @Test("A page goes to the other Apple model only when that might help")
     func otherModel() {
         #expect(AppleModels.isWorthTheOtherModel(PrivateCloudComputeLanguageModel.Error.networkFailure(.init(debugDescription: "offline"))), "PCC out of reach: the iPhone writes it")
@@ -104,5 +152,27 @@ struct GenerationTests {
         spanish.summary = "Calcula la propina y cómo dividir la cuenta entre todos los que comieron."
         spanish.blocks[0].text = "Con una cuenta de 850 pesos y una propina del quince por ciento, cada persona paga su parte del total."
         #expect(Languages.of(spanish, likely: "en") == .spanish, "a page written in another language than asked is still read as what it is")
+    }
+}
+
+/// What a test reader was asked, and how many ran at once.
+private actor Asked {
+    var calls: [Int] = []
+    var limits: [Int] = []
+    var now = 0
+    var most = 0
+
+    func record(_ count: Int, _ limit: Int) {
+        calls.append(count)
+        limits.append(limit)
+    }
+
+    func enter() {
+        now += 1
+        most = max(most, now)
+    }
+
+    func leave() {
+        now -= 1
     }
 }

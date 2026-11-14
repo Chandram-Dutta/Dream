@@ -253,7 +253,11 @@ final class Composer {
         let window = active == .privateCloud ? 32_768 : 8_192
         // A page and the reasoning before it, on PCC; a shorter page on the iPhone.
         let room = reserve ?? (active == .privateCloud ? 30_000 : 6_000)
-        let budget = ContextBudget.forSession(window: window, instructions: instructions, schema: schema, tools: tools, answer: room, calls: calls)
+        // On PCC, a long result is read apart, in a session of its own (ResultReader.swift), and only
+        // notes on it come into this one.
+        let reader = active == .privateCloud && !tools.isEmpty
+            ? ResultReader.privateCloud(for: request, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }) : nil
+        let budget = ContextBudget.forSession(window: window, instructions: instructions, schema: schema, tools: tools, answer: room, calls: calls, reader: reader)
         self.budget = budget
         if !tools.isEmpty { note("Room for tools: \(budget.characters) characters, \(calls) calls") }
         let held = budget.holding(tools)
