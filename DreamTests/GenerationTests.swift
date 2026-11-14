@@ -99,6 +99,20 @@ struct GenerationTests {
         #expect(failing.readerGaveUp, "and the rest of the session doesn't wait on another")
     }
 
+    @Test("Search results go by ids, so only pages read have addresses to cite")
+    func searchIDs() {
+        let log = WebLog()
+        log.start()
+        let first = log.listed("https://example.com/a")
+        let second = log.listed("https://example.org/b")
+        #expect(first == "s1" && second == "s2")
+        #expect(log.listed("https://example.com/a") == "s1", "the same page keeps its id")
+        #expect(log.address(of: "s2") == "https://example.org/b" && log.address(of: " S1.") == "https://example.com/a")
+        #expect(log.address(of: "s9") == nil)
+        log.start()
+        #expect(log.address(of: "s1") == nil, "a new request starts afresh")
+    }
+
     @Test("Readers take turns, a few at a time")
     func gate() async throws {
         let gate = TakingTurns(width: 2)
