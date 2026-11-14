@@ -78,19 +78,37 @@ private actor LiveCache {
 
     private var readings: [Key: (reading: SourceReading, readAt: Date)] = [:]
     private var reading: [Key: Task<SourceReading, Error>] = [:]
+    /// Sources that failed, with when to try again and the error to give until then. Each
+    /// failure in a row doubles the wait, from a minute up to an hour, and a source the service
+    /// refused as asked (its arguments don't fit) isn't tried again until the app starts again:
+    /// a saved page once asked a search service the same broken question every few seconds.
+    private var failures: [Key: (until: Date, times: Int, error: Error)] = [:]
 
     func reading(_ source: Source, from provider: any LiveProvider, again: Bool) async throws -> SourceReading {
         let key = Key(kind: source.kind, parameters: source.parameters)
         if !again, let kept = readings[key], Date.now.timeIntervalSince(kept.readAt) < provider.freshness {
             return kept.reading
         }
+        if let failed = failures[key], Date.now < failed.until { throw failed.error }
         if let running = reading[key] { return try await running.value }
         let task = Task { try await provider.read(source) }
         reading[key] = task
         defer { reading[key] = nil }
-        let fresh = try await task.value
-        readings[key] = (fresh, .now)
-        return fresh
+        do {
+            let fresh = try await task.value
+            readings[key] = (fresh, .now)
+            failures[key] = nil
+            return fresh
+        } catch {
+            // Something the user can fix here (location, Always, a sign-in) is tried again as
+            // soon as it's asked for.
+            if let live = error as? LiveError, live.waitsOnUser || live.reason == .denied { throw error }
+            let times = (failures[key]?.times ?? 0) + 1
+            let refused = (error as? LiveError)?.reason == .notFound || "\(error)".localizedCaseInsensitiveContains("invalid params")
+            let until = refused ? Date.distantFuture : Date.now.addingTimeInterval(min(60 * pow(2, Double(times - 1)), 3600))
+            failures[key] = (until, times, error)
+            throw error
+        }
     }
 }
 

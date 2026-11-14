@@ -34,7 +34,7 @@ struct Trace: Identifiable, Equatable, Sendable {
 @MainActor @Observable
 final class Composer {
     enum Phase: Equatable {
-        case idle, researching, composing, fixing(Int), done
+        case idle, understanding, researching, composing, fixing(Int), done
         case failed(String)
 
         var isBusy: Bool {
@@ -56,7 +56,7 @@ final class Composer {
     /// Where a request is, as the screen's light shows it (Stage.swift).
     var stage: Stage {
         switch phase {
-        case .idle: return .understanding
+        case .idle, .understanding: return asking.isWaiting || consent.isWaiting ? .yourTurn : .understanding
         case .done: return .done
         case .failed: return .failed
         case .fixing: return .checking
@@ -144,8 +144,10 @@ final class Composer {
     private(set) var isChecking = false
     /// The user's town, when they've let Dream use their location.
     private var place: String?
-    private var held: Surface?
-    private var holdUntil = Date.distantPast
+    /// What understanding the request found out, and the articles it looked up, which the page
+    /// is written from and credits.
+    private var understood = ""
+    private var understoodReferences = ReferenceLog()
     /// What the user asked for, which picks the connected services' tools worth offering.
     private var request = ""
 
@@ -160,6 +162,8 @@ final class Composer {
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
         Analytics.send(.pageRequested(withPhoto: image != nil))
         asking.start()
+        understood = ""
+        understoodReferences = ReferenceLog()
         live.start()
         connected.start()
         web.start()
@@ -254,13 +258,13 @@ final class Composer {
 
     /// The tools a surface is written with. Features that give the model a tool add it here. On
     /// the iPhone, only looking things up and recalling the user, which fit its smaller window.
-    private func tools(found: ReferenceLog, web useWeb: Bool = true) -> [any Tool] {
+    private func tools(found: ReferenceLog, web useWeb: Bool = true, lookingOnly: Bool = false) -> [any Tool] {
         // The iPhone's model writes without tools: its background is looked up first (`background`).
         if active == .onDevice { return [] }
         return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
-         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
-         LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
-            + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
+         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+            + (lookingOnly ? [] : [LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })] as [any Tool])
+            + ConnectionTool.offered(for: request, lookingOnly: lookingOnly, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
             + (!useWeb ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
                                onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } }))
     }
@@ -287,71 +291,59 @@ final class Composer {
 
     // MARK: - Asking
 
-    /// Writes the surface for a request while a quick check, in its own session, looks for what
-    /// the request leaves out that only the user can tell (`GapCheck`). If it finds nothing, the
-    /// writing carries on untouched. If it has questions, the writing stops, what Dream remembers
-    /// or the user answers them, and it starts again with the answers.
+    /// Understands the request first (`GapCheck`): what it refers to, looked up in the user's
+    /// services, what Dream remembers, Wikipedia and the web, and then what only the user can
+    /// tell. The user answers that, or Dream answers it from what it remembers, and the page is
+    /// written from the request, the answers and what was found.
     private func write(request intent: String, image: CGImage?, context: [String]) async throws {
-        func asked(_ answers: [Answer]) -> String {
-            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.answersContext(answers))
+        func asked(_ answers: [Answer], found: String) -> String {
+            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.understoodContext(found) + Prompts.answersContext(answers))
         }
-        func prompt(_ answers: [Answer]) -> Prompt {
+        func prompt(_ answers: [Answer], found: String) -> Prompt {
             Prompt {
-                asked(answers)
+                asked(answers, found: found)
                 if let image { Attachment(image) }
             }
         }
         // A photo usually settles what it's about; and on a second model, the answers are in.
         guard image == nil, asking.answers.isEmpty else {
-            return try await write(prompt: prompt(asking.answers), asked: asked(asking.answers), fallback: nil, streaming: true)
+            return try await write(prompt: prompt(asking.answers, found: understood), asked: asked(asking.answers, found: understood), fallback: nil, streaming: true)
         }
         let started = Date()
-        let first = prompt([])
-        isChecking = true
-        held = nil
-        holdUntil = started.addingTimeInterval(GapCheck.hold)
-        defer { isChecking = false; held = nil }
-        let checking = Task { await self.gaps(in: intent) }
-        let writing = Task { try await self.write(prompt: first, asked: asked([]), fallback: nil, streaming: true) }
-        try await withTaskCancellationHandler {
-            let gaps = await checking.value
-            guard !gaps.questions.isEmpty else {
-                note(String(format: "Check: nothing to ask (%.1fs%@)", gaps.seconds, held == nil ? "" : ", while the page was held back"))
-                isChecking = false
-                if surface == nil, let held { surface = held }
-                try await writing.value
-                return
-            }
-            writing.cancel()
-            note(String(format: "Check: %d to ask after %.1fs, so the screen stopped %@: ", gaps.questions.count, gaps.seconds, surface != nil ? "after it showed" : held != nil ? "before it showed" : "before it began")
+        let gaps = await understand(intent)
+        understood = gaps.found
+        if !gaps.found.isEmpty { note("Found: " + gaps.found.replacingOccurrences(of: "\n", with: " / ")) }
+        var answers: [Answer] = []
+        if gaps.questions.isEmpty {
+            note(String(format: "Check: nothing to ask (%.1fs)", gaps.seconds))
+        } else {
+            note(String(format: "Check: %d to ask after %.1fs: ", gaps.questions.count, gaps.seconds)
                  + gaps.questions.map { "\($0.text) (\($0.options.joined(separator: " / "))\($0.allowsTyping ? ", or typed" : ""))" }.joined(separator: "; "))
             for answer in gaps.remembered { note("Remembered: \(answer.question.topic)") }
-            let answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
+            answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
             note("Answered: " + answers.map { $0.isLeftToDream ? "You choose" : $0.isRemembered ? "\($0.choice) (remembered)" : $0.choice }.joined(separator: "; ")
                  + " after \(elapsed(since: started))")
-            _ = await writing.result
-            surface = nil
-            isChecking = false
-            try await write(prompt: prompt(answers), asked: asked(answers), fallback: nil, streaming: true)
-        } onCancel: {
-            checking.cancel()
-            writing.cancel()
         }
+        try await write(prompt: prompt(answers, found: gaps.found), asked: asked(answers, found: gaps.found), fallback: nil, streaming: true)
     }
 
-    /// A partial surface goes on screen, unless the gap check has only just started deciding.
     private func show(_ partial: Surface) {
-        if isChecking, Date.now < holdUntil { held = partial } else { surface = partial }
+        surface = partial
     }
 
-    /// The gap check, on the model this request runs on. If it fails, nothing is asked.
-    private func gaps(in intent: String) async -> GapCheck.Gaps {
+    /// Understanding the request, on Private Cloud Compute, with look-up tools only. If it fails,
+    /// nothing is asked and the page is written from the request alone.
+    private func understand(_ intent: String) async -> GapCheck.Gaps {
         let started = Date()
+        // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
+        // Private Cloud Compute the page is written without asking first.
+        guard active == .privateCloud else { return GapCheck.Gaps() }
+        isChecking = true
+        phase = .understanding
+        defer { isChecking = false }
         do {
-            // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
-            // Private Cloud Compute the page is written without asking first.
-            guard active == .privateCloud else { return GapCheck.Gaps() }
-            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []), reasoning: .light, recent: GapCheck.recentPages(), place: place)
+            let tools = tools(found: understoodReferences, lookingOnly: true)
+            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: tools), reasoning: .light, recent: GapCheck.recentPages(), place: place)
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
             return GapCheck.Gaps()
@@ -366,6 +358,8 @@ final class Composer {
     private func write(prompt asked0: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
         phase = .composing
         let found = ReferenceLog(limit: active == .onDevice ? 0 : ReferenceLog.lookupLimit)
+        // What understanding the request looked up is credited like the writer's own lookups.
+        for reference in understoodReferences.all { found.append(reference) }
         let brief = active == .onDevice ? Prompts.surfaceOnDevice : Prompts.surface
         let format: any SurfaceFormat.Type = active == .onDevice ? DeviceSurface.self : WireSurface.self
         // The iPhone's model gets there in steps: Dream looks the request up itself, and the model

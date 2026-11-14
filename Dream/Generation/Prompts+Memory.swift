@@ -23,9 +23,12 @@ extension Prompts {
 
     // MARK: - The gap check
 
-    /// Instructions for the gap check: short, and only about whether to ask.
+    /// Instructions for understanding a request: find out what it refers to, then ask only
+    /// what's still open.
     static let gapCheck = """
-        You check a request to an app before it builds one interactive screen to answer it. The screen can't ask the user anything, so you find what the request leaves out that only the user can tell and that changes which screen to build, and return questions for it: none, or up to 3.
+        You read a request to an app before it builds one interactive screen to answer it. The screen can't ask the user anything, so first understand the request, then find what's still open that only the user can tell and that changes which screen to build, and return questions for it: none, or up to 3.
+        Understand it before you ask. Read all its words. When it's about the user's own things (their notes, projects, documents, tasks, messages, files) and a connected service has tools for them, look there first, so you know what they have: their projects by name, the pages that match. When a name could mean several unrelated things and the words don't settle it, look it up. Use tools only when what they return would change what you ask or what the screen is built from, and at most 3 calls. Most requests need none: a clear subject, a calculation or a how-to.
+        Then write what you found that the screen should be built from, and ask only what you couldn't find out. Offer as answers the real things you found, like the user's actual project names, never guesses. If what you found settles it, ask nothing.
         Ask when:
         - it names something with unrelated meanings, each a screen about a different subject (Mercury: the planet, the element or the god);
         - it's about the user's own plans, tastes or situation, and leaves out what decides the screen (where and when for a trip, whose occasion a party is for, which kind of budget, what they're in the mood for).

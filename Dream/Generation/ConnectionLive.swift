@@ -35,7 +35,7 @@ struct ConnectionProvider: LiveProvider {
             throw LiveError(.unavailable, "This came from someone else's \(service), so Dream doesn't read it here.")
         }
         guard let connection = Connections.connection(at: source["server"]) else {
-            throw LiveError(.unavailable, "Connect \(service) in Connections to keep this current.")
+            throw LiveError(.unavailable, "Connect \(service) in Connections to keep this current.", waitsOnUser: true)
         }
         guard let tool = connection.tools.first(where: { $0.name == source["tool"] }), tool.readsOnly else {
             throw LiveError(.unavailable, "\(service) no longer offers this to read.")
@@ -43,7 +43,7 @@ struct ConnectionProvider: LiveProvider {
         // Only what the user lets run without asking is read again. A source is declared only
         // then, but "Always" can be taken back in Connections, and a personal call is always asked.
         guard connection.alwaysLooksUp || tool.alwaysAllowed, source["memory"] != "yes" else {
-            throw LiveError(.unavailable, "Dream asks before \(service) looks this up. Choose Always for it in Connections to keep this current.")
+            throw LiveError(.unavailable, "Dream asks before \(service) looks this up. Choose Always for it in Connections to keep this current.", waitsOnUser: true)
         }
         let arguments = (try? JSONValue(json: source["arguments"])) ?? .object([:])
         let result: ToolResult

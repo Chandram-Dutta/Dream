@@ -240,9 +240,14 @@ extension ConnectionTool {
     /// The tools worth offering for this request, from switched-on services and relevant to
     /// what's asked (`ToolPicker`), whatever their hints: ones that look things up or don't say,
     /// and when the request asks to do something, ones that change things. Usually none.
-    static func offered(for request: String, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
-        let looking = ToolPicker.pick(for: request, from: Connections.lookingTools)
-        let changing = ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : []
+    /// The tools worth offering for a request. A service the request involves is offered whole,
+    /// as far as looking things up goes: its look-up tools work together (a search finds a page,
+    /// a fetch opens it), and offered only the ones whose words matched, a model found Notion
+    /// pages it had no tool to open. Tools that change things come only when the request asks to
+    /// act, and never while the request is still being understood (`lookingOnly`).
+    static func offered(for request: String, lookingOnly: Bool = false, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
+        let looking = ToolPicker.whole(ToolPicker.pick(for: request, from: Connections.lookingTools), from: Connections.lookingTools)
+        let changing = !lookingOnly && ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : []
         guard !looking.isEmpty || !changing.isEmpty else { return [] }
         var names: Set<String> = ["lookup", "ask", "recall", "live"]
         let tools = (looking + changing).compactMap { connection, tool -> ConnectionTool? in

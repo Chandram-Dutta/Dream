@@ -42,10 +42,14 @@ about Kenya's languages took 26 s with one Wikipedia lookup.
 
 ## How a request goes
 
-1. **Understanding.** A short gap check on PCC decides whether anything is missing that only the
-   user can tell, like where a trip is to. It says what's missing first, and with nothing missing
-   it asks nothing. A question that only repeats the request is dropped by the engine.
-2. **Your turn**, only if something was missing: tap an answer, or "You choose". Answers worth
+1. **Understanding.** Before anything is asked or written, a short session on PCC reads the
+   request and, when it's about the user's own things or a name that could mean several things,
+   looks first: in their connected services, what Dream remembers, Wikipedia and the web, with
+   look-up tools only. "Check my project's GTM notes" searches Notion and asks which project, by
+   the names it found, instead of guessing that GTM means Google Tag Manager. It writes down what
+   it found, which the page is then built from, and asks only what it couldn't find out. A
+   request that's already clear needs no tools and is understood in a couple of seconds.
+2. **Your turn**, only if something was still open: tap an answer (the real options found), or "You choose". Answers worth
    keeping, like a home town, are remembered on the device.
 3. **Researching.** The model looks up what it states about the world: Wikipedia, the web, live
    data, the user's connected services (each asks permission at the moment of use).
@@ -56,6 +60,14 @@ The light behind the screen shows each stage in its own colors (`Dream/UI/StageL
 violet while understanding, pearl and still on your turn, blue to teal while looking things up,
 Dream's warm light while writing, and green while checking. Once the page is done, the light
 settles at the top in the page's own color, chosen by its subject.
+
+## Connected services
+
+A service the request involves is offered whole, as far as looking things up goes: its search
+finds a page and its fetch opens it. Tools that change things come only when the request asks
+to act, never while it's still being understood, and always ask first. The same call made twice
+gets the first answer back instead of another trip. Calls made together share one token refresh,
+and a source a saved page keeps current backs off when its service fails.
 
 ## Pages carry on
 

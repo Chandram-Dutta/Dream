@@ -256,6 +256,18 @@ enum Connections {
 /// "list") don't count, and a short word matches the start of a longer one, so "repo" finds
 /// "repository". Sentence embeddings were tried and couldn't tell a fitting tool from noise.
 enum ToolPicker {
+    /// Each service among those picked, with the rest of its look-up tools after the ones picked,
+    /// up to `perService` from each.
+    static func whole(_ picked: [(connection: Connection, tool: ConnectedTool)], from tools: [(connection: Connection, tool: ConnectedTool)], perService: Int = 8) -> [(connection: Connection, tool: ConnectedTool)] {
+        var services: [UUID] = []
+        for entry in picked where !services.contains(entry.connection.id) { services.append(entry.connection.id) }
+        return services.flatMap { service in
+            let first = picked.filter { $0.connection.id == service }
+            let rest = tools.filter { entry in entry.connection.id == service && !first.contains { $0.tool.name == entry.tool.name } }
+            return Array((first + rest).prefix(perService))
+        }
+    }
+
     static func pick(for request: String, from tools: [(connection: Connection, tool: ConnectedTool)], limit: Int = 5, perService: Int = 3) -> [(connection: Connection, tool: ConnectedTool)] {
         let asked = words(in: request)
         let things = words(in: nouns(in: request))

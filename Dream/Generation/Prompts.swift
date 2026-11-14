@@ -107,6 +107,12 @@ enum Prompts {
         await memoryContext(for: intent) + languageContext(for: intent, in: place) + liveContext() + connectionContext(for: intent) + webContext()
     }
 
+    /// What understanding the request found out, which the screen is built from.
+    static func understoodContext(_ found: String) -> [String] {
+        guard !found.isEmpty else { return [] }
+        return ["Before writing, Dream looked into the request and found:\n\(found)\nBuild the screen from this. Call a tool again only for more than this, like a page's full text."]
+    }
+
     static func surfaceRequest(_ intent: String, hasImage: Bool, context: [String]) -> String {
         var parts = ["Request: \(intent)"]
         if hasImage {
