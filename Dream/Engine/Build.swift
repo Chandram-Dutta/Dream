@@ -34,7 +34,7 @@ enum Build {
         argument(name)
     }
 
-    /// A value from the environment, for the bench on this Mac (`XAI_API_KEY`, `DREAM_SESSION`).
+    /// A value from the environment, for the bench on this Mac (`DREAM_SESSION`).
     static func environment(_ name: String) -> String? {
         guard hasTestingHooks, let value = ProcessInfo.processInfo.environment[name], !value.isEmpty else { return nil }
         return value

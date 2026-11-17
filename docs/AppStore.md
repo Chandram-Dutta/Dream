@@ -76,14 +76,14 @@ Promotional text can change without a new build, so it's the place for what's ne
 > Help improve Dream (crash reports and usage counts) is on once you sign in, as the line under
 > Sign in with Apple says, and Account turns it off. It never sends what you ask or make.
 >
-> **[Subscription paragraph, once workstream D settles it: what's free, what the subscription adds,
-> the price is shown in the app, it renews automatically unless cancelled at least 24 hours before
-> the end of the period, and it's managed in Settings.]**
+> Made with Apple Intelligence: your pages are made by Apple's models, on Private Cloud Compute,
+> and what you ask goes to no other AI company. No account needed; sign in to keep your pages on
+> every iPhone and let them search the web. Dream is free, with nothing to buy.
 >
 > Terms of use: https://dream.onlychan.xyz/terms
 > Privacy policy: https://dream.onlychan.xyz/privacy
 
-About 2,200 characters, leaving room for the subscription paragraph. Every feature listed is built
+About 2,300 characters. Every feature listed is built
 and merged (ROADMAP.md). Two things are deliberately left out until they've been tried by hand on a
 device: connecting services such as Linear or Notion (MCP sign-in), and universal links. Add them
 once they work.
@@ -102,9 +102,8 @@ anyway), and no other companies' or models' names. Use "maths" in the U.K. and I
 - **Support URL:** https://dream.onlychan.xyz/support
 - **Privacy policy URL:** https://dream.onlychan.xyz/privacy
 - **Terms of use (EULA):** either Apple's standard EULA, or https://dream.onlychan.xyz/terms in the
-  EULA field. For an auto-renewing subscription, guideline 3.1.2 needs working links to both the
-  terms and the privacy policy in the metadata (the description, above) and inside the app, on the
-  paywall (workstream D).
+  EULA field. There's no subscription on the apple-intelligence branch, so guideline 3.1.2's
+  paywall links don't apply.
 - **Marketing URL** (optional): none for now. **[A landing page at https://dream.onlychan.xyz/
   later.]**
 
@@ -163,9 +162,9 @@ Paste into App Review Information › Notes, after filling in the placeholders:
 > an idea), and a page appears in 20 to 60 seconds. The colored field at the top moves while it
 > works.
 >
-> Sign-in: Dream uses Sign in with Apple only, so please sign in with your own Apple Account; no
-> demo credentials are needed. **[Workstream A/D: confirm the free allowance covers a full review,
-> at least 20 pages and 20 changes in a day, or that review accounts are given more.]**
+> Sign-in is optional: pages are made without an account. Signing in (Sign in with Apple only, so
+> please use your own Apple Account; no demo credentials are needed) adds sync, sharing and web
+> search. Pages need an iPhone with Apple Intelligence turned on.
 >
 > Pages are data, not code: the model returns a structured description (text, numbers, formulas,
 > chart and figure definitions), which the app checks and draws with its own native views. No
@@ -180,7 +179,6 @@ Paste into App Review Information › Notes, after filling in the placeholders:
 > 5. Long-press a block and say what to change, or tap the wand to change the whole page.
 > 6. Share a page with the share button: a link opens in Dream or in any browser.
 > 7. Account: **[where the account screen is]**, with export and delete (guideline 5.1.1(v)).
-> 8. Subscription: **[where the paywall appears]**; it works with a sandbox account.
 >
 > Permissions, each asked only when it's first needed:
 > - Location (when in use): the weather and travel times a page shows.
@@ -191,12 +189,12 @@ Paste into App Review Information › Notes, after filling in the placeholders:
 > - Photos: picked with the system photo picker, so Dream sees only the photo you choose; it's sent
 >   with your request.
 >
-> AI and the web: pages are written by **[xAI's Grok]** through Dream's own server. Pages that
-> state facts cite Wikipedia or the web pages that were read, and link to them; web text is shown
-> as short excerpts and summaries, never as a browser. Nothing is sent to an AI provider before
-> sign-in. The line under Sign in with Apple says that what you ask goes to Dream's AI providers,
-> and that continuing agrees to the terms and privacy policy, which name xAI and list what it
-> receives (guideline 5.1.2(i)).
+> AI and the web: pages are written by Apple's models through the Foundation Models framework,
+> on Private Cloud Compute, with small jobs on the device. No third-party AI provider receives
+> anything (guideline 5.1.2(i) doesn't come into it). Pages that state facts cite Wikipedia or the
+> web pages that were read, and link to them; web text is shown as short excerpts and summaries,
+> never as a browser. Web search goes through Dream's server to Parallel, for signed-in accounts,
+> as the privacy policy says.
 >
 > Shared pages: anyone with a link can view a shared page in Dream or on the web. Each one has a
 > report button, reports reach a queue we review within **[24 hours]**, and pages can be taken down
@@ -235,7 +233,7 @@ what we hope people ask for.
 **Recommendation: 13+.** AI-made pages on any subject, grounded in open web results and shareable,
 suit 13+ when sexual and graphic content is refused reliably and shared pages can be reported and
 taken down. If the model's output isn't filtered on the server by launch (workstream C's check
-before publishing, and D's proxy), answer the mature-content questions "Frequent" and take 16+, or
+before publishing), answer the mature-content questions "Frequent" and take 16+, or
 18+ if explicit content can get through. Dream's terms say 16+ everywhere, so the rating should
 be 16+ at least. Chandram chose 16+ in India too, knowing the DPDP Act treats under-18s as
 children needing a parent's consent; revisit if Dream grows there.
@@ -257,14 +255,12 @@ Answer "Yes, it contains third-party content, and I have the rights to use it":
 - **Maps and travel times:** MapKit, under Apple's terms.
 - **Molecules:** PubChem 3D conformers (public domain, from the U.S. National Library of Medicine).
 - **Web pages:** short excerpts and summaries, each citing and linking its source.
-  **[Legal review: quotation limits, and that Parallel's and xAI's terms allow a consumer app.]**
+  **[Legal review: quotation limits, and that Parallel's terms allow a consumer app.]**
 
 ## In-app purchases
 
-Workstream D owns these. **[Subscription group name; products with durations and prices; a free
-trial or not; localized display names and descriptions; a review screenshot of the paywall; the
-App Store Server Notifications v2 URL on the backend.]** The first subscription has to be
-submitted together with a new app version.
+None on the apple-intelligence branch: Dream is free. (Dream Plus lives on `main`, which makes
+pages with other models.)
 
 ## Before submitting
 
@@ -275,20 +271,15 @@ submitted together with a new app version.
   routed (no lawyer review yet; see above).
 - [ ] Parallel's Data Processing Addendum signed, and whether shared pages may carry text made
   from its results (its terms keep each result for the one person who asked).
-- [ ] Permission before a request first goes to the AI provider (5.1.2(i)): agreed at sign-in, with
-  the providers named in the privacy policy (`SignInButton.agreement`). Decide whether review needs
-  more than that.
 - [ ] Sign in with Apple, account deletion in the app, Apple token revocation (A).
 - [ ] Shared pages: report, takedown, a check before publishing, blocking abusive sharers (C).
-- [ ] The free allowance is enough for a full review, and the subscription works in sandbox (D).
-- [ ] Paywall: price, period, renewal terms, restore purchases, and links to terms and privacy (D).
+- [ ] The daily web search allowance is enough for a full review.
 - [ ] The production backend deployed, with D1 migrations applied and secrets set.
 - [ ] Icon: Dream/Assets.xcassets/AppIcon (any, dark and tinted), regenerated with Tools/icon.sh.
 - [ ] Screenshots for 6.9" and the app preview, if any.
 - [ ] Age rating questionnaire, content rights, export compliance.
 - [ ] EU Digital Services Act trader status declared (App Store Connect › Business); a trader's
       address, phone and email are shown on the EU storefronts.
-- [ ] Paid Apps agreement, banking and tax forms (needed for the subscription).
 - [ ] Availability: countries, and whether to launch in the EU and India before the legal review is
       done.
 - [ ] TestFlight round on real devices first, including a fresh install and a sign-out.

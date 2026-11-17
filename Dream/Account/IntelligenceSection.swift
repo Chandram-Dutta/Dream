@@ -21,7 +21,7 @@ struct IntelligenceSection: View {
         } header: {
             Text("Apple Intelligence")
         } footer: {
-            Text("Your pages are made by Apple's models: on Private Cloud Compute, where requests are processed on Apple silicon and never kept, or on this iPhone when you're offline. Dream has no model of its own, and nothing you ask goes to anyone else's.")
+            Text("Your pages are made by Apple's models, on Private Cloud Compute, where requests are processed on Apple silicon and never kept. Dream has no model of its own, and what you ask goes to no other AI company. What a page looks up, on Wikipedia or the web, goes to those services without your name.")
         }
         .task {
             cloud = AppleModels.cloudStatus

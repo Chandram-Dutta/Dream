@@ -625,7 +625,7 @@ async function runRelease(base, local) {
   let response = await fetch(`${base}/privacy/`);
   expect(response.status === 200, "a trailing slash works too");
   const policy = await (await fetch(`${base}/privacy`)).text();
-  expect(["Cloudflare", "xAI", "Parallel", "Apple", "Wikimedia", "PostHog"].every((name) => policy.includes(name)), "the policy names every company that handles data");
+  expect(["Cloudflare", "Parallel", "Apple", "Private Cloud Compute", "Wikimedia", "PubChem", "ExchangeRate-API", "PostHog"].every((name) => policy.includes(name)) && !policy.includes("xAI"), "the policy names every company that handles data, and no AI provider but Apple");
   expect(policy.includes("Digital Personal Data Protection Act") && policy.includes("GDPR"), "and rights under the GDPR and India's DPDP Act");
   response = await fetch(`${base}/terms`, { method: "POST" });
   expect(response.status === 405, "the pages are read-only");

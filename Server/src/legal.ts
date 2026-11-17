@@ -9,7 +9,7 @@ import { document } from "./page";
 export type LegalPath = "/privacy" | "/terms" | "/support";
 
 /** When the pages last changed in a way that matters. */
-const UPDATED = "29 October 2026";
+const UPDATED = "17 November 2026";
 
 const mail = (address: string) => `<a href="mailto:${address}">${address}</a>`;
 const PRIVACY_CONTACT = mail("privacy@onlychan.xyz");
@@ -61,9 +61,10 @@ const PRIVACY = [
   section(
     "The short version",
     list([
-      "Your pages, lists and memory are kept in your account, encrypted on the way and on disk, so they're there on every iPhone you sign in on. They're used only to do what you ask: keep them in step, make and change your pages, and export or delete them.",
-      "Nobody at Dream looks at your pages, lists or memory, unless you ask for help with something specific or the law requires it.",
-      "To make a page, what you ask goes through Dream's server to an AI provider's model (today, xAI), with what's needed to answer it. You agree to this when you sign in.",
+      "Your pages are made by Apple Intelligence: Apple's own models, on Private Cloud Compute or on your iPhone. Dream has no AI model of its own, and what you ask goes to no other AI company.",
+      "You don't need an account. Without one, your pages, lists and memory stay on your iPhone, and nothing about you reaches Dream's server.",
+      "To get facts right, Dream looks things up: Wikipedia, and, once you sign in, the web, through Dream's server and its search provider, Parallel. They receive what's looked up, never who you are.",
+      "If you sign in, your pages, lists and memory are kept in your account, encrypted on the way and on disk, so they're there on every iPhone you sign in on. Nobody at Dream looks at them, unless you ask for help with something specific or the law requires it.",
       "Once you sign in, Dream sends crash reports and usage counts, which you can turn off in Account under “Help improve Dream”. They never include what you ask, what pages say, or your lists and memory.",
       "Dream doesn't sell your data, show ads, or track you across other companies' apps and websites.",
       "You can export or delete everything from Account in the app, at any time.",
@@ -74,7 +75,17 @@ const PRIVACY = [
     p(`Dream is made by ${OWNER}, an independent developer, who decides how your data is used (the “controller”). Write to ${PRIVACY_CONTACT} about anything in this policy.`),
   ),
   section(
+    "How a page is made",
+    p(
+      "What you ask is processed by Apple's models, through Apple's Foundation Models framework. Most pages are made on Private Cloud Compute, Apple's servers built on Apple silicon. Apple says a request sent there is used only to answer it, isn't stored, and isn't accessible to Apple, and that independent experts can inspect the software that runs there. Some small jobs, like suggesting ideas on Home, run on your iPhone's own model, and never leave it.",
+    ),
+    p(
+      "Along with what you ask, the model is given what's needed to answer it: facts from your memory that fit, your answers to its questions, the page you're changing, and what lookups returned. Dream asks before a connected service's tool runs, and before anything is added to your calendar or reminders.",
+    ),
+  ),
+  section(
     "What Dream keeps, and for how long",
+    p("Without an account, Dream keeps nothing about you on its server. Signed in, it keeps:"),
     kept([
       {
         what: "Your account",
@@ -91,15 +102,9 @@ const PRIVACY = [
         how: "until you sign out, or 90 days without use",
       },
       {
-        what: "Notifications",
-        detail:
-          "For each iPhone you let Dream notify: the address Apple gives it for notifications, and whether it's a test build. A notification says only that a page is ready, with the page's title, or that Dream has a question, with the first few words of what you asked. Apple delivers it.",
-        where: SERVER,
-        how: "until that iPhone signs out, or Apple says the address no longer works",
-      },
-      {
         what: "Saved pages",
-        detail: "Each page's template, your numbers and answers on it, and its history: what you asked for, and each change you asked for.",
+        detail:
+          "Each page's template, your numbers and answers on it, and its history: what you asked for, each change you asked for, what was found for it (which can include notes from services you connected), the things it's about, and which page it went on from.",
         where: SERVER,
         how: "until you delete the page or your account",
       },
@@ -132,16 +137,10 @@ const PRIVACY = [
         how: "until you stop sharing it or delete your account",
       },
       {
-        what: "Usage and limits",
-        detail: "How many pages, model tokens and web searches your account has used, to apply the free allowance and your subscription.",
+        what: "Web search counts",
+        detail: "How many web searches and page reads your account has made each day and month, for the daily limits.",
         where: SERVER,
         how: "until you delete your account",
-      },
-      {
-        what: "Subscription",
-        detail: "Whether you subscribe, and Apple's signed record of each purchase and renewal. Apple handles payment; Dream never sees card details.",
-        where: SERVER,
-        how: "until you delete your account; Apple keeps its own record of your purchases",
       },
       {
         what: "Web search answers",
@@ -160,7 +159,7 @@ const PRIVACY = [
       {
         what: "Usage counts, unless you turn off “Help improve Dream”",
         detail:
-          "Events like “page built”, with how long it took, how many parts it had and of which kinds, and whether it used the web; and for each request to an AI model, how much it used, what it cost and how long it took. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
+          "Events like “page built”, with how long each step took, how many parts it had and of which kinds, and whether it used the web; and for each request to Apple's models, how much it used and how long it took. They're linked to Dream's own id for you, so they can be counted per person, and never include what you asked, what pages say, your lists, your memory or web addresses. They're not used for advertising or to track you elsewhere.",
         where: "PostHog, in the United States",
         how: "kept by PostHog; once you delete your account, nothing links them to you",
       },
@@ -172,36 +171,37 @@ const PRIVACY = [
   section(
     "What stays on your iPhone",
     list([
+      "Everything, if you don't sign in: your pages, lists, memory and settings.",
+      "Earlier versions of a page, kept when you change it.",
       "Where you are. Dream uses it for the weather and travel times you ask about, and sends it from your iPhone to Apple Weather and Apple Maps. It never reaches Dream's server.",
       "What you say. Speech is turned into text on your iPhone.",
+      "Translations of a page into your language, made on your iPhone.",
       "Sign-ins to services you connect, kept in your iPhone's Keychain.",
-      "Small private jobs, like picking which facts from your memory fit a request, run on Apple's on-device model.",
     ]),
   ),
   section(
     "Who else handles it",
-    p("Dream uses these companies to run. Each gets only what its job needs."),
+    p("Each of these gets only what its job needs."),
     list([
-      "<strong>Cloudflare</strong> runs Dream's server, database and file storage, so it holds everything Dream keeps.",
-      "<strong>AI providers</strong> run the models that make pages. Today that's <strong>xAI</strong> (Grok), reached through Cloudflare's AI Gateway, which is set to keep no copy. Dream may add or change providers, and this list will say so before it does. For each request a provider receives what you asked, the context needed to answer it (like facts from your memory you've confirmed, your answers, the page you're changing, or list entries you're talking to), any photo you attached, and what lookups returned. It doesn't receive your name, email or Apple ID. " +
-        "xAI doesn't train its models on what it receives through its API, and deletes it after 30 days, keeping it until then only to look into abuse.",
-      "<strong>Parallel</strong> searches the web and reads pages. It receives the searches the model writes and the addresses of pages to read, never your account; Dream keeps names and personal details out of searches. Parallel may use searches and results to improve its own models, without linking them to anyone.",
-      "<strong>Apple</strong> handles Sign in with Apple, App Store purchases, notifications, Weather and Maps.",
-      "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds. It receives what's looked up.",
+      "<strong>Apple</strong> runs the models that make pages (Private Cloud Compute, and the model on your iPhone), and handles Sign in with Apple, Weather, Maps, and the check that a request to Dream's server comes from the real app (App Attest).",
+      "<strong>Cloudflare</strong> runs Dream's server, database and file storage, so it holds everything Dream keeps for signed-in accounts.",
+      "<strong>Parallel</strong> searches the web and reads pages, for signed-in accounts. It receives the searches the model writes and the addresses of pages to read, through Dream's server, never your account; Dream keeps names and personal details out of searches. Parallel may use searches and results to improve its own models, without linking them to anyone.",
+      "<strong>Wikimedia</strong> answers Wikipedia and Wikimedia Commons lookups for facts, pictures and sounds, from your iPhone. It receives what's looked up.",
+      "<strong>PubChem</strong>, from the U.S. National Library of Medicine, gives the shapes of molecules you ask to see. It receives the molecule's name.",
+      "<strong>ExchangeRate-API</strong> gives currency rates. It receives the currency, from your iPhone.",
       "<strong>PostHog</strong> keeps usage counts, in the United States, unless you turn off “Help improve Dream”. It doesn't keep your IP address.",
     ]),
     p(
-      "Services you connect yourself, like Linear or Notion, talk to your iPhone directly, under their own terms. Dream shows you what it will send before one of their tools runs.",
+      "Lookups made from your iPhone reach those services directly, so like any website they see your IP address. Services you connect yourself, like Linear or Notion, also talk to your iPhone directly, under their own terms. What they return is used to make your page, so it goes to Apple's models and is kept with the page.",
     ),
   ),
   section(
     "Why Dream uses it",
     p("Dream uses your data on these grounds:"),
     list([
-      "To provide Dream: your account, pages, lists, memory and subscription, and sending what you ask to AI providers to make your pages (performing the contract with you, which you agree to when you sign in).",
+      "To provide Dream: making your pages with Apple's models, looking up what they need, and, if you sign in, your account, pages, lists and memory (performing the contract with you).",
       "To improve Dream: crash reports and usage counts, which you can turn off at any time in Account (legitimate interests in keeping Dream working and making it better; in India, the consent you give when you sign in, which turning them off withdraws).",
       "To keep Dream safe and working: rate limits, preventing abuse, and fixing problems (legitimate interests).",
-      "Because the law requires it: purchase records.",
     ]),
   ),
   section(
@@ -227,7 +227,7 @@ const PRIVACY = [
       "Deleting your account in the app erases it from Dream's server at once: your account, devices, pages and their history, lists, memory, photos, settings and shared pages, whose links stop working. Dream also tells Apple to revoke its Sign in with Apple link to you. Copies in the database's backups (Cloudflare D1 Time Travel) are gone within 30 days.",
     ),
     p(
-      `Crash reports aren't linked to you, so they stay until they expire after 90 days. Usage counts in PostHog carry only Dream's id for you, which goes with your account, so nothing links them to you afterwards. Apple keeps its own record of your purchases.`,
+      `Crash reports aren't linked to you, so they stay until they expire after 90 days. Usage counts in PostHog carry only Dream's id for you, which goes with your account, so nothing links them to you afterwards. To remove what's on your iPhone, delete the app.`,
     ),
   ),
   section(
@@ -239,7 +239,7 @@ const PRIVACY = [
   section(
     "Moving data between countries",
     p(
-      `Cloudflare runs Dream's server around the world; xAI, Parallel and PostHog are in the United States. When data leaves your country, Dream relies on each provider's data protection terms, including the EU's standard contractual clauses where the provider offers them.`,
+      `Cloudflare runs Dream's server around the world; Parallel and PostHog are in the United States, and Private Cloud Compute runs in Apple's data centers. When data leaves your country, Dream relies on each provider's data protection terms, including the EU's standard contractual clauses where the provider offers them.`,
     ),
   ),
   section(
@@ -255,10 +255,13 @@ const TERMS = [
   section(
     "Agreeing to these terms",
     p(
-      `These terms are between you and ${OWNER}, who makes Dream. By signing in to Dream, or otherwise using it, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including what it says about AI providers and usage counts. If you don't agree, please don't use Dream.`,
+      `These terms are between you and ${OWNER}, who makes Dream. By using Dream, you agree to them and to the ${'<a href="/privacy">privacy policy</a>'}, including, if you sign in, what it says about web search and usage counts. If you don't agree, please don't use Dream.`,
     ),
   ),
-  section("Who can use Dream", p(`You need to be at least 16 and able to agree to these terms. You sign in with your Apple Account; one account per person.`)),
+  section(
+    "Who can use Dream",
+    p(`You need to be at least 16 and able to agree to these terms. You don't need an account; if you make one, you sign in with your Apple Account, one account per person.`),
+  ),
   section(
     "Your account",
     p("You're responsible for what happens in your account, so keep your Apple Account secure. You can delete your account at any time in Account."),
@@ -266,7 +269,7 @@ const TERMS = [
   section(
     "What Dream makes",
     list([
-      "Pages are written by AI models from other companies, today xAI. What you ask, and what's needed to answer it, goes to them through Dream's server, as the privacy policy describes. Dream may change which providers it uses.",
+      "Pages are written by Apple Intelligence, Apple's models on Private Cloud Compute or on your iPhone, as the privacy policy describes. Dream has no model of its own.",
       "AI-made pages can be wrong, out of date or incomplete, even when they look certain.",
       "Dream isn't professional advice: not medical, legal, financial, tax or safety advice. Check anything important with someone qualified.",
       "Calculations follow the formulas on the page. Check them before you rely on the numbers.",
@@ -304,12 +307,10 @@ const TERMS = [
     ),
   ),
   section(
-    "Free use and subscription",
+    "Price",
     list([
-      "Dream is free for up to 5 pages a day and 30 a month. Making a page, or asking for a change to one, counts once; opening and using the pages you have never counts.",
-      "Dream Plus, at $9.99 a month or $79.99 a year (or the App Store's price where you live), raises that to 25 a day and 150 a month. It's bought through Apple and renews automatically for the same period until you cancel at least 24 hours before it ends.",
-      "Manage or cancel it in Settings › your name › Subscriptions. Payment, renewals and refunds are handled by Apple, under Apple's terms.",
-      "If prices change, you'll be told before your next renewal, and can cancel first.",
+      "Dream is free. There's no subscription and nothing to buy in the app.",
+      "Web search has a daily limit per account, so it stays fair for everyone. Pages made without the web have no limit.",
       "Apple's standard Licensed Application End User License Agreement applies to Dream, alongside these terms.",
     ]),
   ),
@@ -323,7 +324,7 @@ const TERMS = [
   section(
     "Disclaimers and liability",
     p(
-      "Dream is provided as it is, without promises that it will be available, correct or fit for a particular purpose. As far as the law allows, Dream isn't liable for indirect or consequential losses, or for decisions made from what a page says, and its total liability to you is limited to what you paid for Dream in the 12 months before the claim.",
+      "Dream is provided as it is, without promises that it will be available, correct or fit for a particular purpose. As far as the law allows, Dream isn't liable for indirect or consequential losses, or for decisions made from what a page says.",
     ),
     p("Nothing here limits liability that the law doesn't allow to be limited, or takes away rights you have as a consumer where you live."),
   ),
@@ -340,23 +341,25 @@ const SUPPORT = [
   ),
   section(
     "Getting started",
-    `<h3>Why do I need to sign in?</h3>`,
-    p("Pages are made through your account, which keeps your pages, lists and what Dream knows on every iPhone you sign in on. Dream uses Sign in with Apple, so you can keep your email private."),
+    `<h3>What do I need?</h3>`,
+    p("An iPhone that supports Apple Intelligence, with Apple Intelligence turned on in Settings. Dream's pages are made by Apple's models."),
+    `<h3>Do I need to sign in?</h3>`,
+    p("No. Without an account, your pages stay on this iPhone. Signing in keeps them on every iPhone you sign in on, lets pages search the web, and lets you share them by link. Dream uses Sign in with Apple, so you can keep your email private."),
     `<h3>I can't sign in</h3>`,
     p(
       `Check you're signed in to your Apple Account in Settings and connected to the internet, then try again. If it still fails, open Settings › your name › Sign in with Apple, remove Dream, and sign in again. If that doesn't help, write to ${SUPPORT_CONTACT} with what the message says.`,
     ),
     `<h3>I have a new iPhone</h3>`,
-    p("Install Dream and sign in with the same Apple Account. Your pages, lists and what Dream knows come back by themselves."),
+    p("Install Dream and sign in with the same Apple Account. Your pages, lists and what Dream knows come back by themselves. Pages made without an account stay on the iPhone they were made on, unless you move them into your account when you sign in."),
   ),
   section(
     "Pages",
     `<h3>A page I made is wrong</h3>`,
     p("Tap Change (the wand) to ask for a fix, or point at the part that's wrong. Pages say where their facts came from at the bottom; check anything important."),
     `<h3>Which AI makes my pages?</h3>`,
-    p('Models from Dream\'s AI providers, today Grok by xAI. What you ask, and what\'s needed to answer it, goes to them through Dream\'s server; never your name, email or Apple ID. The <a href="/privacy">privacy policy</a> lists who gets what.'),
+    p('Apple Intelligence: Apple\'s models, on Private Cloud Compute or on your iPhone. Dream has no model of its own, and what you ask goes to no other AI company. The <a href="/privacy">privacy policy</a> lists who gets what.'),
     `<h3>How many pages can I make?</h3>`,
-    p("Free: 5 a day and 30 a month. Dream Plus: 25 a day and 150 a month. Making a page, or asking for a change to one, counts once; opening and using the pages you have never counts. Dream shows how many are left in Account."),
+    p("As many as you like. Signed-in accounts have a daily limit on web searches; pages that don't need the web aren't counted."),
     `<h3>Can other people see my pages?</h3>`,
     p("Only pages you share, and only by their link. Your numbers go with a shared page only if you choose. See and stop your links in Your shared links."),
     `<h3>A shared page is wrong, offensive or harmful</h3>`,
@@ -368,19 +371,10 @@ const SUPPORT = [
     p("Open Account and choose Export my data."),
     `<h3>How do I delete my account?</h3>`,
     p(
-      "In Dream, open Account and choose Delete my account. Everything Dream keeps on its server is erased at once, and backups are gone within 30 days. Deleting the app doesn't delete your account, and deleting your account doesn't cancel Dream Plus: cancel that first.",
+      "In Dream, open Account and choose Delete my account. Everything Dream keeps on its server is erased at once, and backups are gone within 30 days. Deleting the app doesn't delete your account.",
     ),
     `<h3>How do I turn “Help improve Dream” off?</h3>`,
-    p("In Account. It's on from when you sign in, and sends crash reports and counts of what you use, never what you ask, what pages say, or your lists and memory. When it's off, nothing is sent."),
-  ),
-  section(
-    "Dream Plus",
-    `<h3>How do I cancel, or get a refund?</h3>`,
-    p(
-      'Subscriptions are handled by Apple. Cancel in Settings › your name › Subscriptions. For a refund, go to <a href="https://reportaproblem.apple.com" rel="noopener noreferrer">reportaproblem.apple.com</a>.',
-    ),
-    `<h3>I paid but still have the free limits</h3>`,
-    p("Open Account and tap Restore purchases, signed in to the same Apple Account you paid with."),
+    p("In Account. It's on from when you sign in, and sends crash reports and counts of what you use, never what you ask, what pages say, or your lists and memory. When it's off, or you haven't signed in, nothing is sent."),
   ),
   section(
     "Permissions",

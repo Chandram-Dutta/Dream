@@ -1,8 +1,11 @@
 # App Privacy answers (draft)
 
-What to answer in App Store Connect › App Privacy for Dream 1.0, given the production decisions in
-PRODUCTION.md: accounts with Sign in with Apple, and pages, lists, memory, photos, usage and
-subscriptions stored on Dream's backend (Cloudflare), which can read them. The same answers are
+What to answer in App Store Connect › App Privacy for Dream 1.0 as built on the
+`apple-intelligence` branch: pages made only by Apple's models (Private Cloud Compute and the
+iPhone's), an optional account with Sign in with Apple, and, for signed-in accounts, pages, lists,
+memory, photos and web search counts stored on Dream's backend (Cloudflare), which can read them.
+Without an account nothing about the user reaches Dream's server, but the answers below cover
+what signed-in use collects. There are no purchases. The same answers are
 in the app's privacy manifest, `Dream/PrivacyInfo.xcprivacy`; change both together.
 
 Draft, needs review: the person who submits the app answers these, and the privacy policy
@@ -13,7 +16,7 @@ Draft, needs review: the person who submits the app answers these, and the priva
 - **Tracking:** No. Dream doesn't link its data with other companies' data for advertising, and
   doesn't share it with data brokers. No App Tracking Transparency prompt is needed.
 - **Data linked to you:** name, email address, user ID, device ID, photos, other user content,
-  search history, purchase history, product interaction, other usage data, performance data.
+  search history, product interaction, other usage data, performance data.
 - **Data not linked to you:** crash data, other diagnostic data.
 
 Data collected while "Help improve Dream" is on (product interaction, device ID, performance data,
@@ -28,24 +31,24 @@ Apple's rule is that optional collection is still collection.
 | Contact info › Email address | Yes | Yes | No | App functionality | The email Sign in with Apple shares, often a private relay address. Only if the user shares it. |
 | Contact info › Phone, physical address, other | No | | | | |
 | Health and fitness | No | | | | Pages can be about health, but Dream doesn't collect health data as such; what someone types is user content. |
-| Financial info | No | | | | Purchases go through Apple; Dream never sees payment details. Expense lists are user content. |
+| Financial info | No | | | | Nothing is sold in the app. Expense lists are user content. |
 | Location › Precise, coarse | No (see note) | | | | Location is read on the phone for weather and travel times and sent to Apple's WeatherKit and MapKit. Dream's server and the model get the weather or the travel time, never coordinates; a page's source says "current location", not where it is. |
 | Sensitive info | No | | | | |
 | Contacts | No | | | | |
 | User content › Emails or text messages | No | | | | |
-| User content › Photos or videos | Yes | Yes | No | App functionality | Photos the user attaches to a request or a list, sent to the model and kept with the page. |
+| User content › Photos or videos | Yes | Yes | No | App functionality | Photos the user attaches to a request or a list, given to Apple's model and, signed in, kept with the page. |
 | User content › Audio data | No | | | | Speech is turned into text on the iPhone; audio never leaves it. |
 | User content › Gameplay content | No | | | | |
 | User content › Customer support | No | | | | Support is by email, outside the app. Revisit if in-app support is added. |
-| User content › Other user content | Yes | Yes | No | App functionality | Saved pages (template, values, answers, the history of requests and changes), list entries, memory facts, the list of connected services (not their tokens), settings, and shared pages. Requests are made into pages by Apple's models, on the iPhone or on Private Cloud Compute; no other AI provider receives them. |
+| User content › Other user content | Yes | Yes | No | App functionality | Saved pages (template, values, answers, the history of requests and changes, what was found for them, including notes from connected services), list entries, memory facts, the list of connected services (not their tokens), settings, and shared pages. Requests are made into pages by Apple's models, on the iPhone or on Private Cloud Compute; no other AI provider receives them. |
 | Browsing history | No | | | | Web pages are read by Dream's server for a page, not from the user's browsing. |
 | Search history | Yes | Yes | No | App functionality | What the user asks Dream, kept with each page's history. Web searches the model makes are cached for hours under hashed keys, but come from requests already declared. |
 | Identifiers › User ID | Yes | Yes | No | App functionality, analytics | Dream's own id for the account (a random UUID, never Apple's id or an email). Analytics are tied to it after sign-in. |
 | Identifiers › Device ID | Yes | Yes | No | Analytics | PostHog's random id for this install, until sign-in. Not the advertising identifier, which Dream never reads. Only with "Help improve Dream". |
-| Purchases › Purchase history | Yes | Yes | No | App functionality | Subscription status from Apple's signed transactions (workstream D). |
+| Purchases › Purchase history | No | | | | Nothing is sold in the app. |
 | Usage data › Product interaction | Yes | Yes | No | Analytics | The events in docs/Analytics.md, through PostHog. Only with "Help improve Dream". Never what anyone wrote. |
 | Usage data › Advertising data | No | | | | No ads. |
-| Usage data › Other usage data | Yes | Yes | No | App functionality | Per-account counts of pages, model tokens and searches, for the free allowance and limits (workstream D). |
+| Usage data › Other usage data | Yes | Yes | No | App functionality | Per-account counts of web searches and page reads, for the daily limits. |
 | Diagnostics › Crash data | Yes | No | No | App functionality | MetricKit crash, hang and slow-launch reports, sent to Dream's server with no account. Only with "Help improve Dream". |
 | Diagnostics › Performance data | Yes | Yes | No | App functionality, analytics | Hang and launch durations (not linked, from MetricKit) and how long pages take to build (linked, in product analytics). Declared as linked because the second is. |
 | Diagnostics › Other diagnostic data | Yes | No | No | App functionality | The app and iOS version and the kind of iPhone, with each MetricKit report. |
@@ -59,7 +62,8 @@ Apple's rule is that optional collection is still collection.
   that changes (say, the server starts storing a page's place), or review disagrees, answer
   Location › Coarse location: collected, linked, app functionality.
 - **Third parties count.** Parallel (web search) and PostHog (analytics) receive
-  data on Dream's behalf. Their data is covered by the rows above; the privacy policy names them.
+  data on Dream's behalf. Apple's Private Cloud Compute processes requests but, as Apple's own
+  service under the Foundation Models framework, by Apple's account keeps nothing. Their data is covered by the rows above; the privacy policy names them.
 - **"Help improve Dream" is on from sign-in.** The line under Sign in with Apple says so, with the
   terms and privacy policy; turning it off in Account stops both MetricKit reports and PostHog at
   once. Nothing is sent before sign-in.

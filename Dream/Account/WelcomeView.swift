@@ -97,7 +97,7 @@ struct WelcomeView: View {
             Button("Not now") { account.continueWithoutAccount() }
                 .font(.subheadline.weight(.semibold))
                 .foregroundStyle(.secondary)
-            Text("Made with Apple Intelligence, on your iPhone and Private Cloud Compute. An account keeps your pages, lists and what Dream knows on every iPhone you sign in on.")
+            Text("Made with Apple Intelligence and Private Cloud Compute. An account keeps your pages, lists and what Dream knows on every iPhone you sign in on, and lets pages search the web.")
                 .font(.caption)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

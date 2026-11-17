@@ -44,10 +44,7 @@ this table mirrors it.
 | `connection_added` | `needs_sign_in` | A service is connected | `ConnectionStore.add` |
 | `tool_prompt_shown` | | A connected service's tool asks before it runs | `ConsentView` |
 | `tool_prompt_answered` | `answer` (once, always, deny) | The user answers it | `ConsentView` |
-| `paywall_shown` | | The paywall appears | Subscription (workstream D) |
-| `subscription_started` | `product` | A subscription starts | Workstream D, or the server |
-| `subscription_ended` | | A subscription ends | Workstream D, or the server |
-| `limit_reached` | `kind` (pages, tokens, searches) | A free allowance runs out | Workstream D, or the server |
+| `limit_reached` | `kind` (searches, reads) | A daily web allowance runs out | The server |
 
 Property meanings:
 
@@ -118,11 +115,9 @@ key as the app.
 
 | Event | Properties | Sent when | Where |
 |---|---|---|---|
-| `$ai_generation` | `$ai_trace_id` (the page's id; a page's tool rounds and repairs are one trace), `$ai_span_name` (`page` or `lists`), `$ai_provider`, `$ai_model`, `$ai_input_tokens`, `$ai_cache_read_input_tokens`, `$ai_output_tokens` (with reasoning), `$ai_total_cost_usd` (xAI's own figure when it gives one), `$ai_latency`, `$ai_time_to_first_token`, `$ai_stream`, `$ai_http_status`, `$ai_is_error`, `plan` | Each request through the model proxy, done or failed | `Server/src/model.ts` |
+| `$ai_generation` | `$ai_trace_id` (the page's id; a page's tool rounds and repairs are one trace), `$ai_span_name` (`page` or `lists`), `$ai_provider`, `$ai_model`, `$ai_input_tokens`, `$ai_cache_read_input_tokens`, `$ai_output_tokens` (with reasoning), `$ai_total_cost_usd` (xAI's own figure when it gives one), `$ai_latency`, `$ai_time_to_first_token`, `$ai_stream`, `$ai_http_status`, `$ai_is_error`, `plan` | Each request through the model proxy, done or failed. Not on the apple-intelligence branch, whose app sends its own (above) and never calls the proxy | `Server/src/model.ts` |
 
 They feed PostHog's LLM analytics: cost per person and per page, latency, cache use and errors.
 Never `$ai_input` or `$ai_output_choices`: no messages, answers or tool calls leave for PostHog.
 
-`limit_reached`, `subscription_started` and `subscription_ended` can also be sent from the Worker,
-after the same check. The App Store's notifications come from Apple, not the phone, so they send
-nothing; the app counts purchases itself.
+`limit_reached` is sent from the Worker, after the same check.

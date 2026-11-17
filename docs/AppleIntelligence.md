@@ -1,8 +1,12 @@
 # Dream on Apple Intelligence
 
 This branch (`apple-intelligence`) makes every page with Apple's own models. Dream has no model
-provider, no model proxy and no model of its own. What someone asks is processed on their iPhone
-or on Private Cloud Compute, and nowhere else.
+provider, no model proxy and no model of its own. The models that read what someone asks run on
+their iPhone or on Private Cloud Compute, and nowhere else. What a page looks up goes to the
+source it's looked up in, without who's asking: Wikipedia and Commons, PubChem and exchange rates
+from the iPhone, web search and reading through Dream's server to Parallel (signed in only), and
+services the user connected. The privacy policy (`Server/src/legal.ts`, served at `/privacy`)
+names each, and what it receives.
 
 ## What Dream is
 

@@ -168,9 +168,6 @@ enum Analytics {
         case connectionAdded(needsSignIn: Bool)
         case toolPromptShown
         case toolPromptAnswered(PromptAnswer)
-        case paywallShown
-        case subscriptionStarted(product: String)
-        case subscriptionEnded
         /// A free allowance ran out: "pages", "tokens" or "searches".
         case limitReached(kind: String)
 
@@ -190,9 +187,6 @@ enum Analytics {
             case .connectionAdded: "connection_added"
             case .toolPromptShown: "tool_prompt_shown"
             case .toolPromptAnswered: "tool_prompt_answered"
-            case .paywallShown: "paywall_shown"
-            case .subscriptionStarted: "subscription_started"
-            case .subscriptionEnded: "subscription_ended"
             case .limitReached: "limit_reached"
             case .pageUnderstood: "page_understood"
             case .questionsAnswered: "questions_answered"
@@ -212,7 +206,7 @@ enum Analytics {
 
         var properties: [String: any Sendable] {
             switch self {
-            case .appOpened, .signedIn, .signedOut, .toolPromptShown, .paywallShown, .subscriptionEnded, .versionRestored, .libraryOpened:
+            case .appOpened, .signedIn, .signedOut, .toolPromptShown, .versionRestored, .libraryOpened:
                 return [:]
             case .pageRequested(let withPhoto, let run):
                 return (run?.properties ?? [:]).merging(["with_photo": withPhoto]) { $1 }
@@ -259,8 +253,6 @@ enum Analytics {
                 return ["needs_sign_in": needsSignIn]
             case .toolPromptAnswered(let answer):
                 return ["answer": answer.rawValue]
-            case .subscriptionStarted(let product):
-                return ["product": product]
             case .limitReached(let kind):
                 return ["kind": kind]
             }
