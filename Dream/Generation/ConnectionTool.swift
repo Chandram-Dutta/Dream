@@ -44,6 +44,14 @@ struct ConnectionTool: Tool {
 
     func call(arguments: GeneratedContent) async throws -> String {
         let values = JSONValue(arguments)
+        // The same call again gets the same answer, not another trip to the service: Private
+        // Cloud Compute once searched Notion for "gtm" eight times running and never wrote the page.
+        let key = "\(connection.id)/\(tool.name)/\(values.jsonString)"
+        if let earlier = log.repeated(key) {
+            onUse("\(connection.name): \(tool.name) again, the same as before (\(earlier.times))")
+            if earlier.times > 2 { return "You have called this \(earlier.times) times with the same arguments. Stop calling it and write the screen now from what it returned." }
+            return "You already called this with the same arguments, and it answered the same. Don't call it again: write the screen from this.\n\n" + earlier.answer
+        }
         onUse("\(connection.name): \(tool.name) \(values.jsonString.prefix(160))")
         if !tool.readsOnly { log.tried(tool.name) }
         // The connection as it stands now: an earlier answer may have said "Always".
@@ -68,10 +76,9 @@ struct ConnectionTool: Tool {
             }
         }
         // A look-up the user lets run without asking can be read again when the page opens.
-        if tool.readsOnly, allowedAlways, personal.isEmpty {
-            return await readLive(values)
-        }
-        return await run(values, tool: tool)
+        let answer = tool.readsOnly && allowedAlways && personal.isEmpty ? await readLive(values) : await run(values, tool: tool)
+        if tool.readsOnly { log.answered(key, with: answer) }
+        return answer
     }
 
     // MARK: - Running
@@ -82,7 +89,7 @@ struct ConnectionTool: Tool {
             log.use(connection.name)
             onUse("\(connection.name) answered\(result.isError ? " with an error" : ""): \(result.text.count) characters")
             let done = tool.readsOnly || result.isError ? "" : "\nIt's done: \(connection.name) has made this change. Say so plainly on the screen, without a button for it."
-            return Self.untrusted(result, from: connection.name, tool: tool.name) + done
+            return await Self.untrusted(result, from: connection.name, tool: tool.name, about: request) + done
         } catch {
             onUse("\(connection.name) failed: \(error.localizedDescription)")
             return "\(connection.name) couldn't answer this time. Build the screen without it, and don't claim anything about what it holds."
@@ -102,7 +109,7 @@ struct ConnectionTool: Tool {
             let result = ConnectionResults.result(for: source) ?? ToolResult(text: "", structured: nil, isError: false)
             log.use(connection.name)
             onUse("\(connection.name) answered: \(result.text.count) characters, \(reading.fields.count) values, \(reading.lists.count) lists")
-            var answer = Self.untrusted(result, from: connection.name, tool: tool.name)
+            var answer = await Self.untrusted(result, from: connection.name, tool: tool.name, about: request)
             if !reading.fields.isEmpty || !reading.lists.isEmpty {
                 source.lists = ConnectionReading.shapes(reading)
                 live.declare(source, reading: reading)
@@ -188,14 +195,16 @@ struct ConnectionTool: Tool {
 
     /// What the service returned, fenced and labelled as data, so nothing in it reads as an
     /// instruction. The fence is random each time, so the content can't close it.
-    static func untrusted(_ result: ToolResult, from service: String, tool: String) -> String {
+    /// What a service returned, fenced as data. A long answer is read apart and comes back as
+    /// notes, or keeps its parts about the request, as much as the screen has room for
+    /// (`ContextBudget.fit`).
+    static func untrusted(_ result: ToolResult, from service: String, tool: String, about request: String = "") async -> String {
         var body = result.text
         if let structured = result.structured, !repeats(structured, body) {
             body += (body.isEmpty ? "" : "\n\nStructured content:\n") + structured.jsonString
         }
-        if body.count > resultLimit {
-            body = String(body.prefix(resultLimit)) + "\n[Cut off here; \(body.count - resultLimit) more characters.]"
-        }
+        let limit = min(resultLimit, (ContextBudget.current?.allowance(most: resultLimit) ?? resultLimit) - 600)
+        body = await ContextBudget.fit(body, from: "\(service)'s \(tool)", looking: request, limit: limit)
         if body.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty { body = "(nothing)" }
         let fence = "data-" + UUID().uuidString.prefix(8).lowercased()
         return """
@@ -233,9 +242,14 @@ extension ConnectionTool {
     /// The tools worth offering for this request, from switched-on services and relevant to
     /// what's asked (`ToolPicker`), whatever their hints: ones that look things up or don't say,
     /// and when the request asks to do something, ones that change things. Usually none.
-    static func offered(for request: String, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
-        let looking = ToolPicker.pick(for: request, from: Connections.lookingTools)
-        let changing = ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : []
+    /// The tools worth offering for a request. A service the request involves is offered whole,
+    /// as far as looking things up goes: its look-up tools work together (a search finds a page,
+    /// a fetch opens it), and offered only the ones whose words matched, a model found Notion
+    /// pages it had no tool to open. Tools that change things come only when the request asks to
+    /// act, and never while the request is still being understood (`lookingOnly`).
+    static func offered(for request: String, lookingOnly: Bool = false, asking: Asking, consent: Consent, live: LiveLog, log: ConnectionLog, onUse: @escaping @Sendable (String) -> Void) -> [any Tool] {
+        let looking = ToolPicker.whole(ToolPicker.pick(for: request, from: Connections.lookingTools), from: Connections.lookingTools)
+        let changing = !lookingOnly && ToolPicker.asksToAct(request) ? ToolPicker.pick(for: request, from: Connections.changingTools, limit: 2, perService: 2) : []
         guard !looking.isEmpty || !changing.isEmpty else { return [] }
         var names: Set<String> = ["lookup", "ask", "recall", "live"]
         let tools = (looking + changing).compactMap { connection, tool -> ConnectionTool? in

@@ -6,6 +6,9 @@ Apple), unless they turned it off before. The same choice sends crash and hang r
 own server (Dream/Privacy/Diagnostics.swift). Before sign-in nothing is sent, and turning it off in
 Account calls PostHog's `optOut()` at once.
 
+Feature flags (`FeatureFlag` in the same file) let PostHog switch the fast paths off without
+an update: `instant-pages`, `page-reuse` and `quick-level`, all on by default.
+
 Events say what happened, never what anyone wrote: no requests, page text, values, list entries,
 memory, names or addresses. Every name and property lives in `Dream/Engine/Analytics.swift`;
 this table mirrors it.
@@ -17,9 +20,22 @@ this table mirrors it.
 | `app_opened` | | Dream comes to the front, including at launch | `ImproveDream.start` |
 | `signed_in` | | After sign-in, once `ProductAnalytics.signedIn(userID:)` is called | Account (workstream A) |
 | `signed_out` | | When the session ends | `Session.didChange` |
-| `page_requested` | `with_photo` | A new page is asked for | `Composer.compose` |
-| `page_built` | `seconds`, `model`, `blocks`, `block_kinds`, `inputs`, `outputs`, `lists`, `live_sources`, `used_web`, `used_connections`, `asked_questions`, `mode` | A page finished | `Composer.compose` |
-| `page_failed` | `reason`, `changing`, `seconds` | Making or changing a page failed | `Composer` |
+| `page_requested` | `with_photo`, and the run's `level`, `source`, `$ai_trace_id` | A new page is asked for | `Composer.compose`, `PageMaker.madeAtOnce` |
+| `page_built` | `seconds`, `model`, `blocks`, `block_kinds`, `inputs`, `outputs`, `lists`, `live_sources`, `used_web`, `used_connections`, `asked_questions`, `mode`, and the run (below) | A page finished | `Composer.compose`, `PageMaker.madeAtOnce` |
+| `page_failed` | `reason`, `changing`, `seconds`, `stage`, and the run | Making or changing a page failed | `Composer` |
+| `page_understood` | `seconds`, `tool_calls`, `questions`, `found_something`, `related_pages`, `$ai_trace_id` | Understanding a request finished | `Composer.understand` |
+| `questions_answered` | `count`, `left_to_dream`, `remembered`, `seconds`, `$ai_trace_id` | The user answered Dream's questions | `Composer.write` |
+| `first_block` | `seconds`, `level`, `$ai_trace_id` | The first block of a page shows | `Composer.generateSurface` |
+| `$ai_generation` | `$ai_trace_id`, `$ai_span_name` (understanding, writing, repair, reader, follow_up, ideas), `$ai_model`, `$ai_provider` (apple), `$ai_latency`, `$ai_input_tokens`, `$ai_output_tokens`, `$ai_is_error`, `reasoning`, `level`, `tokens_estimated` | Each model call ends | `Composer.generate`, `ResultReader`, `FollowUp`, `Ideas` |
+| `$ai_span` | `$ai_trace_id`, `$ai_span_name` (lookup, recall, live, search, read, connection), `$ai_latency`, `characters`, `$ai_is_error` | Each tool call ends | `BudgetedTool` |
+| `$ai_trace` | `$ai_trace_id`, `$ai_span_name` (page), `$ai_latency`, `level`, `$ai_is_error` | A page is finished or fails | `Composer` |
+| `follow_up_decided` | `kind` (change, further, new), `seconds` | What was typed to a page is sorted | `SurfaceScreen.submitChange` |
+| `version_restored` | | A page goes back to an earlier version | `PageMenu` |
+| `page_starred` | `on` | A page is starred or unstarred | `PageMenu`, `PageGrid` |
+| `suggestion_tapped` | `position`, `personal` | A suggestion on home is tapped | `HomeView` |
+| `library_opened` | | All pages opens | `LibraryView` |
+| `map_opened` | `pages` | The map of pages opens | `LibraryView` |
+| `linked_page_opened` | `from` (thread, related, map) | A page is opened from another, or from the map | `SurfaceScreen`, `PageMapView` |
 | `page_changed` | as `page_built`, plus `pointed_at_block`; no `model` | A change to a page finished | `Composer.edit` |
 | `controls_used` | `changes`, `controls` | A page closes after its controls were used | `SurfaceScreen` (ControlUses.swift) |
 | `shared` | `kind` (link, picture), `with_numbers` | A link is made, or the picture's share button is tapped | `ShareSheet` |
@@ -28,10 +44,7 @@ this table mirrors it.
 | `connection_added` | `needs_sign_in` | A service is connected | `ConnectionStore.add` |
 | `tool_prompt_shown` | | A connected service's tool asks before it runs | `ConsentView` |
 | `tool_prompt_answered` | `answer` (once, always, deny) | The user answers it | `ConsentView` |
-| `paywall_shown` | | The paywall appears | Subscription (workstream D) |
-| `subscription_started` | `product` | A subscription starts | Workstream D, or the server |
-| `subscription_ended` | | A subscription ends | Workstream D, or the server |
-| `limit_reached` | `kind` (pages, tokens, searches) | A free allowance runs out | Workstream D, or the server |
+| `limit_reached` | `kind` (searches, reads) | A daily web allowance runs out | The server |
 
 Property meanings:
 
@@ -47,6 +60,15 @@ Property meanings:
   `cancelled` (the user left), `other`. Taken from the error's type, never its message.
 - `controls_used.changes`: separate uses, where a slider drag is one; `controls`: how many
   different controls.
+- The run, on `page_requested`, `page_built` and `page_failed`: `level` (instant, reused, quick,
+  standard, deep: Effort.swift), `source` (typed, voice, photo, suggestion, follow_up,
+  typed_on_page, explore, launch), `understood_seconds`, `questions`, `first_block_seconds`,
+  `writing_seconds`, `repairs`, `tool_calls`, `readers`, `generations`, `input_tokens`,
+  `output_tokens` (estimated from characters, about 3 to a token: Apple's models don't report
+  them), `quota_approaching` (Private Cloud Compute's share for now is nearly used) and
+  `$ai_trace_id`, which ties a page's events and model calls together.
+- `$ai_*` events are PostHog's LLM analytics. They never carry `$ai_input` or `$ai_output`: no
+  prompt, request or page goes, only which step, how long and roughly how many tokens.
 
 PostHog adds its own context to each event: app version and build, iOS version, device model,
 locale and screen size. Location from the address is turned off (`disableGeoIp`).
@@ -93,11 +115,9 @@ key as the app.
 
 | Event | Properties | Sent when | Where |
 |---|---|---|---|
-| `$ai_generation` | `$ai_trace_id` (the page's id; a page's tool rounds and repairs are one trace), `$ai_span_name` (`page` or `lists`), `$ai_provider`, `$ai_model`, `$ai_input_tokens`, `$ai_cache_read_input_tokens`, `$ai_output_tokens` (with reasoning), `$ai_total_cost_usd` (xAI's own figure when it gives one), `$ai_latency`, `$ai_time_to_first_token`, `$ai_stream`, `$ai_http_status`, `$ai_is_error`, `plan` | Each request through the model proxy, done or failed | `Server/src/model.ts` |
+| `$ai_generation` | `$ai_trace_id` (the page's id; a page's tool rounds and repairs are one trace), `$ai_span_name` (`page` or `lists`), `$ai_provider`, `$ai_model`, `$ai_input_tokens`, `$ai_cache_read_input_tokens`, `$ai_output_tokens` (with reasoning), `$ai_total_cost_usd` (xAI's own figure when it gives one), `$ai_latency`, `$ai_time_to_first_token`, `$ai_stream`, `$ai_http_status`, `$ai_is_error`, `plan` | Each request through the model proxy, done or failed. Not on the apple-intelligence branch, whose app sends its own (above) and never calls the proxy | `Server/src/model.ts` |
 
 They feed PostHog's LLM analytics: cost per person and per page, latency, cache use and errors.
 Never `$ai_input` or `$ai_output_choices`: no messages, answers or tool calls leave for PostHog.
 
-`limit_reached`, `subscription_started` and `subscription_ended` can also be sent from the Worker,
-after the same check. The App Store's notifications come from Apple, not the phone, so they send
-nothing; the app counts purchases itself.
+`limit_reached` is sent from the Worker, after the same check.

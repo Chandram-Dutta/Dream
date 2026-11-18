@@ -256,13 +256,37 @@ enum Connections {
 /// "list") don't count, and a short word matches the start of a longer one, so "repo" finds
 /// "repository". Sentence embeddings were tried and couldn't tell a fitting tool from noise.
 enum ToolPicker {
+    /// Each service among those picked, with the rest of its look-up tools after the ones picked,
+    /// up to `perService` from each.
+    static func whole(_ picked: [(connection: Connection, tool: ConnectedTool)], from tools: [(connection: Connection, tool: ConnectedTool)], perService: Int = 5) -> [(connection: Connection, tool: ConnectedTool)] {
+        var services: [UUID] = []
+        for entry in picked where !services.contains(entry.connection.id) { services.append(entry.connection.id) }
+        return services.flatMap { service in
+            let first = picked.filter { $0.connection.id == service }
+            let rest = tools.filter { entry in entry.connection.id == service && !first.contains { $0.tool.name == entry.tool.name } }
+            return Array((first + rest).prefix(perService))
+        }
+    }
+
     static func pick(for request: String, from tools: [(connection: Connection, tool: ConnectedTool)], limit: Int = 5, perService: Int = 3) -> [(connection: Connection, tool: ConnectedTool)] {
         let asked = words(in: request)
         let things = words(in: nouns(in: request))
         guard !asked.isEmpty else { return [] }
+        let personal = isAboutTheirOwn(request)
+        // A service comes in only on real evidence that the request is about what it holds: the
+        // request names it, it's about the user's own things ("my notes"), or two of its words
+        // match the service. One word shared with how a tool describes itself is chance: "square
+        // root of 420" once brought in Hugging Face, by "root" in its file tool.
+        var evidence: [UUID: Set<String>] = [:]
+        for entry in tools {
+            evidence[entry.connection.id, default: []].formUnion(matched(asked, things, entry.connection, entry.tool))
+        }
         let scored = tools.enumerated().compactMap { index, entry -> (index: Int, score: Int)? in
             let score = score(asked, things, entry.connection, entry.tool)
-            return score > 0 ? (index, score) : nil
+            guard score > 0 else { return nil }
+            let named = asked.contains { matches($0, serviceWords(entry.connection)) }
+            guard named || personal || evidence[entry.connection.id, default: []].count >= 2 else { return nil }
+            return (index, score)
         }
         var perConnection: [UUID: Int] = [:]
         var picked: [(connection: Connection, tool: ConnectedTool)] = []
@@ -276,10 +300,29 @@ enum ToolPicker {
         return picked
     }
 
+    /// The request's words that point at this service or tool.
+    private static func matched(_ asked: Set<String>, _ things: Set<String>, _ connection: Connection, _ tool: ConnectedTool) -> Set<String> {
+        let service = serviceWords(connection)
+        let described = words(in: tool.summary).union(words(in: tool.title ?? "")).union(words(in: tool.name))
+        return asked.filter { matches($0, service) }.union(things.filter { matches($0, described) })
+    }
+
+    private static func serviceWords(_ connection: Connection) -> Set<String> {
+        words(in: connection.name).union(words(in: connection.host).subtracting(hostWords))
+    }
+
+    /// Whether the request is about the user's own things, which is what a connected service
+    /// holds: my notes, our roadmap, the project I'm on.
+    static func isAboutTheirOwn(_ request: String) -> Bool {
+        let owned: Set<String> = ["my", "mine", "our", "ours", "i", "i'm", "im", "me", "we", "we're", "us", "myself"]
+        return request.lowercased().split { !$0.isLetter && $0 != "'" && $0 != "’" }
+            .contains { owned.contains($0.replacingOccurrences(of: "’", with: "'")) }
+    }
+
     /// Each word the request shares counts once, by where it's found: the service's name, what
     /// the tool says it does, or the tool's own name.
     private static func score(_ asked: Set<String>, _ things: Set<String>, _ connection: Connection, _ tool: ConnectedTool) -> Int {
-        let service = words(in: connection.name).union(words(in: connection.host).subtracting(hostWords))
+        let service = serviceWords(connection)
         let described = words(in: tool.summary).union(words(in: tool.title ?? ""))
         let named = words(in: tool.name)
         let naming = asked.filter { matches($0, service) }

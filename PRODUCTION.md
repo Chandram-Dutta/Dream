@@ -3,6 +3,11 @@
 Dream works end to end as a prototype (see ROADMAP.md). This is what stands between it and a
 public App Store release, the decisions taken, and the work in progress.
 
+> On the `apple-intelligence` branch, pages are made only by Apple's models, sign-in is optional
+> and there's no subscription, so the model, proxy and Dream Plus parts below describe `main`.
+> See docs/AppleIntelligence.md; the privacy policy and terms (`Server/src/legal.ts`) describe
+> that branch.
+
 ## Decisions (2026-10-27)
 
 - **Accounts:** Sign in with Apple, with accounts on Dream's own backend (Cloudflare Worker + D1).

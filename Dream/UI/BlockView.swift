@@ -44,11 +44,22 @@ struct BlockView: View {
             }
             .panel(palette, enabled: isInstrument && depth == 0)
         case .row:
-            // Laid out as if top level, so each metric becomes a tile.
-            HStack(alignment: .top, spacing: 10) {
-                ForEach(block.children) { child in
-                    BlockView(block: child, context: context, depth: depth)
-                        .frame(maxWidth: .infinity, alignment: .leading)
+            // Laid out as if top level, so each metric becomes a tile. Only tiles go side by
+            // side: a control needs the width for its label, value and buttons, and squeezed
+            // beside another one its label wrapped a word to a line.
+            if block.children.allSatisfy({ [.metric, .stat].contains($0.kind) }) {
+                HStack(alignment: .top, spacing: 10) {
+                    ForEach(block.children) { child in
+                        BlockView(block: child, context: context, depth: depth)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+            } else {
+                VStack(alignment: .leading, spacing: 22) {
+                    ForEach(block.children) { child in
+                        BlockView(block: child, context: context, depth: depth)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
                 }
             }
         case .hero:

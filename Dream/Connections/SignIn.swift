@@ -460,10 +460,30 @@ final class ConnectionAuthorizer: HTTPClientAuthorizer, @unchecked Sendable {
         return await refreshed(current, session: session)
     }
 
+    /// The refresh under way, which every call needing one waits on. Calls made together (a model
+    /// asking three of a service's tools at once) each refreshed with the same refresh token;
+    /// a service that hands out a new one each time took the first and refused the rest, which
+    /// read as "sign in again".
+    private var refreshing: Task<SignIn.Credentials?, Never>?
+
     private func refreshed(_ current: SignIn.Credentials, session: URLSession) async -> Bool {
-        guard let fresh = try? await SignIn.refresh(current, session: session) else { return false }
-        fresh.save(for: id)
-        lock.withLock { credentials = fresh }
+        // Another call has refreshed since this one read the tokens: use theirs.
+        if lock.withLock({ credentials?.accessToken != current.accessToken }) { return true }
+        let task: Task<SignIn.Credentials?, Never> = lock.withLock {
+            if let running = refreshing { return running }
+            let started = Task { try? await SignIn.refresh(current, session: session) }
+            refreshing = started
+            return started
+        }
+        let fresh = await task.value
+        lock.withLock { if refreshing == task { refreshing = nil } }
+        guard let fresh else { return lock.withLock { credentials?.accessToken != current.accessToken } }
+        lock.withLock {
+            if credentials?.accessToken == current.accessToken {
+                fresh.save(for: id)
+                credentials = fresh
+            }
+        }
         return true
     }
 }

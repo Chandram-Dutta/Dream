@@ -22,8 +22,8 @@ ln -sfn "$root/Dream/Engine" "$pkg/Sources/Dream/Engine"
 ln -sfn "$root/Dream/Generation" "$pkg/Sources/Dream/Generation"
 ln -sfn "$root/Dream/Sharing/ShareServer.swift" "$pkg/Sources/Dream/Sharing/ShareServer.swift"
 ln -sfn "$root/Dream/Sharing/ShareServer+Links.swift" "$pkg/Sources/Dream/Sharing/ShareServer+Links.swift"
-# A saved page, for what a change made on the server leaves on it (SavedSurface+Change.swift).
-for file in SavedSurface PageTurn PageHistory SavedSurface+Change; do
+# A saved page, and how pages relate.
+for file in SavedSurface PageTurn PageHistory PageGraph ScreenMemory; do
   ln -sfn "$root/Dream/Memory/$file.swift" "$pkg/Sources/Dream/Memory/$file.swift"
 done
 ln -sfn "$root/DreamTests" "$pkg/Tests/DreamTests"

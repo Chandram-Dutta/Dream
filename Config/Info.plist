@@ -23,5 +23,11 @@
 	<string>$(POSTHOG_HOST)</string>
 	<key>PostHogKey</key>
 	<string>$(POSTHOG_KEY)</string>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>$(PRODUCT_BUNDLE_IDENTIFIER).page.*</string>
+	</array>
+	<key>DreamPrivateCloud</key>
+	<string>$(DREAM_PRIVATE_CLOUD)</string>
 </dict>
 </plist>

@@ -31,6 +31,12 @@ struct SurfacePayload: SyncPayload {
     var photo: String?
     /// Lists whose starter entries were already added, so another device doesn't add them again.
     var seeded: [String] = []
+    var starred = false
+    /// The page it went on from.
+    var parent: String?
+    /// What understanding the request found out, and what the page is about.
+    var found = ""
+    var subjects: [String] = []
 
     init() {}
 
@@ -50,6 +56,10 @@ struct SurfacePayload: SyncPayload {
         sharedFrom = try c.decodeIfPresent(String.self, forKey: .sharedFrom)
         photo = try c.decodeIfPresent(String.self, forKey: .photo)
         seeded = try c.decodeIfPresent([String].self, forKey: .seeded) ?? []
+        starred = try c.decodeIfPresent(Bool.self, forKey: .starred) ?? false
+        parent = try c.decodeIfPresent(String.self, forKey: .parent)
+        found = try c.decodeIfPresent(String.self, forKey: .found) ?? ""
+        subjects = try c.decodeIfPresent([String].self, forKey: .subjects) ?? []
     }
 
     /// The same page with less of its generation log, for one that's grown past what an item may

@@ -81,10 +81,14 @@ struct LiveError: LocalizedError, Hashable, Sendable {
 
     var reason: Reason
     var message: String
+    /// Waiting on the user to fix something in Dream (connect a service, choose Always), not on
+    /// the service, so it's worth trying again as soon as asked.
+    var waitsOnUser = false
 
-    init(_ reason: Reason, _ message: String) {
+    init(_ reason: Reason, _ message: String, waitsOnUser: Bool = false) {
         self.reason = reason
         self.message = message
+        self.waitsOnUser = waitsOnUser
     }
 
     var errorDescription: String? { message }

@@ -64,6 +64,10 @@ extension Sync {
         }
         Self.set(saved, \.values, page.values)
         Self.set(saved, \.sharedFrom, page.sharedFrom)
+        Self.set(saved, \.isStarred, page.starred)
+        Self.set(saved, \.parentID, page.parent.flatMap(UUID.init(uuidString:)))
+        Self.set(saved, \.found, page.found)
+        Self.set(saved, \.subjects, page.subjects)
         Self.set(saved, \.updatedAt, page.updatedAt)
         // Starters added anywhere count as added here. If this iPhone added some the account
         // doesn't know of, the comparison notices and sends the page back with them.

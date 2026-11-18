@@ -1,10 +1,11 @@
 import CoreGraphics
 import Foundation
+import FoundationModels
 import ImageIO
 
 // Runs the composer on this Mac and prints what came out, so prompt and checker changes can be
-// judged without the app. Build and run with Tools/bench.sh. It uses Grok, with XAI_API_KEY set
-// (bench.sh reads it from the login Keychain). Settings go as "-name value", like "-xaiModel grok-4.7".
+// judged without the app. Build and run with Tools/bench.sh. It uses Apple's models: Private Cloud
+// Compute, or the on-device model. Settings go as "-name value", like "-provider onDevice".
 // Web search needs a server, like "-webServer http://127.0.0.1:8787" for `wrangler dev` in
 // Server/, and its key in DREAM_WEB_KEY; without them the bench builds with Wikipedia alone and says so.
 
@@ -44,6 +45,19 @@ let photo: CGImage? = UserDefaults.standard.string(forKey: "image").flatMap { pa
         problemCount += Checker.checkLogic(&check).filter { $0.kind == .needsModel }.count
     }
     print("\nUnresolved calculation problems across all requests: \(problemCount)")
+}
+
+// "-tokens 1" prints how much of the on-device model's window the brief, schema and tools take.
+if UserDefaults.standard.bool(forKey: "tokens") {
+    let model = SystemLanguageModel.default
+    let brief = try await model.tokenCount(for: Instructions(Prompts.surfaceOnDevice))
+    let schema = try await model.tokenCount(for: DeviceSurface.generationSchema)
+    let full = try await model.tokenCount(for: WireSurface.generationSchema)
+    let tools = try await model.tokenCount(for: [LookupTool(found: ReferenceLog()), RecallTool(onRecall: { _ in })] as [any Tool])
+    let gap = try await model.tokenCount(for: Instructions(Prompts.gapCheck))
+    print("On-device brief \(brief), its schema \(schema), tools \(tools): \(brief + schema + tools) of \(try await model.contextSize)")
+    print("Full schema \(full); gap check brief \(gap)")
+    exit(0)
 }
 
 // "-name value" pairs are settings (UserDefaults reads them); everything else is a request.

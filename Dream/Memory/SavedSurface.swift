@@ -29,6 +29,18 @@ final class SavedSurface {
     var sharedFrom: String?
     /// The user's conversation with the page, as `[PageTurn]` (`history`).
     var historyData = Data()
+    /// Kept at the top of the shelf.
+    var isStarred = false
+    /// The page this one went on from ("what about Mumbai?"), which its context came from.
+    var parentID: UUID?
+    /// What understanding the request found out (names, titles, ids), which a page going on from
+    /// this one, or a later request about the same things, starts from (PageGraph.swift).
+    var found = ""
+    /// The particular things the page is about: people, places, projects, products, documents.
+    var subjects: [String] = []
+    /// The page as it was before each change, as `[PageVersion]`, newest last. Only on this
+    /// iPhone: a whole page each, too much to send with every change.
+    @Attribute(.externalStorage) var versionsData: Data?
 
     init(intent: String, surface: Surface, modelName: String, log: [String]) {
         self.intent = intent

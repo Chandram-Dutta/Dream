@@ -104,7 +104,7 @@ private enum AccountPlace: Identifiable {
     var id: Self { self }
 }
 
-/// What the account button opens: who's signed in, with the pages left today, then the places
+/// What the account button opens: who's signed in, then the places
 /// that aren't about making a page. Sync shows at the bottom only when it needs attention.
 private struct AccountCard: View {
     let palette: Palette
@@ -148,9 +148,8 @@ private struct AccountCard: View {
 
     /// Under the name: what's left of today's pages, which otherwise lives deep in Account.
     private var detail: String? {
-        guard account.isSignedIn else { return "To make, sync and share pages" }
-        guard let left = Plan.shared.status?.pagesLeftToday else { return nil }
-        return left == 1 ? "1 page left today" : "\(left) pages left today"
+        guard account.isSignedIn else { return "To sync and share pages" }
+        return nil
     }
 
     private func row(_ title: String, systemImage: String, to place: AccountPlace, marked: Bool = false) -> some View {

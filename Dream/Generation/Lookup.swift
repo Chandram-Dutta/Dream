@@ -8,6 +8,8 @@ struct LookupTool: Tool {
     var language = "en"
     /// Told the subject as each lookup starts, so the screen can show it's reading.
     var onLookup: @Sendable (String) -> Void = { _ in }
+    /// The most of an article's introduction the model reads: less on the iPhone, whose window is small.
+    var maxCharacters = Int.max
     let name = "lookup"
     let description = "Looks up a subject in Wikipedia, in the language you're writing in, or in English when that has nothing, and returns the article's introduction. Use it whenever facts, numbers, dates or names matter."
 
@@ -21,7 +23,10 @@ struct LookupTool: Tool {
     }
 
     func call(arguments: Arguments) async throws -> String {
-        guard found.mayLookUp() else { return "That's enough looking up for one screen. Build it from what you've found." }
+        guard found.mayLookUp() else {
+            Build.trace("[Dream] Lookup refused (limit): \(arguments.subject)")
+            return "That's enough looking up for one screen. Build it from what you've found."
+        }
         onLookup(arguments.subject)
         let code = arguments.language.trimmingCharacters(in: .whitespaces)
         let language = Locale(identifier: "en").localizedString(forLanguageCode: code) != nil ? code : self.language
@@ -29,15 +34,24 @@ struct LookupTool: Tool {
             return "Nothing found for \"\(arguments.subject)\"."
         }
         found.append(reference)
-        return "Wikipedia, \"\(reference.title)\" (cite it as \(reference.url)):\n\(reference.extract)"
+        let room = min(maxCharacters, ContextBudget.current?.allowance(most: 6_000) ?? maxCharacters)
+        let extract = await ContextBudget.fit(reference.extract, from: "Wikipedia's \"\(reference.title)\"", looking: arguments.subject, limit: room, readsApart: false)
+        return "Wikipedia, \"\(reference.title)\" (cite it as \(reference.url)):\n\(extract)"
     }
 }
 
 /// What the lookup tool found, so the surface can credit its source and show its image.
 final class ReferenceLog: @unchecked Sendable {
     /// Enough for a screen, as for the web (`WebLog`); more is a model going round in circles.
-    /// Grok looks up five at most; DeepSeek once looked up the same few subjects a dozen times.
+    /// A capable model looks up five at most; a weaker one once looked up the same few subjects a dozen times.
     static let lookupLimit = 6
+
+    /// How many lookups one screen may make: fewer on the iPhone, whose window holds about two.
+    let limit: Int
+
+    init(limit: Int = ReferenceLog.lookupLimit) {
+        self.limit = limit
+    }
 
     private let lock = NSLock()
     private var references: [Reference] = []
@@ -51,7 +65,7 @@ final class ReferenceLog: @unchecked Sendable {
     func mayLookUp() -> Bool {
         lock.withLock {
             lookups += 1
-            return lookups <= Self.lookupLimit
+            return lookups <= limit
         }
     }
 

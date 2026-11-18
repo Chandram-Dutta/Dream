@@ -26,14 +26,15 @@ struct Trace: Identifiable, Equatable, Sendable {
 
 /// Turns what the user wants into a surface: one screen that explains, calculates, or both.
 ///
-/// A capable model (Grok, or Private Cloud Compute once Apple grants it) writes the whole surface
-/// in one pass, looking things up itself through `LookupTool`. The checker fixes what it can and
-/// sends real mistakes back in the same session. Apple's on-device model doesn't build screens;
-/// it's kept for small private jobs elsewhere, like the ideas on the home screen.
+/// Apple's model on Private Cloud Compute writes the whole surface in one pass, reasoning first and
+/// looking things up itself through its tools. The checker fixes what it can and sends real
+/// mistakes back in the same session. Without PCC (offline, or this account's share used up for
+/// now), Apple's model on the iPhone writes it instead, from a shorter brief, through the same
+/// format, checker and renderer.
 @MainActor @Observable
 final class Composer {
     enum Phase: Equatable {
-        case idle, researching, composing, fixing(Int), done
+        case idle, understanding, researching, composing, fixing(Int), done
         case failed(String)
 
         var isBusy: Bool {
@@ -45,6 +46,12 @@ final class Composer {
     }
 
     private(set) var phase: Phase = .idle
+    /// How much the request needs (Effort.swift), which decides how it's made.
+    private(set) var level: Effort.Level = .standard
+    /// How this page is being made, stage by stage, for analytics: timings and counts, never words.
+    var run = Analytics.Run()
+    /// When the page was asked for, which the first block is timed from.
+    private var askedAt = Date()
     /// The surface as it stands, including while it's streaming in.
     private(set) var surface: Surface?
     private(set) var log: [String] = []
@@ -52,6 +59,34 @@ final class Composer {
     /// Working, but with nothing new on screen for a moment: reasoning, or looking something up.
     /// The screen shows it in the color field rather than in words.
     private(set) var isThinking = false
+    /// Where a request is, as the screen's light shows it (Stage.swift).
+    var stage: Stage {
+        switch phase {
+        case .idle, .understanding: return asking.isWaiting || consent.isWaiting ? .yourTurn : .understanding
+        case .done: return .done
+        case .failed: return .failed
+        case .fixing: return .checking
+        case .researching, .composing:
+            if asking.isWaiting || consent.isWaiting { return .yourTurn }
+            if phase == .researching { return .researching }
+            // Before anything is on screen and while the gap check decides: still taking it in.
+            if surface == nil || surface?.isEmpty == true { return isChecking || trail.isEmpty && isThinking ? .understanding : .researching }
+            return .writing
+        }
+    }
+
+    /// Roughly how far along the page is, 0 to 1, for the Lock Screen while Dream is in the background.
+    var progress: Double {
+        switch stage {
+        case .understanding: 0.05
+        case .yourTurn: 0.1
+        case .researching: 0.1 + min(0.25, Double(trail.count) * 0.05)
+        case .writing: 0.4 + min(0.45, Double(surface?.blocks.count ?? 0) * 0.05)
+        case .checking: 0.9
+        case .done, .failed: 1
+        }
+    }
+
     /// The model's questions before it builds, and the user's answers. The screen shows them while the model waits.
     let asking = Asking()
     /// The live data fetched while writing, which the surface's live inputs bind to.
@@ -71,87 +106,100 @@ final class Composer {
     /// The web pages read while writing, which the surface may cite (WebSearch.swift).
     private let web = WebLog()
 
-    /// Which model writes surfaces. If the chosen one can't be used or fails, the next is tried.
+    /// Which of Apple's models writes a page. Both run the same harness: the format, the tools,
+    /// the checker and the renderer. Nothing a person asks leaves Apple's models.
     enum Provider: String, CaseIterable {
-        /// Grok through Dream's server, with the signed-in user's session and allowance (DreamModel.swift).
-        case dream
-        /// Grok, with the developer's own xAI API key from the Keychain.
-        case xai
-        /// Needs an entitlement Apple grants on request (com.apple.developer.private-cloud-compute).
+        /// Apple's larger model on Private Cloud Compute: the whole page, in one pass, with
+        /// reasoning. Requests are processed on Apple silicon servers and never kept.
         case privateCloud
+        /// Apple's model on this iPhone: offline and immediate, with a shorter brief to fit its
+        /// smaller window (Prompts+OnDevice.swift).
+        case onDevice
 
         var name: String {
             switch self {
-            // On Auto, what the router picked for this page (Route.swift), like "Auto → Grok 4.7 · high".
-            case .dream: Route.current?.label ?? "Dream (\(Composer.dreamModelID.isEmpty ? "default" : Composer.dreamModelID))"
-            case .xai: "Grok (\(Composer.xaiModelID))"
             case .privateCloud: "Private Cloud Compute"
+            case .onDevice: "On this iPhone"
             }
         }
 
         var isUsable: Bool {
             switch self {
-            case .dream: DreamLanguageModel.isUsable
-            case .xai: XAILanguageModel.savedKey != nil
-            case .privateCloud: PrivateCloudComputeLanguageModel().isAvailable
+            case .privateCloud: AppleModels.cloudIsAvailable
+            case .onDevice: SystemLanguageModel.default.isAvailable
             }
         }
     }
 
-    nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .dream }
-    nonisolated static var xaiModelID: String { Build.setting("xaiModel") ?? "grok-4.7" }
-    /// The model Dream's server is asked for: the one picked in Account, which only Dream Plus
-    /// can use, or none, for the server's default (Server/src/models.ts). Testing builds can name
-    /// one at launch, like `-xaiModel grok-4.7`.
-    nonisolated static var dreamModelID: String { Build.setting("xaiModel") ?? ModelChoice.picked ?? ModelChoice.auto }
+    /// The model pages are written with first. Testing builds can start on the iPhone's own model
+    /// (`-provider onDevice`).
+    nonisolated static var provider: Provider { Provider(rawValue: Build.setting("provider") ?? "") ?? .privateCloud }
+
+    /// Whether a page PCC can't make is written on the iPhone instead. Off for now.
+    nonisolated static let fallsBackOnDevice = false
 
     /// Whether any model can make screens right now.
-    static var canCompose: Bool { Provider.allCases.contains { $0.isUsable } }
+    static var canCompose: Bool { provider.isUsable }
 
     /// The model this request runs on.
-    private var active: Provider = .dream
-    /// This build or change, as Dream's server counts pages: every request for it, the gap check
-    /// included, carries it.
-    private var page = UUID().uuidString
+    private(set) var active: Provider = .privateCloud
     /// The request's language, whose Wikipedia lookups read first.
     private var language = "en"
     /// While the gap check decides, the page streams in out of sight for a few seconds, so it
     /// rarely appears only to give way to questions.
-    private var isChecking = false
-    private var held: Surface?
-    private var holdUntil = Date.distantPast
+    private(set) var isChecking = false
+    /// The budget of the session opened last, which a repair checks for room.
+    private var budget: ContextBudget?
+    /// The user's town, when they've let Dream use their location.
+    private var place: String?
+    /// What understanding the request found out, and the articles it looked up, which the page
+    /// is written from and credits.
+    private(set) var understood = ""
+    /// The particular things the request is about, which the saved page is remembered by.
+    private(set) var subjects: [String] = []
+    private var understoodReferences = ReferenceLog()
     /// What the user asked for, which picks the connected services' tools worth offering.
     private var request = ""
+    /// What a page going on from another starts from, which understanding it reads too.
+    private var carrying: [String] = []
 
-    /// Makes a new page: on Dream's server when that's switched on (Composer+Server.swift),
-    /// otherwise here.
-    func compose(intent: String, image: CGImage? = nil, onServer: Bool = ServerCompose.isOn) async {
-        if onServer {
-            await composeOnServer(intent: intent, image: image)
-            return
-        }
+    /// Shows a page as it was, as when the user goes back to an earlier version.
+    func show(saved surface: Surface) {
+        self.surface = surface
+    }
+
+    /// Makes a new page. `carrying` is what a page going on from another starts from: that
+    /// page's request, answers, numbers and what was found for it (`Prompts.goingOn`).
+    func compose(intent: String, image: CGImage? = nil, carrying: [String] = [], source: String = "typed") async {
         let started = Date()
-        job = nil
-        change = nil
+        askedAt = started
+        level = Effort.level(for: intent, hasImage: image != nil)
+        if level == .quick, !FeatureFlag.quickLevel.isOn { level = .standard }
+        run = Analytics.Run(level: level.rawValue, source: source)
         log = []
         trail = []
         surface = nil
         isThinking = true
         defer { isThinking = false }
         note("Request: \(intent)\(image == nil ? "" : " (with photo)")")
-        page = UUID().uuidString
-        Analytics.send(.pageRequested(withPhoto: image != nil))
+        Analytics.send(.pageRequested(withPhoto: image != nil, run: run))
+        note("Level: \(level.rawValue)")
         asking.start()
+        understood = ""
+        subjects = []
+        understoodReferences = ReferenceLog()
         live.start()
         connected.start()
         web.start()
         language = Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = intent
         suggestions = Connections.unconnected(in: intent)
-        // Auto (Route.swift): the server picks this page's model and thinking once, up front.
-        if let line = await Route.start(page: page, request: intent, image: image) { note(line) }
         do {
-            let context = await Prompts.context(for: intent)
+            // Where the user is, when they've let Dream know: the page and the gap check are told
+            // the town, so "the weather tomorrow" needs no "Where?".
+            place = await Places.hereIfAllowed()?.area
+            let context = carrying + (await Prompts.context(for: intent, in: place))
+            self.carrying = carrying
             try await withModel {
                 try await self.write(request: intent, image: image, context: context)
             }
@@ -161,34 +209,32 @@ final class Composer {
             note("Done in \(elapsed(since: started))")
             countFinished(changing: false, since: started)
         } catch {
+            let stage = stage.label
             fail(error)
-            countFailure(error, changing: false, since: started)
+            countFailure(error, changing: false, since: started, stage: stage)
         }
     }
 
-    /// Changes a surface, here. `focus` is the block the user pointed at, if any. When pages are
-    /// made on Dream's server, so are changes (`changeOnServer`, Composer+Server.swift).
+    /// Changes a surface. `focus` is the block the user pointed at, if any.
     func edit(_ current: Surface, intent: String, instruction: String, focus: Block?) async {
         let started = Date()
-        job = nil
-        change = nil
         log = []
         trail = []
         surface = current
         isThinking = true
         defer { isThinking = false }
         note("Change: \(instruction)\(focus.map { " (pointing at #\($0.id))" } ?? "")")
-        page = UUID().uuidString
         asking.start(keeping: current.answers)
         live.start(keeping: current.sources)
         connected.start(keeping: current)
         web.start(keeping: current.credits)
         language = current.locale?.language ?? Languages.of(request: intent)?.rawValue ?? Languages.primary
         request = "\(intent). \(instruction)"
-        // Auto (Route.swift): a change is picked for like a new page.
-        if let line = await Route.start(page: page, request: request, image: nil) { note(line) }
         do {
-            let context = await Prompts.context(for: intent)
+            // Where the user is, when they've let Dream know: the page and the gap check are told
+            // the town, so "the weather tomorrow" needs no "Where?".
+            place = await Places.hereIfAllowed()?.area
+            let context = await Prompts.context(for: intent, in: place)
             let asked = Prompts.edit(intent: intent, surface: current, instruction: instruction, focus: focus, context: context)
             try await withModel {
                 try await self.write(prompt: Prompt(asked), asked: asked, fallback: current.reference, streaming: false)
@@ -204,93 +250,89 @@ final class Composer {
         }
     }
 
-    // MARK: - On Dream's server
-
-    /// The job on Dream's server making what this shows, while a page or a change is made there.
-    private(set) var job: ServerJob?
-    /// The change being made there, when it's a change to a page on the shelf. The page screen
-    /// keeps its numbers current while it's made, so it lands with the latest.
-    @ObservationIgnored var change: PageChange?
-    /// What reads the job's events, while something does.
-    @ObservationIgnored var watch: ServerWatch?
-    /// The tools only this iPhone can run, which the job's model may call.
-    @ObservationIgnored private(set) var devices: DeviceTools?
-    /// Told as soon as a page has started on Dream's server, so the app can keep the job and find
-    /// it again if it leaves the page mid-way.
-    @ObservationIgnored var onJob: ((ServerJob) -> Void)?
-    /// Told of each call to this iPhone's tools as it starts to run, so the app can keep it and
-    /// never run it twice.
-    @ObservationIgnored var onDeviceCall: ((String) -> Void)?
-
-    /// The tools this iPhone would give the model for a request if it made the page here
-    /// (`tools(found:)`), less those the server has of its own: what a page on the server may ask
-    /// the phone to run. A change starts from what its page already reads and shows.
-    func offerDeviceTools(for request: String, changing page: Surface?, ran: Set<String> = []) -> DeviceTools {
-        live.start(keeping: page?.sources)
-        connected.start(keeping: page)
-        let devices = DeviceTools.offered(for: request, asking: asking, consent: consent, live: live, log: connected, ran: ran)
-        devices.onRun = { [weak self] id in self?.onDeviceCall?(id) }
-        self.devices = devices
-        return devices
-    }
-
-    /// Services the request names that the user hasn't connected, which the screen offers to
-    /// connect, as for a page made here.
-    func suggestConnections(for intent: String) {
-        suggestions = Connections.unconnected(in: intent)
-    }
-
-    /// Shows a page being made on Dream's server as far as its events have got, in the same state
-    /// a page made here fills, so the screen can't tell the two apart. Everything on that path
-    /// reaches the screen through here.
-    func show(_ progress: PageProgress, job: ServerJob?) {
-        if self.job != job { self.job = job }
-        if phase != progress.phase { phase = progress.phase }
-        if surface != progress.surface { surface = progress.surface }
-        if trail != progress.trail { trail = progress.trail }
-        if log != progress.log {
-            for line in progress.log.dropFirst(log.count) { Build.trace("[Dream] \(line)") }
-            log = progress.log
-        }
-        if isThinking != progress.isThinking { isThinking = progress.isThinking }
-        if modelName != progress.model { modelName = progress.model }
-    }
-
     // MARK: - Model
 
-    /// Runs on the chosen model, or on the other one if the chosen can't be used or fails.
+    /// Runs on the chosen model: Private Cloud Compute, unless the iPhone's own model is picked in
+    /// Under the hood. For now a page PCC can't make doesn't fall back to the iPhone's model,
+    /// whose pages are much thinner (`fallsBackOnDevice`).
     private func withModel(_ run: () async throws -> Void) async throws {
-        let usable = ([Self.provider] + Provider.allCases.filter { $0 != Self.provider }).filter(\.isUsable)
-        guard let first = usable.first else {
-            throw ComposeError("Sign in to make pages.")
-        }
+        let others = Self.fallsBackOnDevice ? Provider.allCases.filter { $0 != Self.provider } : []
+        let usable = ([Self.provider] + others).filter(\.isUsable)
+        guard let first = usable.first else { throw ComposeError(AppleModels.unavailableMessage) }
         active = first
         note("Model: \(active.name)")
         do {
             try await run()
-        } catch let error where !(error is CancellationError) && usable.count > 1 {
+        } catch let error where !(error is CancellationError) && usable.count > 1 && AppleModels.isWorthTheOtherModel(error) {
             note("\(active.name) failed (\(describe(error))); trying \(usable[1].name).")
             active = usable[1]
             try await run()
         }
     }
 
-    private func session(_ instructions: String, tools: [any Tool]) -> LanguageModelSession {
+    /// A session on the active model whose tools are held to what its window has room for
+    /// (ContextBudget.swift): the window, less the instructions, the answer's schema, the tools'
+    /// own descriptions and room for the answer. `calls` is how many tool calls it may make.
+    private func session(_ instructions: String, tools: [any Tool], schema: GenerationSchema? = nil, answer reserve: Int? = nil, calls: Int = 14) -> LanguageModelSession {
+        let window = active == .privateCloud ? 32_768 : 8_192
+        // A page and the reasoning before it, on PCC; a shorter page on the iPhone.
+        let room = reserve ?? (active == .privateCloud ? 30_000 : 6_000)
+        // On PCC, a long result is read apart, in a session of its own (ResultReader.swift), and only
+        // notes on it come into this one.
+        let trace = run.trace, level = level.rawValue
+        let reader = active == .privateCloud && !tools.isEmpty
+            ? ResultReader.privateCloud(for: request, trace: trace, level: level, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }) : nil
+        let budget = ContextBudget.forSession(window: window, instructions: instructions, schema: schema, tools: tools, answer: room, calls: calls, reader: reader)
+        budget.onCall = { [weak self] tool, seconds, characters, failed in
+            // By kind: a connected service's tools are named after it, which stays on the phone.
+            let kind = ["lookup", "recall", "live", "search", "read"].contains(tool) ? tool : "connection"
+            Analytics.send(.toolCall(kind: kind, seconds: seconds, characters: characters, trace: trace, failed: failed))
+            Task { @MainActor in self?.run.toolCalls += 1 }
+        }
+        self.budget = budget
+        if !tools.isEmpty { note("Room for tools: \(budget.characters) characters, \(calls) calls") }
+        let held = budget.holding(tools)
         switch active {
-        case .dream: LanguageModelSession(model: DreamLanguageModel(modelID: Self.dreamModelID, page: page), tools: tools, instructions: instructions)
-        case .xai: LanguageModelSession(model: XAILanguageModel(apiKey: XAILanguageModel.savedKey ?? "", modelID: Self.xaiModelID), tools: tools, instructions: instructions)
-        case .privateCloud: LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: tools, instructions: instructions)
+        case .privateCloud: return LanguageModelSession(model: PrivateCloudComputeLanguageModel(), tools: held, instructions: instructions)
+        case .onDevice: return LanguageModelSession(model: SystemLanguageModel.default, tools: held, instructions: instructions)
         }
     }
 
-    /// The tools a surface is written with. Features that give the model a tool add it here.
-    private func tools(found: ReferenceLog) -> [any Tool] {
-        [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
-         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } }),
-         LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })]
-            + ConnectionTool.offered(for: request, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
-            + WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
-                               onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } })
+    /// How much the model reasons before it writes. Only Private Cloud Compute reasons.
+    private var context: ContextOptions {
+        ContextOptions(includeSchemaInPrompt: true, reasoningLevel: active == .privateCloud ? reasoning.level : nil)
+    }
+
+    var reasoningName: String { reasoning.name }
+
+    /// How much PCC reasons at this request's level, or more if Under the hood says so.
+    private var reasoning: Effort.Reasoning {
+        max(Effort.Reasoning(AppleModels.reasoning), level.reasoning)
+    }
+
+    /// The tools a surface is written with. Features that give the model a tool add it here. On
+    /// the iPhone, only looking things up and recalling the user, which fit its smaller window.
+    private func tools(found: ReferenceLog, web useWeb: Bool = true, lookingOnly: Bool = false) -> [any Tool] {
+        // The iPhone's model writes without tools: its background is looked up first (`background`).
+        if active == .onDevice { return [] }
+        return [LookupTool(found: found, language: language, onLookup: { [weak self] subject in Task { @MainActor in self?.lookingUp(subject) } }),
+         RecallTool(onRecall: { [weak self] line in Task { @MainActor in self?.note(line) } })]
+            + (lookingOnly ? [] : [LiveTool(log: live, onFetch: { [weak self] line in Task { @MainActor in self?.note(line) } })] as [any Tool])
+            + ConnectionTool.offered(for: request, lookingOnly: lookingOnly, asking: asking, consent: consent, live: live, log: connected, onUse: { [weak self] line in Task { @MainActor in self?.note(line) } })
+            // Understanding settles what a request refers to; researching the answer on the web
+            // is the writer's, which has the live tools too. Searching and reading while
+            // understanding took a median 22 seconds, and the writer looked the same things up again.
+            + (!useWeb || lookingOnly ? [] : WebTools.offered(log: web, language: language, onNote: { [weak self] line in Task { @MainActor in self?.note(line) } }, onUse: { [weak self] line in Task { @MainActor in self?.researching(line) } },
+                               onTrace: { [weak self] trace in Task { @MainActor in self?.trail.append(trace) } }))
+    }
+
+    /// The Wikipedia article for a request, looked up before the iPhone's model writes.
+    private func background(for request: String) async -> Reference? {
+        lookingUp(request)
+        let reference = await Lookup.find(request, language: language)
+        note(reference.map { "Background: \($0.title)" } ?? "Background: nothing found")
+        phase = .composing
+        return reference
     }
 
     private func lookingUp(_ subject: String) {
@@ -306,70 +348,84 @@ final class Composer {
 
     // MARK: - Asking
 
-    /// Writes the surface for a request while a quick check, in its own session, looks for what
-    /// the request leaves out that only the user can tell (`GapCheck`). If it finds nothing, the
-    /// writing carries on untouched. If it has questions, the writing stops, what Dream remembers
-    /// or the user answers them, and it starts again with the answers.
+    /// Understands the request first (`GapCheck`): what it refers to, looked up in the user's
+    /// services, what Dream remembers, Wikipedia and the web, and then what only the user can
+    /// tell. The user answers that, or Dream answers it from what it remembers, and the page is
+    /// written from the request, the answers and what was found.
     private func write(request intent: String, image: CGImage?, context: [String]) async throws {
-        func asked(_ answers: [Answer]) -> String {
-            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context + Prompts.answersContext(answers))
+        func asked(_ answers: [Answer], found: String) -> String {
+            Prompts.surfaceRequest(intent, hasImage: image != nil, context: context
+                + Prompts.understoodContext(found, read: web.reading(with: understoodReferences.all).pages) + Prompts.answersContext(answers))
         }
-        func prompt(_ answers: [Answer]) -> Prompt {
+        func prompt(_ answers: [Answer], found: String) -> Prompt {
             Prompt {
-                asked(answers)
+                asked(answers, found: found)
                 if let image { Attachment(image) }
             }
         }
+        // A calculation with its numbers given needs nothing looked up or asked (Effort.swift).
+        if level == .quick {
+            note("Quick: writing straight away, without understanding first")
+            return try await write(prompt: prompt([], found: ""), asked: asked([], found: ""), fallback: nil, streaming: true)
+        }
         // A photo usually settles what it's about; and on a second model, the answers are in.
         guard image == nil, asking.answers.isEmpty else {
-            return try await write(prompt: prompt(asking.answers), asked: asked(asking.answers), fallback: nil, streaming: true)
+            return try await write(prompt: prompt(asking.answers, found: understood), asked: asked(asking.answers, found: understood), fallback: nil, streaming: true)
         }
         let started = Date()
-        let first = prompt([])
-        isChecking = true
-        held = nil
-        holdUntil = started.addingTimeInterval(GapCheck.hold)
-        defer { isChecking = false; held = nil }
-        let checking = Task { await self.gaps(in: intent) }
-        let writing = Task { try await self.write(prompt: first, asked: asked([]), fallback: nil, streaming: true) }
-        try await withTaskCancellationHandler {
-            let gaps = await checking.value
-            guard !gaps.questions.isEmpty else {
-                note(String(format: "Check: nothing to ask (%.1fs%@)", gaps.seconds, held == nil ? "" : ", while the page was held back"))
-                isChecking = false
-                if surface == nil, let held { surface = held }
-                try await writing.value
-                return
-            }
-            writing.cancel()
-            note(String(format: "Check: %d to ask after %.1fs, so the screen stopped %@: ", gaps.questions.count, gaps.seconds, surface != nil ? "after it showed" : held != nil ? "before it showed" : "before it began")
+        let gaps = await understand(intent)
+        understood = gaps.found
+        subjects = gaps.subjects
+        if !gaps.subjects.isEmpty { note("About: " + gaps.subjects.joined(separator: ", ")) }
+        if !gaps.found.isEmpty { note("Found: " + gaps.found.replacingOccurrences(of: "\n", with: " / ")) }
+        var answers: [Answer] = []
+        if gaps.questions.isEmpty {
+            note(String(format: "Check: nothing to ask (%.1fs)", gaps.seconds))
+        } else {
+            note(String(format: "Check: %d to ask after %.1fs: ", gaps.questions.count, gaps.seconds)
                  + gaps.questions.map { "\($0.text) (\($0.options.joined(separator: " / "))\($0.allowsTyping ? ", or typed" : ""))" }.joined(separator: "; "))
             for answer in gaps.remembered { note("Remembered: \(answer.question.topic)") }
-            let answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
+            let askedAt = Date()
+            answers = await asking.ask(gaps.questions, knowing: gaps.remembered)
+            Analytics.send(.questionsAnswered(count: answers.count, leftToDream: answers.filter(\.isLeftToDream).count,
+                                              remembered: answers.filter(\.isRemembered).count, seconds: Date().timeIntervalSince(askedAt), trace: run.trace))
             note("Answered: " + answers.map { $0.isLeftToDream ? "You choose" : $0.isRemembered ? "\($0.choice) (remembered)" : $0.choice }.joined(separator: "; ")
                  + " after \(elapsed(since: started))")
-            _ = await writing.result
-            surface = nil
-            isChecking = false
-            try await write(prompt: prompt(answers), asked: asked(answers), fallback: nil, streaming: true)
-        } onCancel: {
-            checking.cancel()
-            writing.cancel()
         }
+        try await write(prompt: prompt(answers, found: gaps.found), asked: asked(answers, found: gaps.found), fallback: nil, streaming: true)
     }
 
-    /// A partial surface goes on screen, unless the gap check has only just started deciding.
     private func show(_ partial: Surface) {
-        if isChecking, Date.now < holdUntil { held = partial } else { surface = partial }
+        surface = partial
     }
 
-    /// The gap check, on the model this request runs on. If it fails, nothing is asked.
-    private func gaps(in intent: String) async -> GapCheck.Gaps {
+    /// Understanding the request, on Private Cloud Compute, with look-up tools only. If it fails,
+    /// nothing is asked and the page is written from the request alone.
+    private func understand(_ intent: String) async -> GapCheck.Gaps {
         let started = Date()
+        // The iPhone's model asks too readily ("Who is Ada Lovelace known as?"), so without
+        // Private Cloud Compute the page is written without asking first.
+        guard active == .privateCloud else { return GapCheck.Gaps() }
+        isChecking = true
+        phase = .understanding
+        defer { isChecking = false }
         do {
-            return try await GapCheck.run(intent, in: session(Prompts.gapCheck, tools: []))
+            let tools = tools(found: understoodReferences, lookingOnly: true)
+            let session = session(Prompts.gapCheck, tools: tools, schema: GapCheck.WireGaps.generationSchema, answer: 8_000, calls: 4)
+            // A page going on from another is understood with that one in front of it.
+            let related = carrying.isEmpty ? GapCheck.relatedPages(intent) : carrying
+            if !related.isEmpty, carrying.isEmpty { note("Related pages: \(related.count)") }
+            let gaps = try await GapCheck.run(intent, in: session, reasoning: .light, recent: GapCheck.recentPages(), related: related, place: place)
+            let seconds = Date().timeIntervalSince(started)
+            run.understoodSeconds = seconds
+            run.questions = gaps.questions.count
+            Analytics.send(.pageUnderstood(seconds: seconds, toolCalls: budget?.callsMade ?? 0, questions: gaps.questions.count,
+                                           foundSomething: !gaps.found.isEmpty, relatedPages: related.count, trace: run.trace))
+            countGeneration("understanding", seconds: seconds, budget: budget, output: gaps.found.count + 300)
+            return gaps
         } catch {
             note("Check failed after \(elapsed(since: started)) (\(describe(error))); building without asking.")
+            countGeneration("understanding", seconds: Date().timeIntervalSince(started), budget: budget, output: 0, failed: true)
             return GapCheck.Gaps()
         }
     }
@@ -379,39 +435,79 @@ final class Composer {
     /// Writes a whole surface, then has the checker fix what it can and sends real mistakes
     /// back in the same session, so the model sees what it wrote. `asked` is the prompt's text,
     /// for a repair to repeat when the session no longer holds it.
-    private func write(prompt: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
+    private func write(prompt asked0: Prompt, asked: String, fallback: Reference?, streaming: Bool) async throws {
         phase = .composing
-        let found = ReferenceLog()
-        var session = session(Prompts.surface, tools: tools(found: found))
+        let found = ReferenceLog(limit: active == .onDevice ? 0 : ReferenceLog.lookupLimit)
+        // What understanding the request looked up is credited like the writer's own lookups.
+        for reference in understoodReferences.all { found.append(reference) }
+        // A quick page (Effort.swift) is written the way the iPhone's model writes: the short brief
+        // and the narrower page, which is all a calculation needs, and no tools.
+        let quick = level == .quick
+        let narrow = active == .onDevice || quick
+        let brief = narrow ? Prompts.surfaceOnDevice : Prompts.surface
+        let format: any SurfaceFormat.Type = narrow ? DeviceSurface.self : WireSurface.self
+        let writingStarted = Date()
+        defer { run.writingSeconds = Date().timeIntervalSince(writingStarted) }
+        // The iPhone's model gets there in steps: Dream looks the request up itself, and the model
+        // only writes, with what was found in front of it. Calling tools while writing, it looked
+        // the same things up again and again, or stopped.
+        var prompt = asked0
+        if active == .onDevice, fallback == nil, let reference = await background(for: request) {
+            found.append(reference)
+            prompt = Prompt {
+                asked0
+                Prompts.onDeviceBackground(reference)
+            }
+        }
+        var session = session(brief, tools: quick ? [] : tools(found: found), schema: format.generationSchema, calls: level.calls)
         var surface: Surface
         do {
-            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
             // A title and a sentence with nothing under them is as empty as nothing at all: a
             // cheap model once answered a whole EV comparison with just that.
             if surface.blocks.isEmpty, !surface.hasLogic { throw EmptyScreen() }
+        } catch let error as LanguageModelError where Self.isGuardrail(error) && web.hasReadAny {
+            // The safety filter stepped in after the model read pages from the open web, whose
+            // words can trip it on a harmless request (a fan wiki's account of a starship being
+            // destroyed did). Written once more from Wikipedia alone; if the filter steps in
+            // again, the page fails as it would have.
+            note("The safety filter stopped the page after it read the web; writing it from Wikipedia alone.")
+            session = self.session(brief, tools: tools(found: found, web: false), schema: format.generationSchema)
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         } catch where Self.isWorthAnotherTry(error) {
             // Nothing usable came out: a loop or padding with nothing finished, a broken answer, or
             // an empty one. Another go in a new session usually works, and costs less than a page
             // that fails.
             note("Writing again in a new session, after: \(describe(error))")
-            session = self.session(Prompts.surface, tools: tools(found: found))
-            surface = try await generateSurface(in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
+            session = self.session(brief, tools: tools(found: found), schema: format.generationSchema)
+            surface = try await generateSurface(format, in: session, prompt: prompt, found: found, fallback: fallback, streaming: streaming)
         }
         surface = surface.fetched(live).connected(connected)
-        for round in 0...2 {
+        // The iPhone's window holds one repair, in a session of its own; a quick page gets one too.
+        let rounds = narrow ? 1 : 2
+        for round in 0...rounds {
             var issues = Checker.checkLogic(&surface) + connected.problems(in: surface)
             // Once: a page about the world that looked nothing up goes back to look it up.
-            if round == 0 { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
+            // A quick page is a calculation, which states nothing about the world.
+            if round == 0, !quick { issues += Checker.checkSourcing(surface, read: web.reading(with: found.all)) }
             report(issues)
             let problems = issues.filter { $0.kind == .needsModel }
-            if problems.isEmpty || round == 2 { break }
+            if problems.isEmpty || round == rounds { break }
             phase = .fixing(problems.count)
+            run.repairs += 1
             // A screen that stopped early left the session without the request or the screen, so
             // the repair repeats both.
+            // A repair repeats the whole page, so it needs room for two. After research that
+            // filled much of the window, it goes in a new session, given the request and the
+            // page as they stand; so it does on the iPhone, whose window holds one page.
+            if active == .onDevice || (budget?.spent ?? 0) > 0.4 {
+                note("Repairing in a new session, for room.")
+                session = self.session(brief, tools: quick ? [] : tools(found: found), schema: format.generationSchema)
+            }
             let repair = session.endsWithAnswer ? Prompts.repair(problems) : Prompts.repair(problems, restating: asked, screen: surface)
             let before = surface
             do {
-                surface = try await generateSurface(in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false, repairing: true)
+                surface = try await generateSurface(format, in: session, step: "Repair \(round + 1)", prompt: Prompt(repair), found: found, fallback: fallback, streaming: false, repairing: true)
                     .fetched(live).connected(connected)
                 // A repair fixes the page; one that lost most of it isn't worth having.
                 if surface.blocks.count * 2 < before.blocks.count {
@@ -437,28 +533,36 @@ final class Composer {
     /// A whole surface from one request, keeping the finished blocks if the model stops early.
     /// Not a repair: one that stops early leaves the page it was repairing, which is whole, instead
     /// of a few blocks of its rewrite (a page about vaccines once came down to one block that way).
-    private func generateSurface(in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool, repairing: Bool = false) async throws -> Surface {
+    private func generateSurface<Format: SurfaceFormat>(_ format: Format.Type, in session: LanguageModelSession, step: String = "Surface", prompt: Prompt, found: ReferenceLog, fallback: Reference?, streaming: Bool, repairing: Bool = false) async throws -> Surface {
         // The page so far, about six times a second rather than on every token: each update lays
         // out and compares the whole page, and on every token that took the main thread whole
         // while a page streamed in, so it couldn't scroll. The runaway check keeps the same pace.
         let shown = Pace(every: 0.15)
         let checked = Pace(every: 0.25)
-        let onPartial: ((WireSurface.PartiallyGenerated) -> Void)? = streaming ? { partial in
+        let onPartial: ((Format.PartiallyGenerated) -> Void)? = streaming ? { partial in
             guard shown.isDue else { return }
-            self.show(Surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers))
+            let surface = Format.surface(partial: partial, reference: found.first ?? fallback).answered(self.asking.answers)
+            self.show(surface)
+            // The moment the page starts to feel made.
+            if self.run.firstBlockSeconds == nil, !surface.blocks.isEmpty {
+                let seconds = Date().timeIntervalSince(self.askedAt)
+                self.run.firstBlockSeconds = seconds
+                self.note(String(format: "First block after %.1fs", seconds))
+                Analytics.send(.firstBlock(seconds: seconds, level: self.run.level, trace: self.run.trace))
+            }
         } : nil
         if streaming { isStreaming = true }
         defer { if streaming { isStreaming = false } }
         do {
-            let wire = try await generate(WireSurface.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
-                                          onPartial: onPartial, isRunaway: { checked.isDue && Surface(partial: $0, reference: nil).isRepeatingItself })
-            let surface = Surface(wire, reference: found.first ?? fallback)
+            let wire = try await generate(Format.self, in: session, step: step, options: GenerationOptions(temperature: 0.4), prompt: prompt,
+                                          onPartial: onPartial, isRunaway: { checked.isDue && Format.surface(partial: $0, reference: nil).isRepeatingItself })
+            let surface = wire.surface(reference: found.first ?? fallback)
             // The whole answer at once, not the last update before it, while the checks run.
             if streaming { show(surface.answered(asking.answers)) }
             return surface
-        } catch let unfinished as Unfinished<WireSurface.PartiallyGenerated> {
+        } catch let unfinished as Unfinished<Format.PartiallyGenerated> {
             if repairing { throw unfinished }
-            let kept = await salvaged(Surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: unfinished.partial.related != nil)
+            let kept = await salvaged(Format.surface(partial: unfinished.partial, reference: found.first ?? fallback), reason: unfinished.reason, blocksFinished: Format.blocksFinished(unfinished.partial))
             // Finished blocks are worth keeping, and so is a calculation with none, if it has
             // results: the checker gives it its controls and results (Checker.checkBlocks). Inputs
             // alone were kept once, and every repair stopped early too: a page of one slider.
@@ -489,17 +593,20 @@ final class Composer {
 
     // MARK: - Generation
 
-    // A screen has no budget of its own below the server's cap. Providers count thinking against
-    // it, and Grok thinking at low can spend 20,000 tokens on a quadratic: a budget of 20,000 cut
-    // its answer off after 400 characters. Runaways are caught as they start instead: loops by
-    // `isRepeatingItself`, padding by ChatCompletions.Padding.
+    // A screen has no token budget of its own: the model's window is the limit. Runaways are
+    // caught as they start instead, loops by `isRepeatingItself`.
 
     /// Whether writing the screen again might work where this failed: the model looped, padded or
     /// broke its answer with nothing worth keeping, or left it empty. Not when it was stopped, the
     /// safety filter stepped in, or the server refused (sign-in, allowance, a busy model it
     /// already retried).
+    private static func isGuardrail(_ error: LanguageModelError) -> Bool {
+        if case .guardrailViolation = error { return true }
+        return false
+    }
+
     private static func isWorthAnotherTry(_ error: Error) -> Bool {
-        error is Unfinished<WireSurface.PartiallyGenerated> || error is EmptyScreen || error is GeneratedContent.ParsingError
+        error is UnfinishedGeneration || error is EmptyScreen || error is GeneratedContent.ParsingError
     }
 
     private func generate<Content: Generable>(
@@ -514,7 +621,7 @@ final class Composer {
         let started = Date()
         isThinking = true
         let watch = StreamWatch<Content.PartiallyGenerated>()
-        let stream = session.streamResponse(to: prompt, generating: type, options: options)
+        let stream = session.streamResponse(to: prompt, generating: type, options: options, contextOptions: context)
         // The stream is read in its own task so the watchdog below can stop it.
         let reading = Task { @MainActor in
             for try await snapshot in stream {
@@ -533,11 +640,10 @@ final class Composer {
             }
         }
         // A model can stall: nothing new arrives, or tokens keep coming but nothing changes.
-        // Models report activity while they think, so only real silence counts. The server's
-        // heartbeat says the line is open, not that the model is working: it buys a long think,
-        // up to `ceiling`, never a hang. A repair once waited on one for over three minutes.
-        let patience: TimeInterval = 45
-        let ceiling: TimeInterval = 150
+        // Private Cloud Compute reasons before it writes, and tools and the user (a consent card)
+        // count as activity, so only real silence counts, up to `ceiling` for a long think.
+        let patience: TimeInterval = active == .privateCloud ? 90 : 45
+        let ceiling: TimeInterval = 180
         let watchdog = Task { @MainActor in
             while !Task.isCancelled {
                 try? await Task.sleep(for: .milliseconds(500))
@@ -561,6 +667,8 @@ final class Composer {
             }
         } catch where watch.stop == nil {
             note("\(step) stopped after \(elapsed(since: started)) (\(describe(error))).")
+            countGeneration(step.hasPrefix("Repair") ? "repair" : "writing", seconds: Date().timeIntervalSince(started), budget: budget,
+                            output: watch.last?.jsonString.count ?? 0, failed: true)
             // Never keep part of something the safety filter stopped.
             if let modelError = error as? LanguageModelError, case .guardrailViolation = modelError { throw error }
             if let partial = watch.partial, !(error is CancellationError) { throw Unfinished(partial: partial, reason: .cutOff) }
@@ -590,11 +698,11 @@ final class Composer {
         guard let last = watch.last else { throw ComposeError("The model returned nothing.") }
         modelName = active.name
         note("\(step): \(elapsed(since: started)) on \(modelName)")
+        countGeneration(step.hasPrefix("Repair") ? "repair" : "writing", seconds: Date().timeIntervalSince(started), budget: budget, output: last.jsonString.count)
         do {
             return try Content(last)
         } catch {
-            // The answer filled its room before it was done, or turned to padding and was cut
-            // off (ChatCompletions.swift).
+            // The answer filled the model's window before it was done.
             note("\(step) ended before it was finished.")
             if let partial = watch.partial { throw Unfinished(partial: partial, reason: .cutOff) }
             throw error
@@ -622,10 +730,18 @@ final class Composer {
     private func describe(_ error: Error) -> String {
         if let error = error as? LanguageModelError {
             switch error {
-            case .guardrailViolation: return "The model's safety filters blocked this request."
+            case .guardrailViolation: return "Apple's safety filter stopped this page."
             case .contextSizeExceeded: return "This got too big for the model."
             case .rateLimited: return "Too many requests at once. Try again in a moment."
             default: break
+            }
+        }
+        if let error = error as? PrivateCloudComputeLanguageModel.Error {
+            switch error {
+            case .networkFailure: return "Couldn't reach Private Cloud Compute."
+            case .quotaLimitReached: return "Private Cloud Compute is used up for now."
+            case .serviceUnavailable: return "Private Cloud Compute is busy right now."
+            @unknown default: break
             }
         }
         return error.localizedDescription
@@ -651,32 +767,20 @@ final class Composer {
     }
 }
 
-/// When a remote model last sent anything, reasoning included, so a long think isn't taken for a
-/// stall; and when it last did anything but keep the line open.
+/// When the model, a tool or the user last did something while a page is written, so a tool
+/// that takes a while, or a person reading a consent card, isn't taken for a stalled model.
 enum ModelActivity {
     private static let lock = NSLock()
     nonisolated(unsafe) private static var heard = Date.distantPast
-    nonisolated(unsafe) private static var beat = Date.distantPast
 
     /// The model, a tool or the user did something.
     static func touch() {
         lock.withLock { heard = .now }
     }
 
-    /// Dream's server says the line is still open while the model is quiet (Server/src/stream.ts).
-    static func heartbeat() {
-        lock.withLock { beat = .now }
-    }
-
-    /// When anything last arrived, heartbeats included.
-    static var lastSeen: Date {
-        lock.withLock { max(heard, beat) }
-    }
-
-    /// When the model, a tool or the user last did something. Heartbeats don't count.
-    static var lastHeard: Date {
-        lock.withLock { heard }
-    }
+    /// When anything last happened.
+    static var lastSeen: Date { lock.withLock { heard } }
+    static var lastHeard: Date { lastSeen }
 }
 
 /// Lets something happen at most once every so often.
@@ -717,8 +821,11 @@ enum StopReason {
     case cutOff
 }
 
+/// Any generation that stopped before finishing.
+protocol UnfinishedGeneration: Error {}
+
 /// The model stopped before finishing, with what it had written by then.
-struct Unfinished<Partial>: LocalizedError {
+struct Unfinished<Partial>: LocalizedError, UnfinishedGeneration {
     let partial: Partial
     let reason: StopReason
 

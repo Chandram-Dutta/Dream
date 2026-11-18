@@ -80,13 +80,84 @@ enum Analytics {
         }
     }
 
+    /// How a page was made, stage by stage: the level it was made at, and how long each stage
+    /// took. Never what was asked.
+    struct Run: Sendable {
+        /// The run's own id, which ties its model calls together in PostHog's LLM analytics.
+        var trace = UUID().uuidString
+        /// instant, reused, quick, standard or deep (Effort.swift).
+        var level = "standard"
+        /// typed, suggestion, follow_up, explore, voice or launch.
+        var source = "typed"
+        var understoodSeconds: Double?
+        var questions = 0
+        var firstBlockSeconds: Double?
+        var writingSeconds: Double?
+        var repairs = 0
+        var toolCalls = 0
+        var readers = 0
+        var generations = 0
+        var inputTokens = 0
+        var outputTokens = 0
+        var quotaApproaching = false
+
+        var properties: [String: any Sendable] {
+            var properties: [String: any Sendable] = ["level": level, "source": source, "repairs": repairs, "tool_calls": toolCalls,
+                                                      "readers": readers, "generations": generations, "input_tokens": inputTokens,
+                                                      "output_tokens": outputTokens, "quota_approaching": quotaApproaching, "questions": questions,
+                                                      "$ai_trace_id": trace]
+            if let understoodSeconds { properties["understood_seconds"] = Event.rounded(understoodSeconds) }
+            if let firstBlockSeconds { properties["first_block_seconds"] = Event.rounded(firstBlockSeconds) }
+            if let writingSeconds { properties["writing_seconds"] = Event.rounded(writingSeconds) }
+            return properties
+        }
+    }
+
+    /// One call to a model, for PostHog's LLM analytics ($ai_generation): which step, which
+    /// model, how long and roughly how many tokens. Never the prompt or the answer.
+    struct Generation: Sendable {
+        var trace: String
+        /// understanding, writing, repair, reader, follow_up, ideas.
+        var step: String
+        var model: String
+        var seconds: Double
+        var inputTokens: Int
+        var outputTokens: Int
+        var reasoning: String
+        var level: String
+        var failed = false
+    }
+
     enum Event: Sendable {
         case appOpened
         case signedIn
         case signedOut
-        case pageRequested(withPhoto: Bool)
-        case pageBuilt(Shape, model: String, seconds: Double)
-        case pageFailed(Failure, changing: Bool, seconds: Double)
+        case pageRequested(withPhoto: Bool, run: Run? = nil)
+        case pageBuilt(Shape, model: String, seconds: Double, run: Run? = nil)
+        case pageFailed(Failure, changing: Bool, seconds: Double, run: Run? = nil, stage: String = "")
+        /// Understanding the request finished: how long, how many tools it used, how many
+        /// questions it asked, and whether it found anything or knew related pages.
+        case pageUnderstood(seconds: Double, toolCalls: Int, questions: Int, foundSomething: Bool, relatedPages: Int, trace: String)
+        /// The user answered the questions: how many, how many left to Dream, how many Dream
+        /// knew, and how long they took.
+        case questionsAnswered(count: Int, leftToDream: Int, remembered: Int, seconds: Double, trace: String)
+        /// The first block of a page showed, the moment it starts to feel made.
+        case firstBlock(seconds: Double, level: String, trace: String)
+        /// One model call ($ai_generation), one tool call ($ai_span) and a whole page ($ai_trace).
+        case generation(Generation)
+        case toolCall(kind: String, seconds: Double, characters: Int, trace: String, failed: Bool)
+        case pageTrace(trace: String, seconds: Double, level: String, failed: Bool)
+        /// What was typed to a page was taken as a change, as going on from it, or as new.
+        case followUpDecided(kind: String, seconds: Double)
+        case versionRestored
+        case pageStarred(on: Bool)
+        /// A suggestion on home was tapped: which one, and whether they were made from the
+        /// user's own pages.
+        case suggestionTapped(position: Int, personal: Bool)
+        case libraryOpened
+        case mapOpened(pages: Int)
+        /// A linked page was opened from another: from its thread, its related pages or the map.
+        case linkedPageOpened(from: String)
         case pageChanged(Shape, pointedAtBlock: Bool, seconds: Double)
         /// How many times the page's controls were moved while it was open, and how many controls.
         case controlsUsed(changes: Int, controls: Int)
@@ -97,9 +168,6 @@ enum Analytics {
         case connectionAdded(needsSignIn: Bool)
         case toolPromptShown
         case toolPromptAnswered(PromptAnswer)
-        case paywallShown
-        case subscriptionStarted(product: String)
-        case subscriptionEnded
         /// A free allowance ran out: "pages", "tokens" or "searches".
         case limitReached(kind: String)
 
@@ -119,23 +187,58 @@ enum Analytics {
             case .connectionAdded: "connection_added"
             case .toolPromptShown: "tool_prompt_shown"
             case .toolPromptAnswered: "tool_prompt_answered"
-            case .paywallShown: "paywall_shown"
-            case .subscriptionStarted: "subscription_started"
-            case .subscriptionEnded: "subscription_ended"
             case .limitReached: "limit_reached"
+            case .pageUnderstood: "page_understood"
+            case .questionsAnswered: "questions_answered"
+            case .firstBlock: "first_block"
+            case .generation: "$ai_generation"
+            case .toolCall: "$ai_span"
+            case .pageTrace: "$ai_trace"
+            case .followUpDecided: "follow_up_decided"
+            case .versionRestored: "version_restored"
+            case .pageStarred: "page_starred"
+            case .suggestionTapped: "suggestion_tapped"
+            case .libraryOpened: "library_opened"
+            case .mapOpened: "map_opened"
+            case .linkedPageOpened: "linked_page_opened"
             }
         }
 
         var properties: [String: any Sendable] {
             switch self {
-            case .appOpened, .signedIn, .signedOut, .toolPromptShown, .paywallShown, .subscriptionEnded:
+            case .appOpened, .signedIn, .signedOut, .toolPromptShown, .versionRestored, .libraryOpened:
                 return [:]
-            case .pageRequested(let withPhoto):
-                return ["with_photo": withPhoto]
-            case .pageBuilt(let shape, let model, let seconds):
-                return shape.properties.merging(["model": model, "seconds": Self.rounded(seconds)]) { $1 }
-            case .pageFailed(let failure, let changing, let seconds):
-                return ["reason": failure.rawValue, "changing": changing, "seconds": Self.rounded(seconds)]
+            case .pageRequested(let withPhoto, let run):
+                return (run?.properties ?? [:]).merging(["with_photo": withPhoto]) { $1 }
+            case .pageBuilt(let shape, let model, let seconds, let run):
+                return shape.properties.merging(run?.properties ?? [:]) { $1 }.merging(["model": model, "seconds": Self.rounded(seconds)]) { $1 }
+            case .pageFailed(let failure, let changing, let seconds, let run, let stage):
+                return (run?.properties ?? [:]).merging(["reason": failure.rawValue, "changing": changing, "seconds": Self.rounded(seconds), "stage": stage]) { $1 }
+            case .pageUnderstood(let seconds, let toolCalls, let questions, let found, let related, let trace):
+                return ["seconds": Self.rounded(seconds), "tool_calls": toolCalls, "questions": questions, "found_something": found,
+                        "related_pages": related, "$ai_trace_id": trace]
+            case .questionsAnswered(let count, let left, let remembered, let seconds, let trace):
+                return ["count": count, "left_to_dream": left, "remembered": remembered, "seconds": Self.rounded(seconds), "$ai_trace_id": trace]
+            case .firstBlock(let seconds, let level, let trace):
+                return ["seconds": Self.rounded(seconds), "level": level, "$ai_trace_id": trace]
+            case .generation(let call):
+                return ["$ai_trace_id": call.trace, "$ai_span_name": call.step, "$ai_model": call.model, "$ai_provider": "apple",
+                        "$ai_latency": Self.rounded(call.seconds), "$ai_input_tokens": call.inputTokens, "$ai_output_tokens": call.outputTokens,
+                        "$ai_is_error": call.failed, "reasoning": call.reasoning, "level": call.level, "tokens_estimated": true]
+            case .toolCall(let kind, let seconds, let characters, let trace, let failed):
+                return ["$ai_trace_id": trace, "$ai_span_name": kind, "$ai_latency": Self.rounded(seconds), "characters": characters, "$ai_is_error": failed]
+            case .pageTrace(let trace, let seconds, let level, let failed):
+                return ["$ai_trace_id": trace, "$ai_span_name": "page", "$ai_latency": Self.rounded(seconds), "level": level, "$ai_is_error": failed]
+            case .followUpDecided(let kind, let seconds):
+                return ["kind": kind, "seconds": Self.rounded(seconds)]
+            case .pageStarred(let on):
+                return ["on": on]
+            case .suggestionTapped(let position, let personal):
+                return ["position": position, "personal": personal]
+            case .mapOpened(let pages):
+                return ["pages": pages]
+            case .linkedPageOpened(let from):
+                return ["from": from]
             case .pageChanged(let shape, let pointed, let seconds):
                 return shape.properties.merging(["pointed_at_block": pointed, "seconds": Self.rounded(seconds)]) { $1 }
             case .controlsUsed(let changes, let controls):
@@ -150,22 +253,20 @@ enum Analytics {
                 return ["needs_sign_in": needsSignIn]
             case .toolPromptAnswered(let answer):
                 return ["answer": answer.rawValue]
-            case .subscriptionStarted(let product):
-                return ["product": product]
             case .limitReached(let kind):
                 return ["kind": kind]
             }
         }
 
         /// Tenths of a second are plenty, and make durations easier to read in charts.
-        private static func rounded(_ seconds: Double) -> Double {
+        static func rounded(_ seconds: Double) -> Double {
             (seconds * 10).rounded() / 10
         }
     }
 }
 
 /// Switches PostHog can flip without an app update (Dream/Privacy/ProductAnalytics.swift reads
-/// them). None is wired yet. A flag is read only when the user has agreed to help improve Dream;
+/// them). A flag is read only when the user has agreed to help improve Dream;
 /// otherwise, and before flags arrive, each one is its fallback. So a switch that must reach
 /// everyone, like changing the model provider, belongs on Dream's own server instead.
 ///
@@ -186,4 +287,13 @@ struct FeatureFlag: Sendable {
     nonisolated(unsafe) static var source: (@Sendable (_ key: String) -> Bool?)?
 
     var isOn: Bool { Self.source?(key) ?? fallback }
+}
+
+extension FeatureFlag {
+    /// Sums answered by Dream itself, without a model (InstantPage.swift).
+    static let instantPages = FeatureFlag("instant-pages", fallback: true)
+    /// A saved page made again for the same request with other numbers (PageReuse.swift).
+    static let pageReuse = FeatureFlag("page-reuse", fallback: true)
+    /// Calculations with their numbers given, written without understanding first (Effort.swift).
+    static let quickLevel = FeatureFlag("quick-level", fallback: true)
 }

@@ -2,10 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<!-- Notifications from Dream's server (Notifications.swift). Xcode signs App Store and
-	     TestFlight builds for production itself, whatever this says. -->
-	<key>aps-environment</key>
-	<string>development</string>
+	<!-- Pages are written by Apple's larger model on Private Cloud Compute (AppleModels.swift). -->
+	<key>com.apple.developer.private-cloud-compute</key>
+	<true/>
 	<key>com.apple.developer.applesignin</key>
 	<array>
 		<string>Default</string>

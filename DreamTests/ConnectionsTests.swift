@@ -170,6 +170,10 @@ struct ConnectionsTests {
         let tasks = ToolPicker.pick(for: "which tasks are still open in my team notes", from: Connections.lookingTools).map(\.tool.name)
         #expect(tasks.contains("list_tasks"), "a request about tasks gets the task tool")
         #expect(ToolPicker.pick(for: "split a restaurant bill between friends", from: Connections.usableTools).isEmpty, "a bill gets nothing")
+        #expect(ToolPicker.pick(for: "what makes a task hard to estimate", from: Connections.lookingTools).isEmpty,
+                "one word shared with a tool's description isn't enough: \"square root of 420\" once brought in Hugging Face by \"root\"")
+        #expect(!ToolPicker.pick(for: "how many tasks are open in team notes", from: Connections.lookingTools).isEmpty, "naming the service is")
+        #expect(!ToolPicker.pick(for: "how many tasks do I have", from: Connections.lookingTools).isEmpty, "and so is asking about their own")
         for (request, acts) in [("add a task to book the venue", true), ("which tasks are still open", false), ("what's in my team notes", false),
                                 ("save the offsite plan to my notes", true), ("create an issue for the login bug", true), ("my open Linear issues", false)] {
             #expect(ToolPicker.asksToAct(request) == acts, "\"\(request)\" \(acts ? "asks" : "doesn't ask") to do something")
@@ -372,77 +376,5 @@ struct ConnectionsTests {
         let received = try SharedSurface.received(try SharedSurface.encoder.encode(SharedSurface(format: 1, surface: crafted, values: nil, currency: nil, preview: nil)))
         #expect(received.surface.actions?.contains { $0.isConnection } != true, "a shared page can't bring a button for the reader's services")
         #expect(received.surface.sources?.first?.parameters["server"] == nil, "nor a source that would ask them anything")
-    }
-}
-
-// For a page made on Dream's server, the same tools run on the phone (DeviceTools.swift). Here,
-// since they share the connections and the consent answerer with the tests above.
-extension ConnectionsTests {
-    @Test("For a page on the server, a service's tool runs here as it would for a page made here, asking first")
-    func deviceTools() async throws {
-        let notes = TeamNotes(port: 9101)
-        notes.connect()
-        let earlier = Consent.answerer
-        Consent.answerer = .user
-        defer { Consent.answerer = earlier }
-        let consent = Consent()
-        let devices = DeviceTools.offered(for: "which tasks are still open in my team notes", asking: Asking(), consent: consent, live: LiveLog(), log: ConnectionLog())
-        let names = devices.definitions.map(\.name)
-        #expect(names.last == "travel", "travel times, always, as the live tool reads them here")
-        let listing = try #require(names.first { $0.hasSuffix("list_tasks") }, "the service's tools picked for the request: \(names)")
-        let definition = try #require(devices.definitions.first { $0.name == listing })
-        #expect(definition.description.hasPrefix("From Team Notes, a service the user connected."), "described as the phone describes it to a model")
-
-        let asked = Task { await devices.run(DeviceToolCall(id: "call-1", name: listing, arguments: #"{"status": "open"}"#)) }
-        try await Task.sleep(for: .milliseconds(100))
-        #expect(consent.pending?.question == "Let Team Notes look this up?", "asked on the page, at call time")
-        #expect(notes.calls(of: "list_tasks").isEmpty, "and nothing runs before the answer")
-        consent.answer(.once)
-        let once = try #require(await asked.value)
-        #expect(once.id == "call-1" && once.output.contains("What Team Notes returned") && notes.calls(of: "list_tasks") == [.object(["status": .string("open")])])
-        #expect(once.source == nil, "allowed once, it isn't kept current")
-        #expect(await devices.run(DeviceToolCall(id: "call-1", name: listing, arguments: "{}")) == nil, "a call run already isn't run again")
-
-        let withdrawn = Task { await devices.run(DeviceToolCall(id: "call-2", name: listing, arguments: "{}")) }
-        try await Task.sleep(for: .milliseconds(100))
-        #expect(consent.pending != nil)
-        withdrawn.cancel()
-        _ = await withdrawn.value
-        try await Task.sleep(for: .milliseconds(50))
-        #expect(consent.pending == nil && notes.calls(of: "list_tasks").count == 1, "a call the server went past comes off the page, and nothing runs")
-
-        let always = Task { await devices.run(DeviceToolCall(id: "call-3", name: listing, arguments: "{}")) }
-        try await Task.sleep(for: .milliseconds(100))
-        consent.answer(.always)
-        let kept = try #require(await always.value)
-        #expect(kept.source?.kind == Source.connectionKind && kept.source?.name == "listTasks" && kept.source?.fields.isEmpty == false,
-                "allowed always, its source goes with what it returned, for the page to keep current")
-        #expect(kept.output.contains("Dream keeps these current"))
-    }
-
-    @Test("For a page on the server, each service's tool says whether it changes things, as its service does")
-    func deviceToolChanges() throws {
-        let notes = TeamNotes(port: 9102)
-        notes.connect()
-        let request = "add a task to book the venue in my team notes"
-        let devices = DeviceTools.offered(for: request, asking: Asking(), consent: Consent(), live: LiveLog(), log: ConnectionLog())
-        func tool(_ definition: DeviceToolDefinition) -> ConnectedTool? {
-            notes.connection.tools.first { definition.name.hasSuffix($0.name) }
-        }
-        let services = devices.definitions.filter { $0.name != "travel" }
-        #expect(services.contains { tool($0)?.name == "add_task" && $0.changes == true }, "asked to act, the changing tool is offered, and says it changes things: \(services.map(\.name))")
-        #expect(services.allSatisfy { definition in tool(definition).map { definition.changes == $0.readOnlyHint.map { !$0 } } ?? false },
-                "each says what its service's hint says, turned round: false for one that only reads, nothing for one whose service doesn't say")
-        let travel = try #require(devices.definitions.first { $0.name == "travel" })
-        #expect(travel.changes == nil, "a travel time is no service's")
-        let looking = DeviceTools.offered(for: "which tasks are still open in my team notes", asking: Asking(), consent: Consent(), live: LiveLog(), log: ConnectionLog())
-        #expect(!looking.definitions.contains { $0.changes == true }, "asked only to know, nothing that changes things is offered")
-
-        var start = ComposeStart(intent: request, image: nil, page: UUID(), context: [])
-        start.deviceTools = devices.definitions
-        let body = try #require(try JSONSerialization.jsonObject(with: start.body()) as? [String: Any])
-        let sent = try #require(body["deviceTools"] as? [[String: Any]])
-        #expect(sent.first { ($0["name"] as? String)?.hasSuffix("add_task") == true }?["changes"] as? Bool == true, "and the server is told")
-        #expect(sent.first { $0["name"] as? String == "travel" }?.keys.contains("changes") == false, "with nothing said where there's nothing to say")
     }
 }

@@ -4,77 +4,148 @@ import NaturalLanguage
 import Testing
 @testable import Dream
 
-// The generation harness without a model: spotting an answer that has turned to padding, the
-// room thinking gets beside an answer's budget, a repair that restates what the session lost,
-// which server answers are worth asking again, and the language a finished page is labelled
-// with. Whole pages on real models are Tools/bench-many.sh's job.
-
-/// Properties named against the alphabet, to see the declared order survive.
-@Generable
-private struct Declared {
-    var zebra: String
-    var apple: [String]
-    var mango: Int
-    var kiwi: String
-}
+// The generation harness without a model: the iPhone's narrower page, when a page goes to the
+// other Apple model, the stages a request shows, a repair that restates what the session lost,
+// and the language a finished page is labelled with. Whole pages on real models are
+// Tools/bench-many.sh's job.
 
 @Suite("Generation")
 struct GenerationTests {
-    @Test("Padding stops an answer; real JSON never does")
-    func padding() {
-        var json = ChatCompletions.Padding()
-        let page = #"{"title": "Quadratic formula", "inputs": [{"name": "a", "initial": 1, "min": -10, "max": 10, "step": 0.1}],"#
-            + #" "blocks": [{"kind": "paragraph", "text": "$\\pi$ is 3.14159265358979323846264338327950288419716939937510, give or take."}]}"#
-        #expect(json.read(page) == nil, "a page, even one quoting fifty digits of π")
-        var pretty = ChatCompletions.Padding()
-        #expect(pretty.read("{\n" + String(repeating: "  ", count: 40) + "\"title\": \"x\"\n}") == nil, "indentation is fine")
-
-        var blanks = ChatCompletions.Padding()
-        #expect(blanks.read(#"{"title": "Packing list", "collections": ["#) == nil)
-        var stopped: String?
-        for _ in 0..<100 where stopped == nil { stopped = blanks.read("\n\n\n\n\n") }
-        #expect(stopped?.contains("blank") == true, "hundreds of blank characters in a row, even a few at a time")
-
-        var long = ChatCompletions.Padding()
-        let entry = #"{"values": ["Sunscreen", "Beach", "false"]}, "#
-        var ended: String?
-        for _ in 0..<2_000 where ended == nil { ended = long.read(entry) }
-        #expect(ended?.contains("longer than any screen") == true, "an answer longer than any screen, however it's made")
-
-        var pieces = ChatCompletions.Padding()
-        ended = nil
-        for _ in 0..<20_000 where ended == nil { ended = pieces.read(",") }
-        #expect(ended?.contains("longer than any screen") == true, "a loop of one-character pieces too")
-
-        var thinking = ChatCompletions.Padding()
-        #expect(thinking.rethink(String(repeating: "Let me check the list again. ", count: 100)) == nil, "a little thinking once the answer began is fine")
-        ended = nil
-        for _ in 0..<2_000 where ended == nil { ended = thinking.rethink("Wait, maybe add a hat. ") }
-        #expect(ended?.contains("thinking again") == true, "thinking on and on after the answer began is not")
-
-        var digits = ChatCompletions.Padding()
-        #expect(digits.read(#"{"inputs": [{"name": "a", "max": 2.0000000000"#) == nil)
-        #expect(digits.read(String(repeating: "0", count: 40))?.contains("digits") == true, "a number that keeps growing digits")
+    @Test("The iPhone's narrower page becomes the same surface, checked like any other")
+    func onDevicePage() {
+        let wire = DeviceSurface(
+            subject: .money, mode: .use, title: "Bill split", summary: "Each pays ₹600.", symbol: "fork.knife",
+            question: "How much does each person pay?",
+            inputs: [DeviceInput(name: "bill", label: "Bill", role: .adjustable, unit: "", format: .currency, initial: 2400, min: 0, max: 20000, step: 100, options: []),
+                     DeviceInput(name: "people", label: "People", role: .adjustable, unit: "", format: .integer, initial: 4, min: 1, max: 20, step: 1, options: [])],
+            outputs: [DeviceOutput(name: "share", label: "Each pays", unit: "", formula: "bill / people", format: .currency)],
+            blocks: [DeviceBlock(kind: .hero, title: "", text: "", ref: "share", over: "", items: []),
+                     DeviceBlock(kind: .slider, title: "", text: "", ref: "bill", over: "", items: []),
+                     DeviceBlock(kind: .stepper, title: "", text: "", ref: "people", over: "", items: [])],
+            related: ["Tipping customs in India"])
+        var surface = wire.surface(reference: nil)
+        #expect(surface.mode == .use && surface.blocks.map(\.kind) == [.hero, .slider, .stepper])
+        #expect(surface.evaluate(surface.initialValues).values["share"] == 600, "the same engine works out its numbers")
+        #expect(Checker.checkLogic(&surface).filter { $0.kind == .needsModel }.isEmpty, "and the same checker finds nothing to send back")
     }
 
-    @Test("A schema goes out in the order it was declared, the same bytes every time")
-    func schemaOrder() throws {
-        let schema = try JSONSerialization.jsonObject(with: JSONEncoder().encode(Declared.generationSchema))
-        let body: [String: Any] = ["stream": true, "temperature": 0.4, "response_format": ["json_schema": ["schema": schema, "strict": true]]]
-        let sent = try ChatCompletions.ordered(body)
-        let text = String(decoding: sent, as: UTF8.self)
-        let places = ["zebra", "apple", "mango", "kiwi"].compactMap { text.range(of: "\"\($0)\":")?.lowerBound }
-        #expect(places.count == 4 && places == places.sorted(), "properties in the order they were declared, not the alphabet's or a dictionary's")
-        #expect(!text.contains("x-order"), "the ordering extension goes")
-        #expect(try ChatCompletions.ordered(body) == sent, "the same request is the same bytes")
-        let back = try JSONSerialization.jsonObject(with: sent) as? [String: Any]
-        #expect(back?["temperature"] as? Double == 0.4 && back?["stream"] as? Bool == true, "and still JSON that reads back the same")
+    @Test("Tools share what's left of the window, and stop when it's spent")
+    func budget() {
+        let full = ContextBudget.forSession(window: 32_768, instructions: Prompts.surface, schema: WireSurface.generationSchema, tools: [], answer: 30_000, calls: 14)
+        #expect(full.characters > 20_000 && full.characters < 80_000, "PCC's window leaves real room for tools beside the whole brief: \(full.characters)")
+        let small = ContextBudget.forSession(window: 8_192, instructions: Prompts.surfaceOnDevice, schema: DeviceSurface.generationSchema, tools: [], answer: 6_000, calls: 4)
+        #expect(small.characters < full.characters / 2, "the iPhone's window much less")
+
+        let budget = ContextBudget(characters: 40_000, calls: 20)
+        var given: [Int] = []
+        for _ in 0..<10 where budget.mayCall() {
+            let room = budget.allowance()
+            given.append(room)
+            budget.spend(room)
+        }
+        #expect(given.first == 8_000, "a first result gets up to the most")
+        #expect(given == given.sorted(by: >), "each later one less, as many fetched at once: \(given)")
+        #expect(given.reduce(0, +) <= 40_000 + ContextBudget.smallest, "never much past the budget")
+        #expect(!budget.mayCall(), "and once it's spent, no more calls")
+
+        let few = ContextBudget(characters: 100_000, calls: 2)
+        #expect(few.mayCall() && few.mayCall() && !few.mayCall(), "calls are counted too")
     }
 
-    @Test("Thinking gets room beside an answer's budget")
-    func thinkingRoom() {
-        #expect(ChatCompletions.thinkingRoom("none") > 0 && ChatCompletions.thinkingRoom("none") == ChatCompletions.thinkingRoom("low"), "never none, since the server may raise the level")
-        #expect(ChatCompletions.thinkingRoom("high") > ChatCompletions.thinkingRoom("medium") && ChatCompletions.thinkingRoom("medium") > ChatCompletions.thinkingRoom("low"), "more for longer thinking")
+    @Test("A long result keeps its opening and the parts about the request")
+    func excerpt() {
+        let filler = (1...200).map { "Line \($0) about the office plants and the coffee rota." }
+        let page = (["Hyena Dart — project notes", "Owner: Chandram"] + filler.prefix(100) + ["GTM plan: launch in Bengaluru first, with campus ambassadors and a waitlist."] + filler.suffix(100)).joined(separator: "\n")
+        let kept = Excerpt.focused(page, on: "check my hyena dart gtm notes", limit: 1_500)
+        #expect(kept.count <= 1_700)
+        #expect(kept.hasPrefix("Hyena Dart — project notes"), "the opening says what it is")
+        #expect(kept.contains("GTM plan: launch in Bengaluru"), "and the part asked about, from the middle")
+        #expect(kept.contains("[…]"), "with the gaps marked")
+        #expect(Excerpt.focused("short", on: "anything", limit: 100) == "short")
+    }
+
+    @Test("A long result is read apart, and only notes on it come back")
+    func reader() async {
+        let page = (1...400).map { "Line \($0) of a long Notion page about the launch." }.joined(separator: "\n")
+        let asked = Asked()
+        let reading = ContextBudget(characters: 40_000, calls: 10, reader: ResultReader { text, source, focus, limit in
+            await asked.record(text.count, limit)
+            return "Launch: 12 March, Bengaluru first (id 1f2e)."
+        })
+        let notes = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit(page, from: "Notion's fetch", looking: "launch date", limit: 2_000)
+        }
+        #expect(notes.contains("Launch: 12 March") && notes.count < 300, "the writer gets the notes, not the page")
+        let calls = await asked.calls, limits = await asked.limits
+        #expect(calls == [page.count] && (limits.first ?? 0) <= 2_000, "the reader got all of it, and the room for notes")
+
+        let short = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit("A short answer.", from: "Notion", looking: "", limit: 2_000)
+        }
+        let after = await asked.calls.count
+        #expect(short == "A short answer." && after == 1, "what fits isn't read apart")
+
+        let web = await ContextBudget.$current.withValue(reading) {
+            await ContextBudget.fit(page, from: "a web page", looking: "launch", limit: 2_000, readsApart: false)
+        }
+        let afterWeb = await asked.calls.count
+        #expect(afterWeb == 1 && web.contains("The parts about it"), "a web page, already cut by the server, isn't read apart")
+
+        let failing = ContextBudget(characters: 40_000, calls: 10, reader: ResultReader { _, _, _, _ in throw DeadlinePassed() })
+        let cut = await ContextBudget.$current.withValue(failing) {
+            await ContextBudget.fit(page, from: "Notion", looking: "launch", limit: 2_000)
+        }
+        #expect(cut.count <= 2_100 && cut.contains("The parts about it"), "a reader that fails leaves the parts about the request")
+        #expect(failing.readerGaveUp, "and the rest of the session doesn't wait on another")
+    }
+
+    @Test("Search results go by ids, so only pages read have addresses to cite")
+    func searchIDs() {
+        let log = WebLog()
+        log.start()
+        let first = log.listed("https://example.com/a")
+        let second = log.listed("https://example.org/b")
+        #expect(first == "s1" && second == "s2")
+        #expect(log.listed("https://example.com/a") == "s1", "the same page keeps its id")
+        #expect(log.address(of: "s2") == "https://example.org/b" && log.address(of: " S1.") == "https://example.com/a")
+        #expect(log.address(of: "s9") == nil)
+        log.start()
+        #expect(log.address(of: "s1") == nil, "a new request starts afresh")
+    }
+
+    @Test("Readers take turns, a few at a time")
+    func gate() async throws {
+        let gate = TakingTurns(width: 2)
+        let counter = Asked()
+        try await withThrowingTaskGroup(of: Void.self) { group in
+            for _ in 0..<6 {
+                group.addTask {
+                    try await gate.run {
+                        await counter.enter()
+                        try await Task.sleep(for: .milliseconds(20))
+                        await counter.leave()
+                    }
+                }
+            }
+            try await group.waitForAll()
+        }
+        let most = await counter.most
+        #expect(most == 2)
+    }
+
+    @Test("A page goes to the other Apple model only when that might help")
+    func otherModel() {
+        #expect(AppleModels.isWorthTheOtherModel(PrivateCloudComputeLanguageModel.Error.networkFailure(.init(debugDescription: "offline"))), "PCC out of reach: the iPhone writes it")
+        #expect(AppleModels.isWorthTheOtherModel(PrivateCloudComputeLanguageModel.Error.quotaLimitReached(.init(debugDescription: "used up"))), "PCC's share used up for now")
+        #expect(!AppleModels.isWorthTheOtherModel(CancellationError()), "not when the user stopped it")
+    }
+
+    @Test("Each stage of a request says whose turn it is")
+    func stages() {
+        let working: [Stage] = [.understanding, .researching, .writing, .checking]
+        let waiting: [Stage] = [.yourTurn, .done, .failed]
+        #expect(working.filter(\.isDreamsTurn).count == working.count)
+        #expect(waiting.filter(\.isDreamsTurn).isEmpty)
     }
 
     @Test("A repair restates the request when the session lost it")
@@ -92,20 +163,6 @@ struct GenerationTests {
         #expect(restated.contains("share: \"Each pays\"") && restated.contains("uses 'bill'"), "then the screen so far and its problems")
     }
 
-    @Test("Only a busy or silent model is asked again")
-    func transient() {
-        func error(_ status: Int, _ body: String, retryAfter: String? = nil) -> DreamServiceError {
-            let response = HTTPURLResponse(url: URL(string: "https://dream.example/api/model")!, statusCode: status, httpVersion: nil, headerFields: retryAfter.map { ["Retry-After": $0] })!
-            return DreamServiceError(response: response, body: Data(body.utf8))
-        }
-        #expect(error(502, #"{"error":"The model didn't answer. Try again in a moment."}"#).isTransient, "a model that didn't answer")
-        #expect(error(503, #"{"error":"The model is busy. Try again in a moment."}"#, retryAfter: "20").isTransient, "a busy model")
-        #expect(!error(503, #"{"error":"Dream's model isn't set up on this server yet."}"#).isTransient, "not a server that isn't set up")
-        #expect(!error(503, #"{"error":"Dream is very busy today.","reason":"allowance"}"#, retryAfter: "3600").isTransient, "not a spent budget")
-        #expect(!error(429, #"{"error":"You've used today's allowance.","reason":"allowance"}"#, retryAfter: "3600").isTransient, "not a used-up allowance")
-        #expect(!error(400, #"{"error":"The model couldn't take that request."}"#).isTransient, "not a request the model refused")
-    }
-
     @Test("A page is labelled with the request's language when the text leaves it in the running")
     func pageLanguage() {
         var page = Surface(title: "होम लोन EMI", summary: "50 लाख के होम लोन पर 20 साल की EMI सालाना ब्याज दर से निकलती है।", symbol: "", accent: .blue, inputs: [], outputs: [], blocks: [], related: [], reference: nil)
@@ -116,5 +173,27 @@ struct GenerationTests {
         spanish.summary = "Calcula la propina y cómo dividir la cuenta entre todos los que comieron."
         spanish.blocks[0].text = "Con una cuenta de 850 pesos y una propina del quince por ciento, cada persona paga su parte del total."
         #expect(Languages.of(spanish, likely: "en") == .spanish, "a page written in another language than asked is still read as what it is")
+    }
+}
+
+/// What a test reader was asked, and how many ran at once.
+private actor Asked {
+    var calls: [Int] = []
+    var limits: [Int] = []
+    var now = 0
+    var most = 0
+
+    func record(_ count: Int, _ limit: Int) {
+        calls.append(count)
+        limits.append(limit)
+    }
+
+    func enter() {
+        now += 1
+        most = max(most, now)
+    }
+
+    func leave() {
+        now -= 1
     }
 }

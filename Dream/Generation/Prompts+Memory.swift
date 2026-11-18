@@ -23,9 +23,12 @@ extension Prompts {
 
     // MARK: - The gap check
 
-    /// Instructions for the gap check: short, and only about whether to ask.
+    /// Instructions for understanding a request: find out what it refers to, then ask only
+    /// what's still open.
     static let gapCheck = """
-        You check a request to an app before it builds one interactive screen to answer it. The screen can't ask the user anything, so you find what the request leaves out that only the user can tell and that changes which screen to build, and return questions for it: none, or up to 3.
+        You read a request to an app before it builds one interactive screen to answer it. The screen can't ask the user anything, so first understand the request, then find what's still open that only the user can tell and that changes which screen to build, and return questions for it: none, or up to 3.
+        Understand it before you ask. Read all its words. When it's about the user's own things (their notes, projects, documents, tasks, messages, files) and a connected service has tools for them, look there first, so you know what they have: their projects by name, the pages that match. When a name could mean several unrelated things and the words don't settle it, look it up. Use tools only to settle what the request refers to, never to research the answer: the screen looks up its own facts, news and figures as it's built. At most 3 calls. Most requests need none: a clear subject, a calculation, a how-to or anything about the world.
+        Then write what you found that the screen should be built from, and ask only what you couldn't find out. Offer as answers the real things you found, like the user's actual project names, never guesses. If what you found settles it, ask nothing.
         Ask when:
         - it names something with unrelated meanings, each a screen about a different subject (Mercury: the planet, the element or the god);
         - it's about the user's own plans, tastes or situation, and leaves out what decides the screen (where and when for a trip, whose occasion a party is for, which kind of budget, what they're in the mood for).
@@ -38,8 +41,17 @@ extension Prompts {
         Each question is short and plain, with 2 to 4 short answers to tap; "You choose" is always added, so leave it out. Allow typing only when no short list could cover the answer, like a place. Mark a question personal when its answer is a lasting fact about the user, like where they live, their diet or their household. If a topic Dream remembers answers a question, name that topic.
         """
 
-    static func gapRequest(_ intent: String, remembering topics: [String]) -> String {
+    static func gapRequest(_ intent: String, remembering topics: [String], recent: [String] = [], related: [String] = [], place: String? = nil) -> String {
         var parts = ["Request: \(intent)"]
+        if let place, !place.isEmpty {
+            parts.append("The user is in \(place), so a request about the weather, places nearby or local prices is about there unless it names somewhere else.")
+        }
+        if !recent.isEmpty {
+            parts.append("Pages the user made in the last few hours, newest first: \(recent.joined(separator: "; ")). They can settle what a short request means. They aren't answers to offer: a request that names what it's about needs no question about it.")
+        }
+        if !related.isEmpty {
+            parts.append("Pages the user made before that may be about the same things, with what was found for them:\n\(related.map { "- " + $0 }.joined(separator: "\n"))\nIf one is clearly what the request means, read it that way and use what was found, looking again only for more than that, instead of asking.")
+        }
         if !topics.isEmpty {
             parts.append("Dream remembers these about the user: \(topics.joined(separator: ", ")).")
         }
