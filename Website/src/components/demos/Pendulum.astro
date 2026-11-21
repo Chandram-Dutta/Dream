@@ -36,7 +36,7 @@ const worlds = [
       <span class="thumb" aria-hidden="true"></span>
       {
         worlds.map((world, index) => (
-          <button type="button" role="radio" aria-checked={index === 0 ? "true" : "false"} data-world={world.id}>
+          <button type="button" role="radio" aria-checked={index === 0 ? "true" : "false"} tabindex={index === 0 ? 0 : -1} data-world={world.id}>
             {world.name}
           </button>
         ))

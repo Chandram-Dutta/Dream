@@ -213,14 +213,40 @@ function pendulum(page: HTMLElement, units: Units): Controller {
   };
 
   slider.addEventListener("input", update);
-  worlds.addEventListener("click", (event) => {
-    const button = (event.target as Element).closest<HTMLButtonElement>("[data-world]");
-    if (!button) return;
-    const buttons = [...worlds.querySelectorAll<HTMLButtonElement>("[data-world]")];
+  const buttons = [...worlds.querySelectorAll<HTMLButtonElement>("[data-world]")];
+  const select = (button: HTMLButtonElement) => {
     world = button.dataset.world as World;
-    for (const each of buttons) each.setAttribute("aria-checked", String(each === button));
+    for (const each of buttons) {
+      each.setAttribute("aria-checked", String(each === button));
+      each.tabIndex = each === button ? 0 : -1;
+    }
     worlds.style.setProperty("--at", String(buttons.indexOf(button)));
     update();
+  };
+  worlds.addEventListener("click", (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>("[data-world]");
+    if (button) select(button);
+  });
+  worlds.addEventListener("keydown", (event) => {
+    const button = (event.target as Element).closest<HTMLButtonElement>("[data-world]");
+    if (!button) return;
+    let step: number;
+    switch (event.key) {
+      case "ArrowRight":
+      case "ArrowDown":
+        step = 1;
+        break;
+      case "ArrowLeft":
+      case "ArrowUp":
+        step = -1;
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    const next = buttons[(buttons.indexOf(button) + step + buttons.length) % buttons.length];
+    select(next);
+    next.focus();
   });
   new IntersectionObserver(([entry]) => {
     onScreen = entry.isIntersecting;
@@ -239,4 +265,3 @@ function pendulum(page: HTMLElement, units: Units): Controller {
     },
   };
 }
-
