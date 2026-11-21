@@ -101,7 +101,7 @@ async function startLocal(stub, xai, clef) {
     // Pages made on the server ask the stand-in model (src/compose/fake.ts); /api/model never does.
     "MODEL_FAKE:1",
   ].flatMap((pair) => ["--var", pair]);
-  const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
+  const child = spawn("npx", ["wrangler", "dev", "--local", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
     const watch = (chunk) => {
