@@ -7,8 +7,9 @@ Ask for anything, and Dream makes a page that explains it, calculates it, or bot
 Built by Chandram Dutta. Dream is an iOS app, not a chat interface. A request becomes a
 page you can read, change and use again.
 
-<!-- TODO: Record an app demo and add it at docs/media/demo.gif. -->
-![Dream app demo (TODO: add recording)](docs/media/demo.gif)
+![Dream's web demos: exploring the horizon, splitting a bill and changing a pendulum's gravity](docs/media/demo.gif)
+
+*The [web demo](https://dream.onlychan.xyz), recorded in a browser.*
 
 ## A few requests
 
