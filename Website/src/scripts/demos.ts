@@ -153,7 +153,7 @@ function groceries(page: HTMLElement): Controller {
     if (list.children.length === maxItems) {
       if (document.activeElement === input) button.focus();
       form.hidden = true;
-      limit.textContent = `Demo limit: ${maxItems} items.`;
+      limit.textContent = `List full. This demo holds up to ${maxItems} items.`;
     }
   });
   return {

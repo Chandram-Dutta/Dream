@@ -578,6 +578,15 @@ html:not(.js) .aura,
   transition: transform 0.35s var(--snappy);
 }
 
+.check:focus-visible {
+  outline: none;
+}
+
+.check:focus-visible .box {
+  outline: 2px solid var(--accent-ink);
+  outline-offset: 3px;
+}
+
 .check[aria-pressed="true"] .box {
   background: linear-gradient(135deg, var(--accent), var(--companion));
   box-shadow: none;
@@ -602,14 +611,14 @@ html:not(.js) .aura,
 
 .add {
   margin-top: -14px;
-  padding: 10px 0;
-  box-shadow: inset 0 0.5px 0 var(--line);
 }
 
 .add form:not([hidden]) {
   display: flex;
   align-items: center;
   gap: 16px;
+  padding: 10px 0;
+  box-shadow: inset 0 0.5px 0 var(--line);
 }
 
 .add .plus {
@@ -635,19 +644,36 @@ html:not(.js) .aura,
   color: var(--ink-2);
 }
 
-.add-limit {
-  color: var(--ink-2);
-  font-size: var(--t-lead);
-}
-
-.add-limit:not(:empty) {
-  padding: 4px 0;
-}
-
-.add:focus-within {
+.add form:not([hidden]):focus-within {
   box-shadow:
     inset 0 0.5px 0 var(--line),
     inset 0 -2px 0 var(--accent);
+}
+
+.add-limit {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: var(--t-small);
+  font-weight: 550;
+}
+
+.add-limit svg {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  color: var(--accent-ink);
+}
+
+.add form:not([hidden]) + .add-limit svg {
+  display: none;
+}
+
+.add form[hidden] + .add-limit {
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: var(--wash);
+  box-shadow: inset 0 0 0 0.5px var(--edge);
 }
 
 .note {
