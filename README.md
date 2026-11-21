@@ -9,6 +9,8 @@ page you can read, change and use again.
 
 ![Dream's web demos: exploring the horizon, splitting a bill and changing a pendulum's gravity](docs/media/demo.gif)
 
+*The [web demo](https://dream.onlychan.xyz), recorded in a browser.*
+
 ## A few requests
 
 | Ask | The page |
