@@ -348,7 +348,7 @@ async function startLocal(apns) {
     `APNS_TEAM_ID:${TEAM_ID}`,
     `APNS_BASE_URL:${apns.base}`,
   ].flatMap((pair) => ["--var", pair]);
-  const child = spawn("npx", ["wrangler", "dev", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
+  const child = spawn("npx", ["wrangler", "dev", "--local", "--port", String(port), "--ip", "127.0.0.1", ...vars], { cwd: root, env, stdio: ["ignore", "pipe", "pipe"] });
   await new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("wrangler dev didn't start in 60 s")), 60_000);
     const watch = (chunk) => {
