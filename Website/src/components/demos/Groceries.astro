@@ -26,9 +26,12 @@ const left = GROCERIES.filter((item) => !item.done).length;
       ))
     }
   </ul>
-  <form class="add form" style="--i: 2" data-add>
-    <span class="plus" aria-hidden="true">+</span>
-    <input type="text" name="item" placeholder="Add something" aria-label="Add something to the list" maxlength="40" autocomplete="off" enterkeyhint="done" />
-  </form>
+  <div class="add form" style="--i: 2">
+    <form data-add>
+      <span class="plus" aria-hidden="true">+</span>
+      <input type="text" name="item" placeholder="Add something" aria-label="Add something to the list" maxlength="40" autocomplete="off" enterkeyhint="done" />
+    </form>
+    <p class="add-limit" role="status" data-out="limit"></p>
+  </div>
   <p class="note form" style="--i: 3">Lists stay with your pages, on every iPhone you sign in on.</p>
 </article>

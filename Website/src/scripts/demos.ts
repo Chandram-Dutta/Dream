@@ -116,8 +116,10 @@ function bill(page: HTMLElement, units: Units): Controller {
 }
 
 function groceries(page: HTMLElement): Controller {
+  const maxItems = 10;
   const list = find<HTMLUListElement>(page, "[data-list]");
   const left = find(page, '[data-out="left"]');
+  const limit = find(page, '[data-out="limit"]');
   const form = find<HTMLFormElement>(page, "[data-add]");
   const input = find<HTMLInputElement>(form, "input");
   let touched = false;
@@ -137,7 +139,7 @@ function groceries(page: HTMLElement): Controller {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
     const name = input.value.trim();
-    if (!name || list.children.length >= 10) return;
+    if (!name || list.children.length >= maxItems) return;
     touched = true;
     const item = list.firstElementChild?.cloneNode(true) as HTMLLIElement;
     const button = item.querySelector<HTMLButtonElement>(".check");
@@ -148,6 +150,11 @@ function groceries(page: HTMLElement): Controller {
     list.append(item);
     input.value = "";
     count();
+    if (list.children.length === maxItems) {
+      if (document.activeElement === input) button.focus();
+      form.hidden = true;
+      limit.textContent = `Demo limit: ${maxItems} items.`;
+    }
   });
   return {
     shown() {
